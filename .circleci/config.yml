@@ -70,7 +70,9 @@ jobs:
         - *accept_licenses
         - run:
             name: Download dependencies
-            command: ./gradlew androidDependencies
+            command: |
+                sudo chmod +x gradlew
+                ./gradlew androidDependencies
         - *save_cache
         - run:
             name: Run code quality checks
@@ -95,7 +97,9 @@ jobs:
         - *accept_licenses
         - run:
             name: Download dependencies
-            command: ./gradlew androidDependencies
+            command: |
+                sudo chmod +x gradlew
+                ./gradlew androidDependencies
         - *save_cache
         - run:
             name: Run unit tests
