@@ -35,14 +35,6 @@ references:
         - share_app/build/outputs/apk
         - share_app/build/outputs/code-coverage
         - share_app/build/test-results
-  attach_firebase_workspace: &attach_firebase_workspace
-    attach_workspace:
-      at: *workspace
-  persist_firebase_workspace: &persist_firebase_workspace
-    persist_to_workspace:
-      root: *workspace
-      paths:
-        - firebase
 
   ## Docker image configurations
 
