@@ -15,7 +15,6 @@ import java.lang.reflect.Method;
 
 public class WifiHotspot {
 
-    private Context context;
     private Method getWifiApConfig;
     private Method setWifiApEnable;
     private Method setWifiApConfig;
@@ -28,9 +27,7 @@ public class WifiHotspot {
     private static final String TAG = WifiHotspot.class.getClass().getName();
 
     public WifiHotspot(Context context) {
-        this.context = context;
         wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        Method[] methods = wifiManager.getClass().getMethods();
         for (Method method : wifiManager.getClass().getMethods()) {
             switch (method.getName()) {
                 case "isWifiApEnabled" :

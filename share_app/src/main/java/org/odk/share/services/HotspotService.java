@@ -64,7 +64,7 @@ public class HotspotService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        switch (intent.getAction()){
+        switch (intent.getAction()) {
             case ACTION_START:
                 wifiHotspot.enableHotspot();
                 state.sendEmptyMessage(START);
