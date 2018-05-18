@@ -64,22 +64,22 @@ public class HotspotService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        String action = intent.getAction();
-
-        if (action.equals(ACTION_START)) {
-            wifiHotspot.enableHotspot();
-            state.sendEmptyMessage(START);
-        } else if (action.equals(ACTION_STOP)) {
-            stopHotspot();
-        } else if (action.equals(ACTION_STATUS)) {
-            if (state == null) {
-                state = new HotspotState(this);
-            } else {
-                state.removeMessages(STATUS);
-            }
-            state.sendEmptyMessageDelayed(STATUS, notify_sec);
+        switch (intent.getAction()){
+            case ACTION_START:
+                wifiHotspot.enableHotspot();
+                state.sendEmptyMessage(START);
+                break;
+            case ACTION_STOP:
+                stopHotspot();
+                break;
+            case ACTION_STATUS:
+                if (state == null) {
+                    state = new HotspotState(this);
+                } else {
+                    state.removeMessages(STATUS);
+                }
+                state.sendEmptyMessageDelayed(STATUS, notify_sec);
         }
-
         return START_NOT_STICKY;
     }
 

@@ -15,38 +15,38 @@ import java.lang.reflect.Method;
 
 public class WifiHotspot {
 
-    Context context;
-    Method getWifiApConfig;
-    Method setWifiApEnable;
-    Method setWifiApConfig;
-    Method isWifiApEnabled;
-    Method getWifiApState;
-    WifiManager wifiManager;
-    WifiConfiguration lastConfig;
-    WifiConfiguration currConfig;
+    private Context context;
+    private Method getWifiApConfig;
+    private Method setWifiApEnable;
+    private Method setWifiApConfig;
+    private Method isWifiApEnabled;
+    private Method getWifiApState;
+    private WifiManager wifiManager;
+    private WifiConfiguration lastConfig;
+    private WifiConfiguration currConfig;
     private static final String ssid = "ODK-Share";
     private static final String TAG = WifiHotspot.class.getClass().getName();
 
     public WifiHotspot(Context context) {
         this.context = context;
-        wifiManager = (WifiManager) context.getApplicationContext().getSystemService(context.WIFI_SERVICE);
+        wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         Method[] methods = wifiManager.getClass().getMethods();
-        for (int i = 0; i < methods.length; i++) {
-            switch (methods[i].getName()) {
+        for (Method method : wifiManager.getClass().getMethods()) {
+            switch (method.getName()) {
                 case "isWifiApEnabled" :
-                    isWifiApEnabled = methods[i];
+                    isWifiApEnabled = method;
                     break;
                 case "setWifiApEnabled":
-                    setWifiApEnable = methods[i];
+                    setWifiApEnable = method;
                     break;
                 case "getWifiApState":
-                    getWifiApState = methods[i];
+                    getWifiApState = method;
                     break;
                 case "getWifiApConfiguration":
-                    getWifiApConfig = methods[i];
+                    getWifiApConfig = method;
                     break;
                 case "setWifiApConfiguration":
-                    setWifiApConfig = methods[i];
+                    setWifiApConfig = method;
             }
         }
     }
