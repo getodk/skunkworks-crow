@@ -30,4 +30,6 @@ dependencies {
     // butterknife
     implementation "com.jakewharton:butterknife:${rootProject.butterknifeVersion}"
     annotationProcessor "com.jakewharton:butterknife-compiler:${rootProject.butterknifeVersion}"
+
+    implementation "com.jakewharton.timber:timber:4.7.0"
 }

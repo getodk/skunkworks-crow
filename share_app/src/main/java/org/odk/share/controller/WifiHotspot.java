@@ -4,10 +4,11 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
-import android.util.Log;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
+import timber.log.Timber;
 
 /**
  * Created by laksh on 5/17/2018.
@@ -24,7 +25,6 @@ public class WifiHotspot {
     private WifiConfiguration lastConfig;
     private WifiConfiguration currConfig;
     private static final String ssid = "ODK-Share";
-    private static final String TAG = WifiHotspot.class.getClass().getName();
 
     public WifiHotspot(Context context) {
         wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
@@ -61,9 +61,9 @@ public class WifiHotspot {
                 return (WifiConfiguration) obj;
             }
         } catch (IllegalAccessException e) {
-            Log.e(TAG, e.getMessage());
+            Timber.e(e);
         } catch (InvocationTargetException e) {
-            Log.e(TAG, e.getMessage());
+            Timber.e(e);
         }
         return null;
     }
@@ -76,9 +76,9 @@ public class WifiHotspot {
                 return false;
             }
         } catch (IllegalAccessException e) {
-            Log.e(TAG, e.getMessage());
+            Timber.e(e);
         } catch (InvocationTargetException e) {
-            Log.e(TAG, e.getMessage());
+            Timber.e(e);
         }
         return (Boolean) obj;
     }
@@ -91,9 +91,9 @@ public class WifiHotspot {
                 return obj;
             }
         } catch (IllegalAccessException e) {
-            Log.e(TAG, e.getMessage());
+            Timber.e(e);
         } catch (InvocationTargetException e) {
-            Log.e(TAG, e.getMessage());
+            Timber.e(e);
         }
         return null;
     }
@@ -119,9 +119,9 @@ public class WifiHotspot {
                 return (Boolean) obj;
             }
         } catch (IllegalAccessException e) {
-            Log.e(TAG, e.getMessage());
+            Timber.e(e);
         } catch (InvocationTargetException e) {
-            Log.e(TAG, e.getMessage());
+            Timber.e(e);
         }
         return false;
     }
@@ -144,7 +144,7 @@ public class WifiHotspot {
             method.setAccessible(true);
             enabled = (Boolean) method.invoke(cm);
         } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
+            Timber.e(e);
         }
         return enabled;
     }
