@@ -38,6 +38,8 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:layout_gravity="center_vertical"/>
+        android:layout_gravity="center_vertical"
+        android:clickable="false"
+        android:focusable="false"/>
 
 </RelativeLayout>

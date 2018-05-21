@@ -13,6 +13,8 @@ import android.widget.TextView;
 import org.odk.share.R;
 import org.odk.share.provider.InstanceProviderAPI;
 
+import java.util.LinkedHashSet;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -24,10 +26,15 @@ public class InstanceAdapter extends RecyclerView.Adapter<InstanceAdapter.Instan
 
     private Cursor cursor;
     private Context context;
+    private final OnItemClickListener listener;
+    private LinkedHashSet<Long> selectedInstances;
 
-    public InstanceAdapter(Context context, Cursor cursor) {
+    public InstanceAdapter(Context context, Cursor cursor, OnItemClickListener listener,
+                           LinkedHashSet<Long> selectedInstances) {
         this.context = context;
         this.cursor = cursor;
+        this.listener = listener;
+        this.selectedInstances = selectedInstances;
     }
 
     @Override
@@ -38,9 +45,17 @@ public class InstanceAdapter extends RecyclerView.Adapter<InstanceAdapter.Instan
 
     @Override
     public void onBindViewHolder(@NonNull InstanceHolder holder, int position) {
-        cursor.moveToPosition(position);
+        cursor.moveToPosition(holder.getAdapterPosition());
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onItemClick(v, holder.getAdapterPosition());
+            }
+        });
         holder.title.setText(cursor.getString(cursor.getColumnIndex(InstanceProviderAPI.InstanceColumns.DISPLAY_NAME)));
         holder.subtitle.setText(cursor.getString(cursor.getColumnIndex(InstanceProviderAPI.InstanceColumns.DISPLAY_SUBTEXT)));
+        long id = cursor.getLong(cursor.getColumnIndex(InstanceProviderAPI.InstanceColumns._ID));
+        holder.checkBox.setChecked(selectedInstances.contains(id));
     }
 
     @Override
@@ -48,15 +63,23 @@ public class InstanceAdapter extends RecyclerView.Adapter<InstanceAdapter.Instan
         return cursor.getCount();
     }
 
-    class InstanceHolder extends RecyclerView.ViewHolder {
+    public class InstanceHolder extends RecyclerView.ViewHolder {
 
-        @BindView(R.id.tvTitle) TextView title;
-        @BindView(R.id.tvSubtitle) TextView subtitle;
-        @BindView(R.id.checkbox) CheckBox checkBox;
+        @BindView(R.id.tvTitle) public TextView title;
+        @BindView(R.id.tvSubtitle) public TextView subtitle;
+        @BindView(R.id.checkbox) public CheckBox checkBox;
 
         InstanceHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
         }
+    }
+
+    public Cursor getCursor() {
+        return cursor;
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(View v, int position);
     }
 }
