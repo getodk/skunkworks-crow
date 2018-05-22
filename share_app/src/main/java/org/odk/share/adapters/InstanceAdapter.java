@@ -37,8 +37,9 @@ public class InstanceAdapter extends RecyclerView.Adapter<InstanceAdapter.Instan
         this.selectedInstances = selectedInstances;
     }
 
+    @NonNull
     @Override
-    public InstanceHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public InstanceHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.list_item_checkbox, null);
         return new InstanceHolder(view);
     }
@@ -63,7 +64,7 @@ public class InstanceAdapter extends RecyclerView.Adapter<InstanceAdapter.Instan
         return cursor.getCount();
     }
 
-    public class InstanceHolder extends RecyclerView.ViewHolder {
+    static class InstanceHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.tvTitle) public TextView title;
         @BindView(R.id.tvSubtitle) public TextView subtitle;
