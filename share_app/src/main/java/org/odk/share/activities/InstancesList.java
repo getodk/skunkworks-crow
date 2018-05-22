@@ -2,6 +2,7 @@ package org.odk.share.activities;
 
 
 import android.database.Cursor;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -58,13 +59,14 @@ public class InstancesList extends AppCompatActivity implements LoaderManager.Lo
     }
 
 
+    @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         return new InstancesDao().getSavedInstancesCursorLoader(SORT_BY_NAME_ASC);
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
         cursor.moveToFirst();
         instanceAdapter = new InstanceAdapter(this, cursor, this::onListItemClick, selectedInstances);
         recyclerView.setAdapter(instanceAdapter);
@@ -78,7 +80,7 @@ public class InstancesList extends AppCompatActivity implements LoaderManager.Lo
 
 
     @Override
-    public void onLoaderReset(Loader loader) {
+    public void onLoaderReset(@NonNull Loader loader) {
 
     }
 
