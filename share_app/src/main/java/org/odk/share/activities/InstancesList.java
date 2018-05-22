@@ -37,6 +37,8 @@ public class InstancesList extends AppCompatActivity implements LoaderManager.Lo
     protected static final String SORT_BY_NAME_ASC
             = InstanceProviderAPI.InstanceColumns.DISPLAY_NAME + " COLLATE NOCASE ASC";
 
+    private static final String SELECTED_INSTANCES = "selectedInstances";
+
     private static final int INSTANCE_LOADER = 1;
     private InstanceAdapter instanceAdapter;
     private LinkedHashSet<Long> selectedInstances;
@@ -55,9 +57,25 @@ public class InstancesList extends AppCompatActivity implements LoaderManager.Lo
         LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(llm);
-        getSupportLoaderManager().initLoader(INSTANCE_LOADER, null, this);
     }
 
+    @Override
+    protected void onResume() {
+        getSupportLoaderManager().initLoader(INSTANCE_LOADER, null, this);
+        super.onResume();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable(SELECTED_INSTANCES, selectedInstances);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle state) {
+        super.onRestoreInstanceState(state);
+        selectedInstances = (LinkedHashSet<Long>) state.getSerializable(SELECTED_INSTANCES);
+    }
 
     @NonNull
     @Override

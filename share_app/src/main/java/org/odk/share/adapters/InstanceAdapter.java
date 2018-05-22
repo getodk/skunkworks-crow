@@ -64,6 +64,16 @@ public class InstanceAdapter extends RecyclerView.Adapter<InstanceAdapter.Instan
         return cursor.getCount();
     }
 
+
+
+    public Cursor getCursor() {
+        return cursor;
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(View v, int position);
+    }
+
     static class InstanceHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.tvTitle) public TextView title;
@@ -74,13 +84,5 @@ public class InstanceAdapter extends RecyclerView.Adapter<InstanceAdapter.Instan
             super(view);
             ButterKnife.bind(this, view);
         }
-    }
-
-    public Cursor getCursor() {
-        return cursor;
-    }
-
-    public interface OnItemClickListener {
-        void onItemClick(View v, int position);
     }
 }
