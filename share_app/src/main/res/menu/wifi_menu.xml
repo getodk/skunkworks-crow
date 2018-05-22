@@ -1,0 +1,14 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_scan"
+        android:title="Scan"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/menu_qr_code"
+        android:title="Scan QR Code"
+        app:showAsAction="never"/>
+
+</menu>
