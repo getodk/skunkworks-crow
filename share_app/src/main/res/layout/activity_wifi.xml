@@ -17,7 +17,7 @@
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         android:gravity="center"
-        android:text="No Wifi Network available. Scan again"
+        android:text="@string/no_wifi_available"
         android:textSize="22sp"
         android:padding="10dp"/>
 

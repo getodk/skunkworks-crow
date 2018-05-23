@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import org.odk.share.R;
 import org.odk.share.controller.Wifi;
+import org.odk.share.listeners.OnItemClickListener;
 
 import java.util.List;
 
@@ -46,12 +47,7 @@ public class WifiResultAdapter extends RecyclerView.Adapter<WifiResultAdapter.Wi
     @Override
     public void onBindViewHolder(@NonNull final WifiHolder holder, int position) {
         holder.title.setText(wifiScanResult.get(holder.getAdapterPosition()).SSID);
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                listener.onItemClick(v, holder.getAdapterPosition());
-            }
-        });
+        holder.itemView.setOnClickListener(v -> listener.onItemClick(v, holder.getAdapterPosition()));
 
         if (Wifi.isClose(wifiScanResult.get(holder.getAdapterPosition()))) {
             holder.wifiProtect.setVisibility(VISIBLE);
@@ -65,7 +61,7 @@ public class WifiResultAdapter extends RecyclerView.Adapter<WifiResultAdapter.Wi
         return wifiScanResult.size();
     }
 
-    public class WifiHolder extends RecyclerView.ViewHolder {
+    static class WifiHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.tvTitle) public TextView title;
         @BindView(R.id.ivWifi) public ImageView wifiProtect;
@@ -74,8 +70,5 @@ public class WifiResultAdapter extends RecyclerView.Adapter<WifiResultAdapter.Wi
             super(view);
             ButterKnife.bind(this, view);
         }
-    }
-    public interface OnItemClickListener {
-        void onItemClick(View v, int position);
     }
 }

@@ -3,12 +3,12 @@
 
     <item
         android:id="@+id/menu_scan"
-        android:title="Scan"
+        android:title="@string/scan"
         app:showAsAction="always"/>
 
     <item
         android:id="@+id/menu_qr_code"
-        android:title="Scan QR Code"
+        android:title="@string/scan_qr_code"
         app:showAsAction="never"/>
 
 </menu>

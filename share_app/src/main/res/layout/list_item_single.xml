@@ -10,8 +10,7 @@
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:textColor="@android:color/black"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="text"/>
+        android:textAppearance="?android:attr/textAppearanceMedium"/>
 
     <ImageView
         android:layout_width="wrap_content"
@@ -20,7 +19,6 @@
         android:layout_alignRight="@+id/tvTitle"
         android:src="@drawable/ic_lock"
         android:layout_centerVertical="true"
-        android:id="@+id/ivWifi"
-        />
+        android:id="@+id/ivWifi" />
 
 </RelativeLayout>

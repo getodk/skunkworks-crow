@@ -4,8 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.support.v7.app.AppCompatActivity;
@@ -13,11 +11,9 @@ import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,7 +26,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
+import timber.log.Timber;
 
 public class WifiActivity extends AppCompatActivity {
 
@@ -53,7 +49,7 @@ public class WifiActivity extends AppCompatActivity {
 
         wifiManager = wifi.getWifiManager();
 
-        if (wifiManager.isWifiEnabled() == false) {
+        if (!wifiManager.isWifiEnabled()) {
             wifiManager.setWifiEnabled(true);
         }
 
@@ -62,19 +58,34 @@ public class WifiActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(wifiResultAdapter);
+    }
 
+    @Override
+    protected void onResume() {
         startScan();
         registerReceiver(wifiStateReceiver, new IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION));
+        super.onResume();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        try {
+            unregisterReceiver(receiver);
+            unregisterReceiver(wifiStateReceiver);
+        } catch (IllegalArgumentException e) {
+            Timber.e(e);
+        }
     }
 
     private void onListItemClick(View view, int i) {
-        Log.d("Clicked " , scanResultList.get(i) + "");
+        Timber.d("Clicked " + scanResultList.get(i));
     }
 
     public void startScan() {
         scanResultList.clear();
         wifiResultAdapter.notifyDataSetChanged();
-        setEmptyViewVisibilty("Scanning.. Wait");
+        setEmptyViewVisibility(getString(R.string.scanning));
         registerReceiver(receiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
         wifiManager.startScan();
     }
@@ -85,11 +96,11 @@ public class WifiActivity extends AppCompatActivity {
             scanResultList.addAll(wifiManager.getScanResults());
             unregisterReceiver(this);
             wifiResultAdapter.notifyDataSetChanged();
-            setEmptyViewVisibilty("No available wifi. Scan again !");
+            setEmptyViewVisibility(getString(R.string.no_wifi_available));
         }
     };
 
-    private void setEmptyViewVisibilty(String text) {
+    private void setEmptyViewVisibility(String text) {
         if (scanResultList.size() > 0) {
             recyclerView.setVisibility(View.VISIBLE);
             emptyView.setVisibility(View.GONE);
@@ -103,31 +114,19 @@ public class WifiActivity extends AppCompatActivity {
     public BroadcastReceiver wifiStateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            int extraWifiState = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE ,WifiManager.WIFI_STATE_UNKNOWN);
+            int wifiState = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE, WifiManager.WIFI_STATE_UNKNOWN);
 
-            switch(extraWifiState){
+            switch (wifiState) {
                 case WifiManager.WIFI_STATE_DISABLED:
-                    Log.d("State","WIFI STATE DISABLED");
                     scanResultList.clear();
-                    setEmptyViewVisibilty("Turn on the wifi and then scan.");
+                    setEmptyViewVisibility(getString(R.string.enable_wifi));
                     break;
                 case WifiManager.WIFI_STATE_ENABLED:
-                    Log.d("State","WIFI STATE ENABLED");
                     startScan();
                     break;
             }
         }
     };
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        try {
-            unregisterReceiver(receiver);
-            unregisterReceiver(wifiStateReceiver);
-        } catch (IllegalArgumentException e) {
-        }
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -142,7 +141,7 @@ public class WifiActivity extends AppCompatActivity {
                 if (wifiManager.isWifiEnabled()) {
                    startScan();
                 } else {
-                    Toast.makeText(this, "Turn on the wifi to scan", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, getString(R.string.enable_wifi), Toast.LENGTH_LONG).show();
                 }
                 return true;
 
