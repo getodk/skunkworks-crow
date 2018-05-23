@@ -17,6 +17,8 @@
     <string name="scan_qr_code">Scan QR Code</string>
     <string name="show_password">Show Password</string>
     <string name="connect">Connect</string>
+    <string name="connected">Connected</string>
+    <string name="already_connected">Already connected</string>
     <string name="cancel">Cancel</string>
     <string name="password_empty">Password field is empty</string>
 </resources>

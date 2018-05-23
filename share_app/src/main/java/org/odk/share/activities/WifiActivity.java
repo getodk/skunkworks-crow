@@ -5,7 +5,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
+import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -49,6 +53,7 @@ public class WifiActivity extends AppCompatActivity {
     private WifiResultAdapter wifiResultAdapter;
     private List<ScanResult> scanResultList;
     private boolean isReceiverRegistered;
+    private boolean isWifiReceiverRegisterd;
     private AlertDialog alertDialog;
 
     @Override
@@ -91,6 +96,10 @@ public class WifiActivity extends AppCompatActivity {
             if (isReceiverRegistered) {
                 unregisterReceiver(receiver);
             }
+
+            if (isWifiReceiverRegisterd) {
+                unregisterReceiver(wifiReceiver);
+            }
         } catch (IllegalArgumentException e) {
             Timber.e(e);
         }
@@ -103,6 +112,7 @@ public class WifiActivity extends AppCompatActivity {
             showPasswordDialog(scanResultList.get(i));
         } else {
             // connect
+            connectToWifi(scanResultList.get(i), null);
         }
     }
 
@@ -147,6 +157,7 @@ public class WifiActivity extends AppCompatActivity {
                         String pw = passwordEditText.getText().toString();
                         if (!pw.equals("")) {
                             Timber.d(pw);
+                            connectToWifi(scanResult, pw);
                             dialog.dismiss();
                         } else {
                             passwordEditText.setError(getString(R.string.password_empty));
@@ -156,6 +167,41 @@ public class WifiActivity extends AppCompatActivity {
             }
         });
         alertDialog.show();
+    }
+
+    private void connectToWifi(ScanResult wifiNetwork, String password) {
+        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+
+        if (wifiInfo.getBSSID() != null && wifiInfo.getBSSID().equals(wifiNetwork.BSSID)) {
+            // already connected to a network
+            Toast.makeText(this, getString(R.string.already_connected) + wifiNetwork.SSID, Toast.LENGTH_LONG).show();
+        } else {
+            WifiConfiguration conf = new WifiConfiguration();
+            conf.SSID = "\"" + wifiNetwork.SSID + "\"";
+
+            if (Wifi.isClose(wifiNetwork)) {
+                conf.preSharedKey = "\"" + password + "\"";
+            } else {
+                conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+            }
+
+            WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+            wifiManager.addNetwork(conf);
+
+            List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
+            for (WifiConfiguration i : list) {
+                Timber.d(i.SSID);
+                if (i.SSID != null && i.SSID.equals("\"" + wifiNetwork.SSID + "\"")) {
+                    Timber.d("Found");
+                    wifiManager.disconnect();
+                    wifiManager.enableNetwork(i.networkId, true);
+                    wifiManager.reconnect();
+                    isWifiReceiverRegisterd = true;
+                    registerReceiver(wifiReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+                    break;
+                }
+            }
+        }
     }
 
     public void startScan() {
@@ -202,6 +248,32 @@ public class WifiActivity extends AppCompatActivity {
                 case WifiManager.WIFI_STATE_ENABLED:
                     startScan();
                     break;
+            }
+        }
+    };
+
+    public BroadcastReceiver wifiReceiver = new BroadcastReceiver() {
+        boolean isConnected = false;
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            ConnectivityManager connectivity = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (connectivity != null) {
+                NetworkInfo[] info = connectivity.getAllNetworkInfo();
+                if (info != null) {
+                    for (int i = 0; i < info.length; i++) {
+                        if (info[i].getState() == NetworkInfo.State.CONNECTED) {
+                            if (!isConnected) {
+                                isConnected = true;
+                                isWifiReceiverRegisterd = false;
+                                WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+                                Timber.d(String.valueOf(wifiInfo));
+                                Toast.makeText(WifiActivity.this, getString(R.string.connected), Toast.LENGTH_LONG).show();
+                                unregisterReceiver(this);
+                            }
+                        }
+                    }
+                }
             }
         }
     };
