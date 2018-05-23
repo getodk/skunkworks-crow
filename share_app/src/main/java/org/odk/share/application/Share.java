@@ -10,10 +10,17 @@ import timber.log.Timber;
 
 public class Share extends Application {
 
+    private static Share singleton = null;
+
     @Override
     public void onCreate() {
         super.onCreate();
 
+        singleton = this;
         Timber.plant(new Timber.DebugTree());
+    }
+
+    public static Share getInstance() {
+        return singleton;
     }
 }
