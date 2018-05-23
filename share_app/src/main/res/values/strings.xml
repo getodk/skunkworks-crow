@@ -15,4 +15,8 @@
     <string name="scanning">Scanning. Please wait</string>
     <string name="scan">Scan</string>
     <string name="scan_qr_code">Scan QR Code</string>
+    <string name="show_password">Show Password</string>
+    <string name="connect">Connect</string>
+    <string name="cancel">Cancel</string>
+    <string name="password_empty">Password field is empty</string>
 </resources>
