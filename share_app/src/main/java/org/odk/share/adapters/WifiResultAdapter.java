@@ -2,7 +2,9 @@ package org.odk.share.adapters;
 
 import android.content.Context;
 import android.net.wifi.ScanResult;
+import android.net.wifi.WifiManager;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,9 +20,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-
-import static android.view.View.GONE;
-import static android.view.View.VISIBLE;
 
 /**
  * Created by laksh on 5/22/2018.
@@ -49,10 +48,37 @@ public class WifiResultAdapter extends RecyclerView.Adapter<WifiResultAdapter.Wi
         holder.title.setText(wifiScanResult.get(holder.getAdapterPosition()).SSID);
         holder.itemView.setOnClickListener(v -> listener.onItemClick(v, holder.getAdapterPosition()));
 
+        int level = WifiManager.calculateSignalLevel(wifiScanResult.get(holder.getAdapterPosition()).level, 4);
         if (Wifi.isClose(wifiScanResult.get(holder.getAdapterPosition()))) {
-            holder.wifiProtect.setVisibility(VISIBLE);
+            switch (level) {
+                case 0:
+                    holder.wifiProtect.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_signal_wifilock_1));
+                    break;
+                case 1:
+                    holder.wifiProtect.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_signal_wifilock_2));
+                    break;
+                case 2:
+                    holder.wifiProtect.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_signal_wifilock_3));
+                    break;
+                case 3:
+                    holder.wifiProtect.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_signal_wifilock_4));
+                    break;
+            }
         } else {
-            holder.wifiProtect.setVisibility(GONE);
+            switch (level) {
+                case 0:
+                    holder.wifiProtect.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_signal_wifi_1));
+                    break;
+                case 1:
+                    holder.wifiProtect.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_signal_wifi_2));
+                    break;
+                case 2:
+                    holder.wifiProtect.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_signal_wifi_3));
+                    break;
+                case 3:
+                    holder.wifiProtect.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_signal_wifi_4));
+                    break;
+            }
         }
     }
 
