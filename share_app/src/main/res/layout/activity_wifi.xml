@@ -1,24 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/activity_main"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <android.support.v7.widget.RecyclerView
+    <!-- Toolbar -->
+    <include layout="@layout/toolbar" />
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/recyclerView"
-        android:visibility="gone"/>
+        android:layout_below="@+id/toolbar">
 
-    <TextView
-        android:id="@+id/empty_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:gravity="center"
-        android:text="@string/no_wifi_available"
-        android:textSize="22sp"
-        android:padding="10dp"/>
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/recyclerView"
+            android:visibility="gone"/>
 
+        <TextView
+            android:id="@+id/empty_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:gravity="center"
+            android:text="@string/no_wifi_available"
+            android:textSize="22sp"
+            android:padding="10dp"/>
+
+    </RelativeLayout>
 </RelativeLayout>

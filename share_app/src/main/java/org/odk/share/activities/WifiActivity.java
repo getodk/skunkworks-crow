@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -43,11 +44,9 @@ import timber.log.Timber;
 
 public class WifiActivity extends AppCompatActivity {
 
-    @BindView(R.id.recyclerView)
-    RecyclerView recyclerView;
-
-    @BindView(R.id.empty_view)
-    TextView emptyView;
+    @BindView(R.id.recyclerView) RecyclerView recyclerView;
+    @BindView(R.id.empty_view) TextView emptyView;
+    @BindView(R.id.toolbar) Toolbar toolbar;
 
     private WifiManager wifiManager;
     private WifiResultAdapter wifiResultAdapter;
@@ -61,6 +60,10 @@ public class WifiActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wifi);
         ButterKnife.bind(this);
+
+        setTitle(getString(R.string.view_wifi));
+        setSupportActionBar(toolbar);
+
         Wifi wifi = new Wifi(this);
 
         wifiManager = wifi.getWifiManager();
@@ -216,7 +219,11 @@ public class WifiActivity extends AppCompatActivity {
     BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context c, Intent intent) {
-            scanResultList.addAll(wifiManager.getScanResults());
+            for (ScanResult scanResult: wifiManager.getScanResults()) {
+                if (scanResult.SSID.endsWith(getString(R.string.hotspot_name_suffix))) {
+                    scanResultList.add(scanResult);
+                }
+            }
             isReceiverRegistered = false;
             unregisterReceiver(this);
             wifiResultAdapter.notifyDataSetChanged();

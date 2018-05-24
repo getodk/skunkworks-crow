@@ -17,7 +17,6 @@
         android:layout_height="wrap_content"
         android:layout_alignEnd="@+id/tvTitle"
         android:layout_alignRight="@+id/tvTitle"
-        android:src="@drawable/ic_lock"
         android:layout_centerVertical="true"
         android:id="@+id/ivWifi" />
 
