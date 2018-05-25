@@ -12,7 +12,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import org.odk.share.R;
-import org.odk.share.controller.WifiHotspot;
+import org.odk.share.controller.WifiHotspotHelper;
 import org.odk.share.services.HotspotService;
 
 import butterknife.BindView;
@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick (R.id.bStartHotspot)
     public void startHotspot() {
-        boolean isMobileDataEnable = WifiHotspot.isMobileDataEnabled(getApplicationContext());
+        boolean isMobileDataEnable = WifiHotspotHelper.isMobileDataEnabled(getApplicationContext());
         if (isMobileDataEnable) {
             // ask user
             Toast.makeText(this, getString(R.string.mobile_data_message),
@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         if (isHotspotRunning) {
-            new WifiHotspot(this).disableHotspot();
+            new WifiHotspotHelper(this).disableHotspot();
         }
         super.onDestroy();
     }

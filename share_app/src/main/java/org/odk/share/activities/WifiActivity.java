@@ -33,7 +33,7 @@ import android.widget.Toast;
 
 import org.odk.share.R;
 import org.odk.share.adapters.WifiResultAdapter;
-import org.odk.share.controller.Wifi;
+import org.odk.share.controller.WifiHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,9 +64,9 @@ public class WifiActivity extends AppCompatActivity {
         setTitle(getString(R.string.view_wifi));
         setSupportActionBar(toolbar);
 
-        Wifi wifi = new Wifi(this);
+        WifiHelper wifiHelper = new WifiHelper(this);
 
-        wifiManager = wifi.getWifiManager();
+        wifiManager = wifiHelper.getWifiManager();
 
         if (!wifiManager.isWifiEnabled()) {
             wifiManager.setWifiEnabled(true);
@@ -110,7 +110,7 @@ public class WifiActivity extends AppCompatActivity {
 
     private void onListItemClick(View view, int i) {
         Timber.d("Clicked " + scanResultList.get(i));
-        if (Wifi.isClose(scanResultList.get(i))) {
+        if (WifiHelper.isClose(scanResultList.get(i))) {
             // Show dialog and ask for password
             showPasswordDialog(scanResultList.get(i));
         } else {
@@ -182,7 +182,7 @@ public class WifiActivity extends AppCompatActivity {
             WifiConfiguration conf = new WifiConfiguration();
             conf.SSID = "\"" + wifiNetwork.SSID + "\"";
 
-            if (Wifi.isClose(wifiNetwork)) {
+            if (WifiHelper.isClose(wifiNetwork)) {
                 conf.preSharedKey = "\"" + password + "\"";
             } else {
                 conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);

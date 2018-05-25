@@ -12,7 +12,7 @@
         android:textColor="@android:color/black"
         android:textAppearance="?android:attr/textAppearanceMedium"/>
 
-    <ImageView
+    <org.odk.share.views.WifiView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignEnd="@+id/tvTitle"

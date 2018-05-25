@@ -8,11 +8,11 @@ import android.net.wifi.WifiManager;
  * Created by laksh on 5/22/2018.
  */
 
-public class Wifi {
+public class WifiHelper {
 
-    private WifiManager wifiManager;
+    private final WifiManager wifiManager;
 
-    public Wifi(Context context) {
+    public WifiHelper(Context context) {
         wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
     }
 
@@ -20,6 +20,7 @@ public class Wifi {
         return wifiManager;
     }
 
+    // Checks whether the wifi hotspot is password protected or not
     public static boolean isClose(ScanResult result) {
         if (result.capabilities.contains("EAP") || result.capabilities.contains("PSK") || result.capabilities.contains("WEP")) {
             return true;
