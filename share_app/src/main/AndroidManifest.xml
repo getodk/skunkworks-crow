@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
 
     <application
         android:name=".application.Share"
@@ -14,7 +15,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.InstancesList">
+
+        <activity android:name=".activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -22,9 +24,11 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".services.HotspotService" />
+        <activity android:name=".activities.WifiActivity"/>
 
-        <activity android:name=".activities.MainActivity"></activity>
+        <activity android:name=".activities.InstancesList"/>
+
+        <service android:name=".services.HotspotService" />
     </application>
 
 </manifest>

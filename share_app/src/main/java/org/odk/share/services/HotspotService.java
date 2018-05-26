@@ -17,7 +17,7 @@ import android.support.v4.content.LocalBroadcastManager;
 
 import org.odk.share.R;
 import org.odk.share.activities.MainActivity;
-import org.odk.share.controller.WifiHotspot;
+import org.odk.share.controller.WifiHotspotHelper;
 
 /**
  * Created by laksh on 5/18/2018.
@@ -25,7 +25,7 @@ import org.odk.share.controller.WifiHotspot;
 
 public class HotspotService extends Service {
 
-    WifiHotspot wifiHotspot;
+    WifiHotspotHelper wifiHotspotHelper;
     HotspotState state;
     private static final int notify_sec = 4000;
     private static final int HOTSPOT_NOTIFICATION_ID = 34567;
@@ -48,7 +48,7 @@ public class HotspotService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        wifiHotspot = new WifiHotspot(getApplicationContext());
+        wifiHotspotHelper = new WifiHotspotHelper(getApplicationContext());
         stopReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -66,7 +66,7 @@ public class HotspotService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         switch (intent.getAction()) {
             case ACTION_START:
-                wifiHotspot.enableHotspot();
+                wifiHotspotHelper.enableHotspot();
                 state.sendEmptyMessage(START);
                 break;
             case ACTION_STOP:
@@ -93,8 +93,8 @@ public class HotspotService extends Service {
 
     private void stopHotspot() {
 
-        if (wifiHotspot != null) {
-            wifiHotspot.disableHotspot();
+        if (wifiHotspotHelper != null) {
+            wifiHotspotHelper.disableHotspot();
         }
 
         if (state != null) {
@@ -140,8 +140,8 @@ public class HotspotService extends Service {
         public void handleMessage(Message msg) {
             int id = msg.what;
             if (id == START) {
-                if (service != null && service.wifiHotspot != null) {
-                    if (service.wifiHotspot.isHotspotEnabled()) {
+                if (service != null && service.wifiHotspotHelper != null) {
+                    if (service.wifiHotspotHelper.isHotspotEnabled()) {
                         updateNotification(getString(R.string.hotspot_running), true);
                     } else {
                         removeMessages(START);
@@ -149,7 +149,7 @@ public class HotspotService extends Service {
                     }
                 }
             } else if (id == STATUS) {
-                if (service.wifiHotspot == null || !service.wifiHotspot.isHotspotEnabled()) {
+                if (service.wifiHotspotHelper == null || !service.wifiHotspotHelper.isHotspotEnabled()) {
                     stopHotspot();
                 } else {
                   sendEmptyMessageDelayed(2, notify_sec);

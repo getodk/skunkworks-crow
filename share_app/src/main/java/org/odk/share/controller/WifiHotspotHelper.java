@@ -5,6 +5,8 @@ import android.net.ConnectivityManager;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 
+import org.odk.share.R;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -14,7 +16,7 @@ import timber.log.Timber;
  * Created by laksh on 5/17/2018.
  */
 
-public class WifiHotspot {
+public class WifiHotspotHelper {
 
     private Method getWifiApConfig;
     private Method setWifiApEnable;
@@ -24,9 +26,11 @@ public class WifiHotspot {
     private WifiManager wifiManager;
     private WifiConfiguration lastConfig;
     private WifiConfiguration currConfig;
-    private static final String ssid = "ODK-Share";
+    private Context context;
+    private static final String ssid = "hotspot";
 
-    public WifiHotspot(Context context) {
+    public WifiHotspotHelper(Context context) {
+        this.context = context;
         wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         for (Method method : wifiManager.getClass().getMethods()) {
             switch (method.getName()) {
@@ -102,8 +106,7 @@ public class WifiHotspot {
         // Save last wifi Configuration
         lastConfig = getWifiConfig();
 
-        // Create New Wifi Configuration
-        currConfig = createNewConfig(ssid);
+        currConfig = createNewConfig(ssid + context.getString(R.string.hotspot_name_suffix));
         return toggleHotspot(currConfig, true);
     }
 

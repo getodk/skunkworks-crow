@@ -7,17 +7,25 @@ import android.content.IntentFilter;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
+import android.support.v7.widget.Toolbar;
 import android.widget.Button;
 import android.widget.Toast;
 
 import org.odk.share.R;
-import org.odk.share.controller.WifiHotspot;
+import org.odk.share.controller.WifiHotspotHelper;
 import org.odk.share.services.HotspotService;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button startHotspot;
+    @BindView(R.id.toolbar) Toolbar toolbar;
+    @BindView(R.id.bStartHotspot)Button startHotspot;
+    @BindView(R.id.bSendForms) Button sendForms;
+    @BindView(R.id.bViewWifi) Button viewWifi;
+
     private boolean isHotspotRunning;
     private LocalBroadcastManager localBroadcastManager;
 
@@ -25,27 +33,41 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
+
+        setTitle(getString(R.string.send_forms));
+        setSupportActionBar(toolbar);
 
         isHotspotRunning = false;
-        startHotspot = (Button) findViewById(R.id.bStartHotspot);
-        startHotspot.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                boolean isMobileDataEnable = WifiHotspot.isMobileDataEnabled(getApplicationContext());
-                if (isMobileDataEnable) {
-                    // ask user
-                    Toast.makeText(getApplicationContext(), "Your mobile data can be consumed. Disable it and then try again",
-                            Toast.LENGTH_LONG).show();
-                } else {
-                    if (!isHotspotRunning) {
-                        initiateHotspot();
-                    } else {
-                        Toast.makeText(MainActivity.this, "Hotspot already running", Toast.LENGTH_LONG).show();
-                    }
-                }
-            }
-        });
         localBroadcastManager = LocalBroadcastManager.getInstance(this);
+    }
+
+    @OnClick (R.id.bViewWifi)
+    public void viewWifiNetworks() {
+        Intent intent = new Intent(this, WifiActivity.class);
+        startActivity(intent);
+    }
+
+    @OnClick (R.id.bStartHotspot)
+    public void startHotspot() {
+        boolean isMobileDataEnable = WifiHotspotHelper.isMobileDataEnabled(getApplicationContext());
+        if (isMobileDataEnable) {
+            // ask user
+            Toast.makeText(this, getString(R.string.mobile_data_message),
+                    Toast.LENGTH_LONG).show();
+        } else {
+            if (!isHotspotRunning) {
+                initiateHotspot();
+            } else {
+                Toast.makeText(this, getString(R.string.hotspot_already_running), Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    @OnClick (R.id.bSendForms)
+    public void selectForms() {
+        Intent intent = new Intent(this, InstancesList.class);
+        startActivity(intent);
     }
 
     private void initiateHotspot() {
@@ -74,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         if (isHotspotRunning) {
-            new WifiHotspot(this).disableHotspot();
+            new WifiHotspotHelper(this).disableHotspot();
         }
         super.onDestroy();
     }
