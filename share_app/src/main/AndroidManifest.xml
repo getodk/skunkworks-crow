@@ -25,7 +25,6 @@
         </activity>
 
         <activity android:name=".activities.WifiActivity"/>
-
         <activity android:name=".activities.InstancesList"/>
 
         <activity android:name=".preferences.SettingsPreference"/>

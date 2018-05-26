@@ -26,11 +26,11 @@ public class WifiHotspotHelper {
     private WifiManager wifiManager;
     private WifiConfiguration lastConfig;
     private WifiConfiguration currConfig;
-    private Context context;
-    private static final String ssid = "hotspot";
+    public static final String ssid = "ODK-Share";
 
-    public WifiHotspotHelper(Context context) {
-        this.context = context;
+    public static WifiHotspotHelper wifiHotspotHelper;
+
+    private WifiHotspotHelper(Context context) {
         wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         for (Method method : wifiManager.getClass().getMethods()) {
             switch (method.getName()) {
@@ -50,6 +50,13 @@ public class WifiHotspotHelper {
                     setWifiApConfig = method;
             }
         }
+    }
+
+    public static synchronized WifiHotspotHelper getInstance(Context context) {
+        if (wifiHotspotHelper == null) {
+            wifiHotspotHelper = new WifiHotspotHelper(context);
+        }
+        return wifiHotspotHelper;
     }
 
     public boolean isSupported() {
@@ -102,9 +109,12 @@ public class WifiHotspotHelper {
         return null;
     }
 
-    public boolean enableHotspot() {
-        // Save last wifi Configuration
+    public void saveLastConfig() {
         lastConfig = getWifiConfig();
+    }
+
+    public boolean enableHotspot() {
+        saveLastConfig();
 
         currConfig = createNewConfig(ssid + context.getString(R.string.hotspot_name_suffix));
         return toggleHotspot(currConfig, true);
@@ -112,7 +122,7 @@ public class WifiHotspotHelper {
 
     public boolean disableHotspot() {
         setWifiConfig(lastConfig);
-        return toggleHotspot(currConfig, false);
+        return toggleHotspot(lastConfig, false);
     }
 
     private boolean toggleHotspot(WifiConfiguration configuration, boolean enable) {
@@ -129,7 +139,7 @@ public class WifiHotspotHelper {
         return false;
     }
 
-    private WifiConfiguration createNewConfig(String ssid) {
+    public WifiConfiguration createNewConfig(String ssid) {
         WifiConfiguration wifiConf = new WifiConfiguration();
         wifiConf.SSID = ssid;
         wifiConf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);

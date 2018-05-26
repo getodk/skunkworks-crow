@@ -25,9 +25,10 @@ import org.odk.share.controller.WifiHotspotHelper;
 
 public class HotspotService extends Service {
 
-    WifiHotspotHelper wifiHotspotHelper;
-    HotspotState state;
-    private static final int notify_sec = 4000;
+    private WifiHotspotHelper wifiHotspotHelper;
+    private HotspotState state;
+    private static final int notify_stop = 5000;
+    private static final int notify_start = 1000;
     private static final int HOTSPOT_NOTIFICATION_ID = 34567;
     private BroadcastReceiver stopReceiver;
 
@@ -35,6 +36,7 @@ public class HotspotService extends Service {
     public static final String ACTION_STOP = "hotspot_stop";
     public static final String ACTION_STATUS = "hotspot_status";
     public static final String BROADCAST_HOTSPOT_DISABLED = "hotspot_disabled";
+    public static final String BROADCAST_HOTSPOT_ENABLED = "hotspot_enabled";
 
     private static final int START = 1;
     private static final int STATUS = 2;
@@ -48,7 +50,7 @@ public class HotspotService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        wifiHotspotHelper = new WifiHotspotHelper(getApplicationContext());
+        wifiHotspotHelper = WifiHotspotHelper.getInstance(getApplicationContext());
         stopReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -66,7 +68,6 @@ public class HotspotService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         switch (intent.getAction()) {
             case ACTION_START:
-                wifiHotspotHelper.enableHotspot();
                 state.sendEmptyMessage(START);
                 break;
             case ACTION_STOP:
@@ -78,7 +79,7 @@ public class HotspotService extends Service {
                 } else {
                     state.removeMessages(STATUS);
                 }
-                state.sendEmptyMessageDelayed(STATUS, notify_sec);
+                state.sendEmptyMessageDelayed(STATUS, notify_stop);
         }
         return START_NOT_STICKY;
     }
@@ -143,16 +144,19 @@ public class HotspotService extends Service {
                 if (service != null && service.wifiHotspotHelper != null) {
                     if (service.wifiHotspotHelper.isHotspotEnabled()) {
                         updateNotification(getString(R.string.hotspot_running), true);
+                        Intent intent = new Intent(BROADCAST_HOTSPOT_ENABLED);
+                        LocalBroadcastManager bm = LocalBroadcastManager.getInstance(getApplicationContext());
+                        bm.sendBroadcast(intent);
                     } else {
                         removeMessages(START);
-                        sendEmptyMessageDelayed(START, notify_sec);
+                        sendEmptyMessageDelayed(START, notify_start);
                     }
                 }
             } else if (id == STATUS) {
                 if (service.wifiHotspotHelper == null || !service.wifiHotspotHelper.isHotspotEnabled()) {
                     stopHotspot();
                 } else {
-                  sendEmptyMessageDelayed(2, notify_sec);
+                  sendEmptyMessageDelayed(STATUS, notify_stop);
                 }
             }
         }
