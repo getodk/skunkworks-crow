@@ -26,4 +26,14 @@
     <string name="already_connected">Already connected to </string>
     <string name="cancel">Cancel</string>
     <string name="password_empty">Password field is empty</string>
+
+    <string name="settings">Settings</string>
+    <string name="default_hotspot_ssid">hotspot</string>
+    <string name="default_hotspot_password">12345678</string>
+    <string name="title_hotspot_ssid">Hotspot SSID</string>
+    <string name="title_hotspot_password">Set Hotspot password</string>
+    <string name="set_password">Set Password</string>
+    <string name="password_hotspot">Password required to connect with hotspot</string>
+    <string name="hotspot_name_error">Hotspot name should not be empty</string>
+    <string name="hotspot_password_error">Password length should be atleast 8 characters long</string>
 </resources>
