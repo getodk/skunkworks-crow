@@ -4,6 +4,7 @@
     <string name="hotspot_start">Starting hotspot</string>
     <string name="stop">Stop</string>
     <string name="start_hotspot">Start Hotspot</string>
+    <string name="hotspot_settings_dialog">Enable protable hotspot from the settings.</string>
     <string name="hotspot_name_suffix">-odk-share</string>
     <string name="hotspot_already_running">Hotspot already running</string>
     <string name="mobile_data_message">Your mobile data can be consumed. Disable it and then try again</string>

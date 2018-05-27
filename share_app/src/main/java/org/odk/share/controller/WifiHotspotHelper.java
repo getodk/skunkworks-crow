@@ -26,11 +26,13 @@ public class WifiHotspotHelper {
     private WifiManager wifiManager;
     private WifiConfiguration lastConfig;
     private WifiConfiguration currConfig;
+    private Context context;
     public static final String ssid = "ODK-Share";
 
     public static WifiHotspotHelper wifiHotspotHelper;
 
     private WifiHotspotHelper(Context context) {
+        this.context = context;
         wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         for (Method method : wifiManager.getClass().getMethods()) {
             switch (method.getName()) {

@@ -3,9 +3,11 @@ package org.odk.share.activities;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -108,16 +110,7 @@ public class MainActivity extends AppCompatActivity {
         // In devices having Android >= 7, created hotspot having some issues with connecting to other devices.
         // Open settings to trigger the hotspot manually.
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            wifiHotspot.saveLastConfig();
-            wifiHotspot.setWifiConfig(wifiHotspot.createNewConfig(WifiHotspotHelper.ssid +
-                    getString(R.string.hotspot_name_suffix)));
-            final Intent intent = new Intent(Intent.ACTION_MAIN, null);
-            intent.addCategory(Intent.CATEGORY_LAUNCHER);
-            final ComponentName cn = new ComponentName("com.android.settings", "com.android.settings.TetherSettings");
-            intent.setComponent(cn);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-            openSettings = true;
+            showAlertDialog();
         } else {
             wifiHotspot.enableHotspot();
             Intent serviceIntent = new Intent(getApplicationContext(), HotspotService.class);
@@ -128,6 +121,35 @@ public class MainActivity extends AppCompatActivity {
             intent.setAction(HotspotService.ACTION_STATUS);
             startService(intent);
         }
+    }
+
+    private void showAlertDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.hotspot_settings_dialog);
+        builder.setPositiveButton(getString(R.string.settings), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                wifiHotspot.saveLastConfig();
+                wifiHotspot.setWifiConfig(wifiHotspot.createNewConfig(WifiHotspotHelper.ssid +
+                        getString(R.string.hotspot_name_suffix)));
+                final Intent intent = new Intent(Intent.ACTION_MAIN, null);
+                intent.addCategory(Intent.CATEGORY_LAUNCHER);
+                final ComponentName cn = new ComponentName("com.android.settings", "com.android.settings.TetherSettings");
+                intent.setComponent(cn);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                openSettings = true;
+            }
+        });
+        builder.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        builder.setCancelable(false);
+        builder.show();
     }
 
     @Override
