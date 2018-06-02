@@ -8,7 +8,7 @@
     <string name="hotspot_name_suffix">-odk-share</string>
     <string name="hotspot_already_running">Hotspot already running</string>
     <string name="mobile_data_message">Your mobile data can be consumed. Disable it and then try again</string>
-    
+
     <string name="saved_forms">Saved Forms</string>
     <string name="send_selected">Send</string>
     <string name="select_all">Select all</string>

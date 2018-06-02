@@ -1,11 +1,14 @@
 package org.odk.share.activities;
 
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
+import android.net.DhcpInfo;
 import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
@@ -34,7 +37,11 @@ import android.widget.Toast;
 import org.odk.share.R;
 import org.odk.share.adapters.WifiResultAdapter;
 import org.odk.share.controller.WifiHelper;
+import org.odk.share.listeners.ProgressListener;
+import org.odk.share.tasks.WifiReceiveTask;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,7 +49,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import timber.log.Timber;
 
-public class WifiActivity extends AppCompatActivity {
+public class WifiActivity extends AppCompatActivity implements ProgressListener {
 
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
     @BindView(R.id.empty_view) TextView emptyView;
@@ -54,6 +61,9 @@ public class WifiActivity extends AppCompatActivity {
     private boolean isReceiverRegistered;
     private boolean isWifiReceiverRegisterd;
     private AlertDialog alertDialog;
+
+    private ProgressDialog progressDialog = null;
+    private static final int DIALOG_DOWNLOAD_PROGRESS = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -264,20 +274,22 @@ public class WifiActivity extends AppCompatActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            ConnectivityManager connectivity = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-            if (connectivity != null) {
-                NetworkInfo[] info = connectivity.getAllNetworkInfo();
+            Timber.e("RECEIVER CONNECTION ");
+            ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (cm != null) {
+                NetworkInfo info = cm.getActiveNetworkInfo();
                 if (info != null) {
-                    for (int i = 0; i < info.length; i++) {
-                        if (info[i].getState() == NetworkInfo.State.CONNECTED) {
-                            if (!isConnected) {
-                                isConnected = true;
-                                isWifiReceiverRegisterd = false;
-                                WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-                                Timber.d(String.valueOf(wifiInfo));
-                                Toast.makeText(WifiActivity.this, getString(R.string.connected), Toast.LENGTH_LONG).show();
-                                unregisterReceiver(this);
-                            }
+                    Timber.d(info + " " + info.getTypeName() + " " + info.getType());
+                    if (info.getState() == NetworkInfo.State.CONNECTED && info.getTypeName().compareTo("WIFI") == 0) {
+                        if (!isConnected) {
+                            isConnected = true;
+                            isWifiReceiverRegisterd = false;
+                            String dstAddress = getAccessPointIpAddress(context);
+                            showDialog(DIALOG_DOWNLOAD_PROGRESS);
+                            WifiReceiveTask wifiReceiveTask = new WifiReceiveTask(dstAddress);
+                            wifiReceiveTask.setUploaderListener(WifiActivity.this);
+                            wifiReceiveTask.execute();
+                            unregisterReceiver(this);
                         }
                     }
                 }
@@ -306,5 +318,74 @@ public class WifiActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected Dialog onCreateDialog(int id) {
+        switch (id) {
+            case DIALOG_DOWNLOAD_PROGRESS:
+                progressDialog = new ProgressDialog(this);
+                progressDialog.setMessage("Receiving");
+                progressDialog.setIndeterminate(true);
+                progressDialog.setCancelable(false);
+                progressDialog.show();
+                return progressDialog;
+            default:
+                return null;
+        }
+    }
+
+    public static String getAccessPointIpAddress(Context context) {
+        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        DhcpInfo dhcpInfo = wifiManager.getDhcpInfo();
+        byte[] ipAddress = convertToBytes(dhcpInfo.serverAddress);
+        try {
+            String ip = InetAddress.getByAddress(ipAddress).getHostAddress();
+            return ip.replace("/", "");
+        } catch (UnknownHostException e) {
+            Timber.e(e);
+        }
+        return null;
+    }
+
+    private static byte[] convertToBytes(int hostAddress) {
+        return new byte[]{(byte) (0xff & hostAddress),
+                (byte) (0xff & (hostAddress >> 8)),
+                (byte) (0xff & (hostAddress >> 16)),
+                (byte) (0xff & (hostAddress >> 24))};
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (wifiManager != null) {
+            Timber.d("Wifi disabled");
+            wifiManager.setWifiEnabled(false);
+        }
+        super.onDestroy();
+    }
+
+    @Override
+    public void uploadingComplete(String result) {
+        try {
+            dismissDialog(DIALOG_DOWNLOAD_PROGRESS);
+        } catch (Exception e) {
+            Timber.e(e);
+        }
+        Toast.makeText(this, "Files Received", Toast.LENGTH_LONG).show();
+        finish();
+    }
+
+    @Override
+    public void progressUpdate(int progress, int total) {
+    }
+
+    @Override
+    public void onCancel() {
+        Toast.makeText(this, " Task Canceled", Toast.LENGTH_LONG).show();
+        try {
+            dismissDialog(DIALOG_DOWNLOAD_PROGRESS);
+        } catch (Exception e) {
+            Timber.e(e);
+        }
     }
 }

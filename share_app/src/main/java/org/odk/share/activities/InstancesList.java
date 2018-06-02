@@ -1,6 +1,6 @@
 package org.odk.share.activities;
 
-
+import android.content.Intent;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +12,7 @@ import org.odk.share.R;
 import org.odk.share.adapters.InstanceAdapter;
 import org.odk.share.dao.InstancesDao;
 import org.odk.share.provider.InstanceProviderAPI;
+import org.odk.share.utilities.ArrayUtils;
 
 
 import android.support.v4.app.LoaderManager;
@@ -124,6 +125,12 @@ public class InstancesList extends AppCompatActivity implements LoaderManager.Lo
 
     @OnClick(R.id.send_button)
     public void send() {
+        Intent intent = new Intent(this, SendActivity.class);
+        Long[] arr = selectedInstances.toArray(new Long[selectedInstances.size()]);
+        long[] a = ArrayUtils.toPrimitive(arr);
+        intent.putExtra("instance_ids", a);
+        startActivity(intent);
+        finish();
     }
 
     @OnClick(R.id.toggle_button)
