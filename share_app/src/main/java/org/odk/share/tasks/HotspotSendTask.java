@@ -33,6 +33,10 @@ public class HotspotSendTask extends AsyncTask<Long, Integer, String> {
     private Socket socket;
     private ServerSocket serverSocket;
 
+    public HotspotSendTask(ServerSocket serverSocket) {
+        this.serverSocket = serverSocket;
+    }
+
     public void setUploaderListener(ProgressListener sl) {
         synchronized (this) {
             stateListener = sl;
@@ -70,10 +74,6 @@ public class HotspotSendTask extends AsyncTask<Long, Integer, String> {
     protected String doInBackground(Long... longs) {
 
         try {
-            serverSocket = new ServerSocket(8080);
-
-            Timber.d("Local port " + serverSocket.getLocalPort() + " " + serverSocket.getLocalSocketAddress() + " " + serverSocket.getInetAddress());
-
             socket = serverSocket.accept();
             // show dialog and connected
             if (processSelectedFiles(longs)) {

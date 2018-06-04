@@ -64,6 +64,7 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
 
     private ProgressDialog progressDialog = null;
     private static final int DIALOG_DOWNLOAD_PROGRESS = 1;
+    private String wifiNetworkSSID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -206,6 +207,7 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
                 Timber.d(i.SSID);
                 if (i.SSID != null && i.SSID.equals("\"" + wifiNetwork.SSID + "\"")) {
                     Timber.d("Found");
+                    wifiNetworkSSID = i.SSID;
                     wifiManager.disconnect();
                     wifiManager.enableNetwork(i.networkId, true);
                     wifiManager.reconnect();
@@ -230,7 +232,7 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
         @Override
         public void onReceive(Context c, Intent intent) {
             for (ScanResult scanResult: wifiManager.getScanResults()) {
-                if (scanResult.SSID.endsWith(getString(R.string.hotspot_name_suffix))) {
+                if (scanResult.SSID.contains(getString(R.string.hotspot_name_suffix))) {
                     scanResultList.add(scanResult);
                 }
             }
@@ -281,12 +283,14 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
                 if (info != null) {
                     Timber.d(info + " " + info.getTypeName() + " " + info.getType());
                     if (info.getState() == NetworkInfo.State.CONNECTED && info.getTypeName().compareTo("WIFI") == 0) {
-                        if (!isConnected) {
+                        if (!isConnected && wifiNetworkSSID != null && wifiNetworkSSID.equalsIgnoreCase(info.getExtraInfo())) {
                             isConnected = true;
                             isWifiReceiverRegisterd = false;
                             String dstAddress = getAccessPointIpAddress(context);
                             showDialog(DIALOG_DOWNLOAD_PROGRESS);
-                            WifiReceiveTask wifiReceiveTask = new WifiReceiveTask(dstAddress);
+                            String port = info.getExtraInfo().split("_")[1];
+                            WifiReceiveTask wifiReceiveTask = new WifiReceiveTask(dstAddress,
+                                    Integer.parseInt(port.substring(0, port.length() - 1)));
                             wifiReceiveTask.setUploaderListener(WifiActivity.this);
                             wifiReceiveTask.execute();
                             unregisterReceiver(this);

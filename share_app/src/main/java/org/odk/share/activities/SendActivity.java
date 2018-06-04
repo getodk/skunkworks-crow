@@ -21,6 +21,9 @@ import org.odk.share.services.HotspotService;
 import org.odk.share.tasks.HotspotSendTask;
 import org.odk.share.utilities.ArrayUtils;
 
+import java.io.IOException;
+import java.net.ServerSocket;
+
 import timber.log.Timber;
 
 public class SendActivity extends AppCompatActivity implements ProgressListener {
@@ -35,6 +38,7 @@ public class SendActivity extends AppCompatActivity implements ProgressListener 
     private static final int PROGRESS_DIALOG = 1;
     private ProgressDialog progressDialog;
     private String alertMsg;
+    private ServerSocket serverSocket;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +49,15 @@ public class SendActivity extends AppCompatActivity implements ProgressListener 
         instancesToSend = ArrayUtils.toObject(instancesIds);
 
         wifiHotspot = WifiHotspotHelper.getInstance(this);
+
+        try {
+            serverSocket = new ServerSocket(0);
+            wifiHotspot.setPort(serverSocket.getLocalPort());
+        } catch (IOException e) {
+            Timber.e(e);
+            finish();
+        }
+
         isHotspotRunning = false;
         openSettings = false;
 
@@ -94,7 +107,7 @@ public class SendActivity extends AppCompatActivity implements ProgressListener 
             public void onClick(DialogInterface dialog, int which) {
                 wifiHotspot.saveLastConfig();
                 wifiHotspot.setWifiConfig(wifiHotspot.createNewConfig(WifiHotspotHelper.ssid +
-                        getString(R.string.hotspot_name_suffix)));
+                        getString(R.string.hotspot_name_suffix) + "_" + wifiHotspot.getPort()));
                 final Intent intent = new Intent(Intent.ACTION_MAIN, null);
                 intent.addCategory(Intent.CATEGORY_LAUNCHER);
                 final ComponentName cn = new ComponentName("com.android.settings", "com.android.settings.TetherSettings");
@@ -176,7 +189,7 @@ public class SendActivity extends AppCompatActivity implements ProgressListener 
 
     private void startSending() {
         showDialog(PROGRESS_DIALOG);
-        hotspotSendTask = new HotspotSendTask();
+        hotspotSendTask = new HotspotSendTask(serverSocket);
         hotspotSendTask.setUploaderListener(this);
         hotspotSendTask.execute(instancesToSend);
     }

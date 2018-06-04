@@ -22,6 +22,7 @@ import timber.log.Timber;
 public class WifiReceiveTask extends AsyncTask<String, Integer, String> {
 
     String ip;
+    int port;
     ProgressListener stateListener;
 
     public void setUploaderListener(ProgressListener sl) {
@@ -39,8 +40,9 @@ public class WifiReceiveTask extends AsyncTask<String, Integer, String> {
         }
     }
 
-    public WifiReceiveTask(String ip) {
+    public WifiReceiveTask(String ip, int port) {
         this.ip = ip;
+        this.port = port;
     }
 
     private String readData() {
@@ -49,9 +51,9 @@ public class WifiReceiveTask extends AsyncTask<String, Integer, String> {
         List<File> fileList = new ArrayList<>();
         String dialogMessage = null;
         ArrayList<String> filesDownloaded = new ArrayList<>();
-        Timber.d("Socket" + ip);
+        Timber.d("Socket" + ip + " " + port);
         try {
-            socket = new Socket(ip, 8080);
+            socket = new Socket(ip, port);
             DataInputStream dis = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
             int num = dis.readInt();
             Timber.d("Number of forms" + num + " ");
