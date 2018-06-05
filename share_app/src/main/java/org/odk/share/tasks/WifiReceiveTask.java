@@ -1,17 +1,21 @@
 package org.odk.share.tasks;
 
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Environment;
+
+import org.odk.share.dao.FormsDao;
 import org.odk.share.listeners.ProgressListener;
+import org.odk.share.provider.FormsProviderAPI;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
+import java.net.UnknownHostException;
 
 import timber.log.Timber;
 
@@ -21,9 +25,11 @@ import timber.log.Timber;
 
 public class WifiReceiveTask extends AsyncTask<String, Integer, String> {
 
-    String ip;
-    int port;
-    ProgressListener stateListener;
+    private String ip;
+    private int port;
+    private ProgressListener stateListener;
+    private DataInputStream dis;
+    private DataOutputStream dos;
 
     public void setUploaderListener(ProgressListener sl) {
         synchronized (this) {
@@ -45,94 +51,151 @@ public class WifiReceiveTask extends AsyncTask<String, Integer, String> {
         this.port = port;
     }
 
-    private String readData() {
+    private String receiveForms() {
+        String message = null;
         Socket socket = null;
-        int fileNo;
-        List<File> fileList = new ArrayList<>();
-        String dialogMessage = null;
-        ArrayList<String> filesDownloaded = new ArrayList<>();
-        Timber.d("Socket" + ip + " " + port);
+        Timber.d("Socket " + ip + " " + port);
+
         try {
             socket = new Socket(ip, port);
-            DataInputStream dis = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+            dis = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+            dos = new DataOutputStream(socket.getOutputStream());
             int num = dis.readInt();
             Timber.d("Number of forms" + num + " ");
             while (num-- > 0) {
-                String name1 = dis.readUTF();
-                String name2 = dis.readUTF();
-                String name3 = dis.readUTF();
+                Timber.d("Reading form");
+                readFormAndInstances();
+            }
+        } catch (UnknownHostException e) {
+            Timber.e(e);
+        } catch (IOException e) {
+            Timber.e(e);
+        }
 
-                Timber.d(name1 + " " + name2 + " " + name3);
+        return message;
+    }
 
-                fileNo = dis.readInt();
-                Timber.d("FILE " + fileNo);
-                fileList.clear();
-                boolean checkFormName = false;
-                while (fileNo-- > 0) {
-                    String filename = dis.readUTF();
-                    Timber.d("File" + filename);
-                    if (!checkFormName) {
-                        checkFormName = true;
-                        filesDownloaded.add(filename);
-                        Timber.d("LIST" + filesDownloaded + " " + filesDownloaded.size());
-                    }
-                    long fileSize = dis.readLong();
-                    File newFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/" + filename);
-                    newFile.createNewFile();
-                    FileOutputStream fos = new FileOutputStream(newFile);
-                    int n;
-                    byte[] buf = new byte[4096];
-                    while (fileSize > 0 && (n = dis.read(buf, 0, (int) Math.min(buf.length, fileSize))) != -1) {
-                        fos.write(buf, 0, n);
-                        fileSize -= n;
-                    }
-                    fos.close();
-                    fileList.add(newFile);
-                    Timber.d("File created", filename);
-                }
+    private void readFormAndInstances() {
+        try {
+
+            Timber.d("readFormAndInstances");
+            String formId = dis.readUTF();
+            String formVersion = dis.readUTF();
+            Timber.d(formId + " " + formVersion);
+            if (formVersion.equals("-1")) {
+                formVersion = null;
             }
 
+            boolean formExists = isFormExits(formId, formVersion);
+            Timber.d("Form exits " + formExists);
+            dos.writeBoolean(formExists);
+
+            if (!formExists) {
+                // read form
+                readForm();
+            }
+
+            // readInstances
+            readInstances();
 
         } catch (IOException e) {
-
-            // Connection Interrupted
-            // Make sure to remove each resource for forms which are received incomplete
-            for (File file : fileList) {
-                if (dialogMessage == null) {
-                    dialogMessage = "Files Deleted : " + file.getName() + "\n";
-                } else {
-                    dialogMessage += file.getName();
-                }
-                Timber.d("==Delete " + file.getName() + " " + file.delete());
-            }
-        } finally {
-            try {
-                if (socket != null) {
-                    socket.close();
-                }
-            } catch (IOException e) {
-                Timber.e(e);
-            }
+            Timber.e(e);
         }
-        boolean messageDownload = false;
-        for (String name : filesDownloaded) {
-            if (dialogMessage == null) {
-                messageDownload = true;
-                dialogMessage = "Files Downloaded : ";
-            } else if (!messageDownload) {
-                messageDownload = true;
-                dialogMessage = "\nFiles Downloaded : ";
-            }
-            dialogMessage += name + " ";
-            Timber.d("Message " + dialogMessage);
+    }
 
+    private boolean isFormExits(String formId, String formVersion) {
+        String []selectionArgs;
+        String selection;
+
+        if (formVersion == null) {
+            selectionArgs = new String[]{formId};
+            selection = FormsProviderAPI.FormsColumns.JR_FORM_ID + "=? AND "
+                    + FormsProviderAPI.FormsColumns.JR_VERSION + " IS NULL";
+        } else {
+            selectionArgs = new String[]{formId, formVersion};
+            selection = FormsProviderAPI.FormsColumns.JR_FORM_ID + "=? AND "
+                    + FormsProviderAPI.FormsColumns.JR_VERSION + "=?";
         }
-        return dialogMessage;
+
+        Cursor cursor = new FormsDao().getFormsCursor(null, selection, selectionArgs, null);
+
+        if (cursor != null && cursor.getCount() > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    private void readForm() {
+        try {
+            String displayName = dis.readUTF();
+            String formId = dis.readUTF();
+            String formVersion = dis.readUTF();
+            String submissionUri = dis.readUTF();
+
+            if (formVersion.equals("-1")) {
+                formVersion = null;
+            }
+
+            if (submissionUri.equals("-1")) {
+                submissionUri = null;
+            }
+
+            Timber.d(displayName + " " + formId + " " + formVersion + " " + submissionUri);
+            receiveFile(dis);
+            int numOfRes = dis.readInt();
+            while (numOfRes-- > 0) {
+                receiveFile(dis);
+            }
+        } catch (IOException e) {
+            Timber.e(e);
+        }
+    }
+
+    private void readInstances() {
+        try {
+            int numInstances = dis.readInt();
+            while (numInstances-- > 0) {
+                int numRes = dis.readInt();
+                while (numRes-- > 0) {
+                    receiveFile(dis);
+                }
+            }
+        } catch (IOException e) {
+            Timber.e(e);
+        }
+    }
+
+    private void receiveFile(DataInputStream dis) {
+        try {
+            String filename = dis.readUTF();
+            long fileSize = dis.readLong();
+            Timber.d("Size of file " + filename + " " + fileSize);
+            File shareDir = new File(Environment.getExternalStorageDirectory(), "share");
+
+            if (!shareDir.exists()) {
+                Timber.d("Directory created " + shareDir.getPath() + " " + shareDir.mkdirs());
+            }
+
+            File newFile = new File(shareDir, filename);
+            newFile.createNewFile();
+
+            FileOutputStream fos = new FileOutputStream(newFile);
+            int n;
+            byte[] buf = new byte[4096];
+            while (fileSize > 0 && (n = dis.read(buf, 0, (int) Math.min(buf.length, fileSize))) != -1) {
+                fos.write(buf, 0, n);
+                fileSize -= n;
+            }
+            fos.close();
+            Timber.d("File created and saved " + newFile.getAbsolutePath() + " " + newFile.getName());
+        } catch (IOException e) {
+            Timber.e(e);
+        }
     }
 
     @Override
     protected String doInBackground(String... strings) {
-        return readData();
+        return receiveForms();
     }
 
     @Override

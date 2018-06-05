@@ -3,8 +3,10 @@ package org.odk.share.tasks;
 import android.database.Cursor;
 import android.os.AsyncTask;
 
+import org.odk.share.dao.FormsDao;
 import org.odk.share.dao.InstancesDao;
 import org.odk.share.listeners.ProgressListener;
+import org.odk.share.provider.FormsProviderAPI;
 import org.odk.share.provider.InstanceProviderAPI;
 
 import java.io.BufferedInputStream;
@@ -14,12 +16,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import timber.log.Timber;
 
@@ -32,6 +36,8 @@ public class HotspotSendTask extends AsyncTask<Long, Integer, String> {
     private ProgressListener stateListener;
     private Socket socket;
     private ServerSocket serverSocket;
+    private DataOutputStream dos;
+    private DataInputStream dis;
 
     public HotspotSendTask(ServerSocket serverSocket) {
         this.serverSocket = serverSocket;
@@ -59,6 +65,13 @@ public class HotspotSendTask extends AsyncTask<Long, Integer, String> {
             if (socket != null) {
                 socket.close();
             }
+            if (dos != null) {
+                dos.close();
+            }
+
+            if (dis != null) {
+                dis.close();
+            }
         } catch (IOException e) {
             Timber.e(e);
         }
@@ -74,26 +87,28 @@ public class HotspotSendTask extends AsyncTask<Long, Integer, String> {
     protected String doInBackground(Long... longs) {
 
         try {
+            Timber.d("Waiting for receiver");
             socket = serverSocket.accept();
+            dos = new DataOutputStream(socket.getOutputStream());
+            dis = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+
             // show dialog and connected
+            Timber.d("Start Sending");
+
             if (processSelectedFiles(longs)) {
                 return "Successfully sent " + longs.length + " forms";
             }
         } catch (IOException e) {
             Timber.e(e);
-        } finally {
-            if (socket != null) {
-                try {
-                    socket.close();
-                } catch (IOException e) {
-                    Timber.e(e);
-                }
-            }
         }
+
         return "Sending Failed !";
     }
 
     private boolean processSelectedFiles(Long[] ids) {
+
+        // map that stores key as formId and value is another map which contains version as key and List with instances as value
+        Map<String, Map<String, List<String>>> formMap = new HashMap<>();
         StringBuilder selectionBuf = new StringBuilder(InstanceProviderAPI.InstanceColumns._ID + " IN (");
         String[] selectionArgs = new String[ids.length];
         for (int i = 0; i < ids.length; i++) {
@@ -106,47 +121,238 @@ public class HotspotSendTask extends AsyncTask<Long, Integer, String> {
 
         selectionBuf.append(")");
         String selection = selectionBuf.toString();
+
+        int count = 0;
         Cursor c = null;
         try {
             c = new InstancesDao().getInstancesCursor(selection, selectionArgs);
 
             if (c != null && c.getCount() > 0) {
-                OutputStream os = socket.getOutputStream();
-                DataOutputStream dos = new DataOutputStream(os);
+                c.moveToPosition(-1);
+                while (c.moveToNext()) {
+                    String formId = c.getString(c.getColumnIndex(InstanceProviderAPI.InstanceColumns.JR_FORM_ID));
+                    String formVersion = c.getString(c.getColumnIndex(InstanceProviderAPI.InstanceColumns.JR_VERSION));
+
+                    Map<String, List<String>> instanceMap;
+                    if (formMap.containsKey(formId)) {
+                        instanceMap = formMap.get(formId);
+                    } else {
+                        instanceMap = new HashMap<>();
+                        formMap.put(formId, instanceMap);
+                    }
+
+                    List<String> instancesList;
+                    if (instanceMap.containsKey(formVersion)) {
+                        instancesList = instanceMap.get(formVersion);
+                    } else {
+                        instancesList = new ArrayList<>();
+                        instanceMap.put(formVersion, instancesList);
+                        count++;
+                    }
+
+                    instancesList.add(c.getString(c.getColumnIndex(InstanceProviderAPI.InstanceColumns._ID)));
+                }
+            }
+            Timber.d(String.valueOf(formMap));
+        } finally {
+            if (c != null) {
+                c.close();
+            }
+        }
+
+        // send number of distinct forms
+        try {
+            dos.writeInt(count);
+        } catch (IOException e) {
+            Timber.e(e);
+        }
+
+        // using iterators
+        Iterator<Map.Entry<String, Map<String, List<String>>>> itrId = formMap.entrySet().iterator();
+
+        while (itrId.hasNext()) {
+            Map.Entry<String, Map<String, List<String>>> mapId = itrId.next();
+            Map<String, List<String>> formVersionMap =  mapId.getValue();
+
+            Iterator<Map.Entry<String, List<String>>> itrVersion = formVersionMap.entrySet().iterator();
+            while (itrVersion.hasNext()) {
+                Map.Entry<String, List<String>> mapVersion = itrVersion.next();
+                List<String> instanceIds = mapVersion.getValue();
+                String formVers = mapVersion.getKey();
+                String formId = mapId.getKey();
+
+                Timber.d("Send form : " + formId + " " + formVers + " " + instanceIds);
+                sendFormWithInstance(formId, formVers, instanceIds);
+            }
+        }
+        return true;
+    }
+
+    private void sendFormWithInstance(String formId, String formVersion, List<String> instanceIds) {
+        try {
+            Timber.d("SendFormWithInstance");
+            dos.writeUTF(formId);
+
+            if (formVersion == null) {
+                dos.writeUTF("-1");
+            } else {
+                dos.writeUTF(formVersion);
+            }
+
+            dos.flush();
+
+            Timber.d("Sent " + formId + " " + formVersion);
+
+            Timber.d("Waiting for response from the receiver for " + formId + " " + formVersion);
+            while (dis.available() <= 0) {
+                continue;
+            }
+
+            boolean formExistAtReceiver = dis.readBoolean();
+            Timber.d("Form exists " + formExistAtReceiver);
+
+            if (!formExistAtReceiver) {
+                sendForm(formId, formVersion);
+                Timber.d("Form Sent");
+            }
+
+            Timber.d("Sending Instances");
+            sendInstances(instanceIds);
+            Timber.d("Instanes sent");
+        } catch (IOException e) {
+            Timber.e(e);
+        }
+    }
+
+    private void sendForm(String formId, String formVersion) {
+        String []selectionArgs;
+        String selection;
+
+        if (formVersion == null) {
+            selectionArgs = new String[]{formId};
+            selection = FormsProviderAPI.FormsColumns.JR_FORM_ID + "=? AND "
+                    + FormsProviderAPI.FormsColumns.JR_VERSION + " IS NULL";
+        } else {
+            selectionArgs = new String[]{formId, formVersion};
+            selection = FormsProviderAPI.FormsColumns.JR_FORM_ID + "=? AND "
+                    + FormsProviderAPI.FormsColumns.JR_VERSION + "=?";
+        }
+
+        Cursor cursor = new FormsDao().getFormsCursor(null, selection, selectionArgs, null);
+
+        if (cursor != null) {
+            cursor.moveToPosition(-1);
+            try {
+                if (cursor.moveToNext()) {
+                    String displayName = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.DISPLAY_NAME));
+                    String formMediaPath = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.FORM_MEDIA_PATH));
+                    String formFilePath = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.FORM_FILE_PATH));
+                    String submissionUri = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.SUBMISSION_URI));
+
+                    try {
+                        dos.writeUTF(displayName);
+                        dos.writeUTF(formId);
+
+                        if (formVersion == null) {
+                            dos.writeUTF("-1");
+                        } else {
+                            dos.writeUTF(formVersion);
+                        }
+
+                        if (submissionUri == null) {
+                            dos.writeUTF("-1");
+                        } else {
+                            dos.writeUTF(submissionUri);
+                        }
+
+                        // form file sent
+                        sendFile(formFilePath);
+
+                        // send form resources
+                        File[] formRes = getFormResources(formMediaPath);
+
+                        if (formRes != null) {
+                            dos.writeInt(formRes.length);
+                            for (File f : formRes) {
+                                String fileName = f.getName();
+                                sendFile(formMediaPath + "/" + fileName);
+                            }
+                        } else {
+                            dos.writeInt(0);
+                        }
+                    } catch (IOException e) {
+                        Timber.e(e);
+                    }
+                }
+            } finally {
+                cursor.close();
+            }
+        }
+    }
+
+    private void sendInstances(List<String> instanceIds) {
+        StringBuilder selectionBuf = new StringBuilder(InstanceProviderAPI.InstanceColumns._ID + " IN (");
+        String[] selectionArgs = new String[instanceIds.size()];
+        for (int i = 0; i < instanceIds.size(); i++) {
+            if (i > 0) {
+                selectionBuf.append(",");
+            }
+            selectionBuf.append("?");
+            selectionArgs[i] = instanceIds.get(i);
+        }
+
+        selectionBuf.append(")");
+        String selection = selectionBuf.toString();
+        Cursor c = null;
+        try {
+            c = new InstancesDao().getInstancesCursor(selection, selectionArgs);
+
+            if (c != null && c.getCount() > 0) {
                 dos.writeInt(c.getCount());
                 c.moveToPosition(-1);
                 while (c.moveToNext()) {
-
-                    publishProgress(c.getPosition() + 1, ids.length);
-                    dos.writeUTF(c.getString(c.getColumnIndex(InstanceProviderAPI.InstanceColumns.JR_FORM_ID)));
-                    String formVersion = c.getString(c.getColumnIndex(InstanceProviderAPI.InstanceColumns.JR_VERSION));
-                    if (formVersion == null) {
-                        dos.writeUTF("-1");
-                    } else {
-                        dos.writeUTF(formVersion);
-                    }
-                    dos.writeUTF(c.getString(c.getColumnIndex(InstanceProviderAPI.InstanceColumns.DISPLAY_NAME)));
-
                     String instance = c.getString(
                             c.getColumnIndex(InstanceProviderAPI.InstanceColumns.INSTANCE_FILE_PATH));
-
-                    if (!sendInstance(instance)) {
-                        return false;
-                    }
+                    sendInstance(instance);
                 }
             }
         } catch (IOException e) {
             if (c != null) {
                 c.close();
             }
-            return false;
         } finally {
             if (c != null) {
                 c.close();
             }
         }
-        return true;
     }
+
+    private void sendFile(String filePath) {
+        byte[] bytes = new byte[4096];
+        try {
+            File file = new File(filePath);
+            int read = 0;
+            BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
+            DataInputStream fileInputStream = new DataInputStream(bis);
+            dos.writeUTF(file.getName());
+            dos.writeLong(file.length());
+            while ((read = fileInputStream.read(bytes)) > 0) {
+                dos.write(bytes, 0, read);
+            }
+            final String sentMsg = "File sent to: " + socket;
+            Timber.d("Sent message " + sentMsg);
+        } catch (FileNotFoundException e1) {
+            Timber.e(e1);
+        } catch (IOException e1) {
+            Timber.e(e1);
+        }
+    }
+
+    private File[] getFormResources(String formResPath) {
+        File directory = new File(formResPath);
+        return directory.listFiles();
+    }
+
 
     private boolean sendInstance(String instanceFilePath) {
         File instanceFile = new File(instanceFilePath);
@@ -185,28 +391,26 @@ public class HotspotSendTask extends AsyncTask<Long, Integer, String> {
             }
         }
 
-        if (!uploadOneFile(files)) {
+        if (!uploadFiles(files)) {
             return false;
         }
         return true;
     }
 
-    boolean uploadOneFile(List<File> files) {
+    boolean uploadFiles(List<File> files) {
         byte[] bytes = new byte[4096];
         try {
             int read = 0;
-            OutputStream os = socket.getOutputStream();
-            DataOutputStream dos = new DataOutputStream(os);
             dos.writeInt(files.size());
 
             for (int i = 0; i < files.size(); i++) {
                 File file = files.get(i);
                 publishProgress(i + 1, files.size());
                 BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
-                DataInputStream dis = new DataInputStream(bis);
+                DataInputStream fileInputStream = new DataInputStream(bis);
                 dos.writeUTF(file.getName());
                 dos.writeLong(file.length());
-                while ((read = dis.read(bytes)) > 0) {
+                while ((read = fileInputStream.read(bytes)) > 0) {
                     dos.write(bytes, 0, read);
                 }
                 final String sentMsg = "File sent to: " + socket;
