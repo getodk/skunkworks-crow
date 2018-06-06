@@ -8,7 +8,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
-import android.net.DhcpInfo;
 import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
@@ -38,8 +37,6 @@ import org.odk.share.controller.WifiHelper;
 import org.odk.share.listeners.ProgressListener;
 import org.odk.share.tasks.WifiReceiveTask;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,7 +73,7 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
         setTitle(getString(R.string.connect_wifi));
         setSupportActionBar(toolbar);
 
-        wifiHelper = WifiHelper.getInstance(this);
+        wifiHelper = new WifiHelper(this);
 
         wifiManager = wifiHelper.getWifiManager();
 
@@ -266,7 +263,7 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
                             dismissDialog(DIALOG_CONNECTING);
                             showDialog(DIALOG_DOWNLOAD_PROGRESS);
                             String port = info.getExtraInfo().split("_")[1];
-                            String dstAddress = getAccessPointIpAddress(context);
+                            String dstAddress = wifiHelper.getAccessPointIpAddress();
                             wifiReceiveTask = new WifiReceiveTask(dstAddress,
                                     Integer.parseInt(port.substring(0, port.length() - 1)));
                             wifiReceiveTask.setUploaderListener(WifiActivity.this);
@@ -334,26 +331,6 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
             default:
                 return null;
         }
-    }
-
-    public static String getAccessPointIpAddress(Context context) {
-        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-        DhcpInfo dhcpInfo = wifiManager.getDhcpInfo();
-        byte[] ipAddress = convertToBytes(dhcpInfo.serverAddress);
-        try {
-            String ip = InetAddress.getByAddress(ipAddress).getHostAddress();
-            return ip.replace("/", "");
-        } catch (UnknownHostException e) {
-            Timber.e(e);
-        }
-        return null;
-    }
-
-    private static byte[] convertToBytes(int hostAddress) {
-        return new byte[]{(byte) (0xff & hostAddress),
-                (byte) (0xff & (hostAddress >> 8)),
-                (byte) (0xff & (hostAddress >> 16)),
-                (byte) (0xff & (hostAddress >> 24))};
     }
 
     @Override

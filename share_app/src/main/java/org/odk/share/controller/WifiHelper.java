@@ -1,6 +1,7 @@
 package org.odk.share.controller;
 
 import android.content.Context;
+import android.net.DhcpInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
@@ -9,7 +10,11 @@ import android.widget.Toast;
 
 import org.odk.share.R;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.List;
+
+import timber.log.Timber;
 
 /**
  * Created by laksh on 5/22/2018.
@@ -18,19 +23,11 @@ import java.util.List;
 public class WifiHelper {
 
     private final WifiManager wifiManager;
-    public static WifiHelper wifiHelper;
     private Context context;
 
-    private WifiHelper(Context context) {
+    public WifiHelper(Context context) {
         this.context = context;
         wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-    }
-
-    public static synchronized WifiHelper getInstance(Context context) {
-                if (wifiHelper == null) {
-            wifiHelper = new WifiHelper(context);
-        }
-        return wifiHelper;
     }
 
     public void connectToWifi(ScanResult wifiNetwork, String password) {
@@ -99,5 +96,24 @@ public class WifiHelper {
             return true;
         }
         return false;
+    }
+
+    public String getAccessPointIpAddress() {
+        DhcpInfo dhcpInfo = wifiManager.getDhcpInfo();
+        byte[] ipAddress = convertToBytes(dhcpInfo.serverAddress);
+        try {
+            String ip = InetAddress.getByAddress(ipAddress).getHostAddress();
+            return ip.replace("/", "");
+        } catch (UnknownHostException e) {
+            Timber.e(e);
+        }
+        return null;
+    }
+
+    private byte[] convertToBytes(int hostAddress) {
+        return new byte[]{(byte) (0xff & hostAddress),
+                (byte) (0xff & (hostAddress >> 8)),
+                (byte) (0xff & (hostAddress >> 16)),
+                (byte) (0xff & (hostAddress >> 24))};
     }
 }
