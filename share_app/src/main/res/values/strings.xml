@@ -4,7 +4,7 @@
     <string name="hotspot_start">Starting hotspot</string>
     <string name="stop">Stop</string>
     <string name="start_hotspot">Start Hotspot</string>
-    <string name="hotspot_settings_dialog">Enable protable hotspot from the settings.</string>
+    <string name="hotspot_settings_dialog">Enable portable hotspot from the settings.</string>
     <string name="hotspot_name_suffix">-odk-share</string>
     <string name="hotspot_already_running">Hotspot already running</string>
     <string name="mobile_data_message">Your mobile data can be consumed. Disable it and then try again</string>
@@ -15,7 +15,8 @@
     <string name="clear_all">Clear all</string>
     <string name="send_forms">Send forms</string>
 
-    <string name="view_wifi">View Wifi</string>
+    <string name="connect_wifi">Connect to wifi</string>
+    <string name="receive_forms">Receive forms</string>
     <string name="enable_wifi">Enable Wifi to start scan</string>
     <string name="no_wifi_available">No wifi available. Scan again !</string>
     <string name="scanning">Scanning. Please wait</string>
@@ -24,7 +25,7 @@
     <string name="show_password">Show Password</string>
     <string name="connect">Connect</string>
     <string name="connected">Connected</string>
-    <string name="already_connected">Already connected to </string>
+    <string name="already_connected">Already connected to</string>
     <string name="cancel">Cancel</string>
     <string name="password_empty">Password field is empty</string>
 
