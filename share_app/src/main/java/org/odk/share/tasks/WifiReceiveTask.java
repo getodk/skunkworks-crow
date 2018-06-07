@@ -16,6 +16,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
 
 import timber.log.Timber;
 
@@ -30,6 +33,9 @@ public class WifiReceiveTask extends AsyncTask<String, Integer, String> {
     private ProgressListener stateListener;
     private DataInputStream dis;
     private DataOutputStream dos;
+
+    private static final String INSTANCE_PATH = "share/instances/";
+    private static final String FORM_PATH = "share/forms/";
 
     public void setUploaderListener(ProgressListener sl) {
         synchronized (this) {
@@ -96,7 +102,7 @@ public class WifiReceiveTask extends AsyncTask<String, Integer, String> {
             }
 
             // readInstances
-            readInstances();
+            readInstances(formId);
 
         } catch (IOException e) {
             Timber.e(e);
@@ -141,23 +147,26 @@ public class WifiReceiveTask extends AsyncTask<String, Integer, String> {
             }
 
             Timber.d(displayName + " " + formId + " " + formVersion + " " + submissionUri);
-            receiveFile(dis);
+            receiveFile(FORM_PATH);
             int numOfRes = dis.readInt();
             while (numOfRes-- > 0) {
-                receiveFile(dis);
+                receiveFile(FORM_PATH + displayName + "-media");
             }
         } catch (IOException e) {
             Timber.e(e);
         }
     }
 
-    private void readInstances() {
+    private void readInstances(String formId) {
         try {
             int numInstances = dis.readInt();
             while (numInstances-- > 0) {
                 int numRes = dis.readInt();
+                String time = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss-SSS",
+                        Locale.ENGLISH).format(Calendar.getInstance().getTime());
+                String path = INSTANCE_PATH + formId + "_" + time;
                 while (numRes-- > 0) {
-                    receiveFile(dis);
+                    receiveFile(path);
                 }
             }
         } catch (IOException e) {
@@ -165,12 +174,12 @@ public class WifiReceiveTask extends AsyncTask<String, Integer, String> {
         }
     }
 
-    private void receiveFile(DataInputStream dis) {
+    private void receiveFile(String path) {
         try {
             String filename = dis.readUTF();
             long fileSize = dis.readLong();
             Timber.d("Size of file " + filename + " " + fileSize);
-            File shareDir = new File(Environment.getExternalStorageDirectory(), "share");
+            File shareDir = new File(Environment.getExternalStorageDirectory(), path);
 
             if (!shareDir.exists()) {
                 Timber.d("Directory created " + shareDir.getPath() + " " + shareDir.mkdirs());
