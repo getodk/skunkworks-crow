@@ -64,6 +64,8 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
     private WifiHelper wifiHelper;
     private String wifiNetworkSSID;
 
+    private String alertMsg;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -124,6 +126,7 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
             showPasswordDialog(scanResultList.get(i));
         } else {
             // connect
+            alertMsg = getString(R.string.connecting_wifi);
             showDialog(DIALOG_CONNECTING);
             wifiNetworkSSID = scanResultList.get(i).SSID;
             wifiHelper.connectToWifi(scanResultList.get(i), null);
@@ -304,7 +307,7 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
         switch (id) {
             case DIALOG_DOWNLOAD_PROGRESS:
                 progressDialog = new ProgressDialog(this);
-                progressDialog.setMessage("Receiving");
+                progressDialog.setMessage(alertMsg);
                 progressDialog.setIndeterminate(true);
                 progressDialog.setCancelable(false);
 
@@ -323,7 +326,7 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
                 return progressDialog;
             case DIALOG_CONNECTING:
                 progressDialog = new ProgressDialog(this);
-                progressDialog.setMessage("Connecting to wifi");
+                progressDialog.setMessage(alertMsg);
                 progressDialog.setIndeterminate(true);
                 progressDialog.setCancelable(false);
                 progressDialog.show();
@@ -347,11 +350,13 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
             Timber.e(e);
         }
         Toast.makeText(this, "Files Received", Toast.LENGTH_LONG).show();
-        finish();
+        createAlertDialog("Transfer result", result);
     }
 
     @Override
     public void progressUpdate(int progress, int total) {
+        alertMsg = "Receiving form " + progress + " of " + total;
+        progressDialog.setMessage(alertMsg);
     }
 
     @Override
@@ -362,5 +367,24 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
         } catch (Exception e) {
             Timber.e(e);
         }
+    }
+
+    private void createAlertDialog(String title, String message) {
+        alertDialog = new AlertDialog.Builder(this).create();
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+        DialogInterface.OnClickListener quitListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int i) {
+                switch (i) {
+                    case DialogInterface.BUTTON_POSITIVE:
+                        finish();
+                        break;
+                }
+            }
+        };
+        alertDialog.setCancelable(false);
+        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.ok), quitListener);
+        alertDialog.show();
     }
 }

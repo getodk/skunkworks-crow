@@ -162,11 +162,14 @@ public class HotspotSendTask extends AsyncTask<Long, Integer, String> {
 
         // send number of distinct forms
         try {
+            dos.writeInt(ids.length);
             dos.writeInt(count);
         } catch (IOException e) {
             Timber.e(e);
         }
 
+        int progress = 0;
+        int total = ids.length;
         // using iterators
         Iterator<Map.Entry<String, Map<String, List<String>>>> itrId = formMap.entrySet().iterator();
 
@@ -182,13 +185,14 @@ public class HotspotSendTask extends AsyncTask<Long, Integer, String> {
                 String formId = mapId.getKey();
 
                 Timber.d("Send form : " + formId + " " + formVers + " " + instanceIds);
-                sendFormWithInstance(formId, formVers, instanceIds);
+                sendFormWithInstance(formId, formVers, instanceIds, progress, total);
+                progress += instanceIds.size();
             }
         }
         return true;
     }
 
-    private void sendFormWithInstance(String formId, String formVersion, List<String> instanceIds) {
+    private void sendFormWithInstance(String formId, String formVersion, List<String> instanceIds, int progress, int total) {
         try {
             Timber.d("SendFormWithInstance");
             dos.writeUTF(formId);
@@ -217,7 +221,7 @@ public class HotspotSendTask extends AsyncTask<Long, Integer, String> {
             }
 
             Timber.d("Sending Instances");
-            sendInstances(instanceIds);
+            sendInstances(instanceIds, progress, total);
             Timber.d("Instanes sent");
         } catch (IOException e) {
             Timber.e(e);
@@ -290,7 +294,7 @@ public class HotspotSendTask extends AsyncTask<Long, Integer, String> {
         }
     }
 
-    private void sendInstances(List<String> instanceIds) {
+    private void sendInstances(List<String> instanceIds, int progress, int total) {
         StringBuilder selectionBuf = new StringBuilder(InstanceProviderAPI.InstanceColumns._ID + " IN (");
         String[] selectionArgs = new String[instanceIds.size()];
         for (int i = 0; i < instanceIds.size(); i++) {
@@ -313,6 +317,8 @@ public class HotspotSendTask extends AsyncTask<Long, Integer, String> {
                 while (c.moveToNext()) {
                     String instance = c.getString(
                             c.getColumnIndex(InstanceProviderAPI.InstanceColumns.INSTANCE_FILE_PATH));
+                    publishProgress(++progress, total);
+                    Timber.d("Progress " + progress + " " + total);
                     sendInstance(instance);
                 }
             }
@@ -405,7 +411,6 @@ public class HotspotSendTask extends AsyncTask<Long, Integer, String> {
 
             for (int i = 0; i < files.size(); i++) {
                 File file = files.get(i);
-                publishProgress(i + 1, files.size());
                 BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
                 DataInputStream fileInputStream = new DataInputStream(bis);
                 dos.writeUTF(file.getName());

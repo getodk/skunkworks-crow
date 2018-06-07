@@ -39,6 +39,7 @@ public class SendActivity extends AppCompatActivity implements ProgressListener 
     private ProgressDialog progressDialog;
     private String alertMsg;
     private ServerSocket serverSocket;
+    private AlertDialog alertDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -202,7 +203,7 @@ public class SendActivity extends AppCompatActivity implements ProgressListener 
             // tried to close a dialog not open. don't care.
         }
         Toast.makeText(this, "Files sent", Toast.LENGTH_LONG).show();
-        finish();
+        createAlertDialog("Tranfer result", result);
     }
 
     @Override
@@ -226,7 +227,7 @@ public class SendActivity extends AppCompatActivity implements ProgressListener 
         switch (id) {
             case PROGRESS_DIALOG:
                 progressDialog = new ProgressDialog(this);
-                progressDialog.setTitle("Sending ");
+                progressDialog.setTitle(getString(R.string.waiting_connection));
                 progressDialog.setMessage(alertMsg);
                 progressDialog.setIndeterminate(true);
                 progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -248,4 +249,22 @@ public class SendActivity extends AppCompatActivity implements ProgressListener 
         return null;
     }
 
+    private void createAlertDialog(String title, String message) {
+        alertDialog = new AlertDialog.Builder(this).create();
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+        DialogInterface.OnClickListener quitListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int i) {
+                switch (i) {
+                    case DialogInterface.BUTTON_POSITIVE:
+                        finish();
+                        break;
+                }
+            }
+        };
+        alertDialog.setCancelable(false);
+        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.ok), quitListener);
+        alertDialog.show();
+    }
 }

@@ -33,6 +33,8 @@ public class WifiReceiveTask extends AsyncTask<String, Integer, String> {
     private ProgressListener stateListener;
     private DataInputStream dis;
     private DataOutputStream dos;
+    private int total;
+    private int progress;
 
     private static final String INSTANCE_PATH = "share/instances/";
     private static final String FORM_PATH = "share/forms/";
@@ -58,7 +60,6 @@ public class WifiReceiveTask extends AsyncTask<String, Integer, String> {
     }
 
     private String receiveForms() {
-        String message = null;
         Socket socket = null;
         Timber.d("Socket " + ip + " " + port);
 
@@ -66,11 +67,14 @@ public class WifiReceiveTask extends AsyncTask<String, Integer, String> {
             socket = new Socket(ip, port);
             dis = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
             dos = new DataOutputStream(socket.getOutputStream());
+            total = dis.readInt();
             int num = dis.readInt();
             Timber.d("Number of forms" + num + " ");
             while (num-- > 0) {
                 Timber.d("Reading form");
-                readFormAndInstances();
+                if (readFormAndInstances()) {
+                    return "Successfully received " + total + " forms";
+                }
             }
         } catch (UnknownHostException e) {
             Timber.e(e);
@@ -78,10 +82,10 @@ public class WifiReceiveTask extends AsyncTask<String, Integer, String> {
             Timber.e(e);
         }
 
-        return message;
+        return  "Sending Failed !";
     }
 
-    private void readFormAndInstances() {
+    private boolean readFormAndInstances() {
         try {
 
             Timber.d("readFormAndInstances");
@@ -103,10 +107,11 @@ public class WifiReceiveTask extends AsyncTask<String, Integer, String> {
 
             // readInstances
             readInstances(formId);
-
+            return true;
         } catch (IOException e) {
             Timber.e(e);
         }
+        return false;
     }
 
     private boolean isFormExits(String formId, String formVersion) {
@@ -161,6 +166,7 @@ public class WifiReceiveTask extends AsyncTask<String, Integer, String> {
         try {
             int numInstances = dis.readInt();
             while (numInstances-- > 0) {
+                publishProgress(++progress, total);
                 int numRes = dis.readInt();
                 String time = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss-SSS",
                         Locale.ENGLISH).format(Calendar.getInstance().getTime());
