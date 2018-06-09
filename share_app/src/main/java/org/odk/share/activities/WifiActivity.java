@@ -1,5 +1,7 @@
 package org.odk.share.activities;
 
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -8,8 +10,6 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
-import android.net.wifi.WifiConfiguration;
-import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -34,6 +34,8 @@ import android.widget.Toast;
 import org.odk.share.R;
 import org.odk.share.adapters.WifiResultAdapter;
 import org.odk.share.controller.WifiHelper;
+import org.odk.share.listeners.ProgressListener;
+import org.odk.share.tasks.WifiReceiveTask;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +44,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import timber.log.Timber;
 
-public class WifiActivity extends AppCompatActivity {
+public class WifiActivity extends AppCompatActivity implements ProgressListener {
 
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
     @BindView(R.id.empty_view) TextView emptyView;
@@ -54,6 +56,15 @@ public class WifiActivity extends AppCompatActivity {
     private boolean isReceiverRegistered;
     private boolean isWifiReceiverRegisterd;
     private AlertDialog alertDialog;
+    private WifiReceiveTask wifiReceiveTask;
+
+    private ProgressDialog progressDialog = null;
+    private static final int DIALOG_DOWNLOAD_PROGRESS = 1;
+    private static final int DIALOG_CONNECTING = 2;
+    private WifiHelper wifiHelper;
+    private String wifiNetworkSSID;
+
+    private String alertMsg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,10 +72,10 @@ public class WifiActivity extends AppCompatActivity {
         setContentView(R.layout.activity_wifi);
         ButterKnife.bind(this);
 
-        setTitle(getString(R.string.view_wifi));
+        setTitle(getString(R.string.connect_wifi));
         setSupportActionBar(toolbar);
 
-        WifiHelper wifiHelper = new WifiHelper(this);
+        wifiHelper = new WifiHelper(this);
 
         wifiManager = wifiHelper.getWifiManager();
 
@@ -115,7 +126,12 @@ public class WifiActivity extends AppCompatActivity {
             showPasswordDialog(scanResultList.get(i));
         } else {
             // connect
-            connectToWifi(scanResultList.get(i), null);
+            alertMsg = getString(R.string.connecting_wifi);
+            showDialog(DIALOG_CONNECTING);
+            wifiNetworkSSID = scanResultList.get(i).SSID;
+            wifiHelper.connectToWifi(scanResultList.get(i), null);
+            isWifiReceiverRegisterd = true;
+            registerReceiver(wifiReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
         }
     }
 
@@ -160,8 +176,12 @@ public class WifiActivity extends AppCompatActivity {
                         String pw = passwordEditText.getText().toString();
                         if (!pw.equals("")) {
                             Timber.d(pw);
-                            connectToWifi(scanResult, pw);
                             dialog.dismiss();
+                            wifiNetworkSSID = scanResult.SSID;
+                            wifiHelper.connectToWifi(scanResult, pw);
+                            isWifiReceiverRegisterd = true;
+                            registerReceiver(wifiReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+                            showDialog(DIALOG_CONNECTING);
                         } else {
                             passwordEditText.setError(getString(R.string.password_empty));
                         }
@@ -172,40 +192,7 @@ public class WifiActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
-    private void connectToWifi(ScanResult wifiNetwork, String password) {
-        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
 
-        if (wifiInfo.getBSSID() != null && wifiInfo.getBSSID().equals(wifiNetwork.BSSID)) {
-            // already connected to a network
-            Toast.makeText(this, getString(R.string.already_connected) + wifiNetwork.SSID, Toast.LENGTH_LONG).show();
-        } else {
-            WifiConfiguration conf = new WifiConfiguration();
-            conf.SSID = "\"" + wifiNetwork.SSID + "\"";
-
-            if (WifiHelper.isClose(wifiNetwork)) {
-                conf.preSharedKey = "\"" + password + "\"";
-            } else {
-                conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
-            }
-
-            WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-            wifiManager.addNetwork(conf);
-
-            List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
-            for (WifiConfiguration i : list) {
-                Timber.d(i.SSID);
-                if (i.SSID != null && i.SSID.equals("\"" + wifiNetwork.SSID + "\"")) {
-                    Timber.d("Found");
-                    wifiManager.disconnect();
-                    wifiManager.enableNetwork(i.networkId, true);
-                    wifiManager.reconnect();
-                    isWifiReceiverRegisterd = true;
-                    registerReceiver(wifiReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-                    break;
-                }
-            }
-        }
-    }
 
     public void startScan() {
         scanResultList.clear();
@@ -220,7 +207,7 @@ public class WifiActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context c, Intent intent) {
             for (ScanResult scanResult: wifiManager.getScanResults()) {
-                if (scanResult.SSID.endsWith(getString(R.string.hotspot_name_suffix))) {
+                if (scanResult.SSID.contains(getString(R.string.hotspot_name_suffix))) {
                     scanResultList.add(scanResult);
                 }
             }
@@ -264,20 +251,27 @@ public class WifiActivity extends AppCompatActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            ConnectivityManager connectivity = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-            if (connectivity != null) {
-                NetworkInfo[] info = connectivity.getAllNetworkInfo();
+            Timber.d("RECEIVER CONNECTION ");
+            ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (cm != null) {
+                NetworkInfo info = cm.getActiveNetworkInfo();
                 if (info != null) {
-                    for (int i = 0; i < info.length; i++) {
-                        if (info[i].getState() == NetworkInfo.State.CONNECTED) {
-                            if (!isConnected) {
-                                isConnected = true;
-                                isWifiReceiverRegisterd = false;
-                                WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-                                Timber.d(String.valueOf(wifiInfo));
-                                Toast.makeText(WifiActivity.this, getString(R.string.connected), Toast.LENGTH_LONG).show();
-                                unregisterReceiver(this);
-                            }
+                    Timber.d(info + " " + info.getTypeName() + " " + info.getType() + " " + wifiNetworkSSID  + " " + isConnected);
+                    if (info.getState() == NetworkInfo.State.CONNECTED && info.getTypeName().compareTo("WIFI") == 0) {
+                        if (!isConnected && info.getExtraInfo().equals("\"" + wifiNetworkSSID + "\"")) {
+                            Timber.d("Connected");
+                            isConnected = true;
+                            isWifiReceiverRegisterd = false;
+                            Toast.makeText(getApplicationContext(), "Connected to " + wifiNetworkSSID, Toast.LENGTH_LONG).show();
+                            dismissDialog(DIALOG_CONNECTING);
+                            showDialog(DIALOG_DOWNLOAD_PROGRESS);
+                            String port = info.getExtraInfo().split("_")[1];
+                            String dstAddress = wifiHelper.getAccessPointIpAddress();
+                            wifiReceiveTask = new WifiReceiveTask(dstAddress,
+                                    Integer.parseInt(port.substring(0, port.length() - 1)));
+                            wifiReceiveTask.setUploaderListener(WifiActivity.this);
+                            wifiReceiveTask.execute();
+                            unregisterReceiver(this);
                         }
                     }
                 }
@@ -306,5 +300,90 @@ public class WifiActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected Dialog onCreateDialog(int id) {
+        switch (id) {
+            case DIALOG_DOWNLOAD_PROGRESS:
+                progressDialog = new ProgressDialog(this);
+                progressDialog.setMessage(alertMsg);
+                progressDialog.setIndeterminate(true);
+                progressDialog.setCancelable(false);
+
+                progressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.cancel),
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (wifiReceiveTask != null) {
+                                    wifiReceiveTask.cancel(true);
+                                }
+                                dialog.dismiss();
+                                finish();
+                            }
+                        });
+                progressDialog.show();
+                return progressDialog;
+            case DIALOG_CONNECTING:
+                progressDialog = new ProgressDialog(this);
+                progressDialog.setMessage(alertMsg);
+                progressDialog.setIndeterminate(true);
+                progressDialog.setCancelable(false);
+                progressDialog.show();
+                return progressDialog;
+            default:
+                return null;
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        wifiHelper.disableWifi(wifiNetworkSSID);
+        super.onDestroy();
+    }
+
+    @Override
+    public void uploadingComplete(String result) {
+        try {
+            dismissDialog(DIALOG_DOWNLOAD_PROGRESS);
+        } catch (Exception e) {
+            Timber.e(e);
+        }
+        createAlertDialog(getString(R.string.transfer_result), getString(R.string.receive_success, result));
+    }
+
+    @Override
+    public void progressUpdate(int progress, int total) {
+        alertMsg = getString(R.string.receiving_items, String.valueOf(progress), String.valueOf(total));
+        progressDialog.setMessage(alertMsg);
+    }
+
+    @Override
+    public void onCancel() {
+        Toast.makeText(this, getString(R.string.canceled), Toast.LENGTH_LONG).show();
+        try {
+            dismissDialog(DIALOG_DOWNLOAD_PROGRESS);
+        } catch (Exception e) {
+            Timber.e(e);
+        }
+    }
+
+    private void createAlertDialog(String title, String message) {
+        alertDialog = new AlertDialog.Builder(this).create();
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+        DialogInterface.OnClickListener quitListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int i) {
+                switch (i) {
+                    case DialogInterface.BUTTON_POSITIVE:
+                        finish();
+                        break;
+                }
+            }
+        };
+        alertDialog.setCancelable(false);
+        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.ok), quitListener);
+        alertDialog.show();
     }
 }
