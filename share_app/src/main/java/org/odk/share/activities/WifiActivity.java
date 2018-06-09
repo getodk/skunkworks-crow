@@ -349,19 +349,18 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
         } catch (Exception e) {
             Timber.e(e);
         }
-        Toast.makeText(this, "Files Received", Toast.LENGTH_LONG).show();
-        createAlertDialog("Transfer result", result);
+        createAlertDialog(getString(R.string.transfer_result), getString(R.string.receive_success, result));
     }
 
     @Override
     public void progressUpdate(int progress, int total) {
-        alertMsg = "Receiving form " + progress + " of " + total;
+        alertMsg = getString(R.string.receiving_items, String.valueOf(progress), String.valueOf(total));
         progressDialog.setMessage(alertMsg);
     }
 
     @Override
     public void onCancel() {
-        Toast.makeText(this, " Task Canceled", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, getString(R.string.canceled), Toast.LENGTH_LONG).show();
         try {
             dismissDialog(DIALOG_DOWNLOAD_PROGRESS);
         } catch (Exception e) {

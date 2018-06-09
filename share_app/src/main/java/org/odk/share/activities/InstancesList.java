@@ -39,6 +39,7 @@ public class InstancesList extends AppCompatActivity implements LoaderManager.Lo
             = InstanceProviderAPI.InstanceColumns.DISPLAY_NAME + " COLLATE NOCASE ASC";
 
     private static final String SELECTED_INSTANCES = "selectedInstances";
+    public static final String INSTANCE_IDS = "instance_ids";
 
     private static final int INSTANCE_LOADER = 1;
     private InstanceAdapter instanceAdapter;
@@ -128,7 +129,7 @@ public class InstancesList extends AppCompatActivity implements LoaderManager.Lo
         Intent intent = new Intent(this, SendActivity.class);
         Long[] arr = selectedInstances.toArray(new Long[selectedInstances.size()]);
         long[] a = ArrayUtils.toPrimitive(arr);
-        intent.putExtra("instance_ids", a);
+        intent.putExtra(INSTANCE_IDS, a);
         startActivity(intent);
         finish();
     }

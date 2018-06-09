@@ -38,6 +38,8 @@ public class HotspotSendTask extends AsyncTask<Long, Integer, String> {
     private ServerSocket serverSocket;
     private DataOutputStream dos;
     private DataInputStream dis;
+    private int progress;
+    private int total;
 
     public HotspotSendTask(ServerSocket serverSocket) {
         this.serverSocket = serverSocket;
@@ -94,15 +96,13 @@ public class HotspotSendTask extends AsyncTask<Long, Integer, String> {
 
             // show dialog and connected
             Timber.d("Start Sending");
+            processSelectedFiles(longs);
 
-            if (processSelectedFiles(longs)) {
-                return "Successfully sent " + longs.length + " forms";
-            }
         } catch (IOException e) {
             Timber.e(e);
         }
 
-        return "Sending Failed !";
+        return String.valueOf(progress);
     }
 
     private boolean processSelectedFiles(Long[] ids) {
@@ -168,8 +168,7 @@ public class HotspotSendTask extends AsyncTask<Long, Integer, String> {
             Timber.e(e);
         }
 
-        int progress = 0;
-        int total = ids.length;
+        total = ids.length;
         // using iterators
         Iterator<Map.Entry<String, Map<String, List<String>>>> itrId = formMap.entrySet().iterator();
 
@@ -185,14 +184,14 @@ public class HotspotSendTask extends AsyncTask<Long, Integer, String> {
                 String formId = mapId.getKey();
 
                 Timber.d("Send form : " + formId + " " + formVers + " " + instanceIds);
-                sendFormWithInstance(formId, formVers, instanceIds, progress, total);
+                sendFormWithInstance(formId, formVers, instanceIds);
                 progress += instanceIds.size();
             }
         }
         return true;
     }
 
-    private void sendFormWithInstance(String formId, String formVersion, List<String> instanceIds, int progress, int total) {
+    private void sendFormWithInstance(String formId, String formVersion, List<String> instanceIds) {
         try {
             Timber.d("SendFormWithInstance");
             dos.writeUTF(formId);

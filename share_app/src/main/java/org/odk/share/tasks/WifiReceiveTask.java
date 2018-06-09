@@ -73,7 +73,7 @@ public class WifiReceiveTask extends AsyncTask<String, Integer, String> {
             while (num-- > 0) {
                 Timber.d("Reading form");
                 if (readFormAndInstances()) {
-                    return "Successfully received " + total + " forms";
+                    return String.valueOf(progress);
                 }
             }
         } catch (UnknownHostException e) {
@@ -82,7 +82,7 @@ public class WifiReceiveTask extends AsyncTask<String, Integer, String> {
             Timber.e(e);
         }
 
-        return  "Sending Failed !";
+        return  String.valueOf(progress);
     }
 
     private boolean readFormAndInstances() {

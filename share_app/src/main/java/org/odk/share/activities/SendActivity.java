@@ -26,6 +26,8 @@ import java.net.ServerSocket;
 
 import timber.log.Timber;
 
+import static org.odk.share.activities.InstancesList.INSTANCE_IDS;
+
 public class SendActivity extends AppCompatActivity implements ProgressListener {
 
     private boolean isHotspotRunning;
@@ -46,7 +48,7 @@ public class SendActivity extends AppCompatActivity implements ProgressListener 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_send);
 
-        long[] instancesIds = getIntent().getLongArrayExtra("instance_ids");
+        long[] instancesIds = getIntent().getLongArrayExtra(INSTANCE_IDS);
         instancesToSend = ArrayUtils.toObject(instancesIds);
 
         wifiHotspot = WifiHotspotHelper.getInstance(this);
@@ -202,19 +204,18 @@ public class SendActivity extends AppCompatActivity implements ProgressListener 
         } catch (Exception e) {
             // tried to close a dialog not open. don't care.
         }
-        Toast.makeText(this, "Files sent", Toast.LENGTH_LONG).show();
-        createAlertDialog("Tranfer result", result);
+        createAlertDialog(getString(R.string.transfer_result), getString(R.string.send_success, result));
     }
 
     @Override
     public void progressUpdate(int progress, int total) {
-        alertMsg = "Sending form " + progress + " of " + total;
+        alertMsg = getString(R.string.sending_items, String.valueOf(progress), String.valueOf(total));
         progressDialog.setMessage(alertMsg);
     }
 
     @Override
     public void onCancel() {
-        Toast.makeText(this, "Task Canceled", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, getString(R.string.canceled), Toast.LENGTH_LONG).show();
         try {
             dismissDialog(PROGRESS_DIALOG);
         } catch (Exception e) {
