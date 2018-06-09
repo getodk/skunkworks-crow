@@ -8,10 +8,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.wifi.WifiConfiguration;
+import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.odk.share.R;
@@ -20,16 +24,33 @@ import org.odk.share.listeners.ProgressListener;
 import org.odk.share.services.HotspotService;
 import org.odk.share.tasks.HotspotSendTask;
 import org.odk.share.utilities.ArrayUtils;
+import org.odk.share.utilities.QRCodeUtils;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
+import static android.view.View.VISIBLE;
 import static org.odk.share.activities.InstancesList.INSTANCE_IDS;
+
+/**
+ * Created by laksh on 6/9/2018.
+ */
 
 public class SendActivity extends AppCompatActivity implements ProgressListener {
 
+    @BindView(R.id.toolbar) Toolbar toolbar;
+    @BindView(R.id.tvConnectStatus) TextView connectStatus;
+    @BindView(R.id.ivQRcode) ImageView imageQR;
+
+    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
     private boolean isHotspotRunning;
     private LocalBroadcastManager localBroadcastManager;
     private WifiHotspotHelper wifiHotspot;
@@ -47,6 +68,10 @@ public class SendActivity extends AppCompatActivity implements ProgressListener 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_send);
+        ButterKnife.bind(this);
+
+        setTitle(getString(R.string.send_forms));
+        setSupportActionBar(toolbar);
 
         long[] instancesIds = getIntent().getLongArrayExtra(INSTANCE_IDS);
         instancesToSend = ArrayUtils.toObject(instancesIds);
@@ -109,8 +134,10 @@ public class SendActivity extends AppCompatActivity implements ProgressListener 
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 wifiHotspot.saveLastConfig();
-                wifiHotspot.setWifiConfig(wifiHotspot.createNewConfig(WifiHotspotHelper.ssid +
-                        getString(R.string.hotspot_name_suffix) + "_" + wifiHotspot.getPort()));
+                WifiConfiguration newWifiConfig = wifiHotspot.createNewConfig(WifiHotspotHelper.ssid +
+                        getString(R.string.hotspot_name_suffix));
+                wifiHotspot.setCurrConfig(newWifiConfig);
+                wifiHotspot.setWifiConfig(newWifiConfig);
                 final Intent intent = new Intent(Intent.ACTION_MAIN, null);
                 intent.addCategory(Intent.CATEGORY_LAUNCHER);
                 final ComponentName cn = new ComponentName("com.android.settings", "com.android.settings.TetherSettings");
@@ -169,6 +196,7 @@ public class SendActivity extends AppCompatActivity implements ProgressListener 
             hotspotSendTask.cancel(true);
         }
         Timber.d("Hotspot Stopped");
+        compositeDisposable.dispose();
         super.onDestroy();
     }
 
@@ -191,7 +219,19 @@ public class SendActivity extends AppCompatActivity implements ProgressListener 
     };
 
     private void startSending() {
-        showDialog(PROGRESS_DIALOG);
+        int port = wifiHotspot.getPort();
+        String ssid = wifiHotspot.getCurrConfig().SSID;
+
+        Timber.d("SSID " + ssid + " " + port);
+        Disposable disposable = QRCodeUtils.generateQRCode(ssid, port, null)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(bitmap -> {
+                    imageQR.setVisibility(VISIBLE);
+                    imageQR.setImageBitmap(bitmap);
+                }, Timber::e);
+        compositeDisposable.add(disposable);
+
         hotspotSendTask = new HotspotSendTask(serverSocket);
         hotspotSendTask.setUploaderListener(this);
         hotspotSendTask.execute(instancesToSend);
@@ -210,6 +250,12 @@ public class SendActivity extends AppCompatActivity implements ProgressListener 
     @Override
     public void progressUpdate(int progress, int total) {
         alertMsg = getString(R.string.sending_items, String.valueOf(progress), String.valueOf(total));
+
+        if (progressDialog == null) {
+            showDialog(PROGRESS_DIALOG);
+            return;
+        }
+
         progressDialog.setMessage(alertMsg);
     }
 
@@ -235,15 +281,15 @@ public class SendActivity extends AppCompatActivity implements ProgressListener 
                 progressDialog.setCancelable(false);
                 progressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.cancel),
                         new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (hotspotSendTask != null) {
-                            hotspotSendTask.cancel(true);
-                        }
-                        dialog.dismiss();
-                        finish();
-                    }
-                });
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (hotspotSendTask != null) {
+                                    hotspotSendTask.cancel(true);
+                                }
+                                dialog.dismiss();
+                                finish();
+                            }
+                        });
                 return progressDialog;
         }
 

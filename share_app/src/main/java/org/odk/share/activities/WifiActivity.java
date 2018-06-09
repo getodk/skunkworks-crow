@@ -31,6 +31,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
+import com.journeyapps.barcodescanner.CaptureActivity;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.odk.share.R;
 import org.odk.share.adapters.WifiResultAdapter;
 import org.odk.share.controller.WifiHelper;
@@ -43,6 +49,11 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import timber.log.Timber;
+
+import static org.odk.share.utilities.QRCodeUtils.PASSWORD;
+import static org.odk.share.utilities.QRCodeUtils.PORT;
+import static org.odk.share.utilities.QRCodeUtils.PROTECTED;
+import static org.odk.share.utilities.QRCodeUtils.SSID;
 
 public class WifiActivity extends AppCompatActivity implements ProgressListener {
 
@@ -65,6 +76,7 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
     private String wifiNetworkSSID;
 
     private String alertMsg;
+    private int port;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,12 +138,15 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
             showPasswordDialog(scanResultList.get(i));
         } else {
             // connect
-            alertMsg = getString(R.string.connecting_wifi);
-            showDialog(DIALOG_CONNECTING);
-            wifiNetworkSSID = scanResultList.get(i).SSID;
-            wifiHelper.connectToWifi(scanResultList.get(i), null);
-            isWifiReceiverRegisterd = true;
-            registerReceiver(wifiReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+            IntentIntegrator integrator = new IntentIntegrator(this);
+            integrator.setPrompt(getString(R.string.scan_qr_code));
+            integrator.setDesiredBarcodeFormats(integrator.QR_CODE_TYPES);
+            integrator.setCameraId(0);
+            integrator.setOrientationLocked(false);
+
+            integrator.setCaptureActivity(CaptureActivity.class);
+            integrator.setBeepEnabled(true);
+            integrator.initiateScan();
         }
     }
 
@@ -178,7 +193,7 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
                             Timber.d(pw);
                             dialog.dismiss();
                             wifiNetworkSSID = scanResult.SSID;
-                            wifiHelper.connectToWifi(scanResult, pw);
+                            wifiHelper.connectToWifi(scanResult.SSID, pw);
                             isWifiReceiverRegisterd = true;
                             registerReceiver(wifiReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
                             showDialog(DIALOG_CONNECTING);
@@ -265,10 +280,8 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
                             Toast.makeText(getApplicationContext(), "Connected to " + wifiNetworkSSID, Toast.LENGTH_LONG).show();
                             dismissDialog(DIALOG_CONNECTING);
                             showDialog(DIALOG_DOWNLOAD_PROGRESS);
-                            String port = info.getExtraInfo().split("_")[1];
                             String dstAddress = wifiHelper.getAccessPointIpAddress();
-                            wifiReceiveTask = new WifiReceiveTask(dstAddress,
-                                    Integer.parseInt(port.substring(0, port.length() - 1)));
+                            wifiReceiveTask = new WifiReceiveTask(dstAddress, port);
                             wifiReceiveTask.setUploaderListener(WifiActivity.this);
                             wifiReceiveTask.execute();
                             unregisterReceiver(this);
@@ -385,5 +398,43 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
         alertDialog.setCancelable(false);
         alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.ok), quitListener);
         alertDialog.show();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+
+        if (result != null) {
+            if (result.getContents() == null) {
+                // request was canceled...
+                Timber.i("QR code scanning cancelled");
+            } else {
+                Timber.d("RESULT " + result);
+                try {
+                    JSONObject obj = new JSONObject(result.getContents());
+                    String ssid = (String) obj.get(SSID);
+                    port = (Integer) obj.get(PORT);
+                    String password = null;
+                    Boolean isProtected = (Boolean) obj.get(PROTECTED);
+                    if (isProtected) {
+                        password =  (String) obj.get(PASSWORD);
+                    }
+
+                    Timber.d("Scanned results " + ssid + " " + port + " " + isProtected + " " + password);
+                    alertMsg = getString(R.string.connecting_wifi);
+                    showDialog(DIALOG_CONNECTING);
+                    wifiNetworkSSID = ssid;
+                    registerReceiver(wifiReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+                    wifiHelper.connectToWifi(ssid, password);
+                    isWifiReceiverRegisterd = true;
+                } catch (JSONException e) {
+                    Timber.e(e);
+                }
+
+                return;
+            }
+        }
     }
 }

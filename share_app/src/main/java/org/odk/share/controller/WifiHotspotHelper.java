@@ -30,6 +30,14 @@ public class WifiHotspotHelper {
     public static final String ssid = "ODK-Share";
     private int port;
 
+    public WifiConfiguration getCurrConfig() {
+        return currConfig;
+    }
+
+    public void setCurrConfig(WifiConfiguration currConfig) {
+        this.currConfig = currConfig;
+    }
+
     public int getPort() {
         return port;
     }
@@ -127,7 +135,7 @@ public class WifiHotspotHelper {
     public boolean enableHotspot() {
         saveLastConfig();
 
-        currConfig = createNewConfig(ssid + context.getString(R.string.hotspot_name_suffix) + "_" + port);
+        currConfig = createNewConfig(ssid + context.getString(R.string.hotspot_name_suffix));
         return toggleHotspot(currConfig, true);
     }
 
