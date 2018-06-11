@@ -4,6 +4,12 @@ package org.odk.share.injection.config;
 import android.app.Application;
 import android.content.Context;
 
+import org.odk.share.rx.RxEventBus;
+import org.odk.share.rx.schedulers.BaseSchedulerProvider;
+import org.odk.share.rx.schedulers.SchedulerProvider;
+
+import javax.inject.Singleton;
+
 import dagger.Module;
 import dagger.Provides;
 
@@ -21,4 +27,14 @@ class AppModule {
         return application;
     }
 
+    @Provides
+    BaseSchedulerProvider provideSchedulerProvider() {
+        return new SchedulerProvider();
+    }
+
+    @Provides
+    @Singleton
+    RxEventBus provideRxEventBus() {
+        return new RxEventBus();
+    }
 }
