@@ -14,7 +14,9 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -39,6 +41,7 @@ public class WifiReceiveTask extends AsyncTask<String, Integer, String> {
 
     private static final String INSTANCE_PATH = "share/instances/";
     private static final String FORM_PATH = "share/forms/";
+    private static final int TIMEOUT = 2000;
 
     public void setUploaderListener(ProgressListener sl) {
         synchronized (this) {
@@ -64,7 +67,9 @@ public class WifiReceiveTask extends AsyncTask<String, Integer, String> {
         Timber.d("Socket " + ip + " " + port);
 
         try {
-            socket = new Socket(ip, port);
+            socket = new Socket();
+            socket.connect(new InetSocketAddress(ip, port), TIMEOUT);
+            Timber.d("Socket connected");
             dis = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
             dos = new DataOutputStream(socket.getOutputStream());
             total = dis.readInt();
@@ -75,6 +80,8 @@ public class WifiReceiveTask extends AsyncTask<String, Integer, String> {
                 readFormAndInstances();
             }
         } catch (UnknownHostException e) {
+            Timber.e(e);
+        } catch (SocketTimeoutException e) {
             Timber.e(e);
         } catch (IOException e) {
             Timber.e(e);

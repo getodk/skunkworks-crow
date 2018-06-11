@@ -13,6 +13,14 @@
         android:layout_below="@+id/toolbar"
         android:gravity="center">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/waiting_connection"
+            android:textSize="22sp"
+            android:layout_margin="10dp"
+            android:id="@+id/tvConnectStatus"/>
+
         <ImageView
             android:id="@+id/ivQRcode"
             android:layout_width="match_parent"
@@ -22,11 +30,9 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/waiting_connection"
-            android:textSize="22sp"
+            android:textSize="16sp"
             android:layout_margin="10dp"
-            android:id="@+id/tvConnectStatus"/>
-
+            android:id="@+id/tvConnectInfo"/>
     </LinearLayout>
 
 </RelativeLayout>

@@ -87,7 +87,6 @@ public class HotspotSendTask extends AsyncTask<Long, Integer, String> {
 
     @Override
     protected String doInBackground(Long... longs) {
-
         try {
             Timber.d("Waiting for receiver");
             socket = serverSocket.accept();

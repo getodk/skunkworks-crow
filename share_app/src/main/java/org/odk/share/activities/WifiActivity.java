@@ -87,6 +87,7 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
         setTitle(getString(R.string.connect_wifi));
         setSupportActionBar(toolbar);
 
+        port = -1;
         wifiHelper = new WifiHelper(this);
 
         wifiManager = wifiHelper.getWifiManager();
@@ -138,16 +139,55 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
             showPasswordDialog(scanResultList.get(i));
         } else {
             // connect
-            IntentIntegrator integrator = new IntentIntegrator(this);
-            integrator.setPrompt(getString(R.string.scan_qr_code));
-            integrator.setDesiredBarcodeFormats(integrator.QR_CODE_TYPES);
-            integrator.setCameraId(0);
-            integrator.setOrientationLocked(false);
-
-            integrator.setCaptureActivity(CaptureActivity.class);
-            integrator.setBeepEnabled(true);
-            integrator.initiateScan();
+            alertMsg = getString(R.string.connecting_wifi);
+            showDialog(DIALOG_CONNECTING);
+            wifiNetworkSSID = scanResultList.get(i).SSID;
+            wifiHelper.connectToWifi(scanResultList.get(i).SSID, null);
+            isWifiReceiverRegisterd = true;
+            registerReceiver(wifiReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
         }
+    }
+
+    private void showPortDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Enter port number");
+
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_CLASS_NUMBER);
+        builder.setView(input);
+
+        builder.setPositiveButton(getString(R.string.ok), null);
+        builder.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        alertDialog = builder.create();
+        alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialog) {
+                Button button = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE);
+                button.setOnClickListener(new View.OnClickListener() {
+
+                    @Override
+                    public void onClick(View view) {
+                        String portInput = input.getText().toString();
+                        Timber.d("Port num " + portInput);
+                        if (portInput != null && portInput.length() > 0) {
+                            dialog.dismiss();
+                            Timber.d("Port number");
+                            port = Integer.parseInt(portInput);
+                            startReceiveTask();
+                        } else {
+                            input.setError(getString(R.string.port_empty));
+                        }
+                    }
+                });
+            }
+        });
+        alertDialog.show();
     }
 
     private void showPasswordDialog(ScanResult scanResult) {
@@ -279,11 +319,12 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
                             isWifiReceiverRegisterd = false;
                             Toast.makeText(getApplicationContext(), "Connected to " + wifiNetworkSSID, Toast.LENGTH_LONG).show();
                             dismissDialog(DIALOG_CONNECTING);
-                            showDialog(DIALOG_DOWNLOAD_PROGRESS);
-                            String dstAddress = wifiHelper.getAccessPointIpAddress();
-                            wifiReceiveTask = new WifiReceiveTask(dstAddress, port);
-                            wifiReceiveTask.setUploaderListener(WifiActivity.this);
-                            wifiReceiveTask.execute();
+
+                            if (port != -1) {
+                                startReceiveTask();
+                            } else {
+                                showPortDialog();
+                            }
                             unregisterReceiver(this);
                         }
                     }
@@ -291,6 +332,14 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
             }
         }
     };
+
+    private void startReceiveTask() {
+        showDialog(DIALOG_DOWNLOAD_PROGRESS);
+        String dstAddress = wifiHelper.getAccessPointIpAddress();
+        wifiReceiveTask = new WifiReceiveTask(dstAddress, port);
+        wifiReceiveTask.setUploaderListener(this);
+        wifiReceiveTask.execute();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -310,6 +359,15 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
                 return true;
 
             case R.id.menu_qr_code:
+                IntentIntegrator integrator = new IntentIntegrator(this);
+                integrator.setPrompt(getString(R.string.scan_qr_code));
+                integrator.setDesiredBarcodeFormats(integrator.QR_CODE_TYPES);
+                integrator.setCameraId(0);
+                integrator.setOrientationLocked(false);
+
+                integrator.setCaptureActivity(CaptureActivity.class);
+                integrator.setBeepEnabled(true);
+                integrator.initiateScan();
                 return true;
         }
         return super.onOptionsItemSelected(item);

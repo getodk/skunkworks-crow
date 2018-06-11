@@ -49,6 +49,7 @@ public class SendActivity extends AppCompatActivity implements ProgressListener 
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.tvConnectStatus) TextView connectStatus;
     @BindView(R.id.ivQRcode) ImageView imageQR;
+    @BindView(R.id.tvConnectInfo) TextView connectInfo;
 
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
     private boolean isHotspotRunning;
@@ -231,6 +232,8 @@ public class SendActivity extends AppCompatActivity implements ProgressListener 
                     imageQR.setImageBitmap(bitmap);
                 }, Timber::e);
         compositeDisposable.add(disposable);
+
+        connectInfo.setText(getString(R.string.connection_info, String.valueOf(port), ssid));
 
         hotspotSendTask = new HotspotSendTask(serverSocket);
         hotspotSendTask.setUploaderListener(this);
