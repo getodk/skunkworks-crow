@@ -1,0 +1,12 @@
+package org.odk.share.activities;
+
+import dagger.android.support.DaggerAppCompatActivity;
+
+/**
+ * Dependencies of the activity extending {@link InjectableActivity} which are annotated with
+ * {@link javax.inject.Inject} will be automatically injected.
+ * <p>
+ * Those activities should also be registered in {@link org.odk.share.injection.ActivityBuilder}
+ */
+public abstract class InjectableActivity extends DaggerAppCompatActivity {
+}

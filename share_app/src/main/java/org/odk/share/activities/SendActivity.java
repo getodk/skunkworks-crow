@@ -44,7 +44,7 @@ import static org.odk.share.activities.InstancesList.INSTANCE_IDS;
  * Created by laksh on 6/9/2018.
  */
 
-public class SendActivity extends AppCompatActivity implements ProgressListener {
+public class SendActivity extends InjectableActivity implements ProgressListener {
 
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.tvConnectStatus) TextView connectStatus;

@@ -55,7 +55,7 @@ import static org.odk.share.utilities.QRCodeUtils.PORT;
 import static org.odk.share.utilities.QRCodeUtils.PROTECTED;
 import static org.odk.share.utilities.QRCodeUtils.SSID;
 
-public class WifiActivity extends AppCompatActivity implements ProgressListener {
+public class WifiActivity extends InjectableActivity implements ProgressListener {
 
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
     @BindView(R.id.empty_view) TextView emptyView;

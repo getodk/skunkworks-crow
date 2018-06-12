@@ -28,7 +28,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class InstancesList extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class InstancesList extends InjectableActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     @BindView(R.id.recyclerview) RecyclerView recyclerView;
     @BindView(R.id.toolbar) Toolbar toolbar;
