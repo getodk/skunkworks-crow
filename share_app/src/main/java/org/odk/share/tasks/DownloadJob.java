@@ -1,6 +1,8 @@
 package org.odk.share.tasks;
 
+import android.content.ContentValues;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 
@@ -11,6 +13,9 @@ import org.odk.share.dao.FormsDao;
 import org.odk.share.events.DownloadEvent;
 import org.odk.share.provider.FormsProviderAPI;
 import org.odk.share.rx.RxEventBus;
+import org.odk.share.dao.InstancesDao;
+import org.odk.share.database.ShareDatabaseHelper;
+import org.odk.share.provider.InstanceProviderAPI;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
@@ -28,14 +33,24 @@ import javax.inject.Inject;
 
 import timber.log.Timber;
 
+import static org.odk.share.application.Share.FORMS_PATH;
+import static org.odk.share.application.Share.INSTANCES_PATH;
+import static org.odk.share.dto.TransferInstance.INSTANCE_ID;
+import static org.odk.share.dto.TransferInstance.STATUS_FORM_RECEIVE;
+import static org.odk.share.dto.TransferInstance.TRANSFER_STATUS;
+import static org.odk.share.provider.InstanceProviderAPI.InstanceColumns.CAN_EDIT_WHEN_COMPLETE;
+import static org.odk.share.provider.InstanceProviderAPI.InstanceColumns.DISPLAY_NAME;
+import static org.odk.share.provider.InstanceProviderAPI.InstanceColumns.INSTANCE_FILE_PATH;
+import static org.odk.share.provider.InstanceProviderAPI.InstanceColumns.JR_FORM_ID;
+import static org.odk.share.provider.InstanceProviderAPI.InstanceColumns.JR_VERSION;
+import static org.odk.share.provider.InstanceProviderAPI.InstanceColumns.STATUS;
+import static org.odk.share.provider.InstanceProviderAPI.InstanceColumns.SUBMISSION_URI;
+
 public class DownloadJob extends Job {
 
     public static final String TAG = "formDownloadJob";
     public static final String IP = "ip";
     public static final String PORT = "port";
-
-    private static final String INSTANCE_PATH = "share/instances/";
-    private static final String FORM_PATH = "share/forms/";
     private static final int TIMEOUT = 2000;
 
     @Inject
@@ -135,7 +150,7 @@ public class DownloadJob extends Job {
             }
 
             // readInstances
-            readInstances(formId);
+            readInstances(formId, formVersion);
             return true;
         } catch (IOException e) {
             Timber.e(e);
@@ -178,42 +193,77 @@ public class DownloadJob extends Job {
             }
 
             Timber.d(displayName + " " + formId + " " + formVersion + " " + submissionUri);
-            receiveFile(FORM_PATH);
+            String formName = receiveFile(FORMS_PATH);
             int numOfRes = dis.readInt();
+            String formMediaPath = FORMS_PATH + "/" + displayName + "-media";
             while (numOfRes-- > 0) {
-                receiveFile(FORM_PATH + displayName + "-media");
+                receiveFile(formMediaPath);
             }
+
+            // Add row in forms db
+            ContentValues values = new ContentValues();
+            values.put(FormsProviderAPI.FormsColumns.FORM_FILE_PATH, FORMS_PATH + "/" + formName);
+            values.put(FormsProviderAPI.FormsColumns.DISPLAY_NAME, displayName);
+            values.put(FormsProviderAPI.FormsColumns.JR_FORM_ID, formId);
+            values.put(FormsProviderAPI.FormsColumns.JR_VERSION, formVersion);
+            values.put(FormsProviderAPI.FormsColumns.SUBMISSION_URI, submissionUri);
+            values.put(FormsProviderAPI.FormsColumns.FORM_MEDIA_PATH, formMediaPath);
+            Timber.d("form %s" ,new FormsDao().saveForm(values));
         } catch (IOException e) {
             Timber.e(e);
         }
     }
 
-    private void readInstances(String formId) {
+    private void readInstances(String formId, String formVersion) {
         try {
             int numInstances = dis.readInt();
             while (numInstances-- > 0) {
                 // publish current progress
                 rxEventBus.post(new DownloadEvent(DownloadEvent.Status.DOWNLOADING, ++progress, total));
+                String displayName = dis.readUTF();
+                String submissionUri = dis.readUTF();
+
+                if (submissionUri.equals("-1")) {
+                    submissionUri = null;
+                }
 
                 int numRes = dis.readInt();
                 String time = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss-SSS",
                         Locale.ENGLISH).format(Calendar.getInstance().getTime());
-                String path = INSTANCE_PATH + formId + "_" + time;
+                String path = INSTANCES_PATH + "/" + formId + "_" + time;
                 while (numRes-- > 0) {
                     receiveFile(path);
                 }
+
+                // Add row in instances table
+                ContentValues values = new ContentValues();
+                values.put(DISPLAY_NAME, displayName);
+                values.put(STATUS, InstanceProviderAPI.STATUS_COMPLETE);
+                values.put(CAN_EDIT_WHEN_COMPLETE, "true");
+                values.put(SUBMISSION_URI, submissionUri);
+                values.put(INSTANCE_FILE_PATH, path);
+                values.put(JR_FORM_ID, formId);
+                values.put(JR_VERSION, formVersion);
+                Uri uri = new InstancesDao().saveInstance(values);
+
+                // Add row in share table
+                ContentValues shareValues = new ContentValues();
+                shareValues.put(INSTANCE_ID, Long.parseLong(uri.getLastPathSegment()));
+                shareValues.put(TRANSFER_STATUS, STATUS_FORM_RECEIVE);
+                new ShareDatabaseHelper().insertInstance(shareValues);
             }
         } catch (IOException e) {
             Timber.e(e);
         }
     }
 
-    private void receiveFile(String path) {
+    private String receiveFile(String path) {
+        String filename = null;
         try {
-            String filename = dis.readUTF();
+            filename = dis.readUTF();
             long fileSize = dis.readLong();
             Timber.d("Size of file " + filename + " " + fileSize);
-            File shareDir = new File(Environment.getExternalStorageDirectory(), path);
+            File shareDir = new File(path);
 
             if (!shareDir.exists()) {
                 Timber.d("Directory created " + shareDir.getPath() + " " + shareDir.mkdirs());
@@ -234,5 +284,6 @@ public class DownloadJob extends Job {
         } catch (IOException e) {
             Timber.e(e);
         }
+        return filename;
     }
 }
