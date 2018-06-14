@@ -13,9 +13,4 @@ There are two use cases which are the main reason for implementing this app
 
 ## Links
 * ODK Forum: [https://forum.opendatakit.org/t/internship-project-device-to-device-transfer-android-app/11753](https://forum.opendatakit.org/t/internship-project-device-to-device-transfer-android-app/11753)
-* Project Proposal: [https://docs.google.com/document/d/1nGsVjEr_Vc4fywn6yHKiLkR2kLcEz_VTJteVCrEnRfo/edit](Google doc link)
-
- 
-
-
-
+* Project Proposal: [https://docs.google.com/document/d/1nGsVjEr_Vc4fywn6yHKiLkR2kLcEz_VTJteVCrEnRfo](https://docs.google.com/document/d/1nGsVjEr_Vc4fywn6yHKiLkR2kLcEz_VTJteVCrEnRfo)
