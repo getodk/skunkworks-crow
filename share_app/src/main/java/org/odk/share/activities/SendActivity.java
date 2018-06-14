@@ -2,9 +2,7 @@ package org.odk.share.activities;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -20,7 +18,10 @@ import android.widget.Toast;
 
 import org.odk.share.R;
 import org.odk.share.controller.WifiHotspotHelper;
+import org.odk.share.events.HotspotEvent;
 import org.odk.share.listeners.ProgressListener;
+import org.odk.share.rx.RxEventBus;
+import org.odk.share.rx.schedulers.BaseSchedulerProvider;
 import org.odk.share.services.HotspotService;
 import org.odk.share.tasks.HotspotSendTask;
 import org.odk.share.utilities.ArrayUtils;
@@ -29,6 +30,10 @@ import org.odk.share.utilities.QRCodeUtils;
 import java.io.IOException;
 import java.net.ServerSocket;
 
+import javax.inject.Inject;
+
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -46,6 +51,15 @@ import static org.odk.share.activities.InstancesList.INSTANCE_IDS;
 
 public class SendActivity extends InjectableActivity implements ProgressListener {
 
+    private static final int PROGRESS_DIALOG = 1;
+    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
+
+    @Inject
+    RxEventBus rxEventBus;
+
+    @Inject
+    BaseSchedulerProvider schedulerProvider;
+
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.tvConnectStatus) TextView connectStatus;
     @BindView(R.id.ivQRcode) ImageView imageQR;
@@ -53,17 +67,13 @@ public class SendActivity extends InjectableActivity implements ProgressListener
 
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
     private boolean isHotspotRunning;
-    private LocalBroadcastManager localBroadcastManager;
     private WifiHotspotHelper wifiHotspot;
     private boolean openSettings;
     private Long[] instancesToSend;
     private HotspotSendTask hotspotSendTask;
-
-    private static final int PROGRESS_DIALOG = 1;
     private ProgressDialog progressDialog;
     private String alertMsg;
     private ServerSocket serverSocket;
-    private AlertDialog alertDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,8 +104,26 @@ public class SendActivity extends InjectableActivity implements ProgressListener
             wifiHotspot.disableHotspot();
         }
         startHotspot();
+    }
 
-        localBroadcastManager = LocalBroadcastManager.getInstance(this);
+    /**
+     * Creates a subscription for listening to all hotspot events being send through the
+     * application's {@link RxEventBus}
+     */
+    private Disposable addHotspotEventSubscription() {
+        return rxEventBus.register(HotspotEvent.class)
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.androidThread())
+                .subscribe(hotspotEvent -> {
+                    switch (hotspotEvent.getStatus()) {
+                        case ENABLED:
+                            isHotspotRunning = true;
+                            break;
+                        case DISABLED:
+                            isHotspotRunning = false;
+                            break;
+                    }
+                });
     }
 
     private void startHotspot() {
@@ -176,15 +204,14 @@ public class SendActivity extends InjectableActivity implements ProgressListener
 
             startSending();
         }
-        localBroadcastManager.registerReceiver(receiverHotspotEnabled, new IntentFilter(HotspotService.BROADCAST_HOTSPOT_ENABLED));
-        localBroadcastManager.registerReceiver(receiverHotspotDisabled, new IntentFilter(HotspotService.BROADCAST_HOTSPOT_DISABLED));
+
+        compositeDisposable.add(addHotspotEventSubscription());
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        localBroadcastManager.unregisterReceiver(receiverHotspotDisabled);
-        localBroadcastManager.unregisterReceiver(receiverHotspotEnabled);
+        compositeDisposable.clear();
     }
 
     @Override
@@ -200,24 +227,6 @@ public class SendActivity extends InjectableActivity implements ProgressListener
         compositeDisposable.dispose();
         super.onDestroy();
     }
-
-    private final BroadcastReceiver receiverHotspotDisabled = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(HotspotService.BROADCAST_HOTSPOT_DISABLED)) {
-                isHotspotRunning = false;
-            }
-        }
-    };
-
-    private final BroadcastReceiver receiverHotspotEnabled = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(HotspotService.BROADCAST_HOTSPOT_ENABLED)) {
-                isHotspotRunning = true;
-            }
-        }
-    };
 
     private void startSending() {
         int port = wifiHotspot.getPort();
@@ -300,7 +309,7 @@ public class SendActivity extends InjectableActivity implements ProgressListener
     }
 
     private void createAlertDialog(String title, String message) {
-        alertDialog = new AlertDialog.Builder(this).create();
+        AlertDialog alertDialog = new AlertDialog.Builder(this).create();
         alertDialog.setTitle(title);
         alertDialog.setMessage(message);
         DialogInterface.OnClickListener quitListener = new DialogInterface.OnClickListener() {

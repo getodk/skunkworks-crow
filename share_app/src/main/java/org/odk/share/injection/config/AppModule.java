@@ -8,8 +8,6 @@ import org.odk.share.rx.RxEventBus;
 import org.odk.share.rx.schedulers.BaseSchedulerProvider;
 import org.odk.share.rx.schedulers.SchedulerProvider;
 
-import javax.inject.Singleton;
-
 import dagger.Module;
 import dagger.Provides;
 
@@ -33,7 +31,6 @@ class AppModule {
     }
 
     @Provides
-    @Singleton
     RxEventBus provideRxEventBus() {
         return new RxEventBus();
     }

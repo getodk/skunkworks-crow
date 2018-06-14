@@ -5,6 +5,7 @@ import android.app.Application;
 import org.odk.share.application.Share;
 import org.odk.share.injection.ActivityBuilder;
 import org.odk.share.injection.config.scopes.PerApplication;
+import org.odk.share.services.HotspotService;
 
 import dagger.BindsInstance;
 import dagger.Component;
@@ -27,6 +28,8 @@ import dagger.android.support.AndroidSupportInjectionModule;
 public interface AppComponent extends AndroidInjector<Share> {
 
     void inject(Share share);
+
+    void inject(HotspotService hotspotService);
 
     @Component.Builder
     interface Builder {

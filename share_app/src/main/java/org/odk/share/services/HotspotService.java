@@ -13,11 +13,18 @@ import android.os.IBinder;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.LocalBroadcastManager;
 
 import org.odk.share.R;
 import org.odk.share.activities.MainActivity;
+import org.odk.share.application.Share;
 import org.odk.share.controller.WifiHotspotHelper;
+import org.odk.share.events.HotspotEvent;
+import org.odk.share.rx.RxEventBus;
+import org.odk.share.rx.schedulers.BaseSchedulerProvider;
+
+import javax.inject.Inject;
+
+import io.reactivex.disposables.CompositeDisposable;
 
 /**
  * Created by laksh on 5/18/2018.
@@ -25,21 +32,25 @@ import org.odk.share.controller.WifiHotspotHelper;
 
 public class HotspotService extends Service {
 
-    private WifiHotspotHelper wifiHotspotHelper;
-    private HotspotState state;
-    private static final int notify_stop = 5000;
-    private static final int notify_start = 1000;
-    private static final int HOTSPOT_NOTIFICATION_ID = 34567;
-    private BroadcastReceiver stopReceiver;
-
     public static final String ACTION_START = "hotspot_start";
     public static final String ACTION_STOP = "hotspot_stop";
     public static final String ACTION_STATUS = "hotspot_status";
-    public static final String BROADCAST_HOTSPOT_DISABLED = "hotspot_disabled";
-    public static final String BROADCAST_HOTSPOT_ENABLED = "hotspot_enabled";
-
+    private static final int notify_stop = 5000;
+    private static final int notify_start = 1000;
+    private static final int HOTSPOT_NOTIFICATION_ID = 34567;
     private static final int START = 1;
     private static final int STATUS = 2;
+    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
+
+    @Inject
+    RxEventBus rxEventBus;
+
+    @Inject
+    BaseSchedulerProvider schedulerProvider;
+
+    private WifiHotspotHelper wifiHotspotHelper;
+    private HotspotState state;
+    private BroadcastReceiver stopReceiver;
 
     @Nullable
     @Override
@@ -50,6 +61,10 @@ public class HotspotService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        // inject dependencies
+        ((Share) getApplication()).getAppComponent().inject(this);
+
         wifiHotspotHelper = WifiHotspotHelper.getInstance(getApplicationContext());
         stopReceiver = new BroadcastReceiver() {
             @Override
@@ -86,6 +101,7 @@ public class HotspotService extends Service {
 
     @Override
     public void onDestroy() {
+        compositeDisposable.clear();
         if (stopReceiver != null) {
             unregisterReceiver(stopReceiver);
         }
@@ -104,9 +120,7 @@ public class HotspotService extends Service {
         stopForeground(true);
         stopSelf();
 
-        Intent intent = new Intent(BROADCAST_HOTSPOT_DISABLED);
-        LocalBroadcastManager bm = LocalBroadcastManager.getInstance(this);
-        bm.sendBroadcast(intent);
+        rxEventBus.post(new HotspotEvent(HotspotEvent.Status.DISABLED));
     }
 
     private Notification buildForegroundNotification(String status, boolean showStopButton) {
@@ -144,9 +158,7 @@ public class HotspotService extends Service {
                 if (service != null && service.wifiHotspotHelper != null) {
                     if (service.wifiHotspotHelper.isHotspotEnabled()) {
                         updateNotification(getString(R.string.hotspot_running), true);
-                        Intent intent = new Intent(BROADCAST_HOTSPOT_ENABLED);
-                        LocalBroadcastManager bm = LocalBroadcastManager.getInstance(getApplicationContext());
-                        bm.sendBroadcast(intent);
+                        rxEventBus.post(new HotspotEvent(HotspotEvent.Status.ENABLED));
                     } else {
                         removeMessages(START);
                         sendEmptyMessageDelayed(START, notify_start);
@@ -156,7 +168,7 @@ public class HotspotService extends Service {
                 if (service.wifiHotspotHelper == null || !service.wifiHotspotHelper.isHotspotEnabled()) {
                     stopHotspot();
                 } else {
-                  sendEmptyMessageDelayed(STATUS, notify_stop);
+                    sendEmptyMessageDelayed(STATUS, notify_stop);
                 }
             }
         }
