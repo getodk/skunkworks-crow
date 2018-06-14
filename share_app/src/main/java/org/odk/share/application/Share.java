@@ -1,7 +1,11 @@
 package org.odk.share.application;
 
+import com.evernote.android.job.JobManager;
+import com.evernote.android.job.JobManagerCreateException;
+
 import org.odk.share.injection.config.AppComponent;
 import org.odk.share.injection.config.DaggerAppComponent;
+import org.odk.share.tasks.ShareJobCreator;
 
 import dagger.android.AndroidInjector;
 import dagger.android.DaggerApplication;
@@ -26,6 +30,14 @@ public class Share extends DaggerApplication {
 
         singleton = this;
         Timber.plant(new Timber.DebugTree());
+
+        try {
+            JobManager
+                    .create(this)
+                    .addJobCreator(new ShareJobCreator());
+        } catch (JobManagerCreateException e) {
+            Timber.e(e);
+        }
     }
 
     public AppComponent getAppComponent() {

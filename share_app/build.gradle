@@ -53,4 +53,7 @@ dependencies {
 
     // Better "Subjects" for Rx:
     implementation "com.jakewharton.rxrelay2:rxrelay:2.0.0"
+
+    // evernote's job scheduler
+    implementation "com.evernote:android-job:1.2.5"
 }
