@@ -6,6 +6,8 @@ import org.odk.share.application.Share;
 import org.odk.share.injection.ActivityBuilder;
 import org.odk.share.injection.config.scopes.PerApplication;
 import org.odk.share.services.HotspotService;
+import org.odk.share.tasks.DownloadJob;
+import org.odk.share.tasks.UploadJob;
 
 import dagger.BindsInstance;
 import dagger.Component;
@@ -30,6 +32,10 @@ public interface AppComponent extends AndroidInjector<Share> {
     void inject(Share share);
 
     void inject(HotspotService hotspotService);
+
+    void inject(UploadJob uploadJob);
+
+    void inject(DownloadJob downloadJob);
 
     @Component.Builder
     interface Builder {

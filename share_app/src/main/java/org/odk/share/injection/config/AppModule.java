@@ -4,9 +4,11 @@ package org.odk.share.injection.config;
 import android.app.Application;
 import android.content.Context;
 
+import org.odk.share.injection.config.scopes.PerApplication;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.rx.schedulers.BaseSchedulerProvider;
 import org.odk.share.rx.schedulers.SchedulerProvider;
+import org.odk.share.services.ReceiverService;
 
 import dagger.Module;
 import dagger.Provides;
@@ -31,7 +33,14 @@ class AppModule {
     }
 
     @Provides
+    @PerApplication
     RxEventBus provideRxEventBus() {
         return new RxEventBus();
+    }
+
+    @Provides
+    @PerApplication
+    ReceiverService provideReceiverService(RxEventBus rxEventBus, BaseSchedulerProvider schedulerProvider) {
+        return new ReceiverService(rxEventBus, schedulerProvider);
     }
 }

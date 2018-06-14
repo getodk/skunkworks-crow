@@ -15,4 +15,9 @@ public class HotspotEvent {
     public enum Status {
         ENABLED, DISABLED
     }
+
+    @Override
+    public String toString() {
+        return getClass().getName() + " : " + getStatus();
+    }
 }

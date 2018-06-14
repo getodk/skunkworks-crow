@@ -51,4 +51,6 @@
     <string name="transfer_result">Transfer result</string>
     <string name="receive_success">Successfully received %1$s form(s)</string>
     <string name="send_success">Successfully sent %1$s form(s)</string>
+    <string name="error_while_downloading">Error occurred while downloading form</string>
+    <string name="download_queued">Downloading queued...</string>
 </resources>

@@ -6,6 +6,7 @@ import com.jakewharton.rxrelay2.PublishRelay;
 import com.jakewharton.rxrelay2.Relay;
 
 import io.reactivex.Observable;
+import timber.log.Timber;
 
 /**
  * A simple Event Bus powered by Jake Wharton's RxRelay and RxJava2
@@ -41,6 +42,7 @@ public class RxEventBus {
      * @param event an Event of any type.
      */
     public void post(@NonNull Object event) {
+        Timber.d(event.toString()); // for debugging events that are being sent from place to another
         busSubject.accept(event);
     }
 
