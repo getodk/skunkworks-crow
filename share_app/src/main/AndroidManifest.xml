@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="org.odk.share">
 
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
@@ -28,10 +29,14 @@
         <activity android:name=".activities.WifiActivity" />
         <activity android:name=".activities.InstancesList" />
         <activity android:name=".preferences.SettingsPreference" />
-
+        <activity android:name=".activities.SendActivity"/>
         <service android:name=".services.HotspotService" />
 
-        <activity android:name=".activities.SendActivity"></activity>
+        <activity
+            android:name="com.journeyapps.barcodescanner.CaptureActivity"
+            android:screenOrientation="portrait"
+            tools:replace="android:screenOrientation"
+            android:stateNotNeeded="true"/>
     </application>
 
 </manifest>

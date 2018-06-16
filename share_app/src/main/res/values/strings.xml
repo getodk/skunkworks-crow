@@ -28,6 +28,7 @@
     <string name="already_connected">Already connected to</string>
     <string name="cancel">Cancel</string>
     <string name="password_empty">Password field is empty</string>
+    <string name="port_empty">Port cannot be empty</string>
 
     <string name="settings">Settings</string>
     <string name="default_hotspot_ssid">hotspot</string>
@@ -39,6 +40,7 @@
     <string name="hotspot_name_error">Hotspot name should not be empty</string>
     <string name="hotspot_password_error">Password length should be atleast 8 characters long</string>
     <string name="waiting_connection">Waiting for connection to accept</string>
+    <string name="connection_info">For connection, scan this QR code or type %1$s after connecting to WiFi %2$s</string>
     <string name="connecting_wifi">Connecting to wifi</string>
     <string name="ok">OK</string>
     <string name="canceled">Canceled</string>

@@ -30,26 +30,27 @@ public class WifiHelper {
         wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
     }
 
-    public void connectToWifi(ScanResult wifiNetwork, String password) {
+    public void connectToWifi(String ssid, String password) {
+        Timber.d("SSID : " + ssid + " " + password);
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();
 
-        if (wifiInfo.getBSSID() != null && wifiInfo.getBSSID().equals(wifiNetwork.BSSID)) {
+        if (wifiInfo.getSSID() != null && wifiInfo.getSSID().equals(ssid)) {
             // already connected to a network
             Toast.makeText(context, context.getString(R.string.already_connected) + " " +
-                    wifiNetwork.SSID, Toast.LENGTH_LONG).show();
+                    ssid, Toast.LENGTH_LONG).show();
         } else {
             WifiConfiguration conf = new WifiConfiguration();
-            conf.SSID = "\"" + wifiNetwork.SSID + "\"";
+            conf.SSID = "\"" + ssid + "\"";
 
-            if (WifiHelper.isClose(wifiNetwork)) {
-                conf.preSharedKey = "\"" + password + "\"";
-            } else {
+            if (password == null) {
                 conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+            } else {
+                conf.preSharedKey = "\"" + password + "\"";
             }
-
+            Timber.d("COnfig " + conf);
             wifiManager.addNetwork(conf);
             wifiManager.disconnect();
-            disableOtherNetwork(wifiNetwork.SSID);
+            disableOtherNetwork(ssid);
             wifiManager.reconnect();
         }
     }

@@ -31,6 +31,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
+import com.journeyapps.barcodescanner.CaptureActivity;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.odk.share.R;
 import org.odk.share.adapters.WifiResultAdapter;
 import org.odk.share.controller.WifiHelper;
@@ -43,6 +49,11 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import timber.log.Timber;
+
+import static org.odk.share.utilities.QRCodeUtils.PASSWORD;
+import static org.odk.share.utilities.QRCodeUtils.PORT;
+import static org.odk.share.utilities.QRCodeUtils.PROTECTED;
+import static org.odk.share.utilities.QRCodeUtils.SSID;
 
 public class WifiActivity extends AppCompatActivity implements ProgressListener {
 
@@ -65,6 +76,7 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
     private String wifiNetworkSSID;
 
     private String alertMsg;
+    private int port;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +87,7 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
         setTitle(getString(R.string.connect_wifi));
         setSupportActionBar(toolbar);
 
+        port = -1;
         wifiHelper = new WifiHelper(this);
 
         wifiManager = wifiHelper.getWifiManager();
@@ -129,10 +142,52 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
             alertMsg = getString(R.string.connecting_wifi);
             showDialog(DIALOG_CONNECTING);
             wifiNetworkSSID = scanResultList.get(i).SSID;
-            wifiHelper.connectToWifi(scanResultList.get(i), null);
+            wifiHelper.connectToWifi(scanResultList.get(i).SSID, null);
             isWifiReceiverRegisterd = true;
             registerReceiver(wifiReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
         }
+    }
+
+    private void showPortDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Enter port number");
+
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_CLASS_NUMBER);
+        builder.setView(input);
+
+        builder.setPositiveButton(getString(R.string.ok), null);
+        builder.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        alertDialog = builder.create();
+        alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialog) {
+                Button button = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE);
+                button.setOnClickListener(new View.OnClickListener() {
+
+                    @Override
+                    public void onClick(View view) {
+                        String portInput = input.getText().toString();
+                        Timber.d("Port num " + portInput);
+                        if (portInput != null && portInput.length() > 0) {
+                            dialog.dismiss();
+                            Timber.d("Port number");
+                            port = Integer.parseInt(portInput);
+                            startReceiveTask();
+                        } else {
+                            input.setError(getString(R.string.port_empty));
+                        }
+                    }
+                });
+            }
+        });
+        alertDialog.show();
     }
 
     private void showPasswordDialog(ScanResult scanResult) {
@@ -178,7 +233,7 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
                             Timber.d(pw);
                             dialog.dismiss();
                             wifiNetworkSSID = scanResult.SSID;
-                            wifiHelper.connectToWifi(scanResult, pw);
+                            wifiHelper.connectToWifi(scanResult.SSID, pw);
                             isWifiReceiverRegisterd = true;
                             registerReceiver(wifiReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
                             showDialog(DIALOG_CONNECTING);
@@ -264,13 +319,12 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
                             isWifiReceiverRegisterd = false;
                             Toast.makeText(getApplicationContext(), "Connected to " + wifiNetworkSSID, Toast.LENGTH_LONG).show();
                             dismissDialog(DIALOG_CONNECTING);
-                            showDialog(DIALOG_DOWNLOAD_PROGRESS);
-                            String port = info.getExtraInfo().split("_")[1];
-                            String dstAddress = wifiHelper.getAccessPointIpAddress();
-                            wifiReceiveTask = new WifiReceiveTask(dstAddress,
-                                    Integer.parseInt(port.substring(0, port.length() - 1)));
-                            wifiReceiveTask.setUploaderListener(WifiActivity.this);
-                            wifiReceiveTask.execute();
+
+                            if (port != -1) {
+                                startReceiveTask();
+                            } else {
+                                showPortDialog();
+                            }
                             unregisterReceiver(this);
                         }
                     }
@@ -278,6 +332,14 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
             }
         }
     };
+
+    private void startReceiveTask() {
+        showDialog(DIALOG_DOWNLOAD_PROGRESS);
+        String dstAddress = wifiHelper.getAccessPointIpAddress();
+        wifiReceiveTask = new WifiReceiveTask(dstAddress, port);
+        wifiReceiveTask.setUploaderListener(this);
+        wifiReceiveTask.execute();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -297,6 +359,15 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
                 return true;
 
             case R.id.menu_qr_code:
+                IntentIntegrator integrator = new IntentIntegrator(this);
+                integrator.setPrompt(getString(R.string.scan_qr_code));
+                integrator.setDesiredBarcodeFormats(integrator.QR_CODE_TYPES);
+                integrator.setCameraId(0);
+                integrator.setOrientationLocked(false);
+
+                integrator.setCaptureActivity(CaptureActivity.class);
+                integrator.setBeepEnabled(true);
+                integrator.initiateScan();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -385,5 +456,43 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
         alertDialog.setCancelable(false);
         alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.ok), quitListener);
         alertDialog.show();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+
+        if (result != null) {
+            if (result.getContents() == null) {
+                // request was canceled...
+                Timber.i("QR code scanning cancelled");
+            } else {
+                Timber.d("RESULT " + result);
+                try {
+                    JSONObject obj = new JSONObject(result.getContents());
+                    String ssid = (String) obj.get(SSID);
+                    port = (Integer) obj.get(PORT);
+                    String password = null;
+                    Boolean isProtected = (Boolean) obj.get(PROTECTED);
+                    if (isProtected) {
+                        password =  (String) obj.get(PASSWORD);
+                    }
+
+                    Timber.d("Scanned results " + ssid + " " + port + " " + isProtected + " " + password);
+                    alertMsg = getString(R.string.connecting_wifi);
+                    showDialog(DIALOG_CONNECTING);
+                    wifiNetworkSSID = ssid;
+                    registerReceiver(wifiReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+                    wifiHelper.connectToWifi(ssid, password);
+                    isWifiReceiverRegisterd = true;
+                } catch (JSONException e) {
+                    Timber.e(e);
+                }
+
+                return;
+            }
+        }
     }
 }
