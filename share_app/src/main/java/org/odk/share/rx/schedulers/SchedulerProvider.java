@@ -12,10 +12,10 @@ import io.reactivex.schedulers.Schedulers;
  */
 
 public class SchedulerProvider implements BaseSchedulerProvider {
-    private static Executor backgroundExecutor = Executors.newCachedThreadPool();
-    private static Scheduler BACKGROUND_SCHEDULERS = Schedulers.from(backgroundExecutor);
-    private static Executor internetExecutor = Executors.newCachedThreadPool();
-    private static Scheduler INTERNET_SCHEDULERS = Schedulers.from(internetExecutor);
+    private static final Executor backgroundExecutor = Executors.newCachedThreadPool();
+    private static final Scheduler BACKGROUND_SCHEDULERS = Schedulers.from(backgroundExecutor);
+    private static final Executor internetExecutor = Executors.newCachedThreadPool();
+    private static final Scheduler INTERNET_SCHEDULERS = Schedulers.from(internetExecutor);
 
     @Override
     public Scheduler runOnBackground() {

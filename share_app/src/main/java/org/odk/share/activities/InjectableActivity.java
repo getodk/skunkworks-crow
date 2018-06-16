@@ -1,5 +1,7 @@
 package org.odk.share.activities;
 
+import android.annotation.SuppressLint;
+
 import dagger.android.support.DaggerAppCompatActivity;
 
 /**
@@ -8,5 +10,6 @@ import dagger.android.support.DaggerAppCompatActivity;
  * <p>
  * Those activities should also be registered in {@link org.odk.share.injection.ActivityBuilder}
  */
-public abstract class InjectableActivity extends DaggerAppCompatActivity {
+@SuppressLint("Registered")
+public class InjectableActivity extends DaggerAppCompatActivity {
 }
