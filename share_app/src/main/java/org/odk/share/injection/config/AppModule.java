@@ -4,6 +4,7 @@ package org.odk.share.injection.config;
 import android.app.Application;
 import android.content.Context;
 
+import org.odk.share.controller.WifiHotspotHelper;
 import org.odk.share.injection.config.scopes.PerApplication;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.rx.schedulers.BaseSchedulerProvider;
@@ -42,5 +43,11 @@ class AppModule {
     @PerApplication
     ReceiverService provideReceiverService(RxEventBus rxEventBus, BaseSchedulerProvider schedulerProvider) {
         return new ReceiverService(rxEventBus, schedulerProvider);
+    }
+
+    @Provides
+    @PerApplication
+    WifiHotspotHelper provideHotspotHelper(Context context) {
+        return new WifiHotspotHelper(context);
     }
 }

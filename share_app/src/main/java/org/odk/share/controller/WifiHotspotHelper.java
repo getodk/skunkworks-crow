@@ -5,8 +5,6 @@ import android.net.ConnectivityManager;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 
-import org.odk.share.R;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -26,34 +24,13 @@ public class WifiHotspotHelper {
     private WifiManager wifiManager;
     private WifiConfiguration lastConfig;
     private WifiConfiguration currConfig;
-    private Context context;
-    public static final String ssid = "ODK-Share";
     private int port;
 
-    public WifiConfiguration getCurrConfig() {
-        return currConfig;
-    }
-
-    public void setCurrConfig(WifiConfiguration currConfig) {
-        this.currConfig = currConfig;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
-    }
-
-    public static WifiHotspotHelper wifiHotspotHelper;
-
-    private WifiHotspotHelper(Context context) {
-        this.context = context;
+    public WifiHotspotHelper(Context context) {
         wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         for (Method method : wifiManager.getClass().getMethods()) {
             switch (method.getName()) {
-                case "isWifiApEnabled" :
+                case "isWifiApEnabled":
                     isWifiApEnabled = method;
                     break;
                 case "setWifiApEnabled":
@@ -71,11 +48,34 @@ public class WifiHotspotHelper {
         }
     }
 
-    public static synchronized WifiHotspotHelper getInstance(Context context) {
-        if (wifiHotspotHelper == null) {
-            wifiHotspotHelper = new WifiHotspotHelper(context);
+    public static boolean isMobileDataEnabled(Context context) {
+        boolean enabled = false;
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        try {
+            Class cmClass = Class.forName(cm.getClass().getName());
+            Method method = cmClass.getDeclaredMethod("getMobileDataEnabled");
+            method.setAccessible(true);
+            enabled = (Boolean) method.invoke(cm);
+        } catch (Exception e) {
+            Timber.e(e);
         }
-        return wifiHotspotHelper;
+        return enabled;
+    }
+
+    public WifiConfiguration getCurrConfig() {
+        return currConfig;
+    }
+
+    public void setCurrConfig(WifiConfiguration currConfig) {
+        this.currConfig = currConfig;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
     }
 
     public boolean isSupported() {
@@ -132,10 +132,9 @@ public class WifiHotspotHelper {
         lastConfig = getWifiConfig();
     }
 
-    public boolean enableHotspot() {
+    public boolean enableHotspot(String ssid) {
         saveLastConfig();
-
-        currConfig = createNewConfig(ssid + context.getString(R.string.hotspot_name_suffix));
+        currConfig = createNewConfig(ssid);
         return toggleHotspot(currConfig, true);
     }
 
@@ -165,19 +164,5 @@ public class WifiHotspotHelper {
         wifiManager.addNetwork(wifiConf);
         wifiManager.saveConfiguration();
         return wifiConf;
-    }
-
-    public static boolean isMobileDataEnabled(Context context) {
-        boolean enabled = false;
-        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        try {
-            Class cmClass = Class.forName(cm.getClass().getName());
-            Method method = cmClass.getDeclaredMethod("getMobileDataEnabled");
-            method.setAccessible(true);
-            enabled = (Boolean) method.invoke(cm);
-        } catch (Exception e) {
-            Timber.e(e);
-        }
-        return enabled;
     }
 }

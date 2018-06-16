@@ -48,7 +48,9 @@ public class HotspotService extends Service {
     @Inject
     BaseSchedulerProvider schedulerProvider;
 
-    private WifiHotspotHelper wifiHotspotHelper;
+    @Inject
+    WifiHotspotHelper wifiHotspotHelper;
+
     private HotspotState state;
     private BroadcastReceiver stopReceiver;
 
@@ -65,7 +67,6 @@ public class HotspotService extends Service {
         // inject dependencies
         ((Share) getApplication()).getAppComponent().inject(this);
 
-        wifiHotspotHelper = WifiHotspotHelper.getInstance(getApplicationContext());
         stopReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {

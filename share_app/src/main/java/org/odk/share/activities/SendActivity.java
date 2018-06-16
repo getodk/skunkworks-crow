@@ -46,14 +46,16 @@ import static org.odk.share.activities.InstancesList.INSTANCE_IDS;
 
 public class SendActivity extends InjectableActivity implements ProgressListener {
 
+    public static final String DEFAULT_SSID = "ODK-Share";
     private static final int PROGRESS_DIALOG = 1;
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     @Inject
     RxEventBus rxEventBus;
-
     @Inject
     BaseSchedulerProvider schedulerProvider;
+    @Inject
+    WifiHotspotHelper wifiHotspot;
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -65,7 +67,6 @@ public class SendActivity extends InjectableActivity implements ProgressListener
     TextView connectInfo;
 
     private boolean isHotspotRunning;
-    private WifiHotspotHelper wifiHotspot;
     private boolean openSettings;
     private Long[] instancesToSend;
     private HotspotSendTask hotspotSendTask;
@@ -84,8 +85,6 @@ public class SendActivity extends InjectableActivity implements ProgressListener
 
         long[] instancesIds = getIntent().getLongArrayExtra(INSTANCE_IDS);
         instancesToSend = ArrayUtils.toObject(instancesIds);
-
-        wifiHotspot = WifiHotspotHelper.getInstance(this);
 
         try {
             serverSocket = new ServerSocket(0);
@@ -141,7 +140,7 @@ public class SendActivity extends InjectableActivity implements ProgressListener
         } else {
 
             Timber.d("Started hotspot below N");
-            wifiHotspot.enableHotspot();
+            wifiHotspot.enableHotspot(DEFAULT_SSID + getString(R.string.hotspot_name_suffix));
             Intent serviceIntent = new Intent(getApplicationContext(), HotspotService.class);
             serviceIntent.setAction(HotspotService.ACTION_START);
             startService(serviceIntent);
@@ -161,8 +160,7 @@ public class SendActivity extends InjectableActivity implements ProgressListener
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 wifiHotspot.saveLastConfig();
-                WifiConfiguration newWifiConfig = wifiHotspot.createNewConfig(WifiHotspotHelper.ssid +
-                        getString(R.string.hotspot_name_suffix));
+                WifiConfiguration newWifiConfig = wifiHotspot.createNewConfig(DEFAULT_SSID + getString(R.string.hotspot_name_suffix));
                 wifiHotspot.setCurrConfig(newWifiConfig);
                 wifiHotspot.setWifiConfig(newWifiConfig);
                 final Intent intent = new Intent(Intent.ACTION_MAIN, null);
