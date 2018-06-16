@@ -3,7 +3,6 @@ package org.odk.share.tasks;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 
 import com.evernote.android.job.Job;
