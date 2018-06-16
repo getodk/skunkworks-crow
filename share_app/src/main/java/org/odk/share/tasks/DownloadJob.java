@@ -18,6 +18,7 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -35,17 +36,18 @@ public class DownloadJob extends Job {
 
     private static final String INSTANCE_PATH = "share/instances/";
     private static final String FORM_PATH = "share/forms/";
+    private static final int TIMEOUT = 2000;
 
     @Inject
     RxEventBus rxEventBus;
 
     private String ip;
     private int port;
-
-    private DataInputStream dis;
-    private DataOutputStream dos;
     private int total;
     private int progress;
+    private Socket socket;
+    private DataInputStream dis;
+    private DataOutputStream dos;
 
     @NonNull
     @Override
@@ -69,18 +71,25 @@ public class DownloadJob extends Job {
         Timber.d("Socket " + ip + " " + port);
 
         try {
-            Socket socket = new Socket(ip, port);
+            socket = new Socket();
+            socket.connect(new InetSocketAddress(ip, port), TIMEOUT);
+            Timber.d("Socket connected");
             dis = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
             dos = new DataOutputStream(socket.getOutputStream());
             total = dis.readInt();
             int num = dis.readInt();
-            Timber.d("Number of forms" + num + " ");
-            while (num-- > 0) {
-                Timber.d("Reading form");
-                if (readFormAndInstances()) {
-                    return String.valueOf(progress);
-                }
+            Timber.d("Number of forms : %d", num);
+            for (int i = 0; i < num; i++) {
+                Timber.d("Downloading form : %d", i + 1);
+                boolean result = readFormAndInstances();
+                Timber.d("Form %d downloaded = %s", i + 1, result);
             }
+
+            // close connection
+            socket.close();
+            dos.close();
+            dis.close();
+
         } catch (IOException e) {
             Timber.e(e);
         }

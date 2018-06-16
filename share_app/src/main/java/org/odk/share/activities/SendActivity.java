@@ -5,12 +5,9 @@ import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.net.wifi.WifiConfiguration;
 import android.os.Bundle;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -32,8 +29,6 @@ import java.net.ServerSocket;
 
 import javax.inject.Inject;
 
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -60,12 +55,15 @@ public class SendActivity extends InjectableActivity implements ProgressListener
     @Inject
     BaseSchedulerProvider schedulerProvider;
 
-    @BindView(R.id.toolbar) Toolbar toolbar;
-    @BindView(R.id.tvConnectStatus) TextView connectStatus;
-    @BindView(R.id.ivQRcode) ImageView imageQR;
-    @BindView(R.id.tvConnectInfo) TextView connectInfo;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.tvConnectStatus)
+    TextView connectStatus;
+    @BindView(R.id.ivQRcode)
+    ImageView imageQR;
+    @BindView(R.id.tvConnectInfo)
+    TextView connectInfo;
 
-    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
     private boolean isHotspotRunning;
     private WifiHotspotHelper wifiHotspot;
     private boolean openSettings;
