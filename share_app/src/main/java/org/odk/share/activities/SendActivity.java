@@ -20,12 +20,10 @@ import org.odk.share.listeners.ProgressListener;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.rx.schedulers.BaseSchedulerProvider;
 import org.odk.share.services.HotspotService;
-import org.odk.share.tasks.HotspotSendTask;
+import org.odk.share.services.SenderService;
 import org.odk.share.utilities.ArrayUtils;
 import org.odk.share.utilities.QRCodeUtils;
-
-import java.io.IOException;
-import java.net.ServerSocket;
+import org.odk.share.utilities.SocketUtils;
 
 import javax.inject.Inject;
 
@@ -56,6 +54,8 @@ public class SendActivity extends InjectableActivity implements ProgressListener
     BaseSchedulerProvider schedulerProvider;
     @Inject
     WifiHotspotHelper wifiHotspot;
+    @Inject
+    SenderService senderService;
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -69,10 +69,9 @@ public class SendActivity extends InjectableActivity implements ProgressListener
     private boolean isHotspotRunning;
     private boolean openSettings;
     private Long[] instancesToSend;
-    private HotspotSendTask hotspotSendTask;
     private ProgressDialog progressDialog;
     private String alertMsg;
-    private ServerSocket serverSocket;
+    private int port;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,11 +85,10 @@ public class SendActivity extends InjectableActivity implements ProgressListener
         long[] instancesIds = getIntent().getLongArrayExtra(INSTANCE_IDS);
         instancesToSend = ArrayUtils.toObject(instancesIds);
 
-        try {
-            serverSocket = new ServerSocket(0);
-            wifiHotspot.setPort(serverSocket.getLocalPort());
-        } catch (IOException e) {
-            Timber.e(e);
+        port = SocketUtils.getPort();
+
+        if (port == -1) {
+            Timber.e("Port not available for socket communication");
             finish();
         }
 
@@ -216,16 +214,13 @@ public class SendActivity extends InjectableActivity implements ProgressListener
             wifiHotspot.disableHotspot();
         }
 
-        if (hotspotSendTask != null) {
-            hotspotSendTask.cancel(true);
-        }
+        senderService.cancel();
         Timber.d("Hotspot Stopped");
         compositeDisposable.dispose();
         super.onDestroy();
     }
 
     private void startSending() {
-        int port = wifiHotspot.getPort();
         String ssid = wifiHotspot.getCurrConfig().SSID;
 
         Timber.d("SSID " + ssid + " " + port);
@@ -240,9 +235,7 @@ public class SendActivity extends InjectableActivity implements ProgressListener
 
         connectInfo.setText(getString(R.string.connection_info, String.valueOf(port), ssid));
 
-        hotspotSendTask = new HotspotSendTask(serverSocket);
-        hotspotSendTask.setUploaderListener(this);
-        hotspotSendTask.execute(instancesToSend);
+        senderService.startUploading(instancesToSend, port);
     }
 
     @Override
@@ -291,9 +284,7 @@ public class SendActivity extends InjectableActivity implements ProgressListener
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                if (hotspotSendTask != null) {
-                                    hotspotSendTask.cancel(true);
-                                }
+                                senderService.cancel();
                                 dialog.dismiss();
                                 finish();
                             }

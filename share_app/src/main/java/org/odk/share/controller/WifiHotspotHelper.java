@@ -24,7 +24,6 @@ public class WifiHotspotHelper {
     private WifiManager wifiManager;
     private WifiConfiguration lastConfig;
     private WifiConfiguration currConfig;
-    private int port;
 
     public WifiHotspotHelper(Context context) {
         wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
@@ -68,14 +67,6 @@ public class WifiHotspotHelper {
 
     public void setCurrConfig(WifiConfiguration currConfig) {
         this.currConfig = currConfig;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
     }
 
     public boolean isSupported() {

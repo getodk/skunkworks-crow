@@ -19,4 +19,12 @@ public class SenderService {
     SenderService() {
 
     }
+
+    public void cancel() {
+        // todo
+    }
+
+    public void startUploading(Long[] instancesToSend, int port) {
+
+    }
 }
