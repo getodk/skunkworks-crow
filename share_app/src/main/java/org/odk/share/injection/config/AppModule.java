@@ -10,6 +10,7 @@ import org.odk.share.rx.RxEventBus;
 import org.odk.share.rx.schedulers.BaseSchedulerProvider;
 import org.odk.share.rx.schedulers.SchedulerProvider;
 import org.odk.share.services.ReceiverService;
+import org.odk.share.services.SenderService;
 
 import dagger.Module;
 import dagger.Provides;
@@ -43,6 +44,12 @@ class AppModule {
     @PerApplication
     ReceiverService provideReceiverService(RxEventBus rxEventBus, BaseSchedulerProvider schedulerProvider) {
         return new ReceiverService(rxEventBus, schedulerProvider);
+    }
+
+    @Provides
+    @PerApplication
+    SenderService provideSenderService(RxEventBus rxEventBus, BaseSchedulerProvider schedulerProvider) {
+        return new SenderService(rxEventBus, schedulerProvider);
     }
 
     @Provides

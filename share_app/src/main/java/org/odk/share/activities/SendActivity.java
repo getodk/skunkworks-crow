@@ -16,12 +16,11 @@ import android.widget.Toast;
 import org.odk.share.R;
 import org.odk.share.controller.WifiHotspotHelper;
 import org.odk.share.events.HotspotEvent;
-import org.odk.share.listeners.ProgressListener;
+import org.odk.share.events.UploadEvent;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.rx.schedulers.BaseSchedulerProvider;
 import org.odk.share.services.HotspotService;
 import org.odk.share.services.SenderService;
-import org.odk.share.utilities.ArrayUtils;
 import org.odk.share.utilities.QRCodeUtils;
 import org.odk.share.utilities.SocketUtils;
 
@@ -42,7 +41,7 @@ import static org.odk.share.activities.InstancesList.INSTANCE_IDS;
  * Created by laksh on 6/9/2018.
  */
 
-public class SendActivity extends InjectableActivity implements ProgressListener {
+public class SendActivity extends InjectableActivity {
 
     public static final String DEFAULT_SSID = "ODK-Share";
     private static final int PROGRESS_DIALOG = 1;
@@ -68,10 +67,10 @@ public class SendActivity extends InjectableActivity implements ProgressListener
 
     private boolean isHotspotRunning;
     private boolean openSettings;
-    private Long[] instancesToSend;
     private ProgressDialog progressDialog;
     private String alertMsg;
     private int port;
+    private long[] instancesIds;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,8 +81,7 @@ public class SendActivity extends InjectableActivity implements ProgressListener
         setTitle(getString(R.string.send_forms));
         setSupportActionBar(toolbar);
 
-        long[] instancesIds = getIntent().getLongArrayExtra(INSTANCE_IDS);
-        instancesToSend = ArrayUtils.toObject(instancesIds);
+        instancesIds = getIntent().getLongArrayExtra(INSTANCE_IDS);
 
         port = SocketUtils.getPort();
 
@@ -200,6 +198,53 @@ public class SendActivity extends InjectableActivity implements ProgressListener
         }
 
         compositeDisposable.add(addHotspotEventSubscription());
+        compositeDisposable.add(addUploadEventSubscription());
+    }
+
+    private Disposable addUploadEventSubscription() {
+        return rxEventBus.register(UploadEvent.class)
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.androidThread())
+                .subscribe(uploadEvent -> {
+                    switch (uploadEvent.getStatus()) {
+                        case QUEUED:
+                            Toast.makeText(this, R.string.upload_queued, Toast.LENGTH_SHORT).show();
+                            break;
+                        case UPLOADING:
+                            int progress = uploadEvent.getCurrentProgress();
+                            int total = uploadEvent.getTotalSize();
+                            alertMsg = getString(R.string.sending_items, String.valueOf(progress), String.valueOf(total));
+                            setDialogMessage(PROGRESS_DIALOG, alertMsg);
+                            break;
+                        case FINISHED:
+                            hideDialog(PROGRESS_DIALOG);
+                            String result = uploadEvent.getResult();
+                            createAlertDialog(getString(R.string.transfer_result), getString(R.string.send_success, result));
+                            break;
+                        case ERROR:
+                            Toast.makeText(this, R.string.error_while_downloading, Toast.LENGTH_SHORT).show();
+                            hideDialog(PROGRESS_DIALOG);
+                            break;
+                        case CANCELLED:
+                            Toast.makeText(this, getString(R.string.canceled), Toast.LENGTH_LONG).show();
+                            hideDialog(PROGRESS_DIALOG);
+                            break;
+                    }
+                }, Timber::e);
+    }
+
+    private void setDialogMessage(int dialogId, String message) {
+        if (progressDialog == null) {
+            showDialog(dialogId);
+        }
+
+        progressDialog.setMessage(message);
+    }
+
+    private void hideDialog(int dialogId) {
+        if (progressDialog != null) {
+            dismissDialog(dialogId);
+        }
     }
 
     @Override
@@ -232,42 +277,9 @@ public class SendActivity extends InjectableActivity implements ProgressListener
                     imageQR.setImageBitmap(bitmap);
                 }, Timber::e);
         compositeDisposable.add(disposable);
-
         connectInfo.setText(getString(R.string.connection_info, String.valueOf(port), ssid));
 
-        senderService.startUploading(instancesToSend, port);
-    }
-
-    @Override
-    public void uploadingComplete(String result) {
-        try {
-            dismissDialog(PROGRESS_DIALOG);
-        } catch (Exception e) {
-            // tried to close a dialog not open. don't care.
-        }
-        createAlertDialog(getString(R.string.transfer_result), getString(R.string.send_success, result));
-    }
-
-    @Override
-    public void progressUpdate(int progress, int total) {
-        alertMsg = getString(R.string.sending_items, String.valueOf(progress), String.valueOf(total));
-
-        if (progressDialog == null) {
-            showDialog(PROGRESS_DIALOG);
-            return;
-        }
-
-        progressDialog.setMessage(alertMsg);
-    }
-
-    @Override
-    public void onCancel() {
-        Toast.makeText(this, getString(R.string.canceled), Toast.LENGTH_LONG).show();
-        try {
-            dismissDialog(PROGRESS_DIALOG);
-        } catch (Exception e) {
-            // tried to close a dialog not open. don't care.
-        }
+        senderService.startUploading(instancesIds, port);
     }
 
     @Override
