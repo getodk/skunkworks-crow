@@ -24,6 +24,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -87,7 +88,8 @@ public class UploadJob extends Job {
             serverSocket.close();
             dos.close();
             dis.close();
-
+        } catch (SocketException e) {
+            Timber.e(e);
         } catch (IOException e) {
             Timber.e(e);
         }
@@ -95,6 +97,25 @@ public class UploadJob extends Job {
         return String.valueOf(progress);
     }
 
+    @Override
+    protected void onCancel() {
+        try {
+            if (socket != null) {
+                socket.close();
+            }
+            if (serverSocket != null) {
+                serverSocket.close();
+            }
+            if (dos != null) {
+                dos.close();
+            }
+            if (dis != null) {
+                dis.close();
+            }
+        } catch (IOException e) {
+            Timber.e(e);
+        }
+    }
 
     private boolean processSelectedFiles(Long[] ids) {
 

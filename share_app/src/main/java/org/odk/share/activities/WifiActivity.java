@@ -87,10 +87,8 @@ public class WifiActivity extends InjectableActivity {
 
     @Inject
     ReceiverService receiverService;
-
     @Inject
     RxEventBus rxEventBus;
-
     @Inject
     BaseSchedulerProvider schedulerProvider;
 
@@ -231,10 +229,9 @@ public class WifiActivity extends InjectableActivity {
                     @Override
                     public void onClick(View view) {
                         String portInput = input.getText().toString();
-                        Timber.d("Port num " + portInput);
-                        if (portInput != null && portInput.length() > 0) {
+                        Timber.d("Port : %s", portInput);
+                        if (portInput.length() > 0) {
                             dialog.dismiss();
-                            Timber.d("Port number");
                             port = Integer.parseInt(portInput);
                             startReceiveTask();
                         } else {

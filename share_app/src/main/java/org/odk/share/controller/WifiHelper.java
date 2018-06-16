@@ -30,6 +30,11 @@ public class WifiHelper {
         wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
     }
 
+    // Checks whether the wifi hotspot is password protected or not
+    public static boolean isClose(ScanResult result) {
+        return result.capabilities.contains("EAP") || result.capabilities.contains("PSK") || result.capabilities.contains("WEP");
+    }
+
     public void connectToWifi(String ssid, String password) {
         Timber.d("SSID : " + ssid + " " + password);
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();
@@ -55,8 +60,12 @@ public class WifiHelper {
         }
     }
 
-    public void disableOtherNetwork(String ssid) {
+    private void disableOtherNetwork(String ssid) {
         List<WifiConfiguration> wifiConfigurationList = wifiManager.getConfiguredNetworks();
+
+        if (wifiConfigurationList == null) {
+            return;
+        }
 
         for (WifiConfiguration config : wifiConfigurationList) {
             if (config.SSID.equals("\"" + ssid + "\"")) {
@@ -67,7 +76,7 @@ public class WifiHelper {
         }
     }
 
-    public void removeNetworkAndEnableOther(String ssid) {
+    private void removeNetworkAndEnableOther(String ssid) {
         List<WifiConfiguration> wifiConfigurationList = wifiManager.getConfiguredNetworks();
 
         for (WifiConfiguration config : wifiConfigurationList) {
@@ -89,14 +98,6 @@ public class WifiHelper {
 
     public WifiManager getWifiManager() {
         return wifiManager;
-    }
-
-    // Checks whether the wifi hotspot is password protected or not
-    public static boolean isClose(ScanResult result) {
-        if (result.capabilities.contains("EAP") || result.capabilities.contains("PSK") || result.capabilities.contains("WEP")) {
-            return true;
-        }
-        return false;
     }
 
     public String getAccessPointIpAddress() {

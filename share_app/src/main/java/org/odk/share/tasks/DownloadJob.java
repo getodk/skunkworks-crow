@@ -97,6 +97,23 @@ public class DownloadJob extends Job {
         return String.valueOf(progress);
     }
 
+    @Override
+    protected void onCancel() {
+        try {
+            if (socket != null) {
+                socket.close();
+            }
+            if (dos != null) {
+                dos.close();
+            }
+            if (dis != null) {
+                dis.close();
+            }
+        } catch (IOException e) {
+            Timber.e(e);
+        }
+    }
+
     private boolean readFormAndInstances() {
         try {
             Timber.d("readFormAndInstances");

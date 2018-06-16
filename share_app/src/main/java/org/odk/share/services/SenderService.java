@@ -1,9 +1,9 @@
 package org.odk.share.services;
 
+import com.evernote.android.job.JobManager;
 import com.evernote.android.job.JobRequest;
 import com.evernote.android.job.util.support.PersistableBundleCompat;
 
-import org.odk.share.events.DownloadEvent;
 import org.odk.share.events.UploadEvent;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.rx.schedulers.BaseSchedulerProvider;
@@ -75,7 +75,7 @@ public class SenderService {
             startJob(request);
         }
 
-        rxEventBus.post(new DownloadEvent(DownloadEvent.Status.QUEUED));
+        rxEventBus.post(new UploadEvent(UploadEvent.Status.QUEUED));
     }
 
     private void startJob(JobRequest request) {
@@ -86,9 +86,9 @@ public class SenderService {
 
     public void cancel() {
         if (currentJob != null) {
-            currentJob.cancelAndEdit();
-            currentJob = null;
+            JobManager.instance().getJob(currentJob.getJobId()).cancel();
             rxEventBus.post(new UploadEvent(UploadEvent.Status.CANCELLED));
+            currentJob = null;
         }
     }
 }
