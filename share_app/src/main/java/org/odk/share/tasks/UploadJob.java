@@ -1,13 +1,19 @@
 package org.odk.share.tasks;
 
 import android.database.Cursor;
-import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 
+import com.evernote.android.job.Job;
+
+import org.odk.share.application.Share;
 import org.odk.share.dao.FormsDao;
 import org.odk.share.dao.InstancesDao;
-import org.odk.share.listeners.ProgressListener;
+import org.odk.share.events.UploadEvent;
 import org.odk.share.provider.FormsProviderAPI;
 import org.odk.share.provider.InstanceProviderAPI;
+import org.odk.share.rx.RxEventBus;
+import org.odk.share.utilities.ArrayUtils;
+import org.odk.share.utilities.FileUtils;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
@@ -18,22 +24,27 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
+
+import javax.inject.Inject;
 
 import timber.log.Timber;
 
-/**
- * Created by laksh on 5/30/2018.
- */
+public class UploadJob extends Job {
 
-public class HotspotSendTask extends AsyncTask<Long, Integer, String> {
+    public static final String TAG = "formUploadJob";
+    public static final String INSTANCES = "instances";
+    public static final String PORT = "port";
 
-    private ProgressListener stateListener;
+    @Inject
+    RxEventBus rxEventBus;
+
+    private int port;
+    private Long[] instancesToSend;
     private Socket socket;
     private ServerSocket serverSocket;
     private DataOutputStream dos;
@@ -41,67 +52,69 @@ public class HotspotSendTask extends AsyncTask<Long, Integer, String> {
     private int progress;
     private int total;
 
-    public HotspotSendTask(ServerSocket serverSocket) {
-        this.serverSocket = serverSocket;
-    }
-
-    public void setUploaderListener(ProgressListener sl) {
-        synchronized (this) {
-            stateListener = sl;
-        }
-    }
-
+    @NonNull
     @Override
-    protected void onProgressUpdate(Integer... values) {
-        synchronized (this) {
-            if (stateListener != null) {
-                stateListener.progressUpdate(values[0], values[1]);
-            }
-        }
+    protected Result onRunJob(@NonNull Params params) {
+        ((Share) getContext().getApplicationContext()).getAppComponent().inject(this);
+
+        initJob(params);
+
+        String result = uploadInstances();
+        rxEventBus.post(new UploadEvent(UploadEvent.Status.FINISHED, result));
+
+        return null;
     }
 
-    @Override
-    protected void onPostExecute(String s) {
-        stateListener.uploadingComplete(s);
-        try {
-            if (socket != null) {
-                socket.close();
-            }
-            if (dos != null) {
-                dos.close();
-            }
-
-            if (dis != null) {
-                dis.close();
-            }
-        } catch (IOException e) {
-            Timber.e(e);
-        }
+    private void initJob(Params params) {
+        instancesToSend = ArrayUtils.toObject(params.getExtras().getLongArray(INSTANCES));
+        port = params.getExtras().getInt(PORT, -1);
     }
 
-    @Override
-    protected void onCancelled() {
-        super.onCancelled();
-        stateListener.onCancel();
-    }
-
-    @Override
-    protected String doInBackground(Long... longs) {
+    private String uploadInstances() {
         try {
             Timber.d("Waiting for receiver");
+
+            serverSocket = new ServerSocket(port);
             socket = serverSocket.accept();
             dos = new DataOutputStream(socket.getOutputStream());
             dis = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
 
             // show dialog and connected
             Timber.d("Start Sending");
-            processSelectedFiles(longs);
+            processSelectedFiles(instancesToSend);
 
+            // close connection
+            socket.close();
+            serverSocket.close();
+            dos.close();
+            dis.close();
+        } catch (SocketException e) {
+            Timber.e(e);
         } catch (IOException e) {
             Timber.e(e);
         }
 
         return String.valueOf(progress);
+    }
+
+    @Override
+    protected void onCancel() {
+        try {
+            if (socket != null) {
+                socket.close();
+            }
+            if (serverSocket != null) {
+                serverSocket.close();
+            }
+            if (dos != null) {
+                dos.close();
+            }
+            if (dis != null) {
+                dis.close();
+            }
+        } catch (IOException e) {
+            Timber.e(e);
+        }
     }
 
     private boolean processSelectedFiles(Long[] ids) {
@@ -122,15 +135,12 @@ public class HotspotSendTask extends AsyncTask<Long, Integer, String> {
         String selection = selectionBuf.toString();
 
         int count = 0;
-        Cursor c = null;
-        try {
-            c = new InstancesDao().getInstancesCursor(selection, selectionArgs);
-
-            if (c != null && c.getCount() > 0) {
-                c.moveToPosition(-1);
-                while (c.moveToNext()) {
-                    String formId = c.getString(c.getColumnIndex(InstanceProviderAPI.InstanceColumns.JR_FORM_ID));
-                    String formVersion = c.getString(c.getColumnIndex(InstanceProviderAPI.InstanceColumns.JR_VERSION));
+        try (Cursor cursor = new InstancesDao().getInstancesCursor(selection, selectionArgs)) {
+            if (cursor != null && cursor.getCount() > 0) {
+                cursor.moveToPosition(-1);
+                while (cursor.moveToNext()) {
+                    String formId = cursor.getString(cursor.getColumnIndex(InstanceProviderAPI.InstanceColumns.JR_FORM_ID));
+                    String formVersion = cursor.getString(cursor.getColumnIndex(InstanceProviderAPI.InstanceColumns.JR_VERSION));
 
                     Map<String, List<String>> instanceMap;
                     if (formMap.containsKey(formId)) {
@@ -149,14 +159,10 @@ public class HotspotSendTask extends AsyncTask<Long, Integer, String> {
                         count++;
                     }
 
-                    instancesList.add(c.getString(c.getColumnIndex(InstanceProviderAPI.InstanceColumns._ID)));
+                    instancesList.add(cursor.getString(cursor.getColumnIndex(InstanceProviderAPI.InstanceColumns._ID)));
                 }
             }
             Timber.d(String.valueOf(formMap));
-        } finally {
-            if (c != null) {
-                c.close();
-            }
         }
 
         // send number of distinct forms
@@ -169,15 +175,11 @@ public class HotspotSendTask extends AsyncTask<Long, Integer, String> {
 
         total = ids.length;
         // using iterators
-        Iterator<Map.Entry<String, Map<String, List<String>>>> itrId = formMap.entrySet().iterator();
 
-        while (itrId.hasNext()) {
-            Map.Entry<String, Map<String, List<String>>> mapId = itrId.next();
-            Map<String, List<String>> formVersionMap =  mapId.getValue();
+        for (Map.Entry<String, Map<String, List<String>>> mapId : formMap.entrySet()) {
+            Map<String, List<String>> formVersionMap = mapId.getValue();
 
-            Iterator<Map.Entry<String, List<String>>> itrVersion = formVersionMap.entrySet().iterator();
-            while (itrVersion.hasNext()) {
-                Map.Entry<String, List<String>> mapVersion = itrVersion.next();
+            for (Map.Entry<String, List<String>> mapVersion : formVersionMap.entrySet()) {
                 List<String> instanceIds = mapVersion.getValue();
                 String formVers = mapVersion.getKey();
                 String formId = mapId.getKey();
@@ -227,7 +229,7 @@ public class HotspotSendTask extends AsyncTask<Long, Integer, String> {
     }
 
     private void sendForm(String formId, String formVersion) {
-        String []selectionArgs;
+        String[] selectionArgs;
         String selection;
 
         if (formVersion == null) {
@@ -240,54 +242,49 @@ public class HotspotSendTask extends AsyncTask<Long, Integer, String> {
                     + FormsProviderAPI.FormsColumns.JR_VERSION + "=?";
         }
 
-        Cursor cursor = new FormsDao().getFormsCursor(null, selection, selectionArgs, null);
-
-        if (cursor != null) {
+        try (Cursor cursor = new FormsDao().getFormsCursor(null, selection, selectionArgs, null)) {
             cursor.moveToPosition(-1);
-            try {
-                if (cursor.moveToNext()) {
-                    String displayName = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.DISPLAY_NAME));
-                    String formMediaPath = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.FORM_MEDIA_PATH));
-                    String formFilePath = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.FORM_FILE_PATH));
-                    String submissionUri = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.SUBMISSION_URI));
 
-                    try {
-                        dos.writeUTF(displayName);
-                        dos.writeUTF(formId);
+            if (cursor.moveToNext()) {
+                String displayName = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.DISPLAY_NAME));
+                String formMediaPath = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.FORM_MEDIA_PATH));
+                String formFilePath = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.FORM_FILE_PATH));
+                String submissionUri = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.SUBMISSION_URI));
 
-                        if (formVersion == null) {
-                            dos.writeUTF("-1");
-                        } else {
-                            dos.writeUTF(formVersion);
-                        }
+                try {
+                    dos.writeUTF(displayName);
+                    dos.writeUTF(formId);
 
-                        if (submissionUri == null) {
-                            dos.writeUTF("-1");
-                        } else {
-                            dos.writeUTF(submissionUri);
-                        }
-
-                        // form file sent
-                        sendFile(formFilePath);
-
-                        // send form resources
-                        File[] formRes = getFormResources(formMediaPath);
-
-                        if (formRes != null) {
-                            dos.writeInt(formRes.length);
-                            for (File f : formRes) {
-                                String fileName = f.getName();
-                                sendFile(formMediaPath + "/" + fileName);
-                            }
-                        } else {
-                            dos.writeInt(0);
-                        }
-                    } catch (IOException e) {
-                        Timber.e(e);
+                    if (formVersion == null) {
+                        dos.writeUTF("-1");
+                    } else {
+                        dos.writeUTF(formVersion);
                     }
+
+                    if (submissionUri == null) {
+                        dos.writeUTF("-1");
+                    } else {
+                        dos.writeUTF(submissionUri);
+                    }
+
+                    // form file sent
+                    sendFile(formFilePath);
+
+                    // send form resources
+                    File[] formRes = getFormResources(formMediaPath);
+
+                    if (formRes != null) {
+                        dos.writeInt(formRes.length);
+                        for (File f : formRes) {
+                            String fileName = f.getName();
+                            sendFile(formMediaPath + "/" + fileName);
+                        }
+                    } else {
+                        dos.writeInt(0);
+                    }
+                } catch (IOException e) {
+                    Timber.e(e);
                 }
-            } finally {
-                cursor.close();
             }
         }
     }
@@ -315,15 +312,13 @@ public class HotspotSendTask extends AsyncTask<Long, Integer, String> {
                 while (c.moveToNext()) {
                     String instance = c.getString(
                             c.getColumnIndex(InstanceProviderAPI.InstanceColumns.INSTANCE_FILE_PATH));
-                    publishProgress(++progress, total);
+                    rxEventBus.post(new UploadEvent(UploadEvent.Status.UPLOADING, ++progress, total));
                     Timber.d("Progress " + progress + " " + total);
                     sendInstance(instance);
                 }
             }
         } catch (IOException e) {
-            if (c != null) {
-                c.close();
-            }
+            c.close();
         } finally {
             if (c != null) {
                 c.close();
@@ -357,7 +352,6 @@ public class HotspotSendTask extends AsyncTask<Long, Integer, String> {
         return directory.listFiles();
     }
 
-
     private boolean sendInstance(String instanceFilePath) {
         File instanceFile = new File(instanceFilePath);
         File[] allFiles = instanceFile.getParentFile().listFiles();
@@ -377,7 +371,7 @@ public class HotspotSendTask extends AsyncTask<Long, Integer, String> {
                     continue; // the xml file has already been added
                 }
 
-                String extension = getFileExtension(fileName);
+                String extension = FileUtils.getFileExtension(fileName);
 
                 if (extension.equals("jpg")) { // legacy 0.9x
                     files.add(f);
@@ -395,10 +389,7 @@ public class HotspotSendTask extends AsyncTask<Long, Integer, String> {
             }
         }
 
-        if (!uploadFiles(files)) {
-            return false;
-        }
-        return true;
+        return uploadFiles(files);
     }
 
     boolean uploadFiles(List<File> files) {
@@ -425,13 +416,5 @@ public class HotspotSendTask extends AsyncTask<Long, Integer, String> {
             return false;
         }
         return true;
-    }
-
-    private static String getFileExtension(String fileName) {
-        int dotIndex = fileName.lastIndexOf('.');
-        if (dotIndex == -1) {
-            return "";
-        }
-        return fileName.substring(dotIndex + 1).toLowerCase(Locale.ROOT);
     }
 }

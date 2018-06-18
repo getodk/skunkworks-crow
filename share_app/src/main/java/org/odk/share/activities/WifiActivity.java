@@ -11,9 +11,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -40,14 +39,20 @@ import org.json.JSONObject;
 import org.odk.share.R;
 import org.odk.share.adapters.WifiResultAdapter;
 import org.odk.share.controller.WifiHelper;
-import org.odk.share.listeners.ProgressListener;
-import org.odk.share.tasks.WifiReceiveTask;
+import org.odk.share.events.DownloadEvent;
+import org.odk.share.rx.RxEventBus;
+import org.odk.share.rx.schedulers.BaseSchedulerProvider;
+import org.odk.share.services.ReceiverService;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import timber.log.Timber;
 
 import static org.odk.share.utilities.QRCodeUtils.PASSWORD;
@@ -55,11 +60,14 @@ import static org.odk.share.utilities.QRCodeUtils.PORT;
 import static org.odk.share.utilities.QRCodeUtils.PROTECTED;
 import static org.odk.share.utilities.QRCodeUtils.SSID;
 
-public class WifiActivity extends AppCompatActivity implements ProgressListener {
+public class WifiActivity extends InjectableActivity {
 
-    @BindView(R.id.recyclerView) RecyclerView recyclerView;
-    @BindView(R.id.empty_view) TextView emptyView;
-    @BindView(R.id.toolbar) Toolbar toolbar;
+    @BindView(R.id.recyclerView)
+    RecyclerView recyclerView;
+    @BindView(R.id.empty_view)
+    TextView emptyView;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
 
     private WifiManager wifiManager;
     private WifiResultAdapter wifiResultAdapter;
@@ -67,7 +75,6 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
     private boolean isReceiverRegistered;
     private boolean isWifiReceiverRegisterd;
     private AlertDialog alertDialog;
-    private WifiReceiveTask wifiReceiveTask;
 
     private ProgressDialog progressDialog = null;
     private static final int DIALOG_DOWNLOAD_PROGRESS = 1;
@@ -77,6 +84,15 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
 
     private String alertMsg;
     private int port;
+
+    @Inject
+    ReceiverService receiverService;
+    @Inject
+    RxEventBus rxEventBus;
+    @Inject
+    BaseSchedulerProvider schedulerProvider;
+
+    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,9 +121,48 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
 
     @Override
     protected void onResume() {
+        super.onResume();
         startScan();
         registerReceiver(wifiStateReceiver, new IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION));
-        super.onResume();
+        compositeDisposable.add(addDownloadEventSubscription());
+    }
+
+    @Override
+    protected void onPause() {
+        compositeDisposable.clear();
+        super.onPause();
+    }
+
+    private Disposable addDownloadEventSubscription() {
+        return rxEventBus.register(DownloadEvent.class)
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.androidThread())
+                .subscribe(downloadEvent -> {
+                    switch (downloadEvent.getStatus()) {
+                        case QUEUED:
+                            Toast.makeText(this, R.string.download_queued, Toast.LENGTH_SHORT).show();
+                            break;
+                        case DOWNLOADING:
+                            int progress = downloadEvent.getCurrentProgress();
+                            int total = downloadEvent.getTotalSize();
+                            alertMsg = getString(R.string.receiving_items, String.valueOf(progress), String.valueOf(total));
+                            progressDialog.setMessage(alertMsg);
+                            break;
+                        case FINISHED:
+                            dismissDialog(DIALOG_DOWNLOAD_PROGRESS);
+                            String result = downloadEvent.getResult();
+                            createAlertDialog(getString(R.string.transfer_result), getString(R.string.receive_success, result));
+                            break;
+                        case ERROR:
+                            Toast.makeText(this, R.string.error_while_downloading, Toast.LENGTH_SHORT).show();
+                            dismissDialog(DIALOG_DOWNLOAD_PROGRESS);
+                            break;
+                        case CANCELLED:
+                            Toast.makeText(this, getString(R.string.canceled), Toast.LENGTH_LONG).show();
+                            dismissDialog(DIALOG_DOWNLOAD_PROGRESS);
+                            break;
+                    }
+                }, Timber::e);
     }
 
     @Override
@@ -133,7 +188,7 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
     }
 
     private void onListItemClick(View view, int i) {
-        Timber.d("Clicked " + scanResultList.get(i));
+        Timber.d("Clicked %s", scanResultList.get(i));
         if (WifiHelper.isClose(scanResultList.get(i))) {
             // Show dialog and ask for password
             showPasswordDialog(scanResultList.get(i));
@@ -174,10 +229,9 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
                     @Override
                     public void onClick(View view) {
                         String portInput = input.getText().toString();
-                        Timber.d("Port num " + portInput);
-                        if (portInput != null && portInput.length() > 0) {
+                        Timber.d("Port : %s", portInput);
+                        if (portInput.length() > 0) {
                             dialog.dismiss();
-                            Timber.d("Port number");
                             port = Integer.parseInt(portInput);
                             startReceiveTask();
                         } else {
@@ -247,8 +301,6 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
         alertDialog.show();
     }
 
-
-
     public void startScan() {
         scanResultList.clear();
         wifiResultAdapter.notifyDataSetChanged();
@@ -261,7 +313,7 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
     BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context c, Intent intent) {
-            for (ScanResult scanResult: wifiManager.getScanResults()) {
+            for (ScanResult scanResult : wifiManager.getScanResults()) {
                 if (scanResult.SSID.contains(getString(R.string.hotspot_name_suffix))) {
                     scanResultList.add(scanResult);
                 }
@@ -311,7 +363,7 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
             if (cm != null) {
                 NetworkInfo info = cm.getActiveNetworkInfo();
                 if (info != null) {
-                    Timber.d(info + " " + info.getTypeName() + " " + info.getType() + " " + wifiNetworkSSID  + " " + isConnected);
+                    Timber.d(info + " " + info.getTypeName() + " " + info.getType() + " " + wifiNetworkSSID + " " + isConnected);
                     if (info.getState() == NetworkInfo.State.CONNECTED && info.getTypeName().compareTo("WIFI") == 0) {
                         if (!isConnected && info.getExtraInfo().equals("\"" + wifiNetworkSSID + "\"")) {
                             Timber.d("Connected");
@@ -336,9 +388,7 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
     private void startReceiveTask() {
         showDialog(DIALOG_DOWNLOAD_PROGRESS);
         String dstAddress = wifiHelper.getAccessPointIpAddress();
-        wifiReceiveTask = new WifiReceiveTask(dstAddress, port);
-        wifiReceiveTask.setUploaderListener(this);
-        wifiReceiveTask.execute();
+        receiverService.startDownloading(dstAddress, port);
     }
 
     @Override
@@ -352,7 +402,7 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
         switch (item.getItemId()) {
             case R.id.menu_scan:
                 if (wifiManager.isWifiEnabled()) {
-                   startScan();
+                    startScan();
                 } else {
                     Toast.makeText(this, getString(R.string.enable_wifi), Toast.LENGTH_LONG).show();
                 }
@@ -386,9 +436,7 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                if (wifiReceiveTask != null) {
-                                    wifiReceiveTask.cancel(true);
-                                }
+                                receiverService.cancel();
                                 dialog.dismiss();
                                 finish();
                             }
@@ -411,32 +459,6 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
     protected void onDestroy() {
         wifiHelper.disableWifi(wifiNetworkSSID);
         super.onDestroy();
-    }
-
-    @Override
-    public void uploadingComplete(String result) {
-        try {
-            dismissDialog(DIALOG_DOWNLOAD_PROGRESS);
-        } catch (Exception e) {
-            Timber.e(e);
-        }
-        createAlertDialog(getString(R.string.transfer_result), getString(R.string.receive_success, result));
-    }
-
-    @Override
-    public void progressUpdate(int progress, int total) {
-        alertMsg = getString(R.string.receiving_items, String.valueOf(progress), String.valueOf(total));
-        progressDialog.setMessage(alertMsg);
-    }
-
-    @Override
-    public void onCancel() {
-        Toast.makeText(this, getString(R.string.canceled), Toast.LENGTH_LONG).show();
-        try {
-            dismissDialog(DIALOG_DOWNLOAD_PROGRESS);
-        } catch (Exception e) {
-            Timber.e(e);
-        }
     }
 
     private void createAlertDialog(String title, String message) {
@@ -477,7 +499,7 @@ public class WifiActivity extends AppCompatActivity implements ProgressListener 
                     String password = null;
                     Boolean isProtected = (Boolean) obj.get(PROTECTED);
                     if (isProtected) {
-                        password =  (String) obj.get(PASSWORD);
+                        password = (String) obj.get(PASSWORD);
                     }
 
                     Timber.d("Scanned results " + ssid + " " + port + " " + isProtected + " " + password);

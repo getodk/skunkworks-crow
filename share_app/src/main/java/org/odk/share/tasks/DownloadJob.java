@@ -1,12 +1,16 @@
 package org.odk.share.tasks;
 
 import android.database.Cursor;
-import android.os.AsyncTask;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 
+import com.evernote.android.job.Job;
+
+import org.odk.share.application.Share;
 import org.odk.share.dao.FormsDao;
-import org.odk.share.listeners.ProgressListener;
+import org.odk.share.events.DownloadEvent;
 import org.odk.share.provider.FormsProviderAPI;
+import org.odk.share.rx.RxEventBus;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
@@ -16,51 +20,51 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
+import javax.inject.Inject;
+
 import timber.log.Timber;
 
-/**
- * Created by laksh on 5/31/2018.
- */
+public class DownloadJob extends Job {
 
-public class WifiReceiveTask extends AsyncTask<String, Integer, String> {
-
-    private Socket socket;
-    private String ip;
-    private int port;
-    private ProgressListener stateListener;
-    private DataInputStream dis;
-    private DataOutputStream dos;
-    private int total;
-    private int progress;
+    public static final String TAG = "formDownloadJob";
+    public static final String IP = "ip";
+    public static final String PORT = "port";
 
     private static final String INSTANCE_PATH = "share/instances/";
     private static final String FORM_PATH = "share/forms/";
     private static final int TIMEOUT = 2000;
 
-    public void setUploaderListener(ProgressListener sl) {
-        synchronized (this) {
-            stateListener = sl;
-        }
-    }
+    @Inject
+    RxEventBus rxEventBus;
 
+    private String ip;
+    private int port;
+    private int total;
+    private int progress;
+    private Socket socket;
+    private DataInputStream dis;
+    private DataOutputStream dos;
+
+    @NonNull
     @Override
-    protected void onProgressUpdate(Integer... values) {
-        synchronized (this) {
-            if (stateListener != null) {
-                stateListener.progressUpdate(values[0], values[1]);
-            }
-        }
+    protected Result onRunJob(@NonNull Params params) {
+        ((Share) getContext().getApplicationContext()).getAppComponent().inject(this);
+
+        initJob(params);
+
+        String result = receiveForms();
+        rxEventBus.post(new DownloadEvent(DownloadEvent.Status.FINISHED, result));
+
+        return null;
     }
 
-    public WifiReceiveTask(String ip, int port) {
-        this.ip = ip;
-        this.port = port;
+    private void initJob(Params params) {
+        ip = params.getExtras().getString(IP, "");
+        port = params.getExtras().getInt(PORT, -1);
     }
 
     private String receiveForms() {
@@ -74,25 +78,44 @@ public class WifiReceiveTask extends AsyncTask<String, Integer, String> {
             dos = new DataOutputStream(socket.getOutputStream());
             total = dis.readInt();
             int num = dis.readInt();
-            Timber.d("Number of forms" + num + " ");
-            while (num-- > 0) {
-                Timber.d("Reading form");
-                readFormAndInstances();
+            Timber.d("Number of forms : %d", num);
+            for (int i = 0; i < num; i++) {
+                Timber.d("Downloading form : %d", i + 1);
+                boolean result = readFormAndInstances();
+                Timber.d("Form %d downloaded = %s", i + 1, result);
             }
-        } catch (UnknownHostException e) {
-            Timber.e(e);
-        } catch (SocketTimeoutException e) {
-            Timber.e(e);
+
+            // close connection
+            socket.close();
+            dos.close();
+            dis.close();
+
         } catch (IOException e) {
             Timber.e(e);
         }
 
-        return  String.valueOf(progress);
+        return String.valueOf(progress);
+    }
+
+    @Override
+    protected void onCancel() {
+        try {
+            if (socket != null) {
+                socket.close();
+            }
+            if (dos != null) {
+                dos.close();
+            }
+            if (dis != null) {
+                dis.close();
+            }
+        } catch (IOException e) {
+            Timber.e(e);
+        }
     }
 
     private boolean readFormAndInstances() {
         try {
-
             Timber.d("readFormAndInstances");
             String formId = dis.readUTF();
             String formVersion = dis.readUTF();
@@ -102,7 +125,8 @@ public class WifiReceiveTask extends AsyncTask<String, Integer, String> {
             }
 
             boolean formExists = isFormExits(formId, formVersion);
-            Timber.d("Form exits " + formExists);
+            Timber.d("Form exists %s", formExists);
+
             dos.writeBoolean(formExists);
 
             if (!formExists) {
@@ -120,7 +144,7 @@ public class WifiReceiveTask extends AsyncTask<String, Integer, String> {
     }
 
     private boolean isFormExits(String formId, String formVersion) {
-        String []selectionArgs;
+        String[] selectionArgs;
         String selection;
 
         if (formVersion == null) {
@@ -135,10 +159,7 @@ public class WifiReceiveTask extends AsyncTask<String, Integer, String> {
 
         Cursor cursor = new FormsDao().getFormsCursor(null, selection, selectionArgs, null);
 
-        if (cursor != null && cursor.getCount() > 0) {
-            return true;
-        }
-        return false;
+        return cursor != null && cursor.getCount() > 0;
     }
 
     private void readForm() {
@@ -171,7 +192,9 @@ public class WifiReceiveTask extends AsyncTask<String, Integer, String> {
         try {
             int numInstances = dis.readInt();
             while (numInstances-- > 0) {
-                publishProgress(++progress, total);
+                // publish current progress
+                rxEventBus.post(new DownloadEvent(DownloadEvent.Status.DOWNLOADING, ++progress, total));
+
                 int numRes = dis.readInt();
                 String time = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss-SSS",
                         Locale.ENGLISH).format(Calendar.getInstance().getTime());
@@ -212,29 +235,4 @@ public class WifiReceiveTask extends AsyncTask<String, Integer, String> {
             Timber.e(e);
         }
     }
-
-    @Override
-    protected String doInBackground(String... strings) {
-        return receiveForms();
-    }
-
-    @Override
-    protected void onPostExecute(String s) {
-        stateListener.uploadingComplete(s);
-        try {
-            if (socket != null) {
-                socket.close();
-            }
-            if (dos != null) {
-                dos.close();
-            }
-
-            if (dis != null) {
-                dis.close();
-            }
-        } catch (IOException e) {
-            Timber.e(e);
-        }
-    }
-
 }

@@ -1,7 +1,6 @@
 package org.odk.share.activities;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -15,7 +14,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends InjectableActivity {
 
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.bSendForms) Button sendForms;
