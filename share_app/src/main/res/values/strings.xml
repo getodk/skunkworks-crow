@@ -3,11 +3,9 @@
     <string name="hotspot_running">Running Hotspot</string>
     <string name="hotspot_start">Starting hotspot</string>
     <string name="stop">Stop</string>
-    <string name="start_hotspot">Start Hotspot</string>
     <string name="hotspot_settings_dialog">Enable portable hotspot from the settings.</string>
     <string name="hotspot_name_suffix">-odk-share</string>
     <string name="hotspot_already_running">Hotspot already running</string>
-    <string name="mobile_data_message">Your mobile data can be consumed. Disable it and then try again</string>
 
     <string name="saved_forms">Saved Forms</string>
     <string name="send_selected">Send</string>
@@ -24,7 +22,6 @@
     <string name="scan_qr_code">Scan QR Code</string>
     <string name="show_password">Show Password</string>
     <string name="connect">Connect</string>
-    <string name="connected">Connected</string>
     <string name="already_connected">Already connected to</string>
     <string name="cancel">Cancel</string>
     <string name="password_empty">Password field is empty</string>

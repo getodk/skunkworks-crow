@@ -423,9 +423,9 @@ public class UploadJob extends Job {
             for (int i = 0; i < files.size(); i++) {
                 File file = files.get(i);
                 BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
-                DataInputStream fileInputStream = new DataInputStream(bis);
                 dos.writeUTF(file.getName());
                 dos.writeLong(file.length());
+                DataInputStream fileInputStream = new DataInputStream(bis);
                 Timber.d("Name " + file.getName() + " " + file.length());
                 while ((read = fileInputStream.read(bytes)) > 0) {
                     dos.write(bytes, 0, read);

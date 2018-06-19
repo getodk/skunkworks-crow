@@ -2,7 +2,6 @@ package org.odk.share.application;
 
 import com.evernote.android.job.JobManager;
 import com.evernote.android.job.JobManagerCreateException;
-import android.app.Application;
 import android.os.Environment;
 import org.odk.share.R;
 
@@ -28,8 +27,8 @@ public class Share extends DaggerApplication {
     public static Share getInstance() {
         return singleton;
     }
-    public static final String ODK_ROOT = Environment.getExternalStorageDirectory()
-            + File.separator + "share";
+
+    public static final String ODK_ROOT = Environment.getExternalStorageDirectory() + File.separator + "share";
     public static final String FORMS_PATH = ODK_ROOT + File.separator + "forms";
     public static final String INSTANCES_PATH = ODK_ROOT + File.separator + "instances";
     public static final String METADATA_PATH = ODK_ROOT + File.separator + "metadata";

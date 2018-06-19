@@ -207,7 +207,7 @@ public class DownloadJob extends Job {
             values.put(FormsProviderAPI.FormsColumns.JR_VERSION, formVersion);
             values.put(FormsProviderAPI.FormsColumns.SUBMISSION_URI, submissionUri);
             values.put(FormsProviderAPI.FormsColumns.FORM_MEDIA_PATH, formMediaPath);
-            Timber.d("form %s" ,new FormsDao().saveForm(values));
+            new FormsDao().saveForm(values);
         } catch (IOException e) {
             Timber.e(e);
         }
