@@ -1,5 +1,6 @@
 package org.odk.share.services;
 
+import com.evernote.android.job.Job;
 import com.evernote.android.job.JobManager;
 import com.evernote.android.job.JobRequest;
 import com.evernote.android.job.util.support.PersistableBundleCompat;
@@ -82,8 +83,13 @@ public class ReceiverService {
 
     public void cancel() {
         if (currentJob != null) {
-            JobManager.instance().getJob(currentJob.getJobId()).cancel();
-            rxEventBus.post(new DownloadEvent(DownloadEvent.Status.CANCELLED));
+            Job job = JobManager.instance().getJob(currentJob.getJobId());
+            if (job != null) {
+                job.cancel();
+                rxEventBus.post(new DownloadEvent(DownloadEvent.Status.CANCELLED));
+            } else {
+                Timber.e("Pending job not found : %s", currentJob);
+            }
             currentJob = null;
         }
     }
