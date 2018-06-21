@@ -1,25 +1,43 @@
 package org.odk.share.activities;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 
 import org.odk.share.R;
 import org.odk.share.application.Share;
+import org.odk.share.adapters.FormAdapter;
+import org.odk.share.dao.FormsDao;
 import org.odk.share.preferences.SettingsPreference;
+import org.odk.share.provider.FormsProviderAPI;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class MainActivity extends InjectableActivity {
+public class MainActivity extends InjectableActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.bSendForms) Button sendForms;
     @BindView(R.id.bViewWifi) Button viewWifi;
+    @BindView(R.id.recyclerview) RecyclerView recyclerView;
+
+
+    protected static final String SORT_BY_NAME_ASC
+            = FormsProviderAPI.FormsColumns.DISPLAY_NAME + " COLLATE NOCASE ASC";
+
+    private static final int FORM_LOADER = 2;
+    private FormAdapter formAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,10 +45,20 @@ public class MainActivity extends InjectableActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        setTitle(getString(R.string.send_forms));
+        setTitle(getString(R.string.app_name));
         setSupportActionBar(toolbar);
 
         Share.createODKDirs();
+
+        LinearLayoutManager llm = new LinearLayoutManager(this);
+        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        recyclerView.setLayoutManager(llm);
+    }
+
+    @Override
+    protected void onResume() {
+        getSupportLoaderManager().initLoader(FORM_LOADER, null, this);
+        super.onResume();
     }
 
     @OnClick (R.id.bViewWifi)
@@ -59,5 +87,29 @@ public class MainActivity extends InjectableActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @NonNull
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new FormsDao().getFormsCursorLoader(SORT_BY_NAME_ASC);
+    }
+
+    @Override
+    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
+        cursor.moveToFirst();
+        formAdapter = new FormAdapter(this, cursor, this::onListItemClick);
+        recyclerView.setAdapter(formAdapter);
+
+    }
+
+    @Override
+    public void onLoaderReset(@NonNull Loader loader) {
+
+    }
+
+    private void onListItemClick(View view, int position) {
+        Cursor cursor = formAdapter.getCursor();
+        cursor.moveToPosition(position);
     }
 }
