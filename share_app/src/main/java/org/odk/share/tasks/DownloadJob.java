@@ -249,7 +249,7 @@ public class DownloadJob extends Job {
                 ContentValues shareValues = new ContentValues();
                 shareValues.put(INSTANCE_ID, Long.parseLong(uri.getLastPathSegment()));
                 shareValues.put(TRANSFER_STATUS, STATUS_FORM_RECEIVE);
-                new ShareDatabaseHelper().insertInstance(shareValues);
+                new ShareDatabaseHelper(getContext()).insertInstance(shareValues);
             }
         } catch (IOException e) {
             Timber.e(e);

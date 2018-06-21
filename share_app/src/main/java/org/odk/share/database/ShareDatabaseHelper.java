@@ -1,6 +1,7 @@
 package org.odk.share.database;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -22,26 +23,23 @@ import static org.odk.share.dto.TransferInstance.TRANSFER_STATUS;
 public class ShareDatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "share.db";
-    private static final String SHARE_TABLE_NAME = "share";
+    private static final String SHARE_TABLE_NAME = "transfers";
 
     private static final int DATABASE_VERSION = 1;
 
-    public ShareDatabaseHelper() {
-        super(new DatabaseContext(Share.METADATA_PATH), DATABASE_NAME, null, DATABASE_VERSION);
-        Timber.d("Context " + Share.METADATA_PATH);
+    public ShareDatabaseHelper(Context context) {
+        super(new DatabaseContext(context, Share.METADATA_PATH), DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        Timber.d("Database creation started");
         createInstancesTable(db);
-        Timber.d("Database creation stopped");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
-        Timber.d("onUpgrade");
+        Timber.d("onUpgrade -- OldVersion: %s, NewVersion: %s", oldVersion, newVersion);
         db.execSQL("DROP TABLE IF EXISTS " + SHARE_TABLE_NAME);
         onCreate(db);
     }

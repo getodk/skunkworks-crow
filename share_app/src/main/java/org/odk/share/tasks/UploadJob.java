@@ -336,7 +336,7 @@ public class UploadJob extends Job {
                     values.put(INSTANCE_ID,
                             c.getLong(c.getColumnIndex(InstanceProviderAPI.InstanceColumns._ID)));
                     values.put(TRANSFER_STATUS, STATUS_FORM_SENT);
-                    new ShareDatabaseHelper().insertInstance(values);
+                    new ShareDatabaseHelper(getContext()).insertInstance(values);
                 }
             }
         } catch (IOException e) {

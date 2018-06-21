@@ -1,10 +1,9 @@
 package org.odk.share.database;
 
+import android.content.Context;
 import android.content.ContextWrapper;
 import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
-
-import org.odk.share.application.Share;
 
 import java.io.File;
 
@@ -15,8 +14,8 @@ import java.io.File;
 public class DatabaseContext extends ContextWrapper {
     private String path;
 
-    public DatabaseContext(String path) {
-        super(Share.getInstance());
+    public DatabaseContext(Context context, String path) {
+        super(context);
         this.path = path;
     }
 
