@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import android.widget.Button;
 
 import org.odk.share.R;
+import org.odk.share.application.Share;
 import org.odk.share.preferences.SettingsPreference;
 
 import butterknife.BindView;
@@ -28,6 +29,8 @@ public class MainActivity extends InjectableActivity {
 
         setTitle(getString(R.string.send_forms));
         setSupportActionBar(toolbar);
+
+        Share.createODKDirs();
     }
 
     @OnClick (R.id.bViewWifi)

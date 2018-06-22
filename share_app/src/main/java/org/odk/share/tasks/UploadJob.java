@@ -1,5 +1,6 @@
 package org.odk.share.tasks;
 
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
 
@@ -9,6 +10,7 @@ import org.odk.share.application.Share;
 import org.odk.share.dao.FormsDao;
 import org.odk.share.dao.InstancesDao;
 import org.odk.share.events.UploadEvent;
+import org.odk.share.database.ShareDatabaseHelper;
 import org.odk.share.provider.FormsProviderAPI;
 import org.odk.share.provider.InstanceProviderAPI;
 import org.odk.share.rx.RxEventBus;
@@ -33,6 +35,10 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import timber.log.Timber;
+
+import static org.odk.share.dto.TransferInstance.INSTANCE_ID;
+import static org.odk.share.dto.TransferInstance.STATUS_FORM_SENT;
+import static org.odk.share.dto.TransferInstance.TRANSFER_STATUS;
 
 public class UploadJob extends Job {
 
@@ -183,8 +189,6 @@ public class UploadJob extends Job {
                 List<String> instanceIds = mapVersion.getValue();
                 String formVers = mapVersion.getKey();
                 String formId = mapId.getKey();
-
-                Timber.d("Send form : " + formId + " " + formVers + " " + instanceIds);
                 sendFormWithInstance(formId, formVers, instanceIds);
                 progress += instanceIds.size();
             }
@@ -205,9 +209,7 @@ public class UploadJob extends Job {
 
             dos.flush();
 
-            Timber.d("Sent " + formId + " " + formVersion);
-
-            Timber.d("Waiting for response from the receiver for " + formId + " " + formVersion);
+            Timber.d("Waiting for response from the receiver for %s %s ", formId, formVersion);
             while (dis.available() <= 0) {
                 continue;
             }
@@ -310,11 +312,31 @@ public class UploadJob extends Job {
                 dos.writeInt(c.getCount());
                 c.moveToPosition(-1);
                 while (c.moveToNext()) {
+                    String displayName = c.getString(
+                            c.getColumnIndex(InstanceProviderAPI.InstanceColumns.DISPLAY_NAME));
+                    String submissionUri = c.getString(
+                            c.getColumnIndex(InstanceProviderAPI.InstanceColumns.SUBMISSION_URI));
+
+                    dos.writeUTF(displayName);
+
+                    if (submissionUri == null) {
+                        dos.writeUTF("-1");
+                    } else {
+                        dos.writeUTF(submissionUri);
+                    }
+
+                    rxEventBus.post(new UploadEvent(UploadEvent.Status.UPLOADING, ++progress, total));
                     String instance = c.getString(
                             c.getColumnIndex(InstanceProviderAPI.InstanceColumns.INSTANCE_FILE_PATH));
-                    rxEventBus.post(new UploadEvent(UploadEvent.Status.UPLOADING, ++progress, total));
-                    Timber.d("Progress " + progress + " " + total);
+
                     sendInstance(instance);
+
+                    // add row in share table
+                    ContentValues values = new ContentValues();
+                    values.put(INSTANCE_ID,
+                            c.getLong(c.getColumnIndex(InstanceProviderAPI.InstanceColumns._ID)));
+                    values.put(TRANSFER_STATUS, STATUS_FORM_SENT);
+                    new ShareDatabaseHelper(getContext()).insertInstance(values);
                 }
             }
         } catch (IOException e) {
@@ -339,7 +361,7 @@ public class UploadJob extends Job {
                 dos.write(bytes, 0, read);
             }
             final String sentMsg = "File sent to: " + socket;
-            Timber.d("Sent message " + sentMsg);
+            Timber.d("Sent message %s ", sentMsg);
         } catch (FileNotFoundException e1) {
             Timber.e(e1);
         } catch (IOException e1) {
@@ -388,7 +410,7 @@ public class UploadJob extends Job {
                 }
             }
         }
-
+        Timber.d("Files : " + files);
         return uploadFiles(files);
     }
 
@@ -397,13 +419,14 @@ public class UploadJob extends Job {
         try {
             int read = 0;
             dos.writeInt(files.size());
-
+            Timber.d("File size : " + files.size());
             for (int i = 0; i < files.size(); i++) {
                 File file = files.get(i);
                 BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
-                DataInputStream fileInputStream = new DataInputStream(bis);
                 dos.writeUTF(file.getName());
                 dos.writeLong(file.length());
+                DataInputStream fileInputStream = new DataInputStream(bis);
+                Timber.d("Name " + file.getName() + " " + file.length());
                 while ((read = fileInputStream.read(bytes)) > 0) {
                     dos.write(bytes, 0, read);
                 }
