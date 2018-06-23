@@ -11,8 +11,6 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_toLeftOf="@+id/checkbox"
-        android:layout_toStartOf="@+id/checkbox"
         android:gravity="center_vertical"
         android:textAppearance="?android:attr/textAppearanceLarge"/>
 
@@ -23,8 +21,6 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/tvTitle"
-        android:layout_toLeftOf="@+id/checkbox"
-        android:layout_toStartOf="@+id/checkbox"
         android:gravity="center_vertical"
         android:textAppearance="?android:attr/textAppearanceSmall"/>
 

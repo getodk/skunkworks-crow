@@ -50,8 +50,13 @@ public class FormAdapter extends RecyclerView.Adapter<FormAdapter.FormHolder> {
         holder.title.setText(cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.DISPLAY_NAME)));
         String version = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.JR_VERSION));
         String id = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.JR_FORM_ID));
-        holder.subtitle.setText(((version == null) ? "" : (context.getString(R.string.version) + " "
-                + version + " ")) +  context.getString(R.string.id) + " " + id);
+        String subtitle = "";
+
+        if (version != null) {
+            subtitle = context.getString(R.string.version) + " " + version + " ";
+        }
+        subtitle += context.getString(R.string.id) + " " + id;
+        holder.subtitle.setText(subtitle);
     }
 
     @Override
