@@ -12,8 +12,8 @@
     <string name="select_all">Select all</string>
     <string name="clear_all">Clear all</string>
     <string name="send_forms">Send</string>
-    <string name="version">Version:</string>
-    <string name="id">ID:</string>
+    <string name="version">Version: %1$s</string>
+    <string name="id">ID: %1s</string>
 
     <string name="connect_wifi">Connect to wifi</string>
     <string name="receive_forms">Receive</string>

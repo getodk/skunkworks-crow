@@ -15,8 +15,8 @@ import android.view.View;
 import android.widget.Button;
 
 import org.odk.share.R;
+import org.odk.share.adapters.FormsAdapter;
 import org.odk.share.application.Share;
-import org.odk.share.adapters.FormAdapter;
 import org.odk.share.dao.FormsDao;
 import org.odk.share.preferences.SettingsPreference;
 import org.odk.share.provider.FormsProviderAPI;
@@ -27,17 +27,21 @@ import butterknife.OnClick;
 
 public class MainActivity extends InjectableActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    @BindView(R.id.toolbar) Toolbar toolbar;
-    @BindView(R.id.bSendForms) Button sendForms;
-    @BindView(R.id.bViewWifi) Button viewWifi;
-    @BindView(R.id.recyclerview) RecyclerView recyclerView;
-
-
     protected static final String SORT_BY_NAME_ASC
             = FormsProviderAPI.FormsColumns.DISPLAY_NAME + " COLLATE NOCASE ASC";
 
     private static final int FORM_LOADER = 2;
-    private FormAdapter formAdapter;
+
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.bSendForms)
+    Button sendForms;
+    @BindView(R.id.bViewWifi)
+    Button viewWifi;
+    @BindView(R.id.recyclerview)
+    RecyclerView recyclerView;
+
+    private FormsAdapter formAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,17 +61,23 @@ public class MainActivity extends InjectableActivity implements LoaderManager.Lo
 
     @Override
     protected void onResume() {
-        getSupportLoaderManager().initLoader(FORM_LOADER, null, this);
         super.onResume();
+        setupAdapter();
+        getSupportLoaderManager().initLoader(FORM_LOADER, null, this);
     }
 
-    @OnClick (R.id.bViewWifi)
+    private void setupAdapter() {
+        formAdapter = new FormsAdapter(this, null, this::onItemClick);
+        recyclerView.setAdapter(formAdapter);
+    }
+
+    @OnClick(R.id.bViewWifi)
     public void viewWifiNetworks() {
         Intent intent = new Intent(this, WifiActivity.class);
         startActivity(intent);
     }
 
-    @OnClick (R.id.bSendForms)
+    @OnClick(R.id.bSendForms)
     public void selectForms() {
         Intent intent = new Intent(this, InstancesList.class);
         startActivity(intent);
@@ -97,18 +107,15 @@ public class MainActivity extends InjectableActivity implements LoaderManager.Lo
 
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
-        cursor.moveToFirst();
-        formAdapter = new FormAdapter(this, cursor, this::onListItemClick);
-        recyclerView.setAdapter(formAdapter);
-
+        formAdapter.changeCursor(cursor);
     }
 
     @Override
     public void onLoaderReset(@NonNull Loader loader) {
-
+        formAdapter.swapCursor(null);
     }
 
-    private void onListItemClick(View view, int position) {
+    private void onItemClick(View view, int position) {
         Cursor cursor = formAdapter.getCursor();
         cursor.moveToPosition(position);
     }
