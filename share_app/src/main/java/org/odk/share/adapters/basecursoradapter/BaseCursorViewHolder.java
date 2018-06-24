@@ -1,4 +1,4 @@
-package org.odk.share.adapters.baseCursorAdapter;
+package org.odk.share.adapters.basecursoradapter;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;

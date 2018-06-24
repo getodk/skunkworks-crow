@@ -1,4 +1,4 @@
-package org.odk.share.adapters.baseCursorAdapter;
+package org.odk.share.adapters.basecursoradapter;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -6,7 +6,7 @@ import android.database.DataSetObserver;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 
-public abstract class CursorRecyclerViewAdapter<VH extends BaseCursorViewHolder> extends RecyclerView.Adapter<VH> {
+public abstract class CursorRecyclerViewAdapter<T extends BaseCursorViewHolder> extends RecyclerView.Adapter<T> {
 
     protected Context context;
     private Cursor cursor;
@@ -52,10 +52,10 @@ public abstract class CursorRecyclerViewAdapter<VH extends BaseCursorViewHolder>
         super.setHasStableIds(true);
     }
 
-    public abstract void onBindViewHolder(VH viewHolder, Cursor cursor);
+    public abstract void onBindViewHolder(T viewHolder, Cursor cursor);
 
     @Override
-    public void onBindViewHolder(@NonNull VH viewHolder, int position) {
+    public void onBindViewHolder(@NonNull T viewHolder, int position) {
         if (!dataValid) {
             throw new IllegalStateException("this should only be called when the cursor is valid");
         }

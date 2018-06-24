@@ -9,9 +9,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.odk.share.R;
-import org.odk.share.adapters.baseCursorAdapter.BaseCursorViewHolder;
-import org.odk.share.adapters.baseCursorAdapter.CursorRecyclerViewAdapter;
-import org.odk.share.adapters.baseCursorAdapter.OnItemClickListener;
+import org.odk.share.adapters.basecursoradapter.BaseCursorViewHolder;
+import org.odk.share.adapters.basecursoradapter.CursorRecyclerViewAdapter;
+import org.odk.share.adapters.basecursoradapter.OnItemClickListener;
 import org.odk.share.provider.FormsProviderAPI;
 
 import butterknife.BindView;
