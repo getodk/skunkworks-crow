@@ -28,7 +28,6 @@ public class FormsAdapter extends CursorRecyclerViewAdapter<FormsAdapter.FormHol
         String title = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.DISPLAY_NAME));
         String version = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.JR_VERSION));
         String id = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.JR_FORM_ID));
-
         viewHolder.bind(title, version, id);
     }
 

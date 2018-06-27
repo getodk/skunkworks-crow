@@ -16,7 +16,6 @@ public class BaseCursorViewHolder extends RecyclerView.ViewHolder implements Vie
 
     @Override
     public void onClick(View v) {
-        Timber.d("Onclick" + v);
         if (listener != null) {
             listener.onItemClick(v, getAdapterPosition());
         }

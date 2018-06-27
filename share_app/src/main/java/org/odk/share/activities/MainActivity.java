@@ -24,11 +24,14 @@ import org.odk.share.provider.FormsProviderAPI;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import timber.log.Timber;
 
 public class MainActivity extends InjectableActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     protected static final String SORT_BY_NAME_ASC
             = FormsProviderAPI.FormsColumns.DISPLAY_NAME + " COLLATE NOCASE ASC";
+    public static final String FORM_VERSION = "form_version";
+    public static final String FORM_ID = "form_id";
 
     private static final int FORM_LOADER = 2;
 
@@ -118,5 +121,10 @@ public class MainActivity extends InjectableActivity implements LoaderManager.Lo
     private void onItemClick(View view, int position) {
         Cursor cursor = formAdapter.getCursor();
         cursor.moveToPosition(position);
+        Timber.d("item click " + position);
+        Intent intent  = new Intent(this, InstanceManagerTabs.class);
+        intent.putExtra(FORM_VERSION, cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.JR_VERSION)));
+        intent.putExtra(FORM_ID, cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.JR_FORM_ID)));
+        startActivity(intent);
     }
 }

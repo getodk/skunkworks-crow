@@ -57,4 +57,9 @@
     <string name="cannot_create_directory">Cannot create directory: %s</string>
     <string name="not_a_directory">%s exists, but is not a directory</string>
     <string name="sdcard_unmounted">Collect cannot access the SD card. Perhaps it is mounted via USB? (Current state: %s)</string>
+
+    <string name="statistics">Statistics</string>
+    <string name="sent">Sent</string>
+    <string name="received">Received</string>
+    <string name="reviewed">Reviewed</string>
 </resources>
