@@ -40,7 +40,13 @@
             android:screenOrientation="portrait"
             android:stateNotNeeded="true"
             tools:replace="android:screenOrientation" />
-        <activity android:name=".activities.InstanceManagerTabs"></activity>
+
+        <activity android:name=".activities.InstanceManagerTabs"/>
+
+        <provider
+            android:name=".provider.TransferProvider"
+            android:authorities="org.odk.share.provider.odk.instances" />
+
     </application>
 
 </manifest>

@@ -3,7 +3,6 @@ package org.odk.share.adapters.basecursoradapter;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import timber.log.Timber;
 
 public class BaseCursorViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
