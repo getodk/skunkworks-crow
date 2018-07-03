@@ -24,7 +24,6 @@ import org.odk.share.provider.FormsProviderAPI;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import timber.log.Timber;
 
 public class MainActivity extends InjectableActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 

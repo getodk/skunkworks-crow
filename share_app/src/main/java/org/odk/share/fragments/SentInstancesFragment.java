@@ -26,7 +26,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import timber.log.Timber;
 
 import static org.odk.share.activities.MainActivity.FORM_ID;
 import static org.odk.share.activities.MainActivity.FORM_VERSION;
