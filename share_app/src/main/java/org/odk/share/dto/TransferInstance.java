@@ -16,11 +16,20 @@ public class TransferInstance {
     public static final String STATUS_FORM_SENT = "sent";
 
     private Long id;
-    private Boolean isReviewed;
+    private int isReviewed;
     private String instructions;
     private Long instanceId;
     private String transferStatus;
     private Long lastStatusChangeDate;
+    private Instance instance;
+
+    public Instance getInstance() {
+        return instance;
+    }
+
+    public void setInstance(Instance instance) {
+        this.instance = instance;
+    }
 
     public Long getId() {
         return id;
@@ -30,11 +39,11 @@ public class TransferInstance {
         this.id = id;
     }
 
-    public Boolean getReviewed() {
+    public Integer getReviewed() {
         return isReviewed;
     }
 
-    public void setReviewed(Boolean reviewed) {
+    public void setReviewed(Integer reviewed) {
         isReviewed = reviewed;
     }
 
