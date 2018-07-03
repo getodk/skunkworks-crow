@@ -27,6 +27,8 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static org.odk.share.activities.MainActivity.FORM_ID;
+
 public class InstanceManagerTabs extends AppCompatActivity {
 
     @BindView(R.id.toolbar)
@@ -43,6 +45,13 @@ public class InstanceManagerTabs extends AppCompatActivity {
         ButterKnife.bind(this);
 
         setSupportActionBar(toolbar);
+
+        String formId = getIntent().getStringExtra(FORM_ID);
+
+        if (formId == null) {
+            finish();
+        }
+
         setupViewPager(viewPager);
         tabLayout.setupWithViewPager(viewPager);
         setupTab();

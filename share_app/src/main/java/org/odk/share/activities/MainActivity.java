@@ -121,7 +121,6 @@ public class MainActivity extends InjectableActivity implements LoaderManager.Lo
     private void onItemClick(View view, int position) {
         Cursor cursor = formAdapter.getCursor();
         cursor.moveToPosition(position);
-        Timber.d("item click " + position);
         Intent intent  = new Intent(this, InstanceManagerTabs.class);
         intent.putExtra(FORM_VERSION, cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.JR_VERSION)));
         intent.putExtra(FORM_ID, cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.JR_FORM_ID)));
