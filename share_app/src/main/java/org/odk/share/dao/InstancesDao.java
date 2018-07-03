@@ -27,6 +27,7 @@ import org.odk.share.provider.InstanceProviderAPI;
 import org.odk.share.utilities.ApplicationConstants;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class InstancesDao {
@@ -324,6 +325,44 @@ public class InstancesDao {
             }
         }
         return instances;
+    }
+
+    public HashMap<Long, Instance> getMapFromCursor(Cursor cursor) {
+        HashMap<Long, Instance> instanceMap = new HashMap<>();
+        if (cursor != null) {
+            try {
+                while (cursor.moveToNext()) {
+                    int displayNameColumnIndex = cursor.getColumnIndex(InstanceProviderAPI.InstanceColumns.DISPLAY_NAME);
+                    int submissionUriColumnIndex = cursor.getColumnIndex(InstanceProviderAPI.InstanceColumns.SUBMISSION_URI);
+                    int canEditWhenCompleteIndex = cursor.getColumnIndex(InstanceProviderAPI.InstanceColumns.CAN_EDIT_WHEN_COMPLETE);
+                    int instanceFilePathIndex = cursor.getColumnIndex(InstanceProviderAPI.InstanceColumns.INSTANCE_FILE_PATH);
+                    int jrFormIdColumnIndex = cursor.getColumnIndex(InstanceProviderAPI.InstanceColumns.JR_FORM_ID);
+                    int jrVersionColumnIndex = cursor.getColumnIndex(InstanceProviderAPI.InstanceColumns.JR_VERSION);
+                    int statusColumnIndex = cursor.getColumnIndex(InstanceProviderAPI.InstanceColumns.STATUS);
+                    int lastStatusChangeDateColumnIndex = cursor.getColumnIndex(InstanceProviderAPI.InstanceColumns.LAST_STATUS_CHANGE_DATE);
+                    int displaySubtextColumnIndex = cursor.getColumnIndex(InstanceProviderAPI.InstanceColumns.DISPLAY_SUBTEXT);
+                    int deletedDateColumnIndex = cursor.getColumnIndex(InstanceProviderAPI.InstanceColumns.DELETED_DATE);
+
+                    Instance instance = new Instance.Builder()
+                            .displayName(cursor.getString(displayNameColumnIndex))
+                            .submissionUri(cursor.getString(submissionUriColumnIndex))
+                            .canEditWhenComplete(cursor.getString(canEditWhenCompleteIndex))
+                            .instanceFilePath(cursor.getString(instanceFilePathIndex))
+                            .jrFormId(cursor.getString(jrFormIdColumnIndex))
+                            .jrVersion(cursor.getString(jrVersionColumnIndex))
+                            .status(cursor.getString(statusColumnIndex))
+                            .lastStatusChangeDate(cursor.getLong(lastStatusChangeDateColumnIndex))
+                            .displaySubtext(cursor.getString(displaySubtextColumnIndex))
+                            .deletedDate(cursor.getLong(deletedDateColumnIndex))
+                            .build();
+
+                    instanceMap.put(cursor.getLong(cursor.getColumnIndex(InstanceProviderAPI.InstanceColumns._ID)), instance);
+                }
+            } finally {
+                cursor.close();
+            }
+        }
+        return instanceMap;
     }
 
     public ContentValues getValuesFromInstanceObject(Instance instance) {
