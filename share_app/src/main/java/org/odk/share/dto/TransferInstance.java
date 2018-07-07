@@ -39,11 +39,11 @@ public class TransferInstance {
         this.id = id;
     }
 
-    public Integer getReviewed() {
+    public int getReviewed() {
         return isReviewed;
     }
 
-    public void setReviewed(Integer reviewed) {
+    public void setReviewed(int reviewed) {
         isReviewed = reviewed;
     }
 
