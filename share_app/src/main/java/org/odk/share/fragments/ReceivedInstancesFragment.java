@@ -9,7 +9,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import org.odk.share.R;
 import org.odk.share.adapters.TransferInstanceAdapter;
@@ -38,6 +39,10 @@ public class ReceivedInstancesFragment extends Fragment {
 
     @BindView(R.id.recyclerview)
     RecyclerView recyclerView;
+    @BindView(R.id.buttonholder)
+    LinearLayout buttonLayout;
+    @BindView(R.id.empty_view)
+    TextView emptyView;
 
     HashMap<Long, Instance> instanceMap;
 
@@ -45,6 +50,8 @@ public class ReceivedInstancesFragment extends Fragment {
     List<TransferInstance> transferInstanceList;
     LinkedHashSet<Long> selectedInstances;
     private static final String SELECTED_INSTANCES = "selectedInstances";
+
+    boolean showCheckBox = false;
 
     public ReceivedInstancesFragment() {
     }
@@ -59,12 +66,15 @@ public class ReceivedInstancesFragment extends Fragment {
         transferInstanceList = new ArrayList<>();
         selectedInstances = new LinkedHashSet<>();
 
+        buttonLayout.setVisibility(View.GONE);
+
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(llm);
 
         setupAdapter();
         getInstanceFromDB();
+        setEmptyViewVisibility(getString(R.string.no_forms_received));
         transferInstanceAdapter.notifyDataSetChanged();
 
         return view;
@@ -114,22 +124,22 @@ public class ReceivedInstancesFragment extends Fragment {
     }
 
     private void setupAdapter() {
-        transferInstanceAdapter = new TransferInstanceAdapter(getActivity(), transferInstanceList, this::onItemClick, selectedInstances);
+        transferInstanceAdapter = new TransferInstanceAdapter(getActivity(), transferInstanceList, this::onItemClick, selectedInstances, showCheckBox);
         recyclerView.setAdapter(transferInstanceAdapter);
     }
 
-    private void onItemClick(View view, int position) {
-        CheckBox checkBox = view.findViewById(R.id.checkbox);
-        checkBox.setChecked(!checkBox.isChecked());
-
-        TransferInstance transferInstance = transferInstanceList.get(position);
-        Long id = transferInstance.getId();
-
-        if (selectedInstances.contains(id)) {
-            selectedInstances.remove(id);
+    private void setEmptyViewVisibility(String text) {
+        if (transferInstanceList.size() > 0) {
+            recyclerView.setVisibility(View.VISIBLE);
+            emptyView.setVisibility(View.GONE);
         } else {
-            selectedInstances.add(id);
+            recyclerView.setVisibility(View.GONE);
+            emptyView.setVisibility(View.VISIBLE);
+            emptyView.setText(text);
         }
+    }
+
+    private void onItemClick(View view, int position) {
     }
 
 }

@@ -9,7 +9,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import org.odk.share.R;
 import org.odk.share.adapters.TransferInstanceAdapter;
@@ -26,6 +29,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 import static org.odk.share.activities.MainActivity.FORM_ID;
 import static org.odk.share.activities.MainActivity.FORM_VERSION;
@@ -38,6 +42,14 @@ public class SentInstancesFragment extends Fragment {
 
     @BindView(R.id.recyclerview)
     RecyclerView recyclerView;
+    @BindView(R.id.bToggle)
+    Button toggleButton;
+    @BindView(R.id.bAction)
+    Button sendButton;
+    @BindView(R.id.empty_view)
+    TextView emptyView;
+    @BindView(R.id.buttonholder)
+    LinearLayout buttonLayout;
 
     HashMap<Long, Instance> instanceMap;
 
@@ -64,8 +76,12 @@ public class SentInstancesFragment extends Fragment {
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(llm);
 
+        toggleButton.setText(getString(R.string.select_all));
+        sendButton.setText(getString(R.string.send_forms));
+
         setupAdapter();
         getInstanceFromDB();
+        setEmptyViewVisibility(getString(R.string.no_forms_sent));
         transferInstanceAdapter.notifyDataSetChanged();
 
         return view;
@@ -114,8 +130,19 @@ public class SentInstancesFragment extends Fragment {
     }
 
     private void setupAdapter() {
-        transferInstanceAdapter = new TransferInstanceAdapter(getActivity(), transferInstanceList, this::onItemClick, selectedInstances);
+        transferInstanceAdapter = new TransferInstanceAdapter(getActivity(), transferInstanceList, this::onItemClick, selectedInstances, true);
         recyclerView.setAdapter(transferInstanceAdapter);
+    }
+
+    private void setEmptyViewVisibility(String text) {
+        if (transferInstanceList.size() > 0) {
+            buttonLayout.setVisibility(View.VISIBLE);
+            emptyView.setVisibility(View.GONE);
+        } else {
+            buttonLayout.setVisibility(View.GONE);
+            emptyView.setVisibility(View.VISIBLE);
+            emptyView.setText(text);
+        }
     }
 
     private void onItemClick(View view, int position) {
@@ -130,6 +157,33 @@ public class SentInstancesFragment extends Fragment {
         } else {
             selectedInstances.add(id);
         }
+        toggleButtonLabel();
     }
 
+    @OnClick(R.id.bToggle)
+    public void toggle() {
+        boolean newState = transferInstanceAdapter.getItemCount() > selectedInstances.size();
+
+        if (newState) {
+            for (TransferInstance instance: transferInstanceList) {
+                selectedInstances.add(instance.getId());
+            }
+        } else {
+            selectedInstances.clear();
+        }
+
+        transferInstanceAdapter.notifyDataSetChanged();
+        toggleButtonLabel();
+    }
+
+    private void toggleButtonLabel() {
+        toggleButton.setText(selectedInstances.size() == transferInstanceAdapter.getItemCount() ?
+                getString(R.string.clear_all) : getString(R.string.select_all));
+        sendButton.setEnabled(selectedInstances.size() > 0);
+    }
+
+    @OnClick(R.id.bAction)
+    public void sendForms() {
+
+    }
 }

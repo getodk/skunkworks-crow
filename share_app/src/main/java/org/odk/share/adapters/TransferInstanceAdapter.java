@@ -27,14 +27,16 @@ public class TransferInstanceAdapter extends RecyclerView.Adapter<TransferInstan
     private Context context;
     private List<TransferInstance> items;
     private LinkedHashSet<Long> selectedInstances;
+    private boolean showCheckBox;
 
     private final OnItemClickListener listener;
 
-    public TransferInstanceAdapter(Context context, List<TransferInstance> objects, OnItemClickListener listener, LinkedHashSet<Long> selectedInstances) {
+    public TransferInstanceAdapter(Context context, List<TransferInstance> objects, OnItemClickListener listener, LinkedHashSet<Long> selectedInstances, boolean showCheckBox) {
         this.context = context;
         items = objects;
         this.listener = listener;
         this.selectedInstances = selectedInstances;
+        this.showCheckBox = showCheckBox;
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
@@ -66,10 +68,15 @@ public class TransferInstanceAdapter extends RecyclerView.Adapter<TransferInstan
         holder.title.setText(instance.getInstance().getDisplayName());
         holder.subtitle.setText(instance.getInstance().getDisplaySubtext());
 
-        if (selectedInstances.contains(instance.getId())) {
-            holder.checkBox.setChecked(true);
+        if (showCheckBox) {
+            holder.checkBox.setVisibility(View.VISIBLE);
+            if (selectedInstances.contains(instance.getId())) {
+                holder.checkBox.setChecked(true);
+            } else {
+                holder.checkBox.setChecked(false);
+            }
         } else {
-            holder.checkBox.setChecked(false);
+            holder.checkBox.setVisibility(View.GONE);
         }
     }
 
