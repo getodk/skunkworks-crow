@@ -189,7 +189,10 @@ public class WifiActivity extends InjectableActivity {
 
     private void onListItemClick(View view, int i) {
         Timber.d("Clicked %s", scanResultList.get(i));
-        if (WifiHelper.isClose(scanResultList.get(i))) {
+
+        if (scanResultList.get(i).SSID.contains(getString(R.string.hotspot_name_prefix_oreo))) {
+          Toast.makeText(this, getString(R.string.scan_alert_oreo), Toast.LENGTH_LONG).show();
+        } else if (WifiHelper.isClose(scanResultList.get(i))) {
             // Show dialog and ask for password
             showPasswordDialog(scanResultList.get(i));
         } else {
@@ -314,7 +317,8 @@ public class WifiActivity extends InjectableActivity {
         @Override
         public void onReceive(Context c, Intent intent) {
             for (ScanResult scanResult : wifiManager.getScanResults()) {
-                if (scanResult.SSID.contains(getString(R.string.hotspot_name_suffix))) {
+                if (scanResult.SSID.contains(getString(R.string.hotspot_name_suffix)) ||
+                        scanResult.SSID.contains(getString(R.string.hotspot_name_prefix_oreo))) {
                     scanResultList.add(scanResult);
                 }
             }

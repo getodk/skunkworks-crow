@@ -3,10 +3,15 @@ package org.odk.share.activities;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.widget.ImageView;
@@ -72,6 +77,8 @@ public class SendActivity extends InjectableActivity {
     private int port;
     private long[] instancesIds;
 
+    private WifiManager.LocalOnlyHotspotReservation hotspotReservation;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -128,10 +135,11 @@ public class SendActivity extends InjectableActivity {
     }
 
     private void initiateHotspot() {
-
-        // In devices having Android >= 7, created hotspot having some issues with connecting to other devices.
-        // Open settings to trigger the hotspot manually.
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            turnOnHotspot();
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            // In devices having Android version = 7, created hotspot having some issues with connecting to other devices.
+            // Open settings to trigger the hotspot manually.
             showAlertDialog();
         } else {
 
@@ -144,8 +152,7 @@ public class SendActivity extends InjectableActivity {
             Intent intent = new Intent(getApplicationContext(), HotspotService.class);
             intent.setAction(HotspotService.ACTION_STATUS);
             startService(intent);
-
-            startSending();
+            startSending(wifiHotspot.getCurrConfig());
         }
     }
 
@@ -194,7 +201,7 @@ public class SendActivity extends InjectableActivity {
             startService(intent);
             Timber.d("Started hotspot N");
 
-            startSending();
+            startSending(wifiHotspot.getCurrConfig());
         }
 
         compositeDisposable.add(addHotspotEventSubscription());
@@ -255,6 +262,10 @@ public class SendActivity extends InjectableActivity {
 
     @Override
     protected void onDestroy() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            turnOffHotspot();
+        }
+
         if (isHotspotRunning) {
             wifiHotspot.disableHotspot();
         }
@@ -265,11 +276,11 @@ public class SendActivity extends InjectableActivity {
         super.onDestroy();
     }
 
-    private void startSending() {
-        String ssid = wifiHotspot.getCurrConfig().SSID;
+    private void startSending(WifiConfiguration config) {
+        String ssid = config.SSID;
 
         Timber.d("SSID " + ssid + " " + port);
-        Disposable disposable = QRCodeUtils.generateQRCode(ssid, port, null)
+        Disposable disposable = QRCodeUtils.generateQRCode(ssid, port, config.preSharedKey)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(bitmap -> {
@@ -280,6 +291,39 @@ public class SendActivity extends InjectableActivity {
         connectInfo.setText(getString(R.string.connection_info, String.valueOf(port), ssid));
 
         senderService.startUploading(instancesIds, port);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void turnOnHotspot() {
+        WifiManager manager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        manager.startLocalOnlyHotspot(new WifiManager.LocalOnlyHotspotCallback() {
+
+            @Override
+            public void onStarted(WifiManager.LocalOnlyHotspotReservation reservation) {
+                super.onStarted(reservation);
+                hotspotReservation = reservation;
+                startSending(reservation.getWifiConfiguration());
+            }
+
+            @Override
+            public void onStopped() {
+                super.onStopped();
+                Timber.d("Local Hotspot Stopped");
+            }
+
+            @Override
+            public void onFailed(int reason) {
+                super.onFailed(reason);
+                Timber.d("Local Hotspot failed to start");
+            }
+        }, new Handler());
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void turnOffHotspot() {
+        if (hotspotReservation != null) {
+            hotspotReservation.close();
+        }
     }
 
     @Override
