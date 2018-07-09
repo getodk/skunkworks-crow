@@ -80,4 +80,10 @@
     <string name="num_forms_sent">Number of forms sent</string>
     <string name="num_forms_received">Number of forms received</string>
     <string name="num_forms_reviewed">Number of forms reviewed</string>
+    <string name="approve">Approve</string>
+    <string name="Reject">Reject</string>
+    <string name="review_later">Review Later</string>
+    <string name="add_feedback">Add Feeback</string>
+    <string name="view_form_again">View form again</string>
+    <string name="collect_not_installed">Install collect to view the form</string>
 </resources>
