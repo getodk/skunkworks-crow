@@ -31,6 +31,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static org.odk.share.activities.MainActivity.FORM_DISPLAY_NAME;
 import static org.odk.share.activities.MainActivity.FORM_ID;
 import static org.odk.share.activities.MainActivity.FORM_VERSION;
 
@@ -81,7 +82,8 @@ public class SentInstancesFragment extends Fragment {
 
         setupAdapter();
         getInstanceFromDB();
-        setEmptyViewVisibility(getString(R.string.no_forms_sent));
+        setEmptyViewVisibility(getString(R.string.no_forms_sent,
+                getActivity().getIntent().getStringExtra(FORM_DISPLAY_NAME)));
         transferInstanceAdapter.notifyDataSetChanged();
 
         return view;
