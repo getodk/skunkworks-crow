@@ -28,6 +28,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static org.odk.share.activities.MainActivity.FORM_DISPLAY_NAME;
 import static org.odk.share.activities.MainActivity.FORM_ID;
 import static org.odk.share.activities.MainActivity.FORM_VERSION;
 
@@ -74,7 +75,8 @@ public class ReceivedInstancesFragment extends Fragment {
 
         setupAdapter();
         getInstanceFromDB();
-        setEmptyViewVisibility(getString(R.string.no_forms_received));
+        setEmptyViewVisibility(getString(R.string.no_forms_received,
+                getActivity().getIntent().getStringExtra(FORM_DISPLAY_NAME)));
         transferInstanceAdapter.notifyDataSetChanged();
 
         return view;

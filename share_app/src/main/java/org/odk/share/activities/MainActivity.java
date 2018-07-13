@@ -31,6 +31,7 @@ public class MainActivity extends InjectableActivity implements LoaderManager.Lo
             = FormsProviderAPI.FormsColumns.DISPLAY_NAME + " COLLATE NOCASE ASC";
     public static final String FORM_VERSION = "form_version";
     public static final String FORM_ID = "form_id";
+    public static final String FORM_DISPLAY_NAME = "form_display_name";
 
     private static final int FORM_LOADER = 2;
 
@@ -123,6 +124,7 @@ public class MainActivity extends InjectableActivity implements LoaderManager.Lo
         Intent intent  = new Intent(this, InstanceManagerTabs.class);
         intent.putExtra(FORM_VERSION, cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.JR_VERSION)));
         intent.putExtra(FORM_ID, cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.JR_FORM_ID)));
+        intent.putExtra(FORM_DISPLAY_NAME, cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.DISPLAY_NAME)));
         startActivity(intent);
     }
 }
