@@ -13,8 +13,10 @@ import static org.odk.share.dto.TransferInstance.ID;
 import static org.odk.share.dto.TransferInstance.INSTANCE_ID;
 import static org.odk.share.dto.TransferInstance.INSTRUCTIONS;
 import static org.odk.share.dto.TransferInstance.LAST_STATUS_CHANGE_DATE;
-import static org.odk.share.dto.TransferInstance.REVIEWED;
+import static org.odk.share.dto.TransferInstance.REVIEW_STATUS;
+import static org.odk.share.dto.TransferInstance.STATUS_UNREVIEWED;
 import static org.odk.share.dto.TransferInstance.TRANSFER_STATUS;
+import static org.odk.share.dto.TransferInstance.VISITED_COUNT;
 
 /**
  * Created by laksh on 6/13/2018.
@@ -47,10 +49,11 @@ public class ShareDatabaseHelper extends SQLiteOpenHelper {
     private void createInstancesTable(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + SHARE_TABLE_NAME + " ("
                 + ID + " integer primary key, "
-                + REVIEWED + " boolean, "
+                + REVIEW_STATUS + " integer, "
                 + INSTRUCTIONS + " text, "
                 + INSTANCE_ID + " integer not null, "
                 + TRANSFER_STATUS + " text not null, "
+                + VISITED_COUNT + " integer, "
                 + LAST_STATUS_CHANGE_DATE + " date not null ); ");
 
     }
@@ -58,8 +61,8 @@ public class ShareDatabaseHelper extends SQLiteOpenHelper {
     public long insertInstance(ContentValues values) {
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
 
-        if (!values.containsKey(REVIEWED)) {
-            values.put(REVIEWED, false);
+        if (!values.containsKey(REVIEW_STATUS)) {
+            values.put(REVIEW_STATUS, STATUS_UNREVIEWED);
         }
 
         Long now = System.currentTimeMillis();

@@ -84,6 +84,8 @@
     <string name="Reject">Reject</string>
     <string name="review_later">Review Later</string>
     <string name="add_feedback">Add Feeback</string>
-    <string name="view_form_again">View form again</string>
+    <string name="view_form_in_collect">View in ODK Collect</string>
     <string name="collect_not_installed">Install collect to view the form</string>
+    <string name="form_approved">Form approved</string>
+    <string name="form_rejected">Form rejected</string>
 </resources>
