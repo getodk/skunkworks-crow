@@ -75,16 +75,22 @@ public class ReceivedInstancesFragment extends InstanceListFragment {
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(llm);
-
         setupAdapter();
-        getInstanceFromDB();
-        updateAdapter();
-
         return view;
     }
 
+    @Override
+    public void onResume() {
+        getInstanceFromDB();
+        setEmptyViewVisibility(getString(R.string.no_forms_received,
+                getActivity().getIntent().getStringExtra(FORM_DISPLAY_NAME)));
+        transferInstanceAdapter.notifyDataSetChanged();
+        super.onResume();
+    }
+
     private void getInstanceFromDB() {
-        // filter and sort
+        transferInstanceList.clear();
+        selectedInstances.clear();
         String formVersion = getActivity().getIntent().getStringExtra(FORM_VERSION);
         String formId = getActivity().getIntent().getStringExtra(FORM_ID);
         String []selectionArgs;
