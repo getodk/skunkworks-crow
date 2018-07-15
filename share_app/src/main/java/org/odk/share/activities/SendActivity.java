@@ -33,10 +33,8 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 import static android.view.View.VISIBLE;
@@ -78,6 +76,7 @@ public class SendActivity extends InjectableActivity {
     private long[] instancesIds;
 
     private WifiManager.LocalOnlyHotspotReservation hotspotReservation;
+    private WifiConfiguration currentConfig;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -152,7 +151,9 @@ public class SendActivity extends InjectableActivity {
             Intent intent = new Intent(getApplicationContext(), HotspotService.class);
             intent.setAction(HotspotService.ACTION_STATUS);
             startService(intent);
-            startSending(wifiHotspot.getCurrConfig());
+            
+            currentConfig = wifiHotspot.getCurrConfig();
+            startSending();
         }
     }
 
@@ -190,6 +191,9 @@ public class SendActivity extends InjectableActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        compositeDisposable.add(addHotspotEventSubscription());
+        compositeDisposable.add(addUploadEventSubscription());
+
         if (openSettings) {
             openSettings = false;
             Intent serviceIntent = new Intent(getApplicationContext(), HotspotService.class);
@@ -200,12 +204,9 @@ public class SendActivity extends InjectableActivity {
             intent.setAction(HotspotService.ACTION_STATUS);
             startService(intent);
             Timber.d("Started hotspot N");
-
-            startSending(wifiHotspot.getCurrConfig());
+            currentConfig = wifiHotspot.getCurrConfig();            
+            startSending();
         }
-
-        compositeDisposable.add(addHotspotEventSubscription());
-        compositeDisposable.add(addUploadEventSubscription());
     }
 
     private Disposable addUploadEventSubscription() {
@@ -216,6 +217,7 @@ public class SendActivity extends InjectableActivity {
                     switch (uploadEvent.getStatus()) {
                         case QUEUED:
                             Toast.makeText(this, R.string.upload_queued, Toast.LENGTH_SHORT).show();
+                            setupConnectionInfo(currentConfig.SSID, port, currentConfig.preSharedKey);
                             break;
                         case UPLOADING:
                             int progress = uploadEvent.getCurrentProgress();
@@ -238,6 +240,23 @@ public class SendActivity extends InjectableActivity {
                             break;
                     }
                 }, Timber::e);
+    }
+
+    private void setupConnectionInfo(String ssid, int port, String password) {
+        Timber.d("setupConnectionInfo() called with: ssid = [" + ssid + "], port = [" + port + "], password = [" + password + "]");
+
+        // display connection info
+        connectInfo.setText(getString(R.string.connection_info, String.valueOf(this.port), ssid));
+
+        // setup QR code
+        compositeDisposable.add(
+                QRCodeUtils.generateQRCode(ssid, port, password)
+                        .subscribeOn(schedulerProvider.io())
+                        .observeOn(schedulerProvider.androidThread())
+                        .subscribe(bitmap -> {
+                            imageQR.setVisibility(VISIBLE);
+                            imageQR.setImageBitmap(bitmap);
+                        }, Timber::e));
     }
 
     private void setDialogMessage(int dialogId, String message) {
@@ -276,20 +295,7 @@ public class SendActivity extends InjectableActivity {
         super.onDestroy();
     }
 
-    private void startSending(WifiConfiguration config) {
-        String ssid = config.SSID;
-
-        Timber.d("SSID " + ssid + " " + port);
-        Disposable disposable = QRCodeUtils.generateQRCode(ssid, port, config.preSharedKey)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(bitmap -> {
-                    imageQR.setVisibility(VISIBLE);
-                    imageQR.setImageBitmap(bitmap);
-                }, Timber::e);
-        compositeDisposable.add(disposable);
-        connectInfo.setText(getString(R.string.connection_info, String.valueOf(port), ssid));
-
+    private void startSending() {
         senderService.startUploading(instancesIds, port);
     }
 
@@ -302,7 +308,8 @@ public class SendActivity extends InjectableActivity {
             public void onStarted(WifiManager.LocalOnlyHotspotReservation reservation) {
                 super.onStarted(reservation);
                 hotspotReservation = reservation;
-                startSending(reservation.getWifiConfiguration());
+                currentConfig = reservation.getWifiConfiguration();
+                startSending();
             }
 
             @Override
