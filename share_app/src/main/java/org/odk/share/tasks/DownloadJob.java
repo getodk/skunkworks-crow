@@ -230,17 +230,19 @@ public class DownloadJob extends Job {
                 String time = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss-SSS",
                         Locale.ENGLISH).format(Calendar.getInstance().getTime());
                 String path = INSTANCES_PATH + "/" + formId + "_" + time;
-                while (numRes-- > 0) {
+                String instanceFilePath = receiveFile(path);
+
+                while (--numRes > 0) {
                     receiveFile(path);
                 }
 
                 // Add row in instances table
                 ContentValues values = new ContentValues();
                 values.put(DISPLAY_NAME, displayName);
+                values.put(INSTANCE_FILE_PATH, path + "/" + instanceFilePath);
                 values.put(STATUS, InstanceProviderAPI.STATUS_COMPLETE);
                 values.put(CAN_EDIT_WHEN_COMPLETE, "true");
                 values.put(SUBMISSION_URI, submissionUri);
-                values.put(INSTANCE_FILE_PATH, path);
                 values.put(JR_FORM_ID, formId);
                 values.put(JR_VERSION, formVersion);
                 Uri uri = new InstancesDao().saveInstance(values);
