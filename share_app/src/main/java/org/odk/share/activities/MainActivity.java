@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -25,7 +26,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class MainActivity extends InjectableActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class MainActivity extends AppListActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     protected static final String SORT_BY_NAME_ASC
             = FormsProviderAPI.FormsColumns.DISPLAY_NAME + " COLLATE NOCASE ASC";
@@ -54,7 +55,6 @@ public class MainActivity extends InjectableActivity implements LoaderManager.Lo
 
         setTitle(getString(R.string.app_name));
         setSupportActionBar(toolbar);
-
         Share.createODKDirs();
 
         LinearLayoutManager llm = new LinearLayoutManager(this);
@@ -102,10 +102,15 @@ public class MainActivity extends InjectableActivity implements LoaderManager.Lo
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void updateAdapter() {
+        getSupportLoaderManager().restartLoader(FORM_LOADER, null, this);
+    }
+
     @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new FormsDao().getFormsCursorLoader(SORT_BY_NAME_ASC);
+        return new FormsDao().getFormsCursorLoader(getFilterText(), SORT_BY_NAME_ASC);
     }
 
     @Override
