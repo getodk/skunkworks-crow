@@ -10,6 +10,7 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
+import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -81,6 +82,7 @@ public class WifiActivity extends InjectableActivity {
     private static final int DIALOG_CONNECTING = 2;
     private WifiHelper wifiHelper;
     private String wifiNetworkSSID;
+    private WifiInfo lastConnectedWifiInfo;
 
     private String alertMsg;
     private int port;
@@ -103,6 +105,7 @@ public class WifiActivity extends InjectableActivity {
         setTitle(getString(R.string.connect_wifi));
         setSupportActionBar(toolbar);
 
+        lastConnectedWifiInfo = null;
         port = -1;
         wifiHelper = new WifiHelper(this);
 
@@ -110,6 +113,8 @@ public class WifiActivity extends InjectableActivity {
 
         if (!wifiManager.isWifiEnabled()) {
             wifiManager.setWifiEnabled(true);
+        } else {
+            lastConnectedWifiInfo = wifiManager.getConnectionInfo();
         }
 
         scanResultList = new ArrayList<>();
@@ -461,7 +466,13 @@ public class WifiActivity extends InjectableActivity {
 
     @Override
     protected void onDestroy() {
-        wifiHelper.disableWifi(wifiNetworkSSID);
+
+        if (lastConnectedWifiInfo != null) {
+            wifiHelper.getWifiManager().enableNetwork(lastConnectedWifiInfo.getNetworkId(), true);
+            wifiHelper.getWifiManager().reconnect();
+        } else {
+            wifiHelper.disableWifi(wifiNetworkSSID);
+        }
         super.onDestroy();
     }
 
