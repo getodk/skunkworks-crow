@@ -68,6 +68,7 @@ public class SendActivity extends InjectableActivity {
     @BindView(R.id.tvConnectInfo)
     TextView connectInfo;
 
+    private boolean isHotspotInitiated;
     private boolean isHotspotRunning;
     private boolean openSettings;
     private ProgressDialog progressDialog;
@@ -96,13 +97,13 @@ public class SendActivity extends InjectableActivity {
             finish();
         }
 
+        isHotspotInitiated = false;
         isHotspotRunning = false;
         openSettings = false;
 
         if (wifiHotspot.isHotspotEnabled()) {
             wifiHotspot.disableHotspot();
         }
-        startHotspot();
     }
 
     /**
@@ -193,6 +194,11 @@ public class SendActivity extends InjectableActivity {
         super.onResume();
         compositeDisposable.add(addHotspotEventSubscription());
         compositeDisposable.add(addUploadEventSubscription());
+
+        if (!isHotspotInitiated) {
+            isHotspotInitiated = true;
+            startHotspot();
+        }
 
         if (openSettings) {
             openSettings = false;
