@@ -368,7 +368,9 @@ public class WifiActivity extends InjectableActivity {
                 NetworkInfo info = cm.getActiveNetworkInfo();
                 if (info != null) {
                     Timber.d(info + " " + info.getTypeName() + " " + info.getType() + " " + wifiNetworkSSID + " " + isConnected);
-                    if (info.getState() == NetworkInfo.State.CONNECTED && info.getTypeName().compareTo("WIFI") == 0) {
+                    if (info.getState() == NetworkInfo.State.CONNECTED
+                            && info.getTypeName().compareTo("WIFI") == 0
+                            && info.getExtraInfo() != null) {
                         if (!isConnected && info.getExtraInfo().equals("\"" + wifiNetworkSSID + "\"")) {
                             Timber.d("Connected");
                             isConnected = true;
