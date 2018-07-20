@@ -1,5 +1,6 @@
 package org.odk.share.activities;
 
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
@@ -9,9 +10,6 @@ import org.odk.share.R;
 
 import dagger.android.support.DaggerAppCompatActivity;
 
-/**
- * Created by laksh on 7/19/2018.
- */
 
 abstract class AppListActivity extends DaggerAppCompatActivity {
 
@@ -27,10 +25,10 @@ abstract class AppListActivity extends DaggerAppCompatActivity {
         searchView.setQueryHint(getResources().getString(R.string.search));
         searchView.setMaxWidth(Integer.MAX_VALUE);
         SearchView.SearchAutoComplete searchAutoComplete =
-                (SearchView.SearchAutoComplete)searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+                (SearchView.SearchAutoComplete) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
         searchAutoComplete.setCursorVisible(true);
-        searchAutoComplete.setHintTextColor(getColor(android.R.color.white));
-        searchAutoComplete.setTextColor(getColor(android.R.color.white));
+        searchAutoComplete.setHintTextColor(ContextCompat.getColor(this, android.R.color.white));
+        searchAutoComplete.setTextColor(ContextCompat.getColor(this, android.R.color.white));
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {

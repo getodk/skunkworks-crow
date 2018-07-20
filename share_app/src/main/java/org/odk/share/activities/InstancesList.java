@@ -25,7 +25,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class InstancesList extends InjectableActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class InstancesList extends AppListActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     @BindView(R.id.recyclerview) RecyclerView recyclerView;
     @BindView(R.id.toolbar) Toolbar toolbar;
@@ -79,7 +79,7 @@ public class InstancesList extends InjectableActivity implements LoaderManager.L
     @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new InstancesDao().getSavedInstancesCursorLoader(SORT_BY_NAME_ASC);
+        return new InstancesDao().getSavedInstancesCursorLoader(getFilterText(), SORT_BY_NAME_ASC);
     }
 
     @Override
@@ -98,7 +98,6 @@ public class InstancesList extends InjectableActivity implements LoaderManager.L
 
     @Override
     public void onLoaderReset(@NonNull Loader loader) {
-
     }
 
     private void onListItemClick(View view, int position) {
@@ -157,5 +156,10 @@ public class InstancesList extends InjectableActivity implements LoaderManager.L
         } else {
             toggleButton.setText(getString(R.string.select_all));
         }
+    }
+
+    @Override
+    protected void updateAdapter() {
+        getSupportLoaderManager().restartLoader(INSTANCE_LOADER, null, this);
     }
 }
