@@ -19,8 +19,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -51,6 +49,7 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import timber.log.Timber;
@@ -68,6 +67,10 @@ public class WifiActivity extends InjectableActivity {
     TextView emptyView;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
+    @BindView(R.id.bScanQRCode)
+    Button scanQRCode;
+    @BindView(R.id.bScan)
+    Button scanWifi;
 
     private WifiManager wifiManager;
     private WifiResultAdapter wifiResultAdapter;
@@ -305,6 +308,7 @@ public class WifiActivity extends InjectableActivity {
     }
 
     public void startScan() {
+        scanWifi.setEnabled(false);
         scanResultList.clear();
         wifiResultAdapter.notifyDataSetChanged();
         setEmptyViewVisibility(getString(R.string.scanning));
@@ -325,6 +329,7 @@ public class WifiActivity extends InjectableActivity {
             isReceiverRegistered = false;
             unregisterReceiver(this);
             wifiResultAdapter.notifyDataSetChanged();
+            scanWifi.setEnabled(true);
             setEmptyViewVisibility(getString(R.string.no_wifi_available));
         }
     };
@@ -395,36 +400,26 @@ public class WifiActivity extends InjectableActivity {
         receiverService.startDownloading(dstAddress, port);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.wifi_menu, menu);
-        return super.onCreateOptionsMenu(menu);
+    @OnClick(R.id.bScan)
+    public void scanWifi() {
+        if (wifiManager.isWifiEnabled()) {
+            startScan();
+        } else {
+            Toast.makeText(this, getString(R.string.enable_wifi), Toast.LENGTH_LONG).show();
+        }
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_scan:
-                if (wifiManager.isWifiEnabled()) {
-                    startScan();
-                } else {
-                    Toast.makeText(this, getString(R.string.enable_wifi), Toast.LENGTH_LONG).show();
-                }
-                return true;
+    @OnClick(R.id.bScanQRCode)
+    public void scanQRCode() {
+        IntentIntegrator integrator = new IntentIntegrator(this);
+        integrator.setPrompt(getString(R.string.scan_qr_code));
+        integrator.setDesiredBarcodeFormats(integrator.QR_CODE_TYPES);
+        integrator.setCameraId(0);
+        integrator.setOrientationLocked(false);
 
-            case R.id.menu_qr_code:
-                IntentIntegrator integrator = new IntentIntegrator(this);
-                integrator.setPrompt(getString(R.string.scan_qr_code));
-                integrator.setDesiredBarcodeFormats(integrator.QR_CODE_TYPES);
-                integrator.setCameraId(0);
-                integrator.setOrientationLocked(false);
-
-                integrator.setCaptureActivity(CaptureActivity.class);
-                integrator.setBeepEnabled(true);
-                integrator.initiateScan();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
+        integrator.setCaptureActivity(CaptureActivity.class);
+        integrator.setBeepEnabled(true);
+        integrator.initiateScan();
     }
 
     @Override

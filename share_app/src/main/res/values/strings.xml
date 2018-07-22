@@ -22,7 +22,7 @@
     <string name="enable_wifi">Enable Wifi to start scan</string>
     <string name="no_wifi_available">No wifi available. Scan again !</string>
     <string name="scanning">Scanning. Please wait</string>
-    <string name="scan">Scan</string>
+    <string name="scan">Scan wifi</string>
     <string name="scan_qr_code">Scan QR Code</string>
     <string name="show_password">Show Password</string>
     <string name="connect">Connect</string>

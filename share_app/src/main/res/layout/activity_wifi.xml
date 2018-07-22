@@ -10,7 +10,9 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/toolbar">
+        android:layout_below="@id/toolbar"
+        android:id="@+id/relativeLayout"
+        android:layout_above="@+id/buttonholder">
 
         <android.support.v7.widget.RecyclerView
             android:layout_width="match_parent"
@@ -30,4 +32,27 @@
             android:padding="10dp"/>
 
     </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/buttonholder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:weightSum="2">
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/scan"
+            android:id="@+id/bScan"
+            android:layout_weight="1"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/scan_qr_code"
+            android:id="@+id/bScanQRCode"
+            android:layout_weight="1"/>
+    </LinearLayout>
 </RelativeLayout>
