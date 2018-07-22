@@ -39,7 +39,7 @@ import static org.odk.share.activities.MainActivity.FORM_VERSION;
  * Created by laksh on 6/27/2018.
  */
 
-public class ReviewedInstancesFragment extends Fragment {
+public class ReviewedInstancesFragment extends AppListFragment {
 
 
     public ReviewedInstancesFragment() {
@@ -58,6 +58,7 @@ public class ReviewedInstancesFragment extends Fragment {
     LinearLayout buttonLayout;
 
     HashMap<Long, Instance> instanceMap;
+    List<TransferInstance> transferInstanceFilteredList;
 
     TransferInstanceAdapter transferInstanceAdapter;
     List<TransferInstance> transferInstanceList;
@@ -67,6 +68,7 @@ public class ReviewedInstancesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
         View view = inflater.inflate(R.layout.fragment_instances, container, false);
         ButterKnife.bind(this, view);
 
@@ -83,26 +85,23 @@ public class ReviewedInstancesFragment extends Fragment {
 
         setupAdapter();
         getInstanceFromDB();
+        updateAdapter();
 
         setEmptyViewVisibility(getString(R.string.no_forms_reviewed,
                 getActivity().getIntent().getStringExtra(FORM_DISPLAY_NAME)));
-        transferInstanceAdapter.notifyDataSetChanged();
 
         return view;
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        if (savedInstanceState != null) {
-            selectedInstances.addAll((LinkedHashSet<Long>) savedInstanceState.getSerializable(SELECTED_INSTANCES));
+    protected void updateAdapter() {
+        transferInstanceFilteredList.clear();
+        for (TransferInstance instance: transferInstanceList) {
+            if (instance.getInstance().getDisplayName().toLowerCase().contains(getFilterText().toString().toLowerCase())) {
+                transferInstanceFilteredList.add(instance);
+            }
         }
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putSerializable(SELECTED_INSTANCES, selectedInstances);
+        transferInstanceAdapter.notifyDataSetChanged();
     }
 
     private void getInstanceFromDB() {
@@ -134,7 +133,7 @@ public class ReviewedInstancesFragment extends Fragment {
     }
 
     private void setupAdapter() {
-        transferInstanceAdapter = new TransferInstanceAdapter(getActivity(), transferInstanceList, this::onItemClick, selectedInstances, true);
+        transferInstanceAdapter = new TransferInstanceAdapter(getActivity(), transferInstanceFilteredList, this::onItemClick, selectedInstances, true);
         recyclerView.setAdapter(transferInstanceAdapter);
     }
 

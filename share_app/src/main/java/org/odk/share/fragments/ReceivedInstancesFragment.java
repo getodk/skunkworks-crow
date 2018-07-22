@@ -2,8 +2,6 @@ package org.odk.share.fragments;
 
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -36,7 +34,7 @@ import static org.odk.share.activities.MainActivity.FORM_VERSION;
  * Created by laksh on 6/27/2018.
  */
 
-public class ReceivedInstancesFragment extends Fragment {
+public class ReceivedInstancesFragment extends AppListFragment {
 
     @BindView(R.id.recyclerview)
     RecyclerView recyclerView;
@@ -49,8 +47,7 @@ public class ReceivedInstancesFragment extends Fragment {
 
     TransferInstanceAdapter transferInstanceAdapter;
     List<TransferInstance> transferInstanceList;
-    LinkedHashSet<Long> selectedInstances;
-    private static final String SELECTED_INSTANCES = "selectedInstances";
+    List<TransferInstance> transferInstanceFilteredList;
 
     boolean showCheckBox = false;
 
@@ -60,11 +57,13 @@ public class ReceivedInstancesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
         View view = inflater.inflate(R.layout.fragment_instances, container, false);
         ButterKnife.bind(this, view);
 
         instanceMap = new HashMap<>();
         transferInstanceList = new ArrayList<>();
+        transferInstanceFilteredList = new ArrayList<>();
         selectedInstances = new LinkedHashSet<>();
 
         buttonLayout.setVisibility(View.GONE);
@@ -75,25 +74,11 @@ public class ReceivedInstancesFragment extends Fragment {
 
         setupAdapter();
         getInstanceFromDB();
+        updateAdapter();
         setEmptyViewVisibility(getString(R.string.no_forms_received,
                 getActivity().getIntent().getStringExtra(FORM_DISPLAY_NAME)));
-        transferInstanceAdapter.notifyDataSetChanged();
 
         return view;
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        if (savedInstanceState != null) {
-            selectedInstances.addAll((LinkedHashSet<Long>) savedInstanceState.getSerializable(SELECTED_INSTANCES));
-        }
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putSerializable(SELECTED_INSTANCES, selectedInstances);
     }
 
     private void getInstanceFromDB() {
@@ -126,7 +111,8 @@ public class ReceivedInstancesFragment extends Fragment {
     }
 
     private void setupAdapter() {
-        transferInstanceAdapter = new TransferInstanceAdapter(getActivity(), transferInstanceList, this::onItemClick, selectedInstances, showCheckBox);
+        transferInstanceAdapter = new TransferInstanceAdapter(getActivity(), transferInstanceFilteredList,
+                this::onItemClick, selectedInstances, showCheckBox);
         recyclerView.setAdapter(transferInstanceAdapter);
     }
 
@@ -144,4 +130,14 @@ public class ReceivedInstancesFragment extends Fragment {
     private void onItemClick(View view, int position) {
     }
 
+    @Override
+    protected void updateAdapter() {
+        transferInstanceFilteredList.clear();
+        for (TransferInstance instance: transferInstanceList) {
+            if (instance.getInstance().getDisplayName().toLowerCase().contains(getFilterText().toString().toLowerCase())) {
+                transferInstanceFilteredList.add(instance);
+            }
+        }
+        transferInstanceAdapter.notifyDataSetChanged();
+    }
 }
