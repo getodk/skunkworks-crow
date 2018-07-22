@@ -65,8 +65,7 @@ public class UploadJob extends Job {
 
         initJob(params);
 
-        String result = uploadInstances();
-        rxEventBus.post(new UploadEvent(UploadEvent.Status.FINISHED, result));
+        rxEventBus.post(uploadInstances());
 
         return null;
     }
@@ -76,7 +75,7 @@ public class UploadJob extends Job {
         port = params.getExtras().getInt(PORT, -1);
     }
 
-    private String uploadInstances() {
+    private UploadEvent uploadInstances() {
         try {
             Timber.d("Waiting for receiver");
 
@@ -96,11 +95,13 @@ public class UploadJob extends Job {
             dis.close();
         } catch (SocketException e) {
             Timber.e(e);
+            return new UploadEvent(UploadEvent.Status.ERROR, e.getMessage());
         } catch (IOException e) {
             Timber.e(e);
+            return new UploadEvent(UploadEvent.Status.ERROR, e.getMessage());
         }
 
-        return String.valueOf(progress);
+        return new UploadEvent(UploadEvent.Status.FINISHED, String.valueOf(progress));
     }
 
     @Override
