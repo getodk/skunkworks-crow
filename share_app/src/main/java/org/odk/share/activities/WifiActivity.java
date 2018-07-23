@@ -310,7 +310,7 @@ public class WifiActivity extends InjectableActivity {
                             wifiHelper.connectToWifi(scanResult.SSID, pw);
                             isWifiReceiverRegisterd = true;
                             registerReceiver(wifiReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-                            showDialog(DIALOG_CONNECTING);
+                            removeDialog(DIALOG_CONNECTING);
                         } else {
                             passwordEditText.setError(getString(R.string.password_empty));
                         }
@@ -411,7 +411,7 @@ public class WifiActivity extends InjectableActivity {
                             isWifiReceiverRegisterd = false;
                             unregisterReceiver(this);
                             Toast.makeText(getApplicationContext(), "Connected to " + wifiNetworkSSID, Toast.LENGTH_LONG).show();
-                            dismissDialog(DIALOG_CONNECTING);
+                            removeDialog(DIALOG_CONNECTING);
 
                             if (port != -1) {
                                 startReceiveTask();
