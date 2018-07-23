@@ -102,10 +102,7 @@ public class DownloadJob extends Job {
             dos.close();
             dis.close();
 
-        } catch (IOException e) {
-            Timber.e(e);
-            return new DownloadEvent(DownloadEvent.Status.ERROR, e.getMessage());
-        } catch (IllegalArgumentException e) {
+        } catch (IOException | IllegalArgumentException e) {
             Timber.e(e);
             return new DownloadEvent(DownloadEvent.Status.ERROR, e.getMessage());
         }

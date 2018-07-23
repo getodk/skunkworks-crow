@@ -93,9 +93,6 @@ public class UploadJob extends Job {
             serverSocket.close();
             dos.close();
             dis.close();
-        } catch (SocketException e) {
-            Timber.e(e);
-            return new UploadEvent(UploadEvent.Status.ERROR, e.getMessage());
         } catch (IOException e) {
             Timber.e(e);
             return new UploadEvent(UploadEvent.Status.ERROR, e.getMessage());
