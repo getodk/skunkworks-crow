@@ -69,9 +69,7 @@ public class DownloadJob extends Job {
         ((Share) getContext().getApplicationContext()).getAppComponent().inject(this);
 
         initJob(params);
-
-        String result = receiveForms();
-        rxEventBus.post(new DownloadEvent(DownloadEvent.Status.FINISHED, result));
+        rxEventBus.post(receiveForms());
 
         return null;
     }
@@ -81,7 +79,7 @@ public class DownloadJob extends Job {
         port = params.getExtras().getInt(PORT, -1);
     }
 
-    private String receiveForms() {
+    private DownloadEvent receiveForms() {
         Timber.d("Socket " + ip + " " + port);
 
         try {
@@ -104,11 +102,12 @@ public class DownloadJob extends Job {
             dos.close();
             dis.close();
 
-        } catch (IOException e) {
+        } catch (IOException | IllegalArgumentException e) {
             Timber.e(e);
+            return new DownloadEvent(DownloadEvent.Status.ERROR, e.getMessage());
         }
 
-        return String.valueOf(progress);
+        return new DownloadEvent(DownloadEvent.Status.FINISHED, String.valueOf(progress));
     }
 
     @Override

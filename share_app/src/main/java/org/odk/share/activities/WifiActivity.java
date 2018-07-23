@@ -163,8 +163,8 @@ public class WifiActivity extends InjectableActivity {
                             createAlertDialog(getString(R.string.transfer_result), getString(R.string.receive_success, result));
                             break;
                         case ERROR:
-                            Toast.makeText(this, R.string.error_while_downloading, Toast.LENGTH_SHORT).show();
                             dismissDialog(DIALOG_DOWNLOAD_PROGRESS);
+                            createAlertDialog(getString(R.string.transfer_result), getString(R.string.error_while_downloading, downloadEvent.getResult()));
                             break;
                         case CANCELLED:
                             Toast.makeText(this, getString(R.string.canceled), Toast.LENGTH_LONG).show();

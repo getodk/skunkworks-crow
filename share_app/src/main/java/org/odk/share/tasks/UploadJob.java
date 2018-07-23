@@ -26,7 +26,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -65,8 +64,7 @@ public class UploadJob extends Job {
 
         initJob(params);
 
-        String result = uploadInstances();
-        rxEventBus.post(new UploadEvent(UploadEvent.Status.FINISHED, result));
+        rxEventBus.post(uploadInstances());
 
         return null;
     }
@@ -76,7 +74,7 @@ public class UploadJob extends Job {
         port = params.getExtras().getInt(PORT, -1);
     }
 
-    private String uploadInstances() {
+    private UploadEvent uploadInstances() {
         try {
             Timber.d("Waiting for receiver");
 
@@ -94,13 +92,12 @@ public class UploadJob extends Job {
             serverSocket.close();
             dos.close();
             dis.close();
-        } catch (SocketException e) {
-            Timber.e(e);
         } catch (IOException e) {
             Timber.e(e);
+            return new UploadEvent(UploadEvent.Status.ERROR, e.getMessage());
         }
 
-        return String.valueOf(progress);
+        return new UploadEvent(UploadEvent.Status.FINISHED, String.valueOf(progress));
     }
 
     @Override

@@ -237,8 +237,8 @@ public class SendActivity extends InjectableActivity {
                             createAlertDialog(getString(R.string.transfer_result), getString(R.string.send_success, result));
                             break;
                         case ERROR:
-                            Toast.makeText(this, R.string.error_while_downloading, Toast.LENGTH_SHORT).show();
                             hideDialog(PROGRESS_DIALOG);
+                            createAlertDialog(getString(R.string.transfer_result), getString(R.string.error_while_uploading, uploadEvent.getResult()));
                             break;
                         case CANCELLED:
                             Toast.makeText(this, getString(R.string.canceled), Toast.LENGTH_LONG).show();
