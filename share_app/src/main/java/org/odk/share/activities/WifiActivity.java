@@ -54,6 +54,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import timber.log.Timber;
 
+import static com.google.zxing.integration.android.IntentIntegrator.QR_CODE_TYPES;
 import static org.odk.share.utilities.QRCodeUtils.PASSWORD;
 import static org.odk.share.utilities.QRCodeUtils.PORT;
 import static org.odk.share.utilities.QRCodeUtils.PROTECTED;
@@ -411,15 +412,14 @@ public class WifiActivity extends InjectableActivity {
 
     @OnClick(R.id.bScanQRCode)
     public void scanQRCode() {
-        IntentIntegrator integrator = new IntentIntegrator(this);
-        integrator.setPrompt(getString(R.string.scan_qr_code));
-        integrator.setDesiredBarcodeFormats(integrator.QR_CODE_TYPES);
-        integrator.setCameraId(0);
-        integrator.setOrientationLocked(false);
-
-        integrator.setCaptureActivity(CaptureActivity.class);
-        integrator.setBeepEnabled(true);
-        integrator.initiateScan();
+        new IntentIntegrator(this)
+                .setPrompt(getString(R.string.scan_qr_code))
+                .setDesiredBarcodeFormats(QR_CODE_TYPES)
+                .setCameraId(0)
+                .setOrientationLocked(false)
+                .setCaptureActivity(CaptureActivity.class)
+                .setBeepEnabled(true)
+                .initiateScan();
     }
 
     @Override
