@@ -90,6 +90,10 @@ public class WifiActivity extends InjectableActivity {
 
     private String alertMsg;
     private int port;
+    private boolean isQRCodeScanned;
+    private String ssidScanned;
+    private boolean isProtected;
+    private String passwordScanned;
 
     @Inject
     ReceiverService receiverService;
@@ -109,6 +113,10 @@ public class WifiActivity extends InjectableActivity {
         setTitle(getString(R.string.connect_wifi));
         setSupportActionBar(toolbar);
 
+        isQRCodeScanned = false;
+        ssidScanned = null;
+        isProtected = false;
+        passwordScanned = null;
         lastConnectedWifiInfo = null;
         port = -1;
         wifiHelper = new WifiHelper(this);
@@ -206,13 +214,17 @@ public class WifiActivity extends InjectableActivity {
             showPasswordDialog(scanResultList.get(i));
         } else {
             // connect
-            alertMsg = getString(R.string.connecting_wifi);
-            showDialog(DIALOG_CONNECTING);
-            wifiNetworkSSID = scanResultList.get(i).SSID;
-            wifiHelper.connectToWifi(scanResultList.get(i).SSID, null);
-            isWifiReceiverRegisterd = true;
-            registerReceiver(wifiReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+            connectToNetwork(scanResultList.get(i).SSID, null);
         }
+    }
+
+    private void connectToNetwork(String ssid, String password) {
+        alertMsg = getString(R.string.connecting_wifi);
+        showDialog(DIALOG_CONNECTING);
+        wifiNetworkSSID = ssid;
+        wifiHelper.connectToWifi(wifiNetworkSSID, password);
+        isWifiReceiverRegisterd = true;
+        registerReceiver(wifiReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
     }
 
     private void showPortDialog() {
@@ -302,7 +314,7 @@ public class WifiActivity extends InjectableActivity {
                             wifiHelper.connectToWifi(scanResult.SSID, pw);
                             isWifiReceiverRegisterd = true;
                             registerReceiver(wifiReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-                            showDialog(DIALOG_CONNECTING);
+                            removeDialog(DIALOG_CONNECTING);
                         } else {
                             passwordEditText.setError(getString(R.string.password_empty));
                         }
@@ -337,6 +349,23 @@ public class WifiActivity extends InjectableActivity {
             wifiResultAdapter.notifyDataSetChanged();
             scanWifi.setEnabled(true);
             setEmptyViewVisibility(getString(R.string.no_wifi_available));
+
+
+            /*
+                Adding a double verification to check whether the ssid returned by scanned QR Code
+                actually exists or not.
+            */
+            if (isQRCodeScanned) {
+                isQRCodeScanned = false;
+                for (ScanResult scanResult: scanResultList) {
+                    if (scanResult.SSID.equals(ssidScanned)) {
+                        connectToNetwork(ssidScanned, passwordScanned);
+                        return;
+                    }
+                }
+
+                Toast.makeText(c, getString(R.string.no_wifi_available), Toast.LENGTH_LONG).show();
+            }
         }
     };
 
@@ -386,15 +415,15 @@ public class WifiActivity extends InjectableActivity {
                             Timber.d("Connected");
                             isConnected = true;
                             isWifiReceiverRegisterd = false;
+                            unregisterReceiver(this);
                             Toast.makeText(getApplicationContext(), "Connected to " + wifiNetworkSSID, Toast.LENGTH_LONG).show();
-                            dismissDialog(DIALOG_CONNECTING);
+                            removeDialog(DIALOG_CONNECTING);
 
                             if (port != -1) {
                                 startReceiveTask();
                             } else {
                                 showPortDialog();
                             }
-                            unregisterReceiver(this);
                         }
                     }
                 }
@@ -454,6 +483,16 @@ public class WifiActivity extends InjectableActivity {
                 progressDialog.setMessage(alertMsg);
                 progressDialog.setIndeterminate(true);
                 progressDialog.setCancelable(false);
+                progressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.cancel),
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                isWifiReceiverRegisterd = false;
+                                unregisterReceiver(wifiReceiver);
+                                dialog.dismiss();
+                                startScan();
+                            }
+                        });
                 progressDialog.show();
                 return progressDialog;
             default:
@@ -506,21 +545,16 @@ public class WifiActivity extends InjectableActivity {
                 Timber.d("RESULT " + result);
                 try {
                     JSONObject obj = new JSONObject(result.getContents());
-                    String ssid = (String) obj.get(SSID);
+                    ssidScanned = (String) obj.get(SSID);
                     port = (Integer) obj.get(PORT);
-                    String password = null;
-                    Boolean isProtected = (Boolean) obj.get(PROTECTED);
+                    isProtected = (boolean) obj.get(PROTECTED);
                     if (isProtected) {
-                        password = (String) obj.get(PASSWORD);
+                        passwordScanned = (String) obj.get(PASSWORD);
                     }
 
-                    Timber.d("Scanned results " + ssid + " " + port + " " + isProtected + " " + password);
-                    alertMsg = getString(R.string.connecting_wifi);
-                    showDialog(DIALOG_CONNECTING);
-                    wifiNetworkSSID = ssid;
-                    registerReceiver(wifiReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-                    wifiHelper.connectToWifi(ssid, password);
-                    isWifiReceiverRegisterd = true;
+                    Timber.d("Scanned results " + ssidScanned + " " + port + " " + isProtected + " " + passwordScanned);
+                    isQRCodeScanned = true;
+                    startScan();
                 } catch (JSONException e) {
                     Timber.e(e);
                 }
