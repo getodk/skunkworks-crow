@@ -2,8 +2,6 @@ package org.odk.share.fragments;
 
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -26,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -57,8 +56,6 @@ public class SentInstancesFragment extends AppListFragment {
     TransferInstanceAdapter transferInstanceAdapter;
     List<TransferInstance> transferInstanceList;
     List<TransferInstance> transferInstanceFilteredList;
-    LinkedHashSet<Long> selectedInstances;
-    private static final String SELECTED_INSTANCES = "selectedInstances";
 
     public SentInstancesFragment() {
 
@@ -86,9 +83,6 @@ public class SentInstancesFragment extends AppListFragment {
         setupAdapter();
         getInstanceFromDB();
         updateAdapter();
-        setEmptyViewVisibility(getString(R.string.no_forms_sent,
-                getActivity().getIntent().getStringExtra(FORM_DISPLAY_NAME)));
-
         return view;
     }
 
@@ -96,10 +90,15 @@ public class SentInstancesFragment extends AppListFragment {
     protected void updateAdapter() {
         transferInstanceFilteredList.clear();
         for (TransferInstance instance: transferInstanceList) {
-            if (instance.getInstance().getDisplayName().toLowerCase().contains(getFilterText().toString().toLowerCase())) {
+            if (instance.getInstance().getDisplayName().toLowerCase(Locale.getDefault())
+                    .contains(getFilterText().toString().toLowerCase(Locale.getDefault()))) {
                 transferInstanceFilteredList.add(instance);
             }
         }
+
+        setEmptyViewVisibility(getString(R.string.no_forms_sent,
+                getActivity().getIntent().getStringExtra(FORM_DISPLAY_NAME)));
+
         transferInstanceAdapter.notifyDataSetChanged();
     }
 
@@ -137,7 +136,7 @@ public class SentInstancesFragment extends AppListFragment {
     }
 
     private void setEmptyViewVisibility(String text) {
-        if (transferInstanceList.size() > 0) {
+        if (transferInstanceFilteredList.size() > 0) {
             buttonLayout.setVisibility(View.VISIBLE);
             emptyView.setVisibility(View.GONE);
         } else {

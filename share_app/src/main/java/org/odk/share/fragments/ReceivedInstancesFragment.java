@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -75,8 +76,6 @@ public class ReceivedInstancesFragment extends AppListFragment {
         setupAdapter();
         getInstanceFromDB();
         updateAdapter();
-        setEmptyViewVisibility(getString(R.string.no_forms_received,
-                getActivity().getIntent().getStringExtra(FORM_DISPLAY_NAME)));
 
         return view;
     }
@@ -117,7 +116,7 @@ public class ReceivedInstancesFragment extends AppListFragment {
     }
 
     private void setEmptyViewVisibility(String text) {
-        if (transferInstanceList.size() > 0) {
+        if (transferInstanceFilteredList.size() > 0) {
             recyclerView.setVisibility(View.VISIBLE);
             emptyView.setVisibility(View.GONE);
         } else {
@@ -134,10 +133,14 @@ public class ReceivedInstancesFragment extends AppListFragment {
     protected void updateAdapter() {
         transferInstanceFilteredList.clear();
         for (TransferInstance instance: transferInstanceList) {
-            if (instance.getInstance().getDisplayName().toLowerCase().contains(getFilterText().toString().toLowerCase())) {
+            if (instance.getInstance().getDisplayName().toLowerCase(Locale.getDefault())
+                    .contains(getFilterText().toString().toLowerCase(Locale.getDefault()))) {
                 transferInstanceFilteredList.add(instance);
             }
         }
+
+        setEmptyViewVisibility(getString(R.string.no_forms_received,
+                getActivity().getIntent().getStringExtra(FORM_DISPLAY_NAME)));
         transferInstanceAdapter.notifyDataSetChanged();
     }
 }
