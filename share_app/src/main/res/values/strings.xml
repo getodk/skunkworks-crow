@@ -68,7 +68,6 @@
     <string name="no_forms_sent">No filled %s forms sent</string>
     <string name="no_forms_received">No filled %s forms received</string>
     <string name="no_forms_reviewed">No finalized %s forms received</string>
-
     <string name="sort_list">Sort the list</string>
     <string name="search_list">Search the list</string>
     <string name="search">Search</string>
@@ -78,5 +77,7 @@
     <string name="sort_by_date_asc">Date, newest first</string>
     <string name="sort_by_date_desc">Date, oldest first</string>
     <string name="sort_by">Sort by</string>
-
+    <string name="num_forms_sent">Number of forms sent</string>
+    <string name="num_forms_received">Number of forms received</string>
+    <string name="num_forms_reviewed">Number of forms reviewed</string>
 </resources>
