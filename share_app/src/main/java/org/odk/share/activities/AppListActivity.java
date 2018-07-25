@@ -16,6 +16,7 @@ package org.odk.share.activities;
  * limitations under the License.
  */
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.BottomSheetDialog;
@@ -215,7 +216,12 @@ abstract class AppListActivity extends DaggerAppCompatActivity {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
         bottomSheetDialog.setContentView(sheetView);
-
+        bottomSheetDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                isBottomDialogShown = false;
+            }
+        });
         if (isBottomDialogShown) {
             bottomSheetDialog.show();
         }
