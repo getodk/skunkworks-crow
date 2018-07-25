@@ -71,4 +71,11 @@
     <string name="sort_list">Sort the list</string>
     <string name="search_list">Search the list</string>
     <string name="search">Search</string>
+
+    <string name="sort_by_name_asc">Name, A-Z</string>
+    <string name="sort_by_name_desc">Name, Z-A</string>
+    <string name="sort_by_date_asc">Date, newest first</string>
+    <string name="sort_by_date_desc">Date, oldest first</string>
+    <string name="sort_by">Sort by</string>
+
 </resources>

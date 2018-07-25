@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -38,7 +37,7 @@ import static org.odk.share.activities.MainActivity.FORM_VERSION;
  * Created by laksh on 6/27/2018.
  */
 
-public class ReviewedInstancesFragment extends AppListFragment {
+public class ReviewedInstancesFragment extends InstanceListFragment {
 
 
     public ReviewedInstancesFragment() {
@@ -57,10 +56,11 @@ public class ReviewedInstancesFragment extends AppListFragment {
     LinearLayout buttonLayout;
 
     HashMap<Long, Instance> instanceMap;
-    List<TransferInstance> transferInstanceFilteredList;
 
     TransferInstanceAdapter transferInstanceAdapter;
     List<TransferInstance> transferInstanceList;
+    private static final String REVIEWED_INSTANCE_LIST_SORTING_ORDER = "reviewedInstanceListSortingOrder";
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -71,7 +71,6 @@ public class ReviewedInstancesFragment extends AppListFragment {
 
         instanceMap = new HashMap<>();
         transferInstanceList = new ArrayList<>();
-        transferInstanceFilteredList = new ArrayList<>();
         selectedInstances = new LinkedHashSet<>();
 
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
@@ -89,34 +88,45 @@ public class ReviewedInstancesFragment extends AppListFragment {
 
     @Override
     protected void updateAdapter() {
-        transferInstanceFilteredList.clear();
-        for (TransferInstance instance: transferInstanceList) {
-            if (instance.getInstance().getDisplayName().toLowerCase(Locale.getDefault())
-                    .contains(getFilterText().toString().toLowerCase(Locale.getDefault()))) {
-                transferInstanceFilteredList.add(instance);
-            }
-        }
+        getInstanceFromDB();
         setEmptyViewVisibility(getString(R.string.no_forms_reviewed,
                 getActivity().getIntent().getStringExtra(FORM_DISPLAY_NAME)));
         transferInstanceAdapter.notifyDataSetChanged();
     }
 
+    @Override
+    protected String getSortingOrderKey() {
+        return REVIEWED_INSTANCE_LIST_SORTING_ORDER;
+    }
+
     private void getInstanceFromDB() {
+        // filter and sort
         String formVersion = getActivity().getIntent().getStringExtra(FORM_VERSION);
         String formId = getActivity().getIntent().getStringExtra(FORM_ID);
         String []selectionArgs;
         String selection;
 
         if (formVersion == null) {
-            selectionArgs = new String[]{formId};
             selection = InstanceProviderAPI.InstanceColumns.JR_FORM_ID + "=? AND "
                     + InstanceProviderAPI.InstanceColumns.JR_VERSION + " IS NULL";
+            if (getFilterText().length() == 0) {
+                selectionArgs = new String[]{formId};
+            } else {
+                selectionArgs = new String[] {formId,  "%" + getFilterText() + "%"};
+                selection = "AND " + InstanceProviderAPI.InstanceColumns.DISPLAY_NAME + " LIKE ?";
+            }
         } else {
-            selectionArgs = new String[]{formId, formVersion};
             selection = InstanceProviderAPI.InstanceColumns.JR_FORM_ID + "=? AND "
                     + InstanceProviderAPI.InstanceColumns.JR_VERSION + "=?";
+            if (getFilterText().length() == 0) {
+                selectionArgs = new String[]{formId, formVersion};
+            } else {
+                selectionArgs = new String[] {formId,  "%" + getFilterText() + "%"};
+                selection = "AND " + InstanceProviderAPI.InstanceColumns.DISPLAY_NAME + " LIKE ?";
+            }
         }
-        Cursor cursor = new InstancesDao().getInstancesCursor(selection, selectionArgs);
+
+        Cursor cursor = new InstancesDao().getInstancesCursor(null, selection, selectionArgs, getSortingOrder());
         instanceMap = new InstancesDao().getMapFromCursor(cursor);
 
         Cursor transferCursor = new TransferDao().getReviewedInstancesCursor();
@@ -130,12 +140,12 @@ public class ReviewedInstancesFragment extends AppListFragment {
     }
 
     private void setupAdapter() {
-        transferInstanceAdapter = new TransferInstanceAdapter(getActivity(), transferInstanceFilteredList, this::onItemClick, selectedInstances, true);
+        transferInstanceAdapter = new TransferInstanceAdapter(getActivity(), transferInstanceList, this::onItemClick, selectedInstances, true);
         recyclerView.setAdapter(transferInstanceAdapter);
     }
 
     private void setEmptyViewVisibility(String text) {
-        if (transferInstanceFilteredList.size() > 0) {
+        if (transferInstanceList.size() > 0) {
             buttonLayout.setVisibility(View.VISIBLE);
             emptyView.setVisibility(View.GONE);
         } else {

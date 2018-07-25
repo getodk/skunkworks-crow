@@ -25,13 +25,12 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class MainActivity extends AppListActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class MainActivity extends FormListActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    protected static final String SORT_BY_NAME_ASC
-            = FormsProviderAPI.FormsColumns.DISPLAY_NAME + " COLLATE NOCASE ASC";
     public static final String FORM_VERSION = "form_version";
     public static final String FORM_ID = "form_id";
     public static final String FORM_DISPLAY_NAME = "form_display_name";
+    private static final String FORM_CHOOSER_LIST_SORTING_ORDER = "formChooserListSortingOrder";
 
     private static final int FORM_LOADER = 2;
 
@@ -106,10 +105,15 @@ public class MainActivity extends AppListActivity implements LoaderManager.Loade
         getSupportLoaderManager().restartLoader(FORM_LOADER, null, this);
     }
 
+    @Override
+    protected String getSortingOrderKey() {
+        return FORM_CHOOSER_LIST_SORTING_ORDER;
+    }
+
     @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new FormsDao().getFormsCursorLoader(getFilterText(), SORT_BY_NAME_ASC);
+        return new FormsDao().getFormsCursorLoader(getFilterText(), getSortingOrder());
     }
 
     @Override

@@ -1,41 +1,47 @@
+/*
+Copyright 2017 Shobhit
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package org.odk.share.fragments;
 
-
-import android.os.Bundle;
-import android.support.annotation.NonNull;
+import android.preference.PreferenceManager;
+import android.support.design.widget.BottomSheetDialog;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 
 import org.odk.share.R;
+import org.odk.share.adapters.SortDialogAdapter;
+import org.odk.share.application.Share;
 
 import java.util.LinkedHashSet;
 
+import static org.odk.share.utilities.ApplicationConstants.SortingOrder.BY_NAME_ASC;
+
 abstract class AppListFragment extends Fragment {
 
+    protected String[] sortingOptions;
     protected LinkedHashSet<Long> selectedInstances = new LinkedHashSet<>();
-    private static final String SELECTED_INSTANCES = "selectedInstances";
-
+    private Integer selectedSortingOrder;
+    private BottomSheetDialog bottomSheetDialog;
     private String filterText;
-
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        if (savedInstanceState != null) {
-            selectedInstances.addAll((LinkedHashSet<Long>) savedInstanceState.getSerializable(SELECTED_INSTANCES));
-        }
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putSerializable(SELECTED_INSTANCES, selectedInstances);
-    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -48,7 +54,6 @@ abstract class AppListFragment extends Fragment {
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.setQueryHint(getResources().getString(R.string.search));
         searchView.setMaxWidth(Integer.MAX_VALUE);
-
         SearchView.SearchAutoComplete searchAutoComplete =
                 (SearchView.SearchAutoComplete) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
         searchAutoComplete.setCursorVisible(true);
@@ -87,7 +92,78 @@ abstract class AppListFragment extends Fragment {
         });
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_sort:
+                bottomSheetDialog.show();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void performSelectedSearch(int position) {
+        saveSelectedSortingOrder(position);
+        updateAdapter();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (bottomSheetDialog == null) {
+            setupBottomSheet();
+        }
+    }
+
+    private void setupBottomSheet() {
+        bottomSheetDialog = new BottomSheetDialog(getActivity());
+        View sheetView = getActivity().getLayoutInflater().inflate(R.layout.bottom_sheet, null);
+        final RecyclerView recyclerView = sheetView.findViewById(R.id.recyclerView);
+
+        sortingOptions = new String[]{
+                getString(R.string.sort_by_name_asc), getString(R.string.sort_by_name_desc),
+                getString(R.string.sort_by_date_asc), getString(R.string.sort_by_date_desc)
+        };
+        final SortDialogAdapter adapter = new SortDialogAdapter(getActivity(), recyclerView, sortingOptions, getSelectedSortingOrder(), new SortDialogAdapter.RecyclerViewClickListener() {
+            @Override
+            public void onItemClicked(SortDialogAdapter.ViewHolder holder, int position) {
+                holder.updateItemColor(selectedSortingOrder);
+                performSelectedSearch(position);
+                bottomSheetDialog.dismiss();
+            }
+        });
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setAdapter(adapter);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+
+        bottomSheetDialog.setContentView(sheetView);
+    }
+
     protected abstract void updateAdapter();
+
+    protected abstract String getSortingOrderKey();
+
+    private void saveSelectedSortingOrder(int selectedStringOrder) {
+        selectedSortingOrder = selectedStringOrder;
+        PreferenceManager.getDefaultSharedPreferences(Share.getInstance())
+                .edit()
+                .putInt(getSortingOrderKey(), selectedStringOrder)
+                .apply();
+    }
+
+    protected void restoreSelectedSortingOrder() {
+        selectedSortingOrder = PreferenceManager
+                .getDefaultSharedPreferences(Share.getInstance())
+                .getInt(getSortingOrderKey(), BY_NAME_ASC);
+    }
+
+    protected int getSelectedSortingOrder() {
+        if (selectedSortingOrder == null) {
+            restoreSelectedSortingOrder();
+        }
+        return selectedSortingOrder;
+    }
 
     protected CharSequence getFilterText() {
         return filterText != null ? filterText : "";
