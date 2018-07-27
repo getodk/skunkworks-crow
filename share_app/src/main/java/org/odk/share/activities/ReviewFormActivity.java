@@ -60,18 +60,22 @@ public class ReviewFormActivity extends AppCompatActivity {
 
         Cursor cursor = new TransferDao().getInstanceCursorFromId(transferID);
         if (cursor != null) {
-            cursor.moveToFirst();
-            visitedCount = cursor.getInt(cursor.getColumnIndex(TransferInstance.VISITED_COUNT));
+            try {
+                cursor.moveToFirst();
+                visitedCount = cursor.getInt(cursor.getColumnIndex(TransferInstance.VISITED_COUNT));
 
-            int formStatus = cursor.getInt(cursor.getColumnIndex(TransferInstance.REVIEW_STATUS));
+                int formStatus = cursor.getInt(cursor.getColumnIndex(TransferInstance.REVIEW_STATUS));
 
-            if (formStatus == TransferInstance.STATUS_UNREVIEWED) {
-                viewFormInCollect();
-            } else {
-                String feedbackText = cursor.getString(cursor.getColumnIndex(TransferInstance.INSTRUCTIONS));
-                if (feedbackText != null) {
-                    feedback.setText(feedbackText);
+                if (formStatus == TransferInstance.STATUS_UNREVIEWED) {
+                    viewFormInCollect();
+                } else {
+                    String feedbackText = cursor.getString(cursor.getColumnIndex(TransferInstance.INSTRUCTIONS));
+                    if (feedbackText != null) {
+                        feedback.setText(feedbackText);
+                    }
                 }
+            } finally {
+                cursor.close();
             }
         }
     }
@@ -80,8 +84,12 @@ public class ReviewFormActivity extends AppCompatActivity {
     protected void onResume() {
         Cursor cursor = new InstancesDao().getInstancesCursorForId(String.valueOf(instanceID));
         if (cursor != null) {
-            cursor.moveToFirst();
-            description.setText(cursor.getString(cursor.getColumnIndex(InstanceProviderAPI.InstanceColumns.DISPLAY_NAME)));
+            try {
+                cursor.moveToFirst();
+                description.setText(cursor.getString(cursor.getColumnIndex(InstanceProviderAPI.InstanceColumns.DISPLAY_NAME)));
+            } finally {
+                cursor.close();
+            }
         }
 
         super.onResume();
@@ -148,8 +156,12 @@ public class ReviewFormActivity extends AppCompatActivity {
     public void viewFormInCollect() {
         Cursor cursor = new TransferDao().getInstanceCursorFromId(transferID);
         if (cursor != null) {
-            cursor.moveToFirst();
-            visitedCount = cursor.getInt(cursor.getColumnIndex(TransferInstance.VISITED_COUNT));
+            try {
+                cursor.moveToFirst();
+                visitedCount = cursor.getInt(cursor.getColumnIndex(TransferInstance.VISITED_COUNT));
+            } finally {
+                cursor.close();
+            }
         }
         ContentValues values = new ContentValues();
         values.put(TransferInstance.VISITED_COUNT, visitedCount + 1);
