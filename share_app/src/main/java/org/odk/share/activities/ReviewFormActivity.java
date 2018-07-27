@@ -126,6 +126,9 @@ public class ReviewFormActivity extends AppCompatActivity {
             ContentValues values = new ContentValues();
             values.put(TransferInstance.INSTRUCTIONS, feedback);
             values.put(TransferInstance.REVIEW_STATUS, TransferInstance.STATUS_REJECTED);
+            Long now = System.currentTimeMillis();
+            values.put(LAST_STATUS_CHANGE_DATE, now);
+
             String where = TransferInstance.ID + "=?";
             String[] whereArgs = {
                     String.valueOf(transferID)
