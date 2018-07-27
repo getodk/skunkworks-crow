@@ -62,8 +62,18 @@ public class ReviewFormActivity extends AppCompatActivity {
         if (cursor != null) {
             cursor.moveToFirst();
             visitedCount = cursor.getInt(cursor.getColumnIndex(TransferInstance.VISITED_COUNT));
+
+            int formStatus = cursor.getInt(cursor.getColumnIndex(TransferInstance.REVIEW_STATUS));
+
+            if (formStatus == TransferInstance.STATUS_UNREVIEWED) {
+                viewFormInCollect();
+            } else {
+                String feedbackText = cursor.getString(cursor.getColumnIndex(TransferInstance.INSTRUCTIONS));
+                if (feedbackText != null) {
+                    feedback.setText(feedbackText);
+                }
+            }
         }
-        viewFormInCollect();
     }
 
     @Override
