@@ -41,6 +41,8 @@
     <string name="hotspot_name_error">Hotspot name should not be empty</string>
     <string name="hotspot_password_error">Password length should be atleast 8 characters long</string>
     <string name="waiting_connection">Waiting for connection to accept</string>
+    <string name="waiting_hotspot">Waiting for hotspot to connect</string>
+    <string name="connection_issue_hotspot">Problem in enabling hotspot. Try again</string>
     <string name="connection_info">For connection, scan this QR code or type %1$s after connecting to WiFi %2$s</string>
     <string name="connecting_wifi">Connecting to wifi</string>
     <string name="ok">OK</string>

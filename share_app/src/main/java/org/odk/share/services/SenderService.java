@@ -75,8 +75,6 @@ public class SenderService {
         } else {
             startJob(request);
         }
-
-        rxEventBus.post(new UploadEvent(UploadEvent.Status.QUEUED));
     }
 
     private void startJob(JobRequest request) {
