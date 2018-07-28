@@ -2,8 +2,6 @@ package org.odk.share.fragments;
 
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -36,7 +34,7 @@ import static org.odk.share.activities.MainActivity.FORM_VERSION;
  * Created by laksh on 6/27/2018.
  */
 
-public class ReceivedInstancesFragment extends Fragment {
+public class ReceivedInstancesFragment extends InstanceListFragment {
 
     @BindView(R.id.recyclerview)
     RecyclerView recyclerView;
@@ -49,10 +47,10 @@ public class ReceivedInstancesFragment extends Fragment {
 
     TransferInstanceAdapter transferInstanceAdapter;
     List<TransferInstance> transferInstanceList;
-    LinkedHashSet<Long> selectedInstances;
-    private static final String SELECTED_INSTANCES = "selectedInstances";
 
     boolean showCheckBox = false;
+    private static final String RECEIVED_INSTANCE_LIST_SORTING_ORDER = "receivedInstanceListSortingOrder";
+
 
     public ReceivedInstancesFragment() {
     }
@@ -60,6 +58,7 @@ public class ReceivedInstancesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
         View view = inflater.inflate(R.layout.fragment_instances, container, false);
         ButterKnife.bind(this, view);
 
@@ -75,46 +74,40 @@ public class ReceivedInstancesFragment extends Fragment {
 
         setupAdapter();
         getInstanceFromDB();
-        setEmptyViewVisibility(getString(R.string.no_forms_received,
-                getActivity().getIntent().getStringExtra(FORM_DISPLAY_NAME)));
-        transferInstanceAdapter.notifyDataSetChanged();
+        updateAdapter();
 
         return view;
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        if (savedInstanceState != null) {
-            selectedInstances.addAll((LinkedHashSet<Long>) savedInstanceState.getSerializable(SELECTED_INSTANCES));
-        }
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putSerializable(SELECTED_INSTANCES, selectedInstances);
-    }
-
     private void getInstanceFromDB() {
+        // filter and sort
         String formVersion = getActivity().getIntent().getStringExtra(FORM_VERSION);
         String formId = getActivity().getIntent().getStringExtra(FORM_ID);
         String []selectionArgs;
         String selection;
 
         if (formVersion == null) {
-            selectionArgs = new String[]{formId};
             selection = InstanceProviderAPI.InstanceColumns.JR_FORM_ID + "=? AND "
                     + InstanceProviderAPI.InstanceColumns.JR_VERSION + " IS NULL";
+            if (getFilterText().length() == 0) {
+                selectionArgs = new String[]{formId};
+            } else {
+                selectionArgs = new String[] {formId,  "%" + getFilterText() + "%"};
+                selection = "AND " + InstanceProviderAPI.InstanceColumns.DISPLAY_NAME + " LIKE ?";
+            }
         } else {
-            selectionArgs = new String[]{formId, formVersion};
             selection = InstanceProviderAPI.InstanceColumns.JR_FORM_ID + "=? AND "
                     + InstanceProviderAPI.InstanceColumns.JR_VERSION + "=?";
+            if (getFilterText().length() == 0) {
+                selectionArgs = new String[]{formId, formVersion};
+            } else {
+                selectionArgs = new String[] {formId,  "%" + getFilterText() + "%"};
+                selection = "AND " + InstanceProviderAPI.InstanceColumns.DISPLAY_NAME + " LIKE ?";
+            }
         }
 
-        Cursor cursor = new InstancesDao().getInstancesCursor(selection, selectionArgs);
+        Cursor cursor = new InstancesDao().getInstancesCursor(null, selection, selectionArgs, getSortingOrder());
         instanceMap = new InstancesDao().getMapFromCursor(cursor);
-
         Cursor transferCursor = new TransferDao().getReceiveInstancesCursor();
         List<TransferInstance> transferInstances = new TransferDao().getInstancesFromCursor(transferCursor);
         for (TransferInstance instance : transferInstances) {
@@ -126,7 +119,8 @@ public class ReceivedInstancesFragment extends Fragment {
     }
 
     private void setupAdapter() {
-        transferInstanceAdapter = new TransferInstanceAdapter(getActivity(), transferInstanceList, this::onItemClick, selectedInstances, showCheckBox);
+        transferInstanceAdapter = new TransferInstanceAdapter(getActivity(), transferInstanceList,
+                this::onItemClick, selectedInstances, showCheckBox);
         recyclerView.setAdapter(transferInstanceAdapter);
     }
 
@@ -144,4 +138,16 @@ public class ReceivedInstancesFragment extends Fragment {
     private void onItemClick(View view, int position) {
     }
 
+    @Override
+    protected void updateAdapter() {
+        getInstanceFromDB();
+        setEmptyViewVisibility(getString(R.string.no_forms_received,
+                getActivity().getIntent().getStringExtra(FORM_DISPLAY_NAME)));
+        transferInstanceAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    protected String getSortingOrderKey() {
+        return RECEIVED_INSTANCE_LIST_SORTING_ORDER;
+    }
 }

@@ -25,17 +25,15 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class InstancesList extends InjectableActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class InstancesList extends InstanceListActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     @BindView(R.id.recyclerview) RecyclerView recyclerView;
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.send_button) Button sendButton;
     @BindView(R.id.toggle_button) Button toggleButton;
 
-    protected static final String SORT_BY_NAME_ASC
-            = InstanceProviderAPI.InstanceColumns.DISPLAY_NAME + " COLLATE NOCASE ASC";
+    private static final String INSTANCE_LIST_ACTIVITY_SORTING_ORDER = "instanceListActivitySortingOrder";
 
-    private static final String SELECTED_INSTANCES = "selectedInstances";
     public static final String INSTANCE_IDS = "instance_ids";
 
     private static final int INSTANCE_LOADER = 1;
@@ -64,22 +62,10 @@ public class InstancesList extends InjectableActivity implements LoaderManager.L
         super.onResume();
     }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putSerializable(SELECTED_INSTANCES, selectedInstances);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle state) {
-        super.onRestoreInstanceState(state);
-        selectedInstances = (LinkedHashSet<Long>) state.getSerializable(SELECTED_INSTANCES);
-    }
-
     @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new InstancesDao().getSavedInstancesCursorLoader(SORT_BY_NAME_ASC);
+        return new InstancesDao().getSavedInstancesCursorLoader(getFilterText(), getSortingOrder());
     }
 
     @Override
@@ -98,7 +84,6 @@ public class InstancesList extends InjectableActivity implements LoaderManager.L
 
     @Override
     public void onLoaderReset(@NonNull Loader loader) {
-
     }
 
     private void onListItemClick(View view, int position) {
@@ -157,5 +142,15 @@ public class InstancesList extends InjectableActivity implements LoaderManager.L
         } else {
             toggleButton.setText(getString(R.string.select_all));
         }
+    }
+
+    @Override
+    protected void updateAdapter() {
+        getSupportLoaderManager().restartLoader(INSTANCE_LOADER, null, this);
+    }
+
+    @Override
+    protected String getSortingOrderKey() {
+        return INSTANCE_LIST_ACTIVITY_SORTING_ORDER;
     }
 }
