@@ -118,8 +118,11 @@ public class SendActivity extends InjectableActivity {
                     switch (hotspotEvent.getStatus()) {
                         case ENABLED:
                             isHotspotRunning = true;
+                            connectStatus.setText(getString(R.string.waiting_connection));
+                            rxEventBus.post(new UploadEvent(UploadEvent.Status.QUEUED));
                             break;
                         case DISABLED:
+                            connectStatus.setText(getString(R.string.connection_issue_hotspot));
                             isHotspotRunning = false;
                             break;
                     }
