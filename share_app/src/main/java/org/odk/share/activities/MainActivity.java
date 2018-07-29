@@ -127,12 +127,17 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
     }
 
     private void onItemClick(View view, int position) {
-        Cursor cursor = formAdapter.getCursor();
-        cursor.moveToPosition(position);
+
         Intent intent  = new Intent(this, InstanceManagerTabs.class);
-        intent.putExtra(FORM_VERSION, cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.JR_VERSION)));
-        intent.putExtra(FORM_ID, cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.JR_FORM_ID)));
-        intent.putExtra(FORM_DISPLAY_NAME, cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.DISPLAY_NAME)));
+
+        try (Cursor cursor = formAdapter.getCursor()) {
+            if (cursor != null) {
+                cursor.moveToPosition(position);
+                intent.putExtra(FORM_VERSION, cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.JR_VERSION)));
+                intent.putExtra(FORM_ID, cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.JR_FORM_ID)));
+                intent.putExtra(FORM_DISPLAY_NAME, cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.DISPLAY_NAME)));
+            }
+        }
         startActivity(intent);
     }
 }
