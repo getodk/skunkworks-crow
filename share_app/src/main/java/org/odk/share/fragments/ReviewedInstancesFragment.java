@@ -81,8 +81,6 @@ public class ReviewedInstancesFragment extends InstanceListFragment {
         sendButton.setText(getString(R.string.send_forms));
 
         setupAdapter();
-        getInstanceFromDB();
-        updateAdapter();
         return view;
     }
 
@@ -99,8 +97,19 @@ public class ReviewedInstancesFragment extends InstanceListFragment {
         return REVIEWED_INSTANCE_LIST_SORTING_ORDER;
     }
 
+    @Override
+    public void onResume() {
+        getInstanceFromDB();
+
+        setEmptyViewVisibility(getString(R.string.no_forms_reviewed,
+                getActivity().getIntent().getStringExtra(FORM_DISPLAY_NAME)));
+        transferInstanceAdapter.notifyDataSetChanged();
+        super.onResume();
+    }
+
     private void getInstanceFromDB() {
-        // filter and sort
+        transferInstanceList.clear();
+        selectedInstances.clear();
         String formVersion = getActivity().getIntent().getStringExtra(FORM_VERSION);
         String formId = getActivity().getIntent().getStringExtra(FORM_ID);
         String []selectionArgs;

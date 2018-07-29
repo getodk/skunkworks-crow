@@ -6,14 +6,19 @@ package org.odk.share.dto;
 
 public class TransferInstance {
     public static final String ID = "_id";
-    public static final String REVIEWED = "isReviewed";
+    public static final String REVIEW_STATUS = "reviewStatus";
     public static final String INSTRUCTIONS = "instructions";
     public static final String INSTANCE_ID = "instanceId";
     public static final String TRANSFER_STATUS = "transferStatus";
     public static final String LAST_STATUS_CHANGE_DATE = "lastStatusChangeDate";
+    public static final String VISITED_COUNT = "visitedCount";
 
     public static final String STATUS_FORM_RECEIVE = "receive";
     public static final String STATUS_FORM_SENT = "sent";
+
+    public static final int STATUS_UNREVIEWED = 0;
+    public static final int STATUS_ACCEPTED = 1;
+    public static final int STATUS_REJECTED = 2;
 
     private Long id;
     private int isReviewed;

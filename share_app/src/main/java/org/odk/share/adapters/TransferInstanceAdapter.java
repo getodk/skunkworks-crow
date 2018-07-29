@@ -12,8 +12,11 @@ import org.odk.share.R;
 import org.odk.share.dto.TransferInstance;
 import org.odk.share.listeners.OnItemClickListener;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -66,7 +69,6 @@ public class TransferInstanceAdapter extends RecyclerView.Adapter<TransferInstan
         holder.bind(position, listener);
         TransferInstance instance = items.get(position);
         holder.title.setText(instance.getInstance().getDisplayName());
-        holder.subtitle.setText(instance.getInstance().getDisplaySubtext());
 
         if (showCheckBox) {
             holder.checkBox.setVisibility(View.VISIBLE);
@@ -78,6 +80,22 @@ public class TransferInstanceAdapter extends RecyclerView.Adapter<TransferInstan
         } else {
             holder.checkBox.setVisibility(View.GONE);
         }
+
+        Date date = new Date(instance.getLastStatusChangeDate());
+        SimpleDateFormat dateFormat = new SimpleDateFormat(context.getString(R.string.date_at_time),
+                Locale.getDefault());
+        String statusChangeTime = dateFormat.format(date);
+
+        if (instance.getTransferStatus().equalsIgnoreCase(context.getString(R.string.sent))) {
+            holder.subtitle.setText(context.getString(R.string.sent_on, statusChangeTime));
+        } else if (instance.getReviewed() == TransferInstance.STATUS_ACCEPTED) {
+            holder.subtitle.setText(context.getString(R.string.approved_on, statusChangeTime));
+        } else if (instance.getReviewed() == TransferInstance.STATUS_REJECTED) {
+            holder.subtitle.setText(context.getString(R.string.rejected_on, statusChangeTime));
+        } else {
+            holder.subtitle.setText(context.getString(R.string.received_on, statusChangeTime));
+        }
+
     }
 
     @Override

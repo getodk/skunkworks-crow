@@ -1,5 +1,6 @@
 package org.odk.share.dao;
 
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.support.v4.content.CursorLoader;
 
@@ -30,14 +31,15 @@ public class TransferDao {
     }
 
     public Cursor getReviewedInstancesCursor() {
-        String selection = TransferInstance.REVIEWED + " =? ";
-        String[] selectionArgs = {"1"};
+        String selection = TransferInstance.REVIEW_STATUS + " IN (?,?) ";
+        String[] selectionArgs = {String.valueOf(TransferInstance.STATUS_ACCEPTED),
+                String.valueOf(TransferInstance.STATUS_REJECTED)};
         return getInstancesCursor(null, selection, selectionArgs, null);
     }
 
     public Cursor getUnreviewedInstancesCursor() {
-        String selection = TransferInstance.REVIEWED + " =? ";
-        String[] selectionArgs = {"0"};
+        String selection = TransferInstance.REVIEW_STATUS + " =? ";
+        String[] selectionArgs = {String.valueOf(TransferInstance.STATUS_UNREVIEWED)};
         return getInstancesCursor(null, selection, selectionArgs, null);
     }
 
@@ -56,8 +58,9 @@ public class TransferDao {
     }
 
     public CursorLoader getReviewedInstancesCursorLoader() {
-        String selection = TransferInstance.REVIEWED + " =? ";
-        String[] selectionArgs = {String.valueOf(1)};
+        String selection = TransferInstance.REVIEW_STATUS + " IN (?,?) ";
+        String[] selectionArgs = {String.valueOf(TransferInstance.STATUS_ACCEPTED),
+                String.valueOf(TransferInstance.STATUS_REJECTED)};
 
         return getInstancesCursorLoader(null, selection, selectionArgs, null);
     }
@@ -67,9 +70,20 @@ public class TransferDao {
                 .query(CONTENT_URI, projection, selection, selectionArgs, sortOrder);
     }
 
+    public Cursor getInstanceCursorFromId(long id) {
+        String selection = TransferInstance.ID + " =? ";
+        String[] selectionArgs = {String.valueOf(id)};
+        return getInstancesCursor(null, selection, selectionArgs, null);
+    }
+
     public CursorLoader getInstancesCursorLoader(String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         return new CursorLoader(Share.getInstance(), CONTENT_URI, projection, selection, selectionArgs, sortOrder);
     }
+
+    public int updateInstance(ContentValues values, String where, String[] whereArgs) {
+        return Share.getInstance().getContentResolver().update(CONTENT_URI, values, where, whereArgs);
+    }
+
 
     public List<TransferInstance> getInstancesFromCursor(Cursor cursor) {
         List<TransferInstance> instances = new ArrayList<>();
@@ -77,7 +91,7 @@ public class TransferDao {
             try {
                 while (cursor.moveToNext()) {
                     int idColumnIndex = cursor.getColumnIndex(TransferInstance.ID);
-                    int isReviewedColumnIndex = cursor.getColumnIndex(TransferInstance.REVIEWED);
+                    int isReviewedColumnIndex = cursor.getColumnIndex(TransferInstance.REVIEW_STATUS);
                     int instructionColumnIndex = cursor.getColumnIndex(TransferInstance.INSTRUCTIONS);
                     int instanceIdColumnIndex = cursor.getColumnIndex(TransferInstance.INSTANCE_ID);
                     int transferStatusColumnIndex = cursor.getColumnIndex(TransferInstance.TRANSFER_STATUS);

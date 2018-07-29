@@ -52,6 +52,7 @@
             android:name=".provider.TransferProvider"
             android:authorities="org.odk.share.provider.odk.instances" />
 
+        <activity android:name=".activities.ReviewFormActivity"/>
     </application>
 
 </manifest>

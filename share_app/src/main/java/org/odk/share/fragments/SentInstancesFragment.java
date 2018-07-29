@@ -80,14 +80,20 @@ public class SentInstancesFragment extends InstanceListFragment {
         sendButton.setText(getString(R.string.send_forms));
 
         setupAdapter();
-        getInstanceFromDB();
-        updateAdapter();
         return view;
     }
 
     @Override
-    protected void updateAdapter() {
+    public void onResume() {
+        getInstanceFromDB();
+        setEmptyViewVisibility(getString(R.string.no_forms_sent,
+        getActivity().getIntent().getStringExtra(FORM_DISPLAY_NAME)));
+        transferInstanceAdapter.notifyDataSetChanged();
+        super.onResume();
+    }
 
+    @Override
+    protected void updateAdapter() {
         getInstanceFromDB();
         setEmptyViewVisibility(getString(R.string.no_forms_sent,
                 getActivity().getIntent().getStringExtra(FORM_DISPLAY_NAME)));
@@ -100,7 +106,8 @@ public class SentInstancesFragment extends InstanceListFragment {
     }
 
     private void getInstanceFromDB() {
-        // filter and sort
+        transferInstanceList.clear();
+        selectedInstances.clear();
         String formVersion = getActivity().getIntent().getStringExtra(FORM_VERSION);
         String formId = getActivity().getIntent().getStringExtra(FORM_ID);
         String []selectionArgs;

@@ -1,5 +1,6 @@
 package org.odk.share.fragments;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.odk.share.R;
+import org.odk.share.activities.ReviewFormActivity;
 import org.odk.share.adapters.TransferInstanceAdapter;
 import org.odk.share.dao.InstancesDao;
 import org.odk.share.dao.TransferDao;
@@ -29,6 +31,8 @@ import butterknife.ButterKnife;
 import static org.odk.share.activities.MainActivity.FORM_DISPLAY_NAME;
 import static org.odk.share.activities.MainActivity.FORM_ID;
 import static org.odk.share.activities.MainActivity.FORM_VERSION;
+import static org.odk.share.activities.ReviewFormActivity.INSTANCE_ID;
+import static org.odk.share.activities.ReviewFormActivity.TRANSFER_ID;
 
 /**
  * Created by laksh on 6/27/2018.
@@ -71,16 +75,22 @@ public class ReceivedInstancesFragment extends InstanceListFragment {
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(llm);
-
         setupAdapter();
-        getInstanceFromDB();
-        updateAdapter();
-
         return view;
     }
 
+    @Override
+    public void onResume() {
+        getInstanceFromDB();
+        setEmptyViewVisibility(getString(R.string.no_forms_received,
+                getActivity().getIntent().getStringExtra(FORM_DISPLAY_NAME)));
+        transferInstanceAdapter.notifyDataSetChanged();
+        super.onResume();
+    }
+
     private void getInstanceFromDB() {
-        // filter and sort
+        transferInstanceList.clear();
+        selectedInstances.clear();
         String formVersion = getActivity().getIntent().getStringExtra(FORM_VERSION);
         String formId = getActivity().getIntent().getStringExtra(FORM_ID);
         String []selectionArgs;
@@ -136,6 +146,10 @@ public class ReceivedInstancesFragment extends InstanceListFragment {
     }
 
     private void onItemClick(View view, int position) {
+        Intent intent = new Intent(getContext(), ReviewFormActivity.class);
+        intent.putExtra(INSTANCE_ID, transferInstanceList.get(position).getInstanceId());
+        intent.putExtra(TRANSFER_ID, transferInstanceList.get(position).getId());
+        startActivity(intent);
     }
 
     @Override

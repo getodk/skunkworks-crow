@@ -82,4 +82,17 @@
     <string name="num_forms_sent">Number of forms sent</string>
     <string name="num_forms_received">Number of forms received</string>
     <string name="num_forms_reviewed">Number of forms reviewed</string>
+    <string name="approve">Approve</string>
+    <string name="Reject">Reject</string>
+    <string name="review_later">Review Later</string>
+    <string name="add_feedback">Add Feeback</string>
+    <string name="view_form_in_collect">View in ODK Collect</string>
+    <string name="collect_not_installed">Install ODK Collect to view the form</string>
+    <string name="form_approved">Form approved</string>
+    <string name="form_rejected">Form rejected</string>
+    <string name="approved_on">Approved on %s</string>
+    <string name="rejected_on">Rejected on %s</string>
+    <string name="received_on">Unreviewed, Received on %s</string>
+    <string name="sent_on">Sent on %s</string>
+    <string name="date_at_time">EEE, MMM dd, yyyy \'at\' HH:mm</string> <!-- http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html -->
 </resources>
