@@ -14,13 +14,21 @@ import org.odk.share.adapters.basecursoradapter.CursorRecyclerViewAdapter;
 import org.odk.share.adapters.basecursoradapter.OnItemClickListener;
 import org.odk.share.provider.FormsProviderAPI;
 
+import java.util.Map;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static org.odk.share.activities.MainActivity.REVIEWED;
+import static org.odk.share.activities.MainActivity.UNREVIEWED;
+
 public class FormsAdapter extends CursorRecyclerViewAdapter<FormsAdapter.FormHolder> {
 
-    public FormsAdapter(Context context, Cursor cursor, OnItemClickListener listener) {
+    private Map<String, Map<String, Map<String, Integer>>> formMap;
+
+    public FormsAdapter(Context context, Cursor cursor, OnItemClickListener listener, Map<String, Map<String, Map<String, Integer>>> formMap) {
         super(context, cursor, listener);
+        this.formMap = formMap;
     }
 
     @Override
@@ -28,13 +36,27 @@ public class FormsAdapter extends CursorRecyclerViewAdapter<FormsAdapter.FormHol
         String title = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.DISPLAY_NAME));
         String version = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.JR_VERSION));
         String id = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.JR_FORM_ID));
-        viewHolder.bind(title, version, id);
+        int reviewed = 0;
+        int unReviewed = 0;
+        if (formMap.containsKey(id)) {
+            Map<String, Map<String, Integer>> versionMap = formMap.get(id);
+            if (versionMap.containsKey(version)) {
+                Map<String, Integer> statusMap = versionMap.get(version);
+                if (statusMap.containsKey(REVIEWED)) {
+                    reviewed = statusMap.get(REVIEWED);
+                }
+                if (statusMap.containsKey(UNREVIEWED)) {
+                    unReviewed = statusMap.get(UNREVIEWED);
+                }
+            }
+        }
+        viewHolder.bind(title, version, id, reviewed, unReviewed);
     }
 
     @NonNull
     @Override
     public FormHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.two_item_list, null);
+        View view = LayoutInflater.from(context).inflate(R.layout.form_item_list, null);
         return new FormHolder(view);
     }
 
@@ -44,13 +66,17 @@ public class FormsAdapter extends CursorRecyclerViewAdapter<FormsAdapter.FormHol
         TextView tvTitle;
         @BindView(R.id.tvSubtitle)
         TextView tvSubtitle;
+        @BindView(R.id.tvReviewForm)
+        TextView reviewedForms;
+        @BindView(R.id.tvUnReviewForm)
+        TextView unReviewedForms;
 
         FormHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
         }
 
-        void bind(String title, String version, String id) {
+        void bind(String title, String version, String id, int numReviewed, int numUnreviewed) {
             tvTitle.setText(title);
 
             StringBuilder sb = new StringBuilder();
@@ -60,6 +86,8 @@ public class FormsAdapter extends CursorRecyclerViewAdapter<FormsAdapter.FormHol
             sb.append(context.getString(R.string.id, id));
 
             tvSubtitle.setText(sb);
+            reviewedForms.setText(context.getString(R.string.num_reviewed, String.valueOf(numReviewed)));
+            unReviewedForms.setText(context.getString(R.string.num_unreviewed, String.valueOf(numUnreviewed)));
 
         }
     }

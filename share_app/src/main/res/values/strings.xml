@@ -116,4 +116,6 @@
     <string name="rejected">Rejected</string>
     <string name="feedback_sent">\nFeedback sent by reviewer: %s</string>
     <string name="no_feedback_sent">\nNo feedback sent by the reviewer</string>
+    <string name="num_reviewed">Reviewed: %s</string>
+    <string name="num_unreviewed">Unreviewed: %s</string>
 </resources>
