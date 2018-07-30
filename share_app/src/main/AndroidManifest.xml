@@ -36,9 +36,11 @@
         <activity android:name=".activities.WifiActivity" />
         <activity android:name=".activities.InstancesList" />
         <activity android:name=".preferences.SettingsPreference" />
-        <activity android:name=".activities.SendActivity" />
         <activity android:name=".activities.WebViewActivity"/>
         <activity android:name=".activities.AboutActivity"/>
+        <activity
+            android:name=".activities.SendActivity"
+            android:configChanges="orientation|screenSize"/>
 
         <service android:name=".services.HotspotService" />
 

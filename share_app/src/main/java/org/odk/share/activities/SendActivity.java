@@ -106,6 +106,11 @@ public class SendActivity extends InjectableActivity {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        stopHotspotAlertDialog();
+    }
+
     /**
      * Creates a subscription for listening to all hotspot events being send through the
      * application's {@link RxEventBus}
@@ -185,6 +190,37 @@ public class SendActivity extends InjectableActivity {
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
                 finish();
+            }
+        });
+
+        builder.setCancelable(false);
+        builder.show();
+    }
+
+    private void stopHotspotAlertDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.stop_sending);
+        builder.setPositiveButton(getString(R.string.stop), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    turnOffHotspot();
+                }
+
+                if (isHotspotRunning) {
+                    wifiHotspot.disableHotspot();
+                }
+
+                senderService.cancel();
+                Timber.d("Hotspot Stopped");
+                compositeDisposable.dispose();
+                finish();
+            }
+        });
+        builder.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
             }
         });
 
@@ -286,22 +322,6 @@ public class SendActivity extends InjectableActivity {
     protected void onPause() {
         super.onPause();
         compositeDisposable.clear();
-    }
-
-    @Override
-    protected void onDestroy() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            turnOffHotspot();
-        }
-
-        if (isHotspotRunning) {
-            wifiHotspot.disableHotspot();
-        }
-
-        senderService.cancel();
-        Timber.d("Hotspot Stopped");
-        compositeDisposable.dispose();
-        super.onDestroy();
     }
 
     private void startSending() {
