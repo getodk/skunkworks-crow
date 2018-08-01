@@ -96,6 +96,8 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
             case R.id.menu_settings:
                 startActivity(new Intent(this, SettingsPreference.class));
                 return true;
+            case R.id.menu_about:
+                startActivity(new Intent(this, AboutActivity.class));
         }
         return super.onOptionsItemSelected(item);
     }
