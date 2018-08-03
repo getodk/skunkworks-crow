@@ -1,5 +1,6 @@
 package org.odk.share.fragments;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,12 +14,14 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.odk.share.R;
+import org.odk.share.activities.SendActivity;
 import org.odk.share.adapters.TransferInstanceAdapter;
 import org.odk.share.dao.InstancesDao;
 import org.odk.share.dao.TransferDao;
 import org.odk.share.dto.Instance;
 import org.odk.share.dto.TransferInstance;
 import org.odk.share.provider.InstanceProviderAPI;
+import org.odk.share.utilities.ArrayUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,6 +32,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static org.odk.share.activities.InstancesList.INSTANCE_IDS;
 import static org.odk.share.activities.MainActivity.FORM_DISPLAY_NAME;
 import static org.odk.share.activities.MainActivity.FORM_ID;
 import static org.odk.share.activities.MainActivity.FORM_VERSION;
@@ -203,6 +207,17 @@ public class ReviewedInstancesFragment extends InstanceListFragment {
 
     @OnClick(R.id.bAction)
     public void sendForms() {
-
+        List<Long> instanceIds = new ArrayList<>();
+        for (TransferInstance transferInstance: transferInstanceList) {
+            if (selectedInstances.contains(transferInstance.getId())) {
+                instanceIds.add(transferInstance.getInstanceId());
+            }
+        }
+        Intent intent = new Intent(getContext(), SendActivity.class);
+        Long[] arr = instanceIds.toArray(new Long[instanceIds.size()]);
+        long[] a = ArrayUtils.toPrimitive(arr);
+        intent.putExtra(INSTANCE_IDS, a);
+        intent.putExtra("mode", 2);
+        startActivity(intent);
     }
 }

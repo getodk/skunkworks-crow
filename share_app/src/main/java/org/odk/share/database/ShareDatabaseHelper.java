@@ -9,10 +9,12 @@ import org.odk.share.application.Share;
 
 import timber.log.Timber;
 
+import static org.odk.share.dto.InstanceMap.INSTANCE_UUID;
 import static org.odk.share.dto.TransferInstance.ID;
 import static org.odk.share.dto.TransferInstance.INSTANCE_ID;
 import static org.odk.share.dto.TransferInstance.INSTRUCTIONS;
 import static org.odk.share.dto.TransferInstance.LAST_STATUS_CHANGE_DATE;
+import static org.odk.share.dto.TransferInstance.RECEIVED_REVIEW;
 import static org.odk.share.dto.TransferInstance.REVIEW_STATUS;
 import static org.odk.share.dto.TransferInstance.STATUS_UNREVIEWED;
 import static org.odk.share.dto.TransferInstance.TRANSFER_STATUS;
@@ -26,6 +28,7 @@ public class ShareDatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "share.db";
     public static final String SHARE_TABLE_NAME = "transfers";
+    public static final String SHARE_INSTANCE_TABLE = "map_instance";
 
     private static final int DATABASE_VERSION = 1;
 
@@ -53,8 +56,14 @@ public class ShareDatabaseHelper extends SQLiteOpenHelper {
                 + INSTRUCTIONS + " text, "
                 + INSTANCE_ID + " integer not null, "
                 + TRANSFER_STATUS + " text not null, "
+                + RECEIVED_REVIEW + " integer,"
                 + VISITED_COUNT + " integer, "
                 + LAST_STATUS_CHANGE_DATE + " date not null ); ");
+
+        db.execSQL("CREATE TABLE " + SHARE_INSTANCE_TABLE + " ("
+                + ID + " integer primary key, "
+                + INSTANCE_UUID + " text not null, "
+                + INSTANCE_ID + " integer not null ); ");
 
     }
 
@@ -72,6 +81,15 @@ public class ShareDatabaseHelper extends SQLiteOpenHelper {
         }
         long id = sqLiteDatabase.insert(SHARE_TABLE_NAME, null, values);
         sqLiteDatabase.close();
+        return id;
+    }
+
+    public long insertMapping(ContentValues values) {
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+
+        long id = sqLiteDatabase.insert(SHARE_INSTANCE_TABLE, null, values);
+        sqLiteDatabase.close();
+
         return id;
     }
 }

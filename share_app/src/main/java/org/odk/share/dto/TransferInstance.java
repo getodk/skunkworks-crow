@@ -10,6 +10,7 @@ public class TransferInstance {
     public static final String INSTRUCTIONS = "instructions";
     public static final String INSTANCE_ID = "instanceId";
     public static final String TRANSFER_STATUS = "transferStatus";
+    public static final String RECEIVED_REVIEW = "receivedReview";
     public static final String LAST_STATUS_CHANGE_DATE = "lastStatusChangeDate";
     public static final String VISITED_COUNT = "visitedCount";
 

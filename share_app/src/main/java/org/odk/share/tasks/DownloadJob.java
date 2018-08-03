@@ -9,6 +9,9 @@ import com.evernote.android.job.Job;
 
 import org.odk.share.application.Share;
 import org.odk.share.dao.FormsDao;
+import org.odk.share.dao.InstanceMapDao;
+import org.odk.share.dao.TransferDao;
+import org.odk.share.dto.TransferInstance;
 import org.odk.share.events.DownloadEvent;
 import org.odk.share.provider.FormsProviderAPI;
 import org.odk.share.rx.RxEventBus;
@@ -34,8 +37,12 @@ import timber.log.Timber;
 
 import static org.odk.share.application.Share.FORMS_PATH;
 import static org.odk.share.application.Share.INSTANCES_PATH;
+import static org.odk.share.dto.InstanceMap.INSTANCE_UUID;
 import static org.odk.share.dto.TransferInstance.INSTANCE_ID;
+import static org.odk.share.dto.TransferInstance.INSTRUCTIONS;
+import static org.odk.share.dto.TransferInstance.RECEIVED_REVIEW;
 import static org.odk.share.dto.TransferInstance.STATUS_FORM_RECEIVE;
+import static org.odk.share.dto.TransferInstance.STATUS_FORM_SENT;
 import static org.odk.share.dto.TransferInstance.TRANSFER_STATUS;
 import static org.odk.share.provider.InstanceProviderAPI.InstanceColumns.CAN_EDIT_WHEN_COMPLETE;
 import static org.odk.share.provider.InstanceProviderAPI.InstanceColumns.DISPLAY_NAME;
@@ -218,12 +225,28 @@ public class DownloadJob extends Job {
             while (numInstances-- > 0) {
                 // publish current progress
                 rxEventBus.post(new DownloadEvent(DownloadEvent.Status.DOWNLOADING, ++progress, total));
+                String uuid = dis.readUTF();
                 String displayName = dis.readUTF();
                 String submissionUri = dis.readUTF();
 
                 if (submissionUri.equals("-1")) {
                     submissionUri = null;
                 }
+
+                int mode = dis.readInt();
+
+                int feedbackStatus = 0;
+                String feedback = null;
+
+                if (mode == 2) {
+                    feedbackStatus = dis.readInt();
+                    feedback = dis.readUTF();
+                    if (feedback.equals("-1")) {
+                        feedback = null;
+                    }
+                }
+
+                Timber.d("Feedback %s %s", feedbackStatus, feedback);
 
                 int numRes = dis.readInt();
                 String time = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss-SSS",
@@ -244,13 +267,50 @@ public class DownloadJob extends Job {
                 values.put(SUBMISSION_URI, submissionUri);
                 values.put(JR_FORM_ID, formId);
                 values.put(JR_VERSION, formVersion);
-                Uri uri = new InstancesDao().saveInstance(values);
+                Timber.d("UUID " + uuid);
+                long id = new InstanceMapDao().getInstanceId(uuid);
+                Timber.d("Id : " + id);
+                if (id == -1) {
+                    // receiving first time
+                    Uri uri = new InstancesDao().saveInstance(values);
 
-                // Add row in share table
-                ContentValues shareValues = new ContentValues();
-                shareValues.put(INSTANCE_ID, Long.parseLong(uri.getLastPathSegment()));
-                shareValues.put(TRANSFER_STATUS, STATUS_FORM_RECEIVE);
-                new ShareDatabaseHelper(getContext()).insertInstance(shareValues);
+                    ContentValues mapValues = new ContentValues();
+                    mapValues.put(INSTANCE_UUID, uuid);
+                    mapValues.put(INSTANCE_ID, Long.parseLong(uri.getLastPathSegment()));
+                    new ShareDatabaseHelper(getContext()).insertMapping(mapValues);
+
+                    // Add row in share table
+                    ContentValues shareValues = new ContentValues();
+                    shareValues.put(INSTANCE_ID, Long.parseLong(uri.getLastPathSegment()));
+                    if (mode == 2) {
+                        // feedback received
+                        shareValues.put(TRANSFER_STATUS, STATUS_FORM_SENT);
+                        shareValues.put(INSTRUCTIONS, feedback);
+                        shareValues.put(RECEIVED_REVIEW, feedbackStatus);
+                        Timber.d("Mode 2 : " + feedbackStatus);
+                    } else {
+                        shareValues.put(TRANSFER_STATUS, STATUS_FORM_RECEIVE);
+                        Timber.d("Mode 2 : " + feedbackStatus);
+                    }
+
+                    new ShareDatabaseHelper(getContext()).insertInstance(shareValues);
+                } else {
+                    String selection = InstanceProviderAPI.InstanceColumns._ID + "=?";
+                    String[] selectionArgs = {String.valueOf(id)};
+                    new InstancesDao().updateInstance(values, selection, selectionArgs);
+                    TransferInstance transferInstance = new TransferDao().getSentTransferInstanceFromInstanceId(id);
+
+                    if (mode == 2) {
+                        ContentValues shareValues = new ContentValues();
+                        shareValues.put(INSTRUCTIONS, feedback);
+                        shareValues.put(RECEIVED_REVIEW, feedbackStatus);
+                        selection = TransferInstance.ID + " =?";
+                        selectionArgs = new String[]{String.valueOf(transferInstance.getId())};
+                        new TransferDao().updateInstance(shareValues, selection, selectionArgs);
+
+                        Timber.d("Mode 2 : " + "Exists");
+                    }
+                }
             }
         } catch (IOException e) {
             Timber.e(e);

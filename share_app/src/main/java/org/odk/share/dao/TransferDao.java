@@ -2,6 +2,7 @@ package org.odk.share.dao;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.support.annotation.NonNull;
 import android.support.v4.content.CursorLoader;
 
 import org.odk.share.application.Share;
@@ -84,7 +85,27 @@ public class TransferDao {
         return Share.getInstance().getContentResolver().update(CONTENT_URI, values, where, whereArgs);
     }
 
+    public TransferInstance getReceivedTransferInstanceFromInstanceId(long instanceId) {
+        String selection = TransferInstance.INSTANCE_ID + " =? AND " + TransferInstance.TRANSFER_STATUS + " =?";
+        String[] selectionArgs = {String.valueOf(instanceId), TransferInstance.STATUS_FORM_RECEIVE};
+        Cursor cursor = getInstancesCursor(null, selection, selectionArgs, null);
+        List<TransferInstance> transferInstanceList = getInstancesFromCursor(cursor);
+        if (transferInstanceList.size() > 0) {
+            return transferInstanceList.get(0);
+        }
+        return null;
+    }
 
+    public TransferInstance getSentTransferInstanceFromInstanceId(long instanceId) {
+        String selection = TransferInstance.INSTANCE_ID + " =? AND " + TransferInstance.TRANSFER_STATUS + " =?";
+        String[] selectionArgs = {String.valueOf(instanceId), TransferInstance.STATUS_FORM_SENT};
+        Cursor cursor = getInstancesCursor(null, selection, selectionArgs, null);
+        List<TransferInstance> transferInstanceList = getInstancesFromCursor(cursor);
+        if (transferInstanceList.size() > 0) {
+            return transferInstanceList.get(0);
+        }
+        return null;
+    }
     public List<TransferInstance> getInstancesFromCursor(Cursor cursor) {
         List<TransferInstance> instances = new ArrayList<>();
         if (cursor != null) {

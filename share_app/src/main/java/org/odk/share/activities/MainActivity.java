@@ -1,5 +1,6 @@
 package org.odk.share.activities;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -18,12 +19,20 @@ import org.odk.share.R;
 import org.odk.share.adapters.FormsAdapter;
 import org.odk.share.application.Share;
 import org.odk.share.dao.FormsDao;
+import org.odk.share.dao.InstanceMapDao;
+import org.odk.share.database.ShareDatabaseHelper;
 import org.odk.share.preferences.SettingsPreference;
 import org.odk.share.provider.FormsProviderAPI;
+
+import java.util.UUID;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import timber.log.Timber;
+
+import static org.odk.share.dto.InstanceMap.INSTANCE_UUID;
+import static org.odk.share.dto.TransferInstance.INSTANCE_ID;
 
 public class MainActivity extends FormListActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -55,6 +64,8 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
         setSupportActionBar(toolbar);
         Share.createODKDirs();
 
+        getSupportLoaderManager().initLoader(FORM_LOADER, null, this);
+
         LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(llm);
@@ -64,7 +75,7 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
     protected void onResume() {
         super.onResume();
         setupAdapter();
-        getSupportLoaderManager().initLoader(FORM_LOADER, null, this);
+        getSupportLoaderManager().restartLoader(FORM_LOADER, null, this);
     }
 
     private void setupAdapter() {

@@ -112,6 +112,7 @@ public class InstancesList extends InstanceListActivity implements LoaderManager
         Long[] arr = selectedInstances.toArray(new Long[selectedInstances.size()]);
         long[] a = ArrayUtils.toPrimitive(arr);
         intent.putExtra(INSTANCE_IDS, a);
+        intent.putExtra("mode", 1);
         startActivity(intent);
         finish();
     }

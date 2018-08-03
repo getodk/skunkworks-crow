@@ -8,7 +8,10 @@ import com.evernote.android.job.Job;
 
 import org.odk.share.application.Share;
 import org.odk.share.dao.FormsDao;
+import org.odk.share.dao.InstanceMapDao;
 import org.odk.share.dao.InstancesDao;
+import org.odk.share.dao.TransferDao;
+import org.odk.share.dto.TransferInstance;
 import org.odk.share.events.UploadEvent;
 import org.odk.share.database.ShareDatabaseHelper;
 import org.odk.share.provider.FormsProviderAPI;
@@ -30,11 +33,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.inject.Inject;
 
 import timber.log.Timber;
 
+import static org.odk.share.dto.InstanceMap.INSTANCE_UUID;
 import static org.odk.share.dto.TransferInstance.INSTANCE_ID;
 import static org.odk.share.dto.TransferInstance.STATUS_FORM_SENT;
 import static org.odk.share.dto.TransferInstance.TRANSFER_STATUS;
@@ -56,6 +61,7 @@ public class UploadJob extends Job {
     private DataInputStream dis;
     private int progress;
     private int total;
+    private int mode;
 
     @NonNull
     @Override
@@ -72,6 +78,7 @@ public class UploadJob extends Job {
     private void initJob(Params params) {
         instancesToSend = ArrayUtils.toObject(params.getExtras().getLongArray(INSTANCES));
         port = params.getExtras().getInt(PORT, -1);
+        mode = params.getExtras().getInt("mode", 1);
     }
 
     private UploadEvent uploadInstances() {
@@ -304,11 +311,24 @@ public class UploadJob extends Job {
         Cursor c = null;
         try {
             c = new InstancesDao().getInstancesCursor(selection, selectionArgs);
-
+            HashMap<Long, String> instanceMap = new InstanceMapDao().getInstanceMap();
+            Timber.d("Map ", instanceMap);
             if (c != null && c.getCount() > 0) {
                 dos.writeInt(c.getCount());
                 c.moveToPosition(-1);
                 while (c.moveToNext()) {
+                    long id = c.getLong(c.getColumnIndex(InstanceProviderAPI.InstanceColumns._ID));
+                    Timber.d("ID .. "+ id);
+                    if (!instanceMap.containsKey(id)) {
+                        String uuid = UUID.randomUUID().toString();
+                        ContentValues values = new ContentValues();
+                        values.put(INSTANCE_ID, id);
+                        values.put(INSTANCE_UUID, uuid);
+                        new ShareDatabaseHelper(getContext()).insertMapping(values);
+                        instanceMap.put(id, uuid);
+                    }
+                    Timber.d("Sent " + instanceMap.get(id));
+                    dos.writeUTF(instanceMap.get(id));
                     String displayName = c.getString(
                             c.getColumnIndex(InstanceProviderAPI.InstanceColumns.DISPLAY_NAME));
                     String submissionUri = c.getString(
@@ -320,6 +340,18 @@ public class UploadJob extends Job {
                         dos.writeUTF("-1");
                     } else {
                         dos.writeUTF(submissionUri);
+                    }
+
+                    // mode tells whether its the review process or send process
+                    dos.writeInt(mode);
+                    if (mode == 2) {
+                        TransferInstance transferInstance = new TransferDao().getReceivedTransferInstanceFromInstanceId(id);
+                        dos.writeInt(transferInstance.getReviewed());
+                        if (transferInstance.getInstructions() != null && transferInstance.getInstructions().length() > 0) {
+                            dos.writeUTF(transferInstance.getInstructions());
+                        } else {
+                            dos.writeUTF("-1");
+                        }
                     }
 
                     rxEventBus.post(new UploadEvent(UploadEvent.Status.UPLOADING, ++progress, total));

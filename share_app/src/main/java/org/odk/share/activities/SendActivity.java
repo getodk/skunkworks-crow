@@ -75,6 +75,7 @@ public class SendActivity extends InjectableActivity {
     private String alertMsg;
     private int port;
     private long[] instancesIds;
+    private int mode;
 
     private WifiManager.LocalOnlyHotspotReservation hotspotReservation;
     private WifiConfiguration currentConfig;
@@ -89,6 +90,7 @@ public class SendActivity extends InjectableActivity {
         setSupportActionBar(toolbar);
 
         instancesIds = getIntent().getLongArrayExtra(INSTANCE_IDS);
+        mode = getIntent().getIntExtra("mode",1);
 
         port = SocketUtils.getPort();
 
@@ -305,7 +307,7 @@ public class SendActivity extends InjectableActivity {
     }
 
     private void startSending() {
-        senderService.startUploading(instancesIds, port);
+        senderService.startUploading(instancesIds, port, mode);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
