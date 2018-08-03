@@ -14,9 +14,9 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
-    <!-- Device with versions >= Oreo need location permission to start/stop the hotspot-->
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <!-- Device with versions >= Oreo need location permission to start/stop the hotspot -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
         android:name=".application.Share"
@@ -37,6 +37,8 @@
         <activity android:name=".activities.InstancesList" />
         <activity android:name=".preferences.SettingsPreference" />
         <activity android:name=".activities.SendActivity" />
+        <activity android:name=".activities.WebViewActivity"/>
+        <activity android:name=".activities.AboutActivity"/>
 
         <service android:name=".services.HotspotService" />
 
@@ -45,14 +47,13 @@
             android:screenOrientation="portrait"
             android:stateNotNeeded="true"
             tools:replace="android:screenOrientation" />
-
-        <activity android:name=".activities.InstanceManagerTabs"/>
+        <activity android:name=".activities.InstanceManagerTabs" />
 
         <provider
             android:name=".provider.TransferProvider"
             android:authorities="org.odk.share.provider.odk.instances" />
 
-        <activity android:name=".activities.ReviewFormActivity"/>
+        <activity android:name=".activities.ReviewFormActivity" />
     </application>
 
 </manifest>
