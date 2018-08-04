@@ -18,6 +18,7 @@ import org.odk.share.database.ShareDatabaseHelper;
 import org.odk.share.provider.FormsProviderAPI;
 import org.odk.share.provider.InstanceProviderAPI;
 import org.odk.share.rx.RxEventBus;
+import org.odk.share.utilities.ApplicationConstants;
 import org.odk.share.utilities.ArrayUtils;
 import org.odk.share.utilities.FileUtils;
 
@@ -44,6 +45,7 @@ import static org.odk.share.dto.InstanceMap.INSTANCE_UUID;
 import static org.odk.share.dto.TransferInstance.INSTANCE_ID;
 import static org.odk.share.dto.TransferInstance.STATUS_FORM_SENT;
 import static org.odk.share.dto.TransferInstance.TRANSFER_STATUS;
+import static org.odk.share.fragments.ReviewedInstancesFragment.MODE;
 
 public class UploadJob extends Job {
 
@@ -81,7 +83,7 @@ public class UploadJob extends Job {
     private void initJob(Params params) {
         instancesToSend = ArrayUtils.toObject(params.getExtras().getLongArray(INSTANCES));
         port = params.getExtras().getInt(PORT, -1);
-        mode = params.getExtras().getInt("mode", 1);
+        mode = params.getExtras().getInt(MODE, ApplicationConstants.ASK_REVIEW_MODE);
         sbResult = new StringBuilder();
     }
 
@@ -355,7 +357,7 @@ public class UploadJob extends Job {
                         dos.writeUTF(submissionUri);
                     }
 
-                    if (mode == 2) {
+                    if (mode == ApplicationConstants.SEND_REVIEW_MODE) {
                         Timber.d("Waiting for response from the receiver for %s %s ", id, mode);
                         while (dis.available() <= 0) {
                             continue;
@@ -385,7 +387,7 @@ public class UploadJob extends Job {
 
                     sendInstance(instance);
 
-                    if (mode == 2) {
+                    if (mode == ApplicationConstants.SEND_REVIEW_MODE) {
                         // sent the review with the updated files
                         sbResult.append(displayName + getContext().getString(R.string.success,
                                 getContext().getString(R.string.review_sent)));

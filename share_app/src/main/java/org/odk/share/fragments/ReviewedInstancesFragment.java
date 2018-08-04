@@ -21,6 +21,7 @@ import org.odk.share.dao.TransferDao;
 import org.odk.share.dto.Instance;
 import org.odk.share.dto.TransferInstance;
 import org.odk.share.provider.InstanceProviderAPI;
+import org.odk.share.utilities.ApplicationConstants;
 import org.odk.share.utilities.ArrayUtils;
 
 import java.util.ArrayList;
@@ -64,6 +65,7 @@ public class ReviewedInstancesFragment extends InstanceListFragment {
     TransferInstanceAdapter transferInstanceAdapter;
     List<TransferInstance> transferInstanceList;
     private static final String REVIEWED_INSTANCE_LIST_SORTING_ORDER = "reviewedInstanceListSortingOrder";
+    public static final String MODE = "mode";
 
 
     @Override
@@ -217,7 +219,7 @@ public class ReviewedInstancesFragment extends InstanceListFragment {
         Long[] arr = instanceIds.toArray(new Long[instanceIds.size()]);
         long[] a = ArrayUtils.toPrimitive(arr);
         intent.putExtra(INSTANCE_IDS, a);
-        intent.putExtra("mode", 2);
+        intent.putExtra(MODE, ApplicationConstants.SEND_REVIEW_MODE);
         startActivity(intent);
     }
 }

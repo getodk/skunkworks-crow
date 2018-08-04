@@ -17,6 +17,7 @@ import org.odk.share.R;
 import org.odk.share.adapters.InstanceAdapter;
 import org.odk.share.dao.InstancesDao;
 import org.odk.share.provider.InstanceProviderAPI;
+import org.odk.share.utilities.ApplicationConstants;
 import org.odk.share.utilities.ArrayUtils;
 
 import java.util.LinkedHashSet;
@@ -24,6 +25,8 @@ import java.util.LinkedHashSet;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+
+import static org.odk.share.fragments.ReviewedInstancesFragment.MODE;
 
 public class InstancesList extends InstanceListActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -112,7 +115,7 @@ public class InstancesList extends InstanceListActivity implements LoaderManager
         Long[] arr = selectedInstances.toArray(new Long[selectedInstances.size()]);
         long[] a = ArrayUtils.toPrimitive(arr);
         intent.putExtra(INSTANCE_IDS, a);
-        intent.putExtra("mode", 1);
+        intent.putExtra(MODE, ApplicationConstants.ASK_REVIEW_MODE);
         startActivity(intent);
         finish();
     }

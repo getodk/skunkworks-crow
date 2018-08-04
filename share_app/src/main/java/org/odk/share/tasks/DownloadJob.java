@@ -19,6 +19,7 @@ import org.odk.share.rx.RxEventBus;
 import org.odk.share.dao.InstancesDao;
 import org.odk.share.database.ShareDatabaseHelper;
 import org.odk.share.provider.InstanceProviderAPI;
+import org.odk.share.utilities.ApplicationConstants;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
@@ -249,7 +250,7 @@ public class DownloadJob extends Job {
                 Timber.d("Received uuid %s mode %s displayname %s submissionUri %s", uuid, mode, displayName, submissionUri);
                 long id = new InstanceMapDao().getInstanceId(uuid);
 
-                if (mode == 2) {
+                if (mode == ApplicationConstants.SEND_REVIEW_MODE) {
                     try (Cursor cursor = new TransferDao().getSentInstanceInstanceCursorUsingId(id)) {
                         if (id != -1 && cursor != null && cursor.getCount() > 0) {
                             // sent for review start receiving
@@ -269,7 +270,7 @@ public class DownloadJob extends Job {
                 int feedbackStatus = 0;
                 String feedback = null;
 
-                if (mode == 2) {
+                if (mode == ApplicationConstants.SEND_REVIEW_MODE) {
                     feedbackStatus = dis.readInt();
                     feedback = dis.readUTF();
                     if (feedback.equals("-1")) {
@@ -324,14 +325,13 @@ public class DownloadJob extends Job {
                     String[] selectionArgs = {String.valueOf(id)};
                     new InstancesDao().updateInstance(values, selection, selectionArgs);
                     TransferInstance transferInstance = new TransferDao().getSentTransferInstanceFromInstanceId(id);
-                    if (mode == 2) {
+                    if (mode == ApplicationConstants.SEND_REVIEW_MODE) {
                         ContentValues shareValues = new ContentValues();
                         shareValues.put(INSTRUCTIONS, feedback);
                         shareValues.put(RECEIVED_REVIEW_STATUS, feedbackStatus);
                         selection = TransferInstance.ID + " =?";
                         selectionArgs = new String[]{String.valueOf(transferInstance.getId())};
                         new TransferDao().updateInstance(shareValues, selection, selectionArgs);
-                        Timber.d("Mode 2 : " + "Exists");
                         sbResult.append(displayName + getContext().getString(R.string.success, getContext().getString(R.string.review_received)));
                     } else {
 
