@@ -90,7 +90,7 @@ public class SendActivity extends InjectableActivity {
         setSupportActionBar(toolbar);
 
         instancesIds = getIntent().getLongArrayExtra(INSTANCE_IDS);
-        mode = getIntent().getIntExtra("mode",1);
+        mode = getIntent().getIntExtra("mode", 1);
 
         port = SocketUtils.getPort();
 
@@ -239,7 +239,7 @@ public class SendActivity extends InjectableActivity {
                         case FINISHED:
                             hideDialog(PROGRESS_DIALOG);
                             String result = uploadEvent.getResult();
-                            createAlertDialog(getString(R.string.transfer_result), getString(R.string.send_success, result));
+                            createAlertDialog(getString(R.string.transfer_result), result);
                             break;
                         case ERROR:
                             hideDialog(PROGRESS_DIALOG);

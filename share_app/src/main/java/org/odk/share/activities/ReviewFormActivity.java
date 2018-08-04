@@ -129,10 +129,10 @@ public class ReviewFormActivity extends AppCompatActivity {
 
     @OnClick(R.id.bReject)
     public void rejectForm() {
-        String feedback = description.getText().toString();
+        String feedbackText = feedback.getText().toString();
         if (feedback != null) {
             ContentValues values = new ContentValues();
-            values.put(TransferInstance.INSTRUCTIONS, feedback);
+            values.put(TransferInstance.INSTRUCTIONS, feedbackText);
             values.put(TransferInstance.REVIEW_STATUS, TransferInstance.STATUS_REJECTED);
             Long now = System.currentTimeMillis();
             values.put(LAST_STATUS_CHANGE_DATE, now);

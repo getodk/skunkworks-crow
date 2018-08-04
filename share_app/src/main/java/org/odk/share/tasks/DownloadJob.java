@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 
 import com.evernote.android.job.Job;
 
+import org.odk.share.R;
 import org.odk.share.application.Share;
 import org.odk.share.dao.FormsDao;
 import org.odk.share.dao.InstanceMapDao;
@@ -40,9 +41,8 @@ import static org.odk.share.application.Share.INSTANCES_PATH;
 import static org.odk.share.dto.InstanceMap.INSTANCE_UUID;
 import static org.odk.share.dto.TransferInstance.INSTANCE_ID;
 import static org.odk.share.dto.TransferInstance.INSTRUCTIONS;
-import static org.odk.share.dto.TransferInstance.RECEIVED_REVIEW;
+import static org.odk.share.dto.TransferInstance.RECEIVED_REVIEW_STATUS;
 import static org.odk.share.dto.TransferInstance.STATUS_FORM_RECEIVE;
-import static org.odk.share.dto.TransferInstance.STATUS_FORM_SENT;
 import static org.odk.share.dto.TransferInstance.TRANSFER_STATUS;
 import static org.odk.share.provider.InstanceProviderAPI.InstanceColumns.CAN_EDIT_WHEN_COMPLETE;
 import static org.odk.share.provider.InstanceProviderAPI.InstanceColumns.DISPLAY_NAME;
@@ -70,6 +70,8 @@ public class DownloadJob extends Job {
     private DataInputStream dis;
     private DataOutputStream dos;
 
+    private StringBuilder sbResult;
+
     @NonNull
     @Override
     protected Result onRunJob(@NonNull Params params) {
@@ -84,6 +86,7 @@ public class DownloadJob extends Job {
     private void initJob(Params params) {
         ip = params.getExtras().getString(IP, "");
         port = params.getExtras().getInt(PORT, -1);
+        sbResult = new StringBuilder();
     }
 
     private DownloadEvent receiveForms() {
@@ -114,7 +117,7 @@ public class DownloadJob extends Job {
             return new DownloadEvent(DownloadEvent.Status.ERROR, e.getMessage());
         }
 
-        return new DownloadEvent(DownloadEvent.Status.FINISHED, String.valueOf(progress));
+        return new DownloadEvent(DownloadEvent.Status.FINISHED, sbResult.toString());
     }
 
     @Override
@@ -214,6 +217,14 @@ public class DownloadJob extends Job {
             values.put(FormsProviderAPI.FormsColumns.SUBMISSION_URI, submissionUri);
             values.put(FormsProviderAPI.FormsColumns.FORM_MEDIA_PATH, formMediaPath);
             new FormsDao().saveForm(values);
+
+            sbResult.append(displayName + " ");
+            if (formVersion != null) {
+                sbResult.append(getContext().getString(R.string.version, formVersion)).append(" ");
+            }
+            sbResult.append(getContext().getString(R.string.id, formId) + " " +
+                    getContext().getString(R.string.success, getContext().getString(R.string.blank_form,
+                            getContext().getString(R.string.received))));
         } catch (IOException e) {
             Timber.e(e);
         }
@@ -226,6 +237,8 @@ public class DownloadJob extends Job {
                 // publish current progress
                 rxEventBus.post(new DownloadEvent(DownloadEvent.Status.DOWNLOADING, ++progress, total));
                 String uuid = dis.readUTF();
+                int mode = dis.readInt();
+
                 String displayName = dis.readUTF();
                 String submissionUri = dis.readUTF();
 
@@ -233,7 +246,25 @@ public class DownloadJob extends Job {
                     submissionUri = null;
                 }
 
-                int mode = dis.readInt();
+                Timber.d("Received uuid %s mode %s displayname %s submissionUri %s", uuid, mode, displayName, submissionUri);
+                long id = new InstanceMapDao().getInstanceId(uuid);
+
+                if (mode == 2) {
+                    try (Cursor cursor = new TransferDao().getSentInstanceInstanceCursorUsingId(id)) {
+                        if (id != -1 && cursor != null && cursor.getCount() > 0) {
+                            // sent for review start receiving
+                            Timber.d("Form sent for review");
+                            dos.writeBoolean(true);
+                        } else {
+                            // send acknowledgement that form is not needed here
+                            Timber.d("Form not sent from this device for review");
+                            dos.writeBoolean(false);
+                            sbResult.append(displayName + " " + getContext().getString(R.string.failed,
+                                    getContext().getString(R.string.not_sent_for_review)));
+                            continue;
+                        }
+                    }
+                }
 
                 int feedbackStatus = 0;
                 String feedback = null;
@@ -244,6 +275,7 @@ public class DownloadJob extends Job {
                     if (feedback.equals("-1")) {
                         feedback = null;
                     }
+                    Timber.d("Feedback received %s %s", feedbackStatus, feedback);
                 }
 
                 Timber.d("Feedback %s %s", feedbackStatus, feedback);
@@ -267,11 +299,12 @@ public class DownloadJob extends Job {
                 values.put(SUBMISSION_URI, submissionUri);
                 values.put(JR_FORM_ID, formId);
                 values.put(JR_VERSION, formVersion);
-                Timber.d("UUID " + uuid);
-                long id = new InstanceMapDao().getInstanceId(uuid);
-                Timber.d("Id : " + id);
                 if (id == -1) {
                     // receiving first time
+                    Timber.d("Writing received first time");
+                    dos.writeBoolean(false);
+
+                    Timber.d("Sending response if it exists or not receiving first time");
                     Uri uri = new InstancesDao().saveInstance(values);
 
                     ContentValues mapValues = new ContentValues();
@@ -282,33 +315,29 @@ public class DownloadJob extends Job {
                     // Add row in share table
                     ContentValues shareValues = new ContentValues();
                     shareValues.put(INSTANCE_ID, Long.parseLong(uri.getLastPathSegment()));
-                    if (mode == 2) {
-                        // feedback received
-                        shareValues.put(TRANSFER_STATUS, STATUS_FORM_SENT);
-                        shareValues.put(INSTRUCTIONS, feedback);
-                        shareValues.put(RECEIVED_REVIEW, feedbackStatus);
-                        Timber.d("Mode 2 : " + feedbackStatus);
-                    } else {
-                        shareValues.put(TRANSFER_STATUS, STATUS_FORM_RECEIVE);
-                        Timber.d("Mode 2 : " + feedbackStatus);
-                    }
-
+                    shareValues.put(TRANSFER_STATUS, STATUS_FORM_RECEIVE);
+                    sbResult.append(displayName + getContext().getString(R.string.success,
+                            getContext().getString(R.string.received_for_review)));
                     new ShareDatabaseHelper(getContext()).insertInstance(shareValues);
                 } else {
                     String selection = InstanceProviderAPI.InstanceColumns._ID + "=?";
                     String[] selectionArgs = {String.valueOf(id)};
                     new InstancesDao().updateInstance(values, selection, selectionArgs);
                     TransferInstance transferInstance = new TransferDao().getSentTransferInstanceFromInstanceId(id);
-
                     if (mode == 2) {
                         ContentValues shareValues = new ContentValues();
                         shareValues.put(INSTRUCTIONS, feedback);
-                        shareValues.put(RECEIVED_REVIEW, feedbackStatus);
+                        shareValues.put(RECEIVED_REVIEW_STATUS, feedbackStatus);
                         selection = TransferInstance.ID + " =?";
                         selectionArgs = new String[]{String.valueOf(transferInstance.getId())};
                         new TransferDao().updateInstance(shareValues, selection, selectionArgs);
-
                         Timber.d("Mode 2 : " + "Exists");
+                        sbResult.append(displayName + getContext().getString(R.string.success, getContext().getString(R.string.review_received)));
+                    } else {
+
+                        Timber.d("Writing received not first time");
+                        dos.writeBoolean(true);
+                        sbResult.append(displayName + getContext().getString(R.string.success, getContext().getString(R.string.updated)));
                     }
                 }
             }

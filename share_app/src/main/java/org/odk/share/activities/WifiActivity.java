@@ -168,7 +168,7 @@ public class WifiActivity extends InjectableActivity {
                         case FINISHED:
                             dismissDialog(DIALOG_DOWNLOAD_PROGRESS);
                             String result = downloadEvent.getResult();
-                            createAlertDialog(getString(R.string.transfer_result), getString(R.string.receive_success, result));
+                            createAlertDialog(getString(R.string.transfer_result), result);
                             break;
                         case ERROR:
                             dismissDialog(DIALOG_DOWNLOAD_PROGRESS);

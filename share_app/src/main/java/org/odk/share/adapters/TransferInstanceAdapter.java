@@ -87,7 +87,27 @@ public class TransferInstanceAdapter extends RecyclerView.Adapter<TransferInstan
         String statusChangeTime = dateFormat.format(date);
 
         if (instance.getTransferStatus().equalsIgnoreCase(context.getString(R.string.sent))) {
-            holder.subtitle.setText(context.getString(R.string.sent_on, statusChangeTime));
+            if (instance.getReceivedReviewStatus() == TransferInstance.STATUS_ACCEPTED) {
+                StringBuilder sb = new StringBuilder();
+                sb.append(context.getString(R.string.form_received_by_reviewer, context.getString(R.string.accepted)));
+                if (instance.getInstructions() != null && instance.getInstructions().length() > 0) {
+                    sb.append(context.getString(R.string.feedback_sent, instance.getInstructions()));
+                } else {
+                    sb.append(context.getString(R.string.no_feedback_sent));
+                }
+                holder.subtitle.setText(sb.toString());
+            } else if (instance.getReceivedReviewStatus() == TransferInstance.STATUS_REJECTED) {
+                StringBuilder sb = new StringBuilder();
+                sb.append(context.getString(R.string.form_received_by_reviewer, context.getString(R.string.rejected)));
+                if (instance.getInstructions() != null && instance.getInstructions().length() > 0) {
+                    sb.append(context.getString(R.string.feedback_sent, instance.getInstructions()));
+                } else {
+                    sb.append(context.getString(R.string.no_feedback_sent));
+                }
+                holder.subtitle.setText(sb.toString());
+            } else {
+                holder.subtitle.setText(context.getString(R.string.sent_on, statusChangeTime));
+            }
         } else if (instance.getReviewed() == TransferInstance.STATUS_ACCEPTED) {
             holder.subtitle.setText(context.getString(R.string.approved_on, statusChangeTime));
         } else if (instance.getReviewed() == TransferInstance.STATUS_REJECTED) {

@@ -29,7 +29,7 @@ public class InstanceMapDao {
 
         HashMap<Long, String> instanceMap = new HashMap<>();
         if (cursor != null) {
-            Timber.d("CUrsor "+ cursor.getCount());
+            Timber.d("CUrsor " + cursor.getCount());
             try {
                 while (cursor.moveToNext()) {
                     long instanceId = cursor.getLong(cursor.getColumnIndex(INSTANCE_ID));

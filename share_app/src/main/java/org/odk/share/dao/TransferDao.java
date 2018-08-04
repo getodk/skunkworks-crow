@@ -2,7 +2,6 @@ package org.odk.share.dao;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.support.annotation.NonNull;
 import android.support.v4.content.CursorLoader;
 
 import org.odk.share.application.Share;
@@ -41,6 +40,12 @@ public class TransferDao {
     public Cursor getUnreviewedInstancesCursor() {
         String selection = TransferInstance.REVIEW_STATUS + " =? ";
         String[] selectionArgs = {String.valueOf(TransferInstance.STATUS_UNREVIEWED)};
+        return getInstancesCursor(null, selection, selectionArgs, null);
+    }
+
+    public Cursor getSentInstanceInstanceCursorUsingId(long id) {
+        String selection = TransferInstance.TRANSFER_STATUS + " =? AND " + TransferInstance.INSTANCE_ID + " =?";
+        String[] selectionArgs = {TransferInstance.STATUS_FORM_SENT, String.valueOf(id)};
         return getInstancesCursor(null, selection, selectionArgs, null);
     }
 
@@ -106,6 +111,7 @@ public class TransferDao {
         }
         return null;
     }
+
     public List<TransferInstance> getInstancesFromCursor(Cursor cursor) {
         List<TransferInstance> instances = new ArrayList<>();
         if (cursor != null) {
@@ -117,6 +123,7 @@ public class TransferDao {
                     int instanceIdColumnIndex = cursor.getColumnIndex(TransferInstance.INSTANCE_ID);
                     int transferStatusColumnIndex = cursor.getColumnIndex(TransferInstance.TRANSFER_STATUS);
                     int lastStatusChangeDateColumnIndex = cursor.getColumnIndex(TransferInstance.LAST_STATUS_CHANGE_DATE);
+                    int receivedReviewStatusColumnIndex = cursor.getColumnIndex(TransferInstance.RECEIVED_REVIEW_STATUS);
 
                     TransferInstance transferInstance = new TransferInstance();
                     transferInstance.setId(cursor.getLong(idColumnIndex));
@@ -125,6 +132,7 @@ public class TransferDao {
                     transferInstance.setInstanceId(cursor.getLong(instanceIdColumnIndex));
                     transferInstance.setTransferStatus(cursor.getString(transferStatusColumnIndex));
                     transferInstance.setLastStatusChangeDate(cursor.getLong(lastStatusChangeDateColumnIndex));
+                    transferInstance.setReceivedReviewStatus(cursor.getInt(receivedReviewStatusColumnIndex));
 
                     instances.add(transferInstance);
                 }

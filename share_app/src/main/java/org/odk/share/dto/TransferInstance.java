@@ -10,7 +10,7 @@ public class TransferInstance {
     public static final String INSTRUCTIONS = "instructions";
     public static final String INSTANCE_ID = "instanceId";
     public static final String TRANSFER_STATUS = "transferStatus";
-    public static final String RECEIVED_REVIEW = "receivedReview";
+    public static final String RECEIVED_REVIEW_STATUS = "receivedReviewStatus";
     public static final String LAST_STATUS_CHANGE_DATE = "lastStatusChangeDate";
     public static final String VISITED_COUNT = "visitedCount";
 
@@ -28,6 +28,15 @@ public class TransferInstance {
     private String transferStatus;
     private Long lastStatusChangeDate;
     private Instance instance;
+    private int receivedReviewStatus;
+
+    public int getReceivedReviewStatus() {
+        return receivedReviewStatus;
+    }
+
+    public void setReceivedReviewStatus(int receivedReviewStatus) {
+        this.receivedReviewStatus = receivedReviewStatus;
+    }
 
     public Instance getInstance() {
         return instance;

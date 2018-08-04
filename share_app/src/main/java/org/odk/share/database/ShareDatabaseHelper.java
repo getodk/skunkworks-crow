@@ -14,7 +14,7 @@ import static org.odk.share.dto.TransferInstance.ID;
 import static org.odk.share.dto.TransferInstance.INSTANCE_ID;
 import static org.odk.share.dto.TransferInstance.INSTRUCTIONS;
 import static org.odk.share.dto.TransferInstance.LAST_STATUS_CHANGE_DATE;
-import static org.odk.share.dto.TransferInstance.RECEIVED_REVIEW;
+import static org.odk.share.dto.TransferInstance.RECEIVED_REVIEW_STATUS;
 import static org.odk.share.dto.TransferInstance.REVIEW_STATUS;
 import static org.odk.share.dto.TransferInstance.STATUS_UNREVIEWED;
 import static org.odk.share.dto.TransferInstance.TRANSFER_STATUS;
@@ -56,7 +56,7 @@ public class ShareDatabaseHelper extends SQLiteOpenHelper {
                 + INSTRUCTIONS + " text, "
                 + INSTANCE_ID + " integer not null, "
                 + TRANSFER_STATUS + " text not null, "
-                + RECEIVED_REVIEW + " integer,"
+                + RECEIVED_REVIEW_STATUS + " integer,"
                 + VISITED_COUNT + " integer, "
                 + LAST_STATUS_CHANGE_DATE + " date not null ); ");
 
