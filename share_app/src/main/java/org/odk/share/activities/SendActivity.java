@@ -39,6 +39,8 @@ import timber.log.Timber;
 
 import static android.view.View.VISIBLE;
 import static org.odk.share.activities.InstancesList.INSTANCE_IDS;
+import static org.odk.share.fragments.ReviewedInstancesFragment.MODE;
+import static org.odk.share.utilities.ApplicationConstants.ASK_REVIEW_MODE;
 
 /**
  * Created by laksh on 6/9/2018.
@@ -90,7 +92,7 @@ public class SendActivity extends InjectableActivity {
         setSupportActionBar(toolbar);
 
         instancesIds = getIntent().getLongArrayExtra(INSTANCE_IDS);
-        mode = getIntent().getIntExtra("mode", 1);
+        mode = getIntent().getIntExtra(MODE, ASK_REVIEW_MODE);
 
         port = SocketUtils.getPort();
 
