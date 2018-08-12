@@ -87,18 +87,12 @@ public class TransferInstanceAdapter extends RecyclerView.Adapter<TransferInstan
         String statusChangeTime = dateFormat.format(date);
 
         if (instance.getTransferStatus().equalsIgnoreCase(context.getString(R.string.sent))) {
-            if (instance.getReceivedReviewStatus() == TransferInstance.STATUS_ACCEPTED) {
+            if (instance.getReceivedReviewStatus() == TransferInstance.STATUS_ACCEPTED ||
+                    instance.getReceivedReviewStatus() == TransferInstance.STATUS_REJECTED) {
                 StringBuilder sb = new StringBuilder();
-                sb.append(context.getString(R.string.form_received_by_reviewer, context.getString(R.string.accepted)));
-                if (instance.getInstructions() != null && instance.getInstructions().length() > 0) {
-                    sb.append(context.getString(R.string.feedback_sent, instance.getInstructions()));
-                } else {
-                    sb.append(context.getString(R.string.no_feedback_sent));
-                }
-                holder.subtitle.setText(sb.toString());
-            } else if (instance.getReceivedReviewStatus() == TransferInstance.STATUS_REJECTED) {
-                StringBuilder sb = new StringBuilder();
-                sb.append(context.getString(R.string.form_received_by_reviewer, context.getString(R.string.rejected)));
+                sb.append(context.getString(R.string.form_received_by_reviewer,
+                        instance.getReceivedReviewStatus() == TransferInstance.STATUS_ACCEPTED ?
+                                context.getString(R.string.accepted) : context.getString(R.string.rejected)));
                 if (instance.getInstructions() != null && instance.getInstructions().length() > 0) {
                     sb.append(context.getString(R.string.feedback_sent, instance.getInstructions()));
                 } else {
