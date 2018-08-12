@@ -55,8 +55,6 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
         setSupportActionBar(toolbar);
         Share.createODKDirs();
 
-        getSupportLoaderManager().initLoader(FORM_LOADER, null, this);
-
         LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(llm);
@@ -66,7 +64,7 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
     protected void onResume() {
         super.onResume();
         setupAdapter();
-        getSupportLoaderManager().restartLoader(FORM_LOADER, null, this);
+        getSupportLoaderManager().initLoader(FORM_LOADER, null, this);
     }
 
     private void setupAdapter() {
