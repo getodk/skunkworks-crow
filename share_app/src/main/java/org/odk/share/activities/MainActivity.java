@@ -23,16 +23,8 @@ import org.odk.share.R;
 import org.odk.share.adapters.FormsAdapter;
 import org.odk.share.application.Share;
 import org.odk.share.dao.FormsDao;
-import org.odk.share.dao.InstancesDao;
-import org.odk.share.dao.TransferDao;
-import org.odk.share.dto.TransferInstance;
 import org.odk.share.preferences.SettingsPreference;
 import org.odk.share.provider.FormsProviderAPI;
-import org.odk.share.provider.InstanceProviderAPI;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -46,8 +38,6 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
     public static final String FORM_DISPLAY_NAME = "form_display_name";
     private static final String FORM_CHOOSER_LIST_SORTING_ORDER = "formChooserListSortingOrder";
     private static final String COLLECT_PACKAGE = "org.odk.collect.android";
-    public static final String REVIEWED = "reviewed";
-    public static final String UNREVIEWED = "unreviewed";
 
     private static final int FORM_LOADER = 2;
 
@@ -63,7 +53,6 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
     TextView emptyView;
 
     private FormsAdapter formAdapter;
-    Map<String, Map<String, Map<String, Integer>>> formMap;
 
 
     @Override
@@ -75,7 +64,6 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
         setTitle(getString(R.string.app_name));
         setSupportActionBar(toolbar);
         Share.createODKDirs();
-        formMap = new HashMap<>();
 
         LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
@@ -96,7 +84,7 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
     }
 
     private void setupAdapter() {
-        formAdapter = new FormsAdapter(this, null, this::onItemClick, formMap);
+        formAdapter = new FormsAdapter(this, null, this::onItemClick);
         recyclerView.setAdapter(formAdapter);
     }
 
@@ -219,71 +207,5 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
 
         builder.setCancelable(false);
         builder.show();
-    }
-
-    private void getFormStatus() {
-        try (Cursor transferCursor = new TransferDao().getReceiveInstancesCursor()) {
-            List<TransferInstance> transferInstanceList = new TransferDao().getInstancesFromCursor(transferCursor);
-            int len = transferCursor.getCount();
-            HashMap<Long, TransferInstance> idMap = new HashMap<>();
-            StringBuilder selectionBuf = new StringBuilder(InstanceProviderAPI.InstanceColumns._ID + " IN (");
-            String[] selectionArgs = new String[len];
-            for (int i = 0; i < transferInstanceList.size(); i++) {
-                TransferInstance instance = transferInstanceList.get(i);
-                idMap.put(instance.getInstanceId(), instance);
-                if (i > 0) {
-                    selectionBuf.append(",");
-                }
-                selectionBuf.append("?");
-                selectionArgs[i] = String.valueOf(transferInstanceList.get(i).getInstanceId());
-            }
-
-            selectionBuf.append(")");
-            String selection = selectionBuf.toString();
-
-            try (Cursor instanceCursor = new InstancesDao().getInstancesCursor(selection, selectionArgs)) {
-                if (instanceCursor != null && instanceCursor.getCount() > 0) {
-                    instanceCursor.moveToPosition(-1);
-                    while (instanceCursor.moveToNext()) {
-                        String formId = instanceCursor.getString(instanceCursor.getColumnIndex(InstanceProviderAPI.InstanceColumns.JR_FORM_ID));
-                        String formVersion = instanceCursor.getString(instanceCursor.getColumnIndex(InstanceProviderAPI.InstanceColumns.JR_VERSION));
-
-                        Map<String, Map<String, Integer>> instanceMap;
-                        if (formMap.containsKey(formId)) {
-                            instanceMap = formMap.get(formId);
-                        } else {
-                            instanceMap = new HashMap<>();
-                            formMap.put(formId, instanceMap);
-                        }
-
-                        Map<String, Integer> statusMap;
-                        if (instanceMap.containsKey(formVersion)) {
-                            statusMap = instanceMap.get(formVersion);
-                        } else {
-                            statusMap = new HashMap<>();
-                            instanceMap.put(formVersion, statusMap);
-                        }
-
-                        TransferInstance transferInstance = idMap.get(instanceCursor.getLong(instanceCursor.getColumnIndex(InstanceProviderAPI.InstanceColumns._ID)));
-                        if (transferInstance.getReviewed() == TransferInstance.STATUS_REJECTED || transferInstance.getReviewed() == TransferInstance.STATUS_ACCEPTED) {
-                            // Reviewed
-                            if (statusMap.containsKey(REVIEWED)) {
-                                statusMap.put(REVIEWED, statusMap.get(REVIEWED) + 1);
-                            } else {
-                                statusMap.put(REVIEWED, 1);
-                            }
-                        } else {
-                            // Unreviewed
-                            if (statusMap.containsKey(UNREVIEWED)) {
-                                statusMap.put(UNREVIEWED, statusMap.get(UNREVIEWED) + 1);
-                            } else {
-                                statusMap.put(UNREVIEWED, 1);
-                            }
-                        }
-                    }
-                }
-                Timber.d(String.valueOf(formMap));
-            }
-        }
     }
 }

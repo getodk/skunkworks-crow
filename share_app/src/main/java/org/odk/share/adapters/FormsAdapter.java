@@ -12,23 +12,19 @@ import org.odk.share.R;
 import org.odk.share.adapters.basecursoradapter.BaseCursorViewHolder;
 import org.odk.share.adapters.basecursoradapter.CursorRecyclerViewAdapter;
 import org.odk.share.adapters.basecursoradapter.OnItemClickListener;
+import org.odk.share.dao.InstancesDao;
+import org.odk.share.dao.TransferDao;
+import org.odk.share.dto.TransferInstance;
 import org.odk.share.provider.FormsProviderAPI;
-
-import java.util.Map;
+import org.odk.share.provider.InstanceProviderAPI;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static org.odk.share.activities.MainActivity.REVIEWED;
-import static org.odk.share.activities.MainActivity.UNREVIEWED;
-
 public class FormsAdapter extends CursorRecyclerViewAdapter<FormsAdapter.FormHolder> {
 
-    private Map<String, Map<String, Map<String, Integer>>> formMap;
-
-    public FormsAdapter(Context context, Cursor cursor, OnItemClickListener listener, Map<String, Map<String, Map<String, Integer>>> formMap) {
+    public FormsAdapter(Context context, Cursor cursor, OnItemClickListener listener) {
         super(context, cursor, listener);
-        this.formMap = formMap;
     }
 
     @Override
@@ -36,21 +32,7 @@ public class FormsAdapter extends CursorRecyclerViewAdapter<FormsAdapter.FormHol
         String title = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.DISPLAY_NAME));
         String version = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.JR_VERSION));
         String id = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.JR_FORM_ID));
-        int reviewed = 0;
-        int unReviewed = 0;
-        if (formMap.containsKey(id)) {
-            Map<String, Map<String, Integer>> versionMap = formMap.get(id);
-            if (versionMap.containsKey(version)) {
-                Map<String, Integer> statusMap = versionMap.get(version);
-                if (statusMap.containsKey(REVIEWED)) {
-                    reviewed = statusMap.get(REVIEWED);
-                }
-                if (statusMap.containsKey(UNREVIEWED)) {
-                    unReviewed = statusMap.get(UNREVIEWED);
-                }
-            }
-        }
-        viewHolder.bind(title, version, id, reviewed, unReviewed);
+        viewHolder.bind(title, version, id);
     }
 
     @NonNull
@@ -76,7 +58,7 @@ public class FormsAdapter extends CursorRecyclerViewAdapter<FormsAdapter.FormHol
             ButterKnife.bind(this, view);
         }
 
-        void bind(String title, String version, String id, int numReviewed, int numUnreviewed) {
+        void bind(String title, String version, String id) {
             tvTitle.setText(title);
 
             StringBuilder sb = new StringBuilder();
@@ -86,9 +68,58 @@ public class FormsAdapter extends CursorRecyclerViewAdapter<FormsAdapter.FormHol
             sb.append(context.getString(R.string.id, id));
 
             tvSubtitle.setText(sb);
-            reviewedForms.setText(context.getString(R.string.num_reviewed, String.valueOf(numReviewed)));
-            unReviewedForms.setText(context.getString(R.string.num_unreviewed, String.valueOf(numUnreviewed)));
 
+            String[] selectionArgs;
+            String selection;
+
+            if (version == null) {
+                selectionArgs = new String[]{id};
+                selection = InstanceProviderAPI.InstanceColumns.JR_FORM_ID + "=? AND "
+                        + InstanceProviderAPI.InstanceColumns.JR_VERSION + " IS NULL";
+            } else {
+                selectionArgs = new String[]{id, version};
+                selection = InstanceProviderAPI.InstanceColumns.JR_FORM_ID + "=? AND "
+                        + InstanceProviderAPI.InstanceColumns.JR_VERSION + "=?";
+            }
+            int reviewed = 0;
+            int unreviewed = 0;
+            try (Cursor instanceCursor = new InstancesDao().getInstancesCursor(selection, selectionArgs)) {
+                int len = instanceCursor.getCount();
+                StringBuilder selectionBuf = new StringBuilder(InstanceProviderAPI.InstanceColumns._ID + " IN (");
+                selectionArgs = new String[len + 1];
+                int i = 0;
+                if (instanceCursor != null && instanceCursor.getCount() > 0) {
+                    instanceCursor.moveToPosition(-1);
+                    while (instanceCursor.moveToNext()) {
+                        if (i > 0) {
+                            selectionBuf.append(",");
+                        }
+                        selectionBuf.append("?");
+                        selectionArgs[i++] = String.valueOf(instanceCursor.getLong(instanceCursor.getColumnIndex(InstanceProviderAPI.InstanceColumns._ID)));
+                    }
+                }
+
+
+                selectionBuf.append(") AND " + TransferInstance.TRANSFER_STATUS + " =?");
+                selection = selectionBuf.toString();
+                selectionArgs[i] = TransferInstance.STATUS_FORM_RECEIVE;
+
+                try (Cursor transferCursor = new TransferDao().getInstancesCursor(null, selection, selectionArgs, null)) {
+                    if (transferCursor != null && transferCursor.getCount() > 0) {
+                        transferCursor.moveToPosition(-1);
+                        while (transferCursor.moveToNext()) {
+                            long status = transferCursor.getLong(transferCursor.getColumnIndex(TransferInstance.REVIEW_STATUS));
+                            if (status == TransferInstance.STATUS_ACCEPTED || status == TransferInstance.STATUS_REJECTED) {
+                                reviewed++;
+                            } else {
+                                unreviewed++;
+                            }
+                        }
+                    }
+                }
+            }
+            reviewedForms.setText(context.getString(R.string.num_reviewed, String.valueOf(reviewed)));
+            unReviewedForms.setText(context.getString(R.string.num_unreviewed, String.valueOf(unreviewed)));
         }
     }
 }
