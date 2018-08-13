@@ -24,7 +24,7 @@ Share is an Android application which is a companion app to ODK Collect and it h
 ### 1.2 Why Share<a name="why-share"></a>
 
 
-Share is designed to enable offline transfer of blank and filled forms. There are three major use cases for this multi-part surveys, supervisor review and blank form distribution.
+Share is designed to enable offline transfer of blank and filled forms. There are three major use cases for this: multi-part surveys, supervisor review and blank form distribution.
 ODK Collect is designed in such a way that it allows enumerators to download the blank forms and provide them with the interface to fill the blank forms, but sometimes there can be more than one enumerators who want to fill the same form. Collect doesn’t allow more than one enumerators to collaborate on a single form. This is where Share comes into the picture using Share one can select any number of forms and can send to the other enumerator will all the resources attached to it.
 
 Also, sometimes organizations want to review filled forms before sending to the server. So enumerators can send the forms to the supervisor then the supervisor can mark forms as reviewed (accepted/rejected) with some feedback and then can send back to the same enumerator if required.
@@ -37,8 +37,8 @@ The Share app requires ODK Collect installed on the device first because it uses
 
 ### 2.1 Install and setting up ODK Collect<a name="install-collect"></a>
 
-To install ODK Collect visit this link.
-To know more about ODK Collect visit the this documentation
+To install ODK Collect visit [this](https://docs.opendatakit.org/collect-install) link.
+To know more about ODK Collect visit the [documentation](https://docs.opendatakit.org/collect-intro) page
 
 ### 2.2 Install Share<a name="install-share"></a>
 
@@ -54,21 +54,21 @@ Launch the app to see  a listing of all distinct versions of blank forms on the 
 
 To view details of any form category tap on any category shown on home screen.
 <p align="center">
-  <img src="https://github.com/lakshyagupta21/share/blob/91ad9210c67615263aaccced89616562f77249fa/screenshots/home_screen.png" width="280" height="500"/>
+  <img src="/screenshots/home_screen.png" width="280" height="500"/>
 </p>
 
 #### 3.1.1 View statistics of forms received<a name="view-statistics"></a>
 
 To view the statistics of any specific blank form on the device, tap on any item on the home screen. The statistics screen will show the number of filled forms sent, filled forms reviewed and unreviewed. This will give the supervisor a glimpse of all the details of form transfer happened through the device.
 <p align="center">
-  <img src="https://github.com/lakshyagupta21/share/blob/SHARE-78/screenshots/statistics_tab.png" width="280" height="500"/>
+  <img src="/screenshots/statistics_tab.png" width="280" height="500"/>
 </p>
 
 #### 3.1.2 View sent forms<a name="view-sent-forms"></a>
 
 To view the details of the form sent from the device navigate to ‘Sent’ tabs, the screen shows the details of sent filled forms if any forms were sent for a review and the supervisor sent back the forms with feedback then the user will be able to see the form reviewed status with feedback.
 <p align="center">
-  <img src="https://github.com/lakshyagupta21/share/blob/SHARE-78/screenshots/send_tab.png" width="280" height="500"/>
+  <img src="/screenshots/send_tab.png" width="280" height="500"/>
 </p>
 
 #### 3.1.3 View Received forms<a name="view-received-forms"></a>
@@ -76,8 +76,8 @@ To view the details of the form sent from the device navigate to ‘Sent’ tabs
 To view the details of forms received navigate to the ‘Received’ tab. To review the forms, tap on any received form to open the filled form in ODK Collect. After viewing the form, the user will be navigated to a screen asking for feedback and can mark the form as accepted or rejected. If the user is not ready to provide feedback,  even if wants to review later can tap on “Review later”. Using this option user will be navigated back to the receive screen so that user can review other forms. If supervisor already opened the form previously then the user will be navigated to a feedback screen directly if the supervisor wants to view the form again then tap on “View from in ODK Collect” to view it again.
 
 <p float="left" align="center">
-  <img src="https://github.com/lakshyagupta21/share/blob/SHARE-78/screenshots/review.gif" width="280" height="500"/>
-  <img src="https://github.com/lakshyagupta21/share/blob/SHARE-78/screenshots/receive_review.gif" width="280" height="500"/>
+  <img src="/screenshots/review.gif" width="280" height="500"/>
+  <img src="/screenshots/receive_review.gif" width="280" height="500"/>
 </p>
 
 
@@ -106,7 +106,7 @@ If hotspot initiation is successful then the screen will show the QR Code genera
 Is user wants to manually connect to it then the screen shows the network name so that user can connect to it by tapping on the network, and after wifi is connected it will ask for a port number which is required to create the connection.
 
 <p align="center">
-  <img src="https://github.com/lakshyagupta21/share/blob/SHARE-78/screenshots/send_normal_mode.gif" width="280" height="500"/>
+  <img src="/screenshots/send_normal_mode.gif" width="280" height="500"/>
 </p>
 
 For devices having Android version 7.0 and 7.1 user will be sent to settings to enable the wifi hotspot functionality. The user will then need to tap the device back button to come back to share.
@@ -126,7 +126,7 @@ Connecting to the sender’s network will disable all the wifi network available
 For some devices, the user is not allowed to configure the wifi hotspot from the app. Currently for Android versions < 8, “ODK-SHARE-odk-share” is set as the default network name and for versions >= 8 it is AndroidShare-XXXX which is set by Android.
 
 <p float="left" align="center">
-  <img src="https://github.com/lakshyagupta21/share/blob/SHARE-78/screenshots/received_for_review.gif" width="280" height="500"/>
-  <img src="https://github.com/lakshyagupta21/share/blob/SHARE-78/screenshots/received_qr_code.gif" width="280" height="500"/>
+  <img src="/screenshots/received_for_review.gif" width="280" height="500"/>
+  <img src="/screenshots/received_qr_code.gif" width="280" height="500"/>
 </p>
 
