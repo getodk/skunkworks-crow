@@ -76,8 +76,7 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
     protected void onResume() {
         super.onResume();
         if (isCollectInstalled()) {
-            setupAdapter();
-            getSupportLoaderManager().initLoader(FORM_LOADER, null, this);
+            updateAdapter();
         } else {
             showAlertDialog();
         }
