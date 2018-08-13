@@ -49,6 +49,7 @@
     <string name="connecting_wifi">Connecting to wifi</string>
     <string name="ok">OK</string>
     <string name="canceled">Canceled</string>
+    <string name="stop_sending">Stop Sending</string>
 
 
     <string name="sending_items">Sending %1$s of %2$s form(s)</string>
