@@ -50,12 +50,15 @@
             android:stateNotNeeded="true"
             tools:replace="android:screenOrientation" />
         <activity android:name=".activities.InstanceManagerTabs" />
+        <activity android:name=".activities.ReviewFormActivity" />
 
         <provider
             android:name=".provider.TransferProvider"
             android:authorities="org.odk.share.provider.odk.instances" />
 
-        <activity android:name=".activities.ReviewFormActivity" />
+        <provider
+            android:name=".provider.InstanceMapProvider"
+            android:authorities="org.odk.share.provider.odk.map" />
     </application>
 
 </manifest>

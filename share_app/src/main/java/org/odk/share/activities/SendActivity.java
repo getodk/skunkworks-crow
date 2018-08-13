@@ -39,6 +39,8 @@ import timber.log.Timber;
 
 import static android.view.View.VISIBLE;
 import static org.odk.share.activities.InstancesList.INSTANCE_IDS;
+import static org.odk.share.fragments.ReviewedInstancesFragment.MODE;
+import static org.odk.share.utilities.ApplicationConstants.ASK_REVIEW_MODE;
 
 /**
  * Created by laksh on 6/9/2018.
@@ -75,6 +77,7 @@ public class SendActivity extends InjectableActivity {
     private String alertMsg;
     private int port;
     private long[] instancesIds;
+    private int mode;
 
     private WifiManager.LocalOnlyHotspotReservation hotspotReservation;
     private WifiConfiguration currentConfig;
@@ -89,6 +92,7 @@ public class SendActivity extends InjectableActivity {
         setSupportActionBar(toolbar);
 
         instancesIds = getIntent().getLongArrayExtra(INSTANCE_IDS);
+        mode = getIntent().getIntExtra(MODE, ASK_REVIEW_MODE);
 
         port = SocketUtils.getPort();
 
@@ -273,7 +277,7 @@ public class SendActivity extends InjectableActivity {
                         case FINISHED:
                             hideDialog(PROGRESS_DIALOG);
                             String result = uploadEvent.getResult();
-                            createAlertDialog(getString(R.string.transfer_result), getString(R.string.send_success, result));
+                            createAlertDialog(getString(R.string.transfer_result), result);
                             break;
                         case ERROR:
                             hideDialog(PROGRESS_DIALOG);
@@ -325,7 +329,7 @@ public class SendActivity extends InjectableActivity {
     }
 
     private void startSending() {
-        senderService.startUploading(instancesIds, port);
+        senderService.startUploading(instancesIds, port, mode);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)

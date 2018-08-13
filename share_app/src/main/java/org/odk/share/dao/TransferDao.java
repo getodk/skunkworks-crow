@@ -43,6 +43,12 @@ public class TransferDao {
         return getInstancesCursor(null, selection, selectionArgs, null);
     }
 
+    public Cursor getSentInstanceInstanceCursorUsingId(long id) {
+        String selection = TransferInstance.TRANSFER_STATUS + " =? AND " + TransferInstance.INSTANCE_ID + " =?";
+        String[] selectionArgs = {TransferInstance.STATUS_FORM_SENT, String.valueOf(id)};
+        return getInstancesCursor(null, selection, selectionArgs, null);
+    }
+
     public CursorLoader getSentInstancesCursorLoader() {
         String selection = TransferInstance.TRANSFER_STATUS + " =? ";
         String[] selectionArgs = {TransferInstance.STATUS_FORM_SENT};
@@ -84,6 +90,27 @@ public class TransferDao {
         return Share.getInstance().getContentResolver().update(CONTENT_URI, values, where, whereArgs);
     }
 
+    public TransferInstance getReceivedTransferInstanceFromInstanceId(long instanceId) {
+        String selection = TransferInstance.INSTANCE_ID + " =? AND " + TransferInstance.TRANSFER_STATUS + " =?";
+        String[] selectionArgs = {String.valueOf(instanceId), TransferInstance.STATUS_FORM_RECEIVE};
+        Cursor cursor = getInstancesCursor(null, selection, selectionArgs, null);
+        List<TransferInstance> transferInstanceList = getInstancesFromCursor(cursor);
+        if (transferInstanceList.size() > 0) {
+            return transferInstanceList.get(0);
+        }
+        return null;
+    }
+
+    public TransferInstance getSentTransferInstanceFromInstanceId(long instanceId) {
+        String selection = TransferInstance.INSTANCE_ID + " =? AND " + TransferInstance.TRANSFER_STATUS + " =?";
+        String[] selectionArgs = {String.valueOf(instanceId), TransferInstance.STATUS_FORM_SENT};
+        Cursor cursor = getInstancesCursor(null, selection, selectionArgs, null);
+        List<TransferInstance> transferInstanceList = getInstancesFromCursor(cursor);
+        if (transferInstanceList.size() > 0) {
+            return transferInstanceList.get(0);
+        }
+        return null;
+    }
 
     public List<TransferInstance> getInstancesFromCursor(Cursor cursor) {
         List<TransferInstance> instances = new ArrayList<>();
@@ -96,6 +123,7 @@ public class TransferDao {
                     int instanceIdColumnIndex = cursor.getColumnIndex(TransferInstance.INSTANCE_ID);
                     int transferStatusColumnIndex = cursor.getColumnIndex(TransferInstance.TRANSFER_STATUS);
                     int lastStatusChangeDateColumnIndex = cursor.getColumnIndex(TransferInstance.LAST_STATUS_CHANGE_DATE);
+                    int receivedReviewStatusColumnIndex = cursor.getColumnIndex(TransferInstance.RECEIVED_REVIEW_STATUS);
 
                     TransferInstance transferInstance = new TransferInstance();
                     transferInstance.setId(cursor.getLong(idColumnIndex));
@@ -104,6 +132,7 @@ public class TransferDao {
                     transferInstance.setInstanceId(cursor.getLong(instanceIdColumnIndex));
                     transferInstance.setTransferStatus(cursor.getString(transferStatusColumnIndex));
                     transferInstance.setLastStatusChangeDate(cursor.getLong(lastStatusChangeDateColumnIndex));
+                    transferInstance.setReceivedReviewStatus(cursor.getInt(receivedReviewStatusColumnIndex));
 
                     instances.add(transferInstance);
                 }

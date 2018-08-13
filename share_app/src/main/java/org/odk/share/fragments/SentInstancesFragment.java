@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -27,7 +26,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 import static org.odk.share.activities.MainActivity.FORM_DISPLAY_NAME;
 import static org.odk.share.activities.MainActivity.FORM_ID;
@@ -71,6 +69,8 @@ public class SentInstancesFragment extends InstanceListFragment {
         instanceMap = new HashMap<>();
         transferInstanceList = new ArrayList<>();
         selectedInstances = new LinkedHashSet<>();
+
+        buttonLayout.setVisibility(View.GONE);
 
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
@@ -147,7 +147,7 @@ public class SentInstancesFragment extends InstanceListFragment {
     }
 
     private void setupAdapter() {
-        transferInstanceAdapter = new TransferInstanceAdapter(getActivity(), transferInstanceList, this::onItemClick, selectedInstances, true);
+        transferInstanceAdapter = new TransferInstanceAdapter(getActivity(), transferInstanceList, this::onItemClick, selectedInstances, false);
         recyclerView.setAdapter(transferInstanceAdapter);
     }
 
@@ -163,44 +163,5 @@ public class SentInstancesFragment extends InstanceListFragment {
     }
 
     private void onItemClick(View view, int position) {
-        CheckBox checkBox = view.findViewById(R.id.checkbox);
-        checkBox.setChecked(!checkBox.isChecked());
-
-        TransferInstance transferInstance = transferInstanceList.get(position);
-        Long id = transferInstance.getId();
-
-        if (selectedInstances.contains(id)) {
-            selectedInstances.remove(id);
-        } else {
-            selectedInstances.add(id);
-        }
-        toggleButtonLabel();
-    }
-
-    @OnClick(R.id.bToggle)
-    public void toggle() {
-        boolean newState = transferInstanceAdapter.getItemCount() > selectedInstances.size();
-
-        if (newState) {
-            for (TransferInstance instance: transferInstanceList) {
-                selectedInstances.add(instance.getId());
-            }
-        } else {
-            selectedInstances.clear();
-        }
-
-        transferInstanceAdapter.notifyDataSetChanged();
-        toggleButtonLabel();
-    }
-
-    private void toggleButtonLabel() {
-        toggleButton.setText(selectedInstances.size() == transferInstanceAdapter.getItemCount() ?
-                getString(R.string.clear_all) : getString(R.string.select_all));
-        sendButton.setEnabled(selectedInstances.size() > 0);
-    }
-
-    @OnClick(R.id.bAction)
-    public void sendForms() {
-
     }
 }

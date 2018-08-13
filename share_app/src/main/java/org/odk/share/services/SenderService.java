@@ -59,10 +59,11 @@ public class SenderService {
 
     }
 
-    public void startUploading(long[] instancesToSend, int port) {
+    public void startUploading(long[] instancesToSend, int port, int mode) {
         PersistableBundleCompat extras = new PersistableBundleCompat();
         extras.putLongArray(UploadJob.INSTANCES, instancesToSend);
         extras.putInt(UploadJob.PORT, port);
+        extras.putInt("mode", mode);
 
         // Build request
         JobRequest request = new JobRequest.Builder(UploadJob.TAG)
