@@ -43,7 +43,8 @@ To know more about ODK Collect visit the [documentation](https://docs.opendataki
 ### 2.2 Install Share<a name="install-share"></a>
 
 Share app can be downloaded and installed from the link provided below.
-[Download APK](https://github.com/opendatakit/share/releases/download/v0.9.0/share_app-debug.apk)
+
+[Download APK](https://github.com/opendatakit/share/releases)
 
 ## 3. Using Share<a name="using-share"></a>
 Share app can be used by enumerators in sharing forms and by supervisor in reviewing the forms.
