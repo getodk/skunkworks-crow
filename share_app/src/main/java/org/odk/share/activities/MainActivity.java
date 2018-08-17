@@ -67,6 +67,8 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
         LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(llm);
+        setupAdapter();
+        getSupportLoaderManager().initLoader(FORM_LOADER, null, this);
     }
 
     @Override
@@ -74,8 +76,7 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
         super.onResume();
 
         if (isCollectInstalled()) {
-            setupAdapter();
-            getSupportLoaderManager().initLoader(FORM_LOADER, null, this);
+            updateAdapter();
         } else {
             showAlertDialog();
         }
@@ -135,7 +136,9 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
         formAdapter.changeCursor(cursor);
-        setEmptyViewVisibility(cursor.getCount());
+        if (cursor != null && !cursor.isClosed()) {
+            setEmptyViewVisibility(cursor.getCount());
+        }
     }
 
     @Override
