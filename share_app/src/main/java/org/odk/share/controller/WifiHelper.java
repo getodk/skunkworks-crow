@@ -92,7 +92,9 @@ public class WifiHelper {
     }
 
     public void disableWifi(String ssid) {
-        removeNetworkAndEnableOther(ssid);
+        if (ssid != null) {
+            removeNetworkAndEnableOther(ssid);
+        }
         wifiManager.setWifiEnabled(false);
     }
 
