@@ -207,17 +207,7 @@ public class SendActivity extends InjectableActivity {
         builder.setPositiveButton(getString(R.string.stop), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    turnOffHotspot();
-                }
-
-                if (isHotspotRunning) {
-                    wifiHotspot.disableHotspot();
-                }
-
-                senderService.cancel();
-                Timber.d("Hotspot Stopped");
-                compositeDisposable.dispose();
+                stopHotspot();
                 finish();
             }
         });
@@ -230,6 +220,20 @@ public class SendActivity extends InjectableActivity {
 
         builder.setCancelable(false);
         builder.show();
+    }
+
+    private void stopHotspot() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            turnOffHotspot();
+        }
+
+        if (isHotspotRunning) {
+            wifiHotspot.disableHotspot();
+        }
+
+        senderService.cancel();
+        Timber.d("Hotspot Stopped");
+        compositeDisposable.dispose();
     }
 
     @Override
@@ -400,6 +404,7 @@ public class SendActivity extends InjectableActivity {
             public void onClick(DialogInterface dialog, int i) {
                 switch (i) {
                     case DialogInterface.BUTTON_POSITIVE:
+                        stopHotspot();
                         finish();
                         break;
                 }
