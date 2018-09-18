@@ -19,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.odk.share.R;
+import org.odk.share.controller.WifiHelper;
 import org.odk.share.controller.WifiHotspotHelper;
 import org.odk.share.events.HotspotEvent;
 import org.odk.share.events.UploadEvent;
@@ -99,6 +100,10 @@ public class SendActivity extends InjectableActivity {
         if (port == -1) {
             Timber.e("Port not available for socket communication");
             finish();
+        }
+        WifiHelper wifiHelper = new WifiHelper(this);
+        if (wifiHelper.getWifiManager().isWifiEnabled()) {
+            wifiHelper.disableWifi(null);
         }
 
         isHotspotInitiated = false;
