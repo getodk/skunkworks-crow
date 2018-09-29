@@ -1,12 +1,23 @@
 package org.odk.share.fragments;
 
 import android.database.Cursor;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.formatter.LargeValueFormatter;
 
 import org.odk.share.R;
 import org.odk.share.dao.InstancesDao;
@@ -15,6 +26,7 @@ import org.odk.share.dto.Instance;
 import org.odk.share.dto.TransferInstance;
 import org.odk.share.provider.InstanceProviderAPI;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -41,6 +53,8 @@ public class StatisticsFragment extends Fragment {
     TextView title;
     @BindView(R.id.formSubTitle)
     TextView subtitle;
+    @BindView(R.id.chart)
+    BarChart chart;
 
     private String formVersion;
     private String formId;
@@ -117,7 +131,65 @@ public class StatisticsFragment extends Fragment {
             }
         }
         formsReviewed.setText(String.valueOf(reviewCount));
+        drawGraph(sentCount,receiveCount,reviewCount);
 
         super.onResume();
+    }
+
+    public void drawGraph(int sentCount,int receiveCount,int reviewCount){
+        List<BarEntry> entries = new ArrayList<>();
+        entries.add(new BarEntry(0,sentCount));
+        entries.add(new BarEntry(1,receiveCount));
+        entries.add(new BarEntry(2,reviewCount));
+
+        BarDataSet set = new BarDataSet(entries, "Counts");
+        set.setValueFormatter(new LargeValueFormatter());
+        set.setValueTextSize(10);
+        BarData data = new BarData(set);
+        data.setBarWidth(0.9f); // set custom bar width
+
+        XAxis xAxis = chart.getXAxis();
+        YAxis yAxisR = chart.getAxisRight();
+        YAxis yAxisL= chart.getAxisLeft();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        yAxisR.setEnabled(false);
+        xAxis.setDrawGridLines(false);
+        yAxisR.setDrawGridLines(false);
+        xAxis.setDrawLabels(true);
+        xAxis.setTypeface(Typeface.DEFAULT_BOLD);
+        yAxisL.setTypeface(Typeface.DEFAULT_BOLD);
+        String mValues[]={"Sent","Received","Reviewed"};
+        xAxis.setLabelCount(3);
+        xAxis.setValueFormatter((value, axis) -> mValues[(int) (value)]);
+        yAxisL.setValueFormatter(new LargeValueFormatter());
+        yAxisL.setAxisMinimum(0);
+        int maxValue=Math.max(Math.max(sentCount,receiveCount),reviewCount);
+        int granularity=1;
+        if(maxValue<=5){
+            yAxisL.setAxisMaximum(5);}
+        else{
+            int axisMax;
+            maxValue+=1;
+            if(maxValue%5!=0){
+                granularity=(maxValue/5)+1;
+                axisMax=5*granularity;
+            }
+            else{
+                axisMax=maxValue;
+                granularity=maxValue/5;
+            }
+            yAxisL.setAxisMaximum(axisMax);
+        }
+        yAxisL.setGranularity(granularity);
+        yAxisL.setLabelCount(6,true);
+        xAxis.setTextSize(13);
+
+        chart.setData(data);
+        chart.setFitBars(true); // make the x-axis fit exactly all bars
+        chart.setDoubleTapToZoomEnabled(false);
+        chart.setPinchZoom(false);
+        chart.setTouchEnabled(false);
+        chart.setDescription(null);
+        chart.invalidate(); // refresh
     }
 }

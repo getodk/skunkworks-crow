@@ -30,6 +30,11 @@
         android:textColor="@color/colorPrimary"
         android:textSize="18sp" />
 
+    <com.github.mikephil.charting.charts.BarChart
+        android:id="@+id/chart"
+        android:layout_width="362dp"
+        android:layout_height="184dp" />
+
     <TableLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
