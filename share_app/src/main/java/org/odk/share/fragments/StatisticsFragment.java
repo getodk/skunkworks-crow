@@ -43,12 +43,6 @@ import static org.odk.share.activities.MainActivity.FORM_VERSION;
 
 public class StatisticsFragment extends Fragment {
 
-    @BindView(R.id.tvFormsSent)
-    TextView formsSent;
-    @BindView(R.id.tvFormsReceived)
-    TextView formsReceived;
-    @BindView(R.id.tvFormsReviewed)
-    TextView formsReviewed;
     @BindView(R.id.formTitle)
     TextView title;
     @BindView(R.id.formSubTitle)
@@ -110,7 +104,6 @@ public class StatisticsFragment extends Fragment {
                 sentCount++;
             }
         }
-        formsSent.setText(String.valueOf(sentCount));
 
         transferCursor = new TransferDao().getReceiveInstancesCursor();
         transferInstances = new TransferDao().getInstancesFromCursor(transferCursor);
@@ -120,7 +113,6 @@ public class StatisticsFragment extends Fragment {
                 receiveCount++;
             }
         }
-        formsReceived.setText(String.valueOf(receiveCount));
 
         transferCursor = new TransferDao().getReviewedInstancesCursor();
         transferInstances = new TransferDao().getInstancesFromCursor(transferCursor);
@@ -130,9 +122,7 @@ public class StatisticsFragment extends Fragment {
                 reviewCount++;
             }
         }
-        formsReviewed.setText(String.valueOf(reviewCount));
         drawGraph(sentCount,receiveCount,reviewCount);
-
         super.onResume();
     }
 
