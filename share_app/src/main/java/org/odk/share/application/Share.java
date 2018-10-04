@@ -30,9 +30,12 @@ public class Share extends DaggerApplication {
 
     public static final String ODK_ROOT = Environment.getExternalStorageDirectory() + File.separator + "share";
     public static final String ODK_COLLECT_ROOT = Environment.getExternalStorageDirectory() + File.separator + "odk";
-    public static final String FORMS_PATH = ODK_COLLECT_ROOT + File.separator + "forms";
-    public static final String INSTANCES_PATH = ODK_COLLECT_ROOT + File.separator + "instances";
-    public static final String METADATA_PATH = ODK_ROOT + File.separator + "metadata";
+    public static final String FORMS_DIR_NAME = "forms";
+    public static final String INSTANCES_DIR_NAME = "instances";
+    public static final String METADATA_DIR_NAME = "metadata";
+    public static final String FORMS_PATH = ODK_COLLECT_ROOT + File.separator + FORMS_DIR_NAME;
+    public static final String INSTANCES_PATH = ODK_COLLECT_ROOT + File.separator + INSTANCES_DIR_NAME;
+    public static final String METADATA_PATH = ODK_ROOT + File.separator + METADATA_DIR_NAME;
 
     @Override
     public void onCreate() {

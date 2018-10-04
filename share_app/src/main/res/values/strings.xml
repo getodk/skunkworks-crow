@@ -113,6 +113,7 @@
     <string name="rejected">Rejected</string>
     <string name="feedback_sent">\nFeedback sent by reviewer: %s</string>
     <string name="no_feedback_sent">\nNo feedback sent by the reviewer</string>
+
     <string-array name="stats_field">
         <item name="sent">Sent</item>
         <item name="received">Received</item>
@@ -120,4 +121,8 @@
     </string-array>
     <string name="filled_form">Filled forms</string>
     <string name="blank_form">Blank Forms</string>
+
+    <string name="default_odk_destination_dir">\/sdcard\/odk</string>
+    <string name="title_odk_destination_dir">ODK Destination Directory</string>
+    <string name="odk_destination_dir_error">The destination should not be empty</string>
 </resources>

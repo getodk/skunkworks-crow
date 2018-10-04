@@ -27,6 +27,7 @@ public class SettingsPreference extends PreferenceActivity {
     EditTextPreference hotspotNamePreference;
     EditTextPreference hotspotPasswordPreference;
     CheckBoxPreference passwordRequirePreference;
+    EditTextPreference odkDestinationDirPreference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,12 +54,15 @@ public class SettingsPreference extends PreferenceActivity {
         hotspotNamePreference = (EditTextPreference) findPreference(PreferenceKeys.KEY_HOTSPOT_NAME);
         hotspotPasswordPreference = (EditTextPreference) findPreference(PreferenceKeys.KEY_HOTSPOT_PASSWORD);
         passwordRequirePreference = (CheckBoxPreference) findPreference(PreferenceKeys.KEY_HOTSPOT_PWD_REQUIRE);
+        odkDestinationDirPreference = (EditTextPreference) findPreference(PreferenceKeys.KEY_ODK_DESTINATION_DIR);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
         hotspotNamePreference.setSummary(prefs.getString(PreferenceKeys.KEY_HOTSPOT_NAME,
                 getString(R.string.default_hotspot_ssid)));
         boolean isPasswordSet = prefs.getBoolean(PreferenceKeys.KEY_HOTSPOT_PWD_REQUIRE, false);
+        odkDestinationDirPreference.setSummary(prefs.getString(PreferenceKeys.KEY_ODK_DESTINATION_DIR,
+                getString(R.string.default_odk_destination_dir)));
 
         hotspotPasswordPreference.setEnabled(isPasswordSet);
         passwordRequirePreference.setChecked(isPasswordSet);
@@ -66,6 +70,7 @@ public class SettingsPreference extends PreferenceActivity {
         hotspotNamePreference.setOnPreferenceChangeListener(preferenceChangeListener());
         hotspotPasswordPreference.setOnPreferenceChangeListener(preferenceChangeListener());
         passwordRequirePreference.setOnPreferenceChangeListener(preferenceChangeListener());
+        odkDestinationDirPreference.setOnPreferenceChangeListener(preferenceChangeListener());
     }
 
     private Preference.OnPreferenceChangeListener preferenceChangeListener() {
@@ -91,6 +96,15 @@ public class SettingsPreference extends PreferenceActivity {
                         hotspotPasswordPreference.setEnabled(true);
                     } else {
                         hotspotPasswordPreference.setEnabled(false);
+                    }
+                    break;
+                case PreferenceKeys.KEY_ODK_DESTINATION_DIR:
+                    String dir = newValue.toString();
+                    if (dir.length() == 0) {
+                        Toast.makeText(Share.getInstance(), getString(R.string.odk_destination_dir_error), Toast.LENGTH_LONG).show();
+                        return false;
+                    } else {
+                        odkDestinationDirPreference.setSummary(dir);
                     }
                     break;
             }
