@@ -21,5 +21,11 @@
             android:summary="@string/password_hotspot"
             android:title="@string/set_password" />
 
+        <EditTextPreference
+            android:defaultValue="@string/default_odk_destination_dir"
+            android:summary="@string/default_odk_destination_dir"
+            android:title="@string/title_odk_destination_dir"
+            android:key="odk_destination_dir" />
+
     </PreferenceCategory>
 </PreferenceScreen>

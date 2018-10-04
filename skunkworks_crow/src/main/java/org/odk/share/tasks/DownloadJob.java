@@ -1,8 +1,10 @@
 package org.odk.share.tasks;
 
 import android.content.ContentValues;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
 import com.evernote.android.job.Job;
@@ -18,6 +20,9 @@ import org.odk.share.dao.TransferDao;
 import org.odk.share.database.ShareDatabaseHelper;
 import org.odk.share.dto.TransferInstance;
 import org.odk.share.events.DownloadEvent;
+import org.odk.share.preferences.PreferenceKeys;
+import org.odk.share.provider.FormsProviderAPI;
+import org.odk.share.provider.InstanceProviderAPI;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.utilities.ApplicationConstants;
 
@@ -44,7 +49,8 @@ import static org.odk.collect.android.provider.InstanceProviderAPI.InstanceColum
 import static org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns.JR_VERSION;
 import static org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns.STATUS;
 import static org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns.SUBMISSION_URI;
-import static org.odk.share.application.Share.FORMS_PATH;
+import static org.odk.share.application.Share.FORMS_DIR_NAME;
+import static org.odk.share.application.Share.INSTANCES_DIR_NAME;
 import static org.odk.share.application.Share.INSTANCES_PATH;
 import static org.odk.share.dto.InstanceMap.INSTANCE_UUID;
 import static org.odk.share.dto.TransferInstance.INSTANCE_ID;
@@ -250,16 +256,16 @@ public class DownloadJob extends Job {
             }
 
             Timber.d(displayName + " " + formId + " " + formVersion + " " + submissionUri);
-            String formName = receiveFile(FORMS_PATH);
+            String formName = receiveFile(getFormsPath());
             int numOfRes = dis.readInt();
-            String formMediaPath = FORMS_PATH + "/" + displayName + "-media";
+            String formMediaPath = getFormsPath() + File.separator + displayName + "-media";
             while (numOfRes-- > 0) {
                 receiveFile(formMediaPath);
             }
 
             // Add row in forms db
             ContentValues values = new ContentValues();
-            values.put(FormsProviderAPI.FormsColumns.FORM_FILE_PATH, FORMS_PATH + "/" + formName);
+            values.put(FormsProviderAPI.FormsColumns.FORM_FILE_PATH, getFormsPath() + File.separator + formName);
             values.put(FormsProviderAPI.FormsColumns.DISPLAY_NAME, displayName);
             values.put(FormsProviderAPI.FormsColumns.JR_FORM_ID, formId);
             values.put(FormsProviderAPI.FormsColumns.JR_VERSION, formVersion);
@@ -277,6 +283,21 @@ public class DownloadJob extends Job {
         } catch (IOException e) {
             Timber.e(e);
         }
+    }
+
+    private String getFormsPath() {
+        return getOdkDestinationDir() + File.separator + FORMS_DIR_NAME;
+    }
+
+    private String getInstancesPath() {
+        return getOdkDestinationDir() + File.separator + INSTANCES_DIR_NAME;
+    }
+
+    private String getOdkDestinationDir() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext().getApplicationContext());
+
+        return prefs.getString(PreferenceKeys.KEY_ODK_DESTINATION_DIR,
+                getContext().getString(R.string.default_odk_destination_dir));
     }
 
     private void readInstances(String formId, String formVersion) {
@@ -332,7 +353,8 @@ public class DownloadJob extends Job {
                 int numRes = dis.readInt();
                 String time = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss-SSS",
                         Locale.ENGLISH).format(Calendar.getInstance().getTime());
-                String path = INSTANCES_PATH + "/" + formId + "_" + time;
+
+                String path = getInstancesPath() + File.separator + formId + "_" + time;
                 String instanceFilePath = receiveFile(path);
 
                 while (--numRes > 0) {
