@@ -9,6 +9,7 @@ public class TransferInstance {
     public static final String REVIEW_STATUS = "reviewStatus";
     public static final String INSTRUCTIONS = "instructions";
     public static final String INSTANCE_ID = "instanceId";
+    public static final String INSTANCE_UUID = "instanceUuid";
     public static final String TRANSFER_STATUS = "transferStatus";
     public static final String RECEIVED_REVIEW_STATUS = "receivedReviewStatus";
     public static final String LAST_STATUS_CHANGE_DATE = "lastStatusChangeDate";
@@ -25,6 +26,7 @@ public class TransferInstance {
     private int isReviewed;
     private String instructions;
     private Long instanceId;
+    private String instanceUuid;
     private String transferStatus;
     private Long lastStatusChangeDate;
     private Instance instance;
@@ -74,8 +76,16 @@ public class TransferInstance {
         return instanceId;
     }
 
+    public String getInstanceUuid() {
+        return instanceUuid;
+    }
+
     public void setInstanceId(Long instanceId) {
         this.instanceId = instanceId;
+    }
+
+    public void setInstanceUuid(String instanceUuid) {
+        this.instanceUuid = instanceUuid;
     }
 
     public String getTransferStatus() {

@@ -287,8 +287,8 @@ public class DownloadJob extends Job {
                 long id = new InstanceMapDao().getInstanceId(uuid);
 
                 if (mode == ApplicationConstants.SEND_REVIEW_MODE) {
-                    try (Cursor cursor = new TransferDao().getSentInstanceInstanceCursorUsingId(id)) {
-                        if (id != -1 && cursor != null && cursor.getCount() > 0) {
+                    try (Cursor cursor = new TransferDao().getSentInstanceInstanceCursorUsingUuid(uuid)) {
+                        if (cursor != null && cursor.getCount() > 0) {
                             // sent for review start receiving
                             Timber.d("Form sent for review");
                             dos.writeBoolean(true);
@@ -352,6 +352,7 @@ public class DownloadJob extends Job {
                     // Add row in share table
                     ContentValues shareValues = new ContentValues();
                     shareValues.put(INSTANCE_ID, Long.parseLong(uri.getLastPathSegment()));
+                    shareValues.put(TransferInstance.INSTANCE_UUID, uuid);
                     shareValues.put(TRANSFER_STATUS, STATUS_FORM_RECEIVE);
                     sbResult.append(displayName + getContext().getString(R.string.success,
                             getContext().getString(R.string.received_for_review)));
@@ -360,7 +361,7 @@ public class DownloadJob extends Job {
                     String selection = InstanceProviderAPI.InstanceColumns._ID + "=?";
                     String[] selectionArgs = {String.valueOf(id)};
                     new InstancesDao().updateInstance(values, selection, selectionArgs);
-                    TransferInstance transferInstance = new TransferDao().getSentTransferInstanceFromInstanceId(id);
+                    TransferInstance transferInstance = new TransferDao().getSentTransferInstanceFromInstanceUuid(uuid);
                     if (mode == ApplicationConstants.SEND_REVIEW_MODE) {
                         ContentValues shareValues = new ContentValues();
                         shareValues.put(INSTRUCTIONS, feedback);

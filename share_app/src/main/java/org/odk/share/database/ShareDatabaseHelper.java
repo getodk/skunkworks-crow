@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import org.odk.share.application.Share;
+import org.odk.share.dto.TransferInstance;
 
 import timber.log.Timber;
 
@@ -55,6 +56,7 @@ public class ShareDatabaseHelper extends SQLiteOpenHelper {
                 + REVIEW_STATUS + " integer, "
                 + INSTRUCTIONS + " text, "
                 + INSTANCE_ID + " integer not null, "
+                + TransferInstance.INSTANCE_UUID + " text not null, "
                 + TRANSFER_STATUS + " text not null, "
                 + RECEIVED_REVIEW_STATUS + " integer,"
                 + VISITED_COUNT + " integer, "

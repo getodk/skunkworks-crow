@@ -43,9 +43,9 @@ public class TransferDao {
         return getInstancesCursor(null, selection, selectionArgs, null);
     }
 
-    public Cursor getSentInstanceInstanceCursorUsingId(long id) {
-        String selection = TransferInstance.TRANSFER_STATUS + " =? AND " + TransferInstance.INSTANCE_ID + " =?";
-        String[] selectionArgs = {TransferInstance.STATUS_FORM_SENT, String.valueOf(id)};
+    public Cursor getSentInstanceInstanceCursorUsingUuid(String uuid) {
+        String selection = TransferInstance.TRANSFER_STATUS + " =? AND " + TransferInstance.INSTANCE_UUID + " =?";
+        String[] selectionArgs = {TransferInstance.STATUS_FORM_SENT, uuid};
         return getInstancesCursor(null, selection, selectionArgs, null);
     }
 
@@ -101,9 +101,9 @@ public class TransferDao {
         return null;
     }
 
-    public TransferInstance getSentTransferInstanceFromInstanceId(long instanceId) {
-        String selection = TransferInstance.INSTANCE_ID + " =? AND " + TransferInstance.TRANSFER_STATUS + " =?";
-        String[] selectionArgs = {String.valueOf(instanceId), TransferInstance.STATUS_FORM_SENT};
+    public TransferInstance getSentTransferInstanceFromInstanceUuid(String uuid) {
+        String selection = TransferInstance.INSTANCE_UUID + " =? AND " + TransferInstance.TRANSFER_STATUS + " =?";
+        String[] selectionArgs = {uuid, TransferInstance.STATUS_FORM_SENT};
         Cursor cursor = getInstancesCursor(null, selection, selectionArgs, null);
         List<TransferInstance> transferInstanceList = getInstancesFromCursor(cursor);
         if (transferInstanceList.size() > 0) {
@@ -121,6 +121,7 @@ public class TransferDao {
                     int isReviewedColumnIndex = cursor.getColumnIndex(TransferInstance.REVIEW_STATUS);
                     int instructionColumnIndex = cursor.getColumnIndex(TransferInstance.INSTRUCTIONS);
                     int instanceIdColumnIndex = cursor.getColumnIndex(TransferInstance.INSTANCE_ID);
+                    int instanceUuidColumnIndex = cursor.getColumnIndex(TransferInstance.INSTANCE_UUID);
                     int transferStatusColumnIndex = cursor.getColumnIndex(TransferInstance.TRANSFER_STATUS);
                     int lastStatusChangeDateColumnIndex = cursor.getColumnIndex(TransferInstance.LAST_STATUS_CHANGE_DATE);
                     int receivedReviewStatusColumnIndex = cursor.getColumnIndex(TransferInstance.RECEIVED_REVIEW_STATUS);
@@ -130,6 +131,7 @@ public class TransferDao {
                     transferInstance.setReviewed(cursor.getInt(isReviewedColumnIndex));
                     transferInstance.setInstructions(cursor.getString(instructionColumnIndex));
                     transferInstance.setInstanceId(cursor.getLong(instanceIdColumnIndex));
+                    transferInstance.setInstanceUuid(cursor.getString(instanceUuidColumnIndex));
                     transferInstance.setTransferStatus(cursor.getString(transferStatusColumnIndex));
                     transferInstance.setLastStatusChangeDate(cursor.getLong(lastStatusChangeDateColumnIndex));
                     transferInstance.setReceivedReviewStatus(cursor.getInt(receivedReviewStatusColumnIndex));
