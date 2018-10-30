@@ -80,9 +80,6 @@
     <string name="sort_by_date_asc">Date, newest first</string>
     <string name="sort_by_date_desc">Date, oldest first</string>
     <string name="sort_by">Sort by</string>
-    <string name="num_forms_sent">Number of forms sent</string>
-    <string name="num_forms_received">Number of forms received</string>
-    <string name="num_forms_reviewed">Number of forms reviewed</string>
     <string name="approve">Approve</string>
     <string name="Reject">Reject</string>
     <string name="review_later">Review Later</string>
