@@ -10,13 +10,11 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.formatter.LargeValueFormatter;
 
 import org.odk.share.R;
@@ -122,15 +120,15 @@ public class StatisticsFragment extends Fragment {
                 reviewCount++;
             }
         }
-        drawGraph(sentCount,receiveCount,reviewCount);
+        drawGraph(sentCount, receiveCount, reviewCount);
         super.onResume();
     }
 
-    public void drawGraph(int sentCount,int receiveCount,int reviewCount){
+    public void drawGraph(int sentCount, int receiveCount, int reviewCount) {
         List<BarEntry> entries = new ArrayList<>();
-        entries.add(new BarEntry(0,sentCount));
-        entries.add(new BarEntry(1,receiveCount));
-        entries.add(new BarEntry(2,reviewCount));
+        entries.add(new BarEntry(0, sentCount));
+        entries.add(new BarEntry(1, receiveCount));
+        entries.add(new BarEntry(2, reviewCount));
 
         BarDataSet set = new BarDataSet(entries, "Counts");
         set.setValueFormatter(new LargeValueFormatter());
@@ -140,7 +138,7 @@ public class StatisticsFragment extends Fragment {
 
         XAxis xAxis = chart.getXAxis();
         YAxis yAxisR = chart.getAxisRight();
-        YAxis yAxisL= chart.getAxisLeft();
+        YAxis yAxisL = chart.getAxisLeft();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         yAxisR.setEnabled(false);
         xAxis.setDrawGridLines(false);
@@ -148,30 +146,30 @@ public class StatisticsFragment extends Fragment {
         xAxis.setDrawLabels(true);
         xAxis.setTypeface(Typeface.DEFAULT_BOLD);
         yAxisL.setTypeface(Typeface.DEFAULT_BOLD);
-        String mValues[]={"Sent","Received","Reviewed"};
+        String[] mValues = {"Sent", "Received", "Reviewed"};
         xAxis.setLabelCount(3);
         xAxis.setValueFormatter((value, axis) -> mValues[(int) (value)]);
         yAxisL.setValueFormatter(new LargeValueFormatter());
         yAxisL.setAxisMinimum(0);
-        int maxValue=Math.max(Math.max(sentCount,receiveCount),reviewCount);
-        int granularity=1;
-        if(maxValue<=5){
-            yAxisL.setAxisMaximum(5);}
-        else{
+        int maxValue = Math.max(Math.max(sentCount, receiveCount), reviewCount);
+        int granularity = 1;
+        if (maxValue <= 5) {
+            yAxisL.setAxisMaximum(5);
+        } else {
             int axisMax;
             maxValue+=1;
-            if(maxValue%5!=0){
-                granularity=(maxValue/5)+1;
-                axisMax=5*granularity;
+            if(maxValue % 5 != 0) {
+                granularity = (maxValue / 5) + 1;
+                axisMax = 5 * granularity;
             }
-            else{
-                axisMax=maxValue;
-                granularity=maxValue/5;
+            else {
+                axisMax = maxValue;
+                granularity = maxValue / 5;
             }
             yAxisL.setAxisMaximum(axisMax);
         }
         yAxisL.setGranularity(granularity);
-        yAxisL.setLabelCount(6,true);
+        yAxisL.setLabelCount(6, true);
         xAxis.setTextSize(13);
 
         chart.setData(data);
