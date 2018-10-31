@@ -157,12 +157,11 @@ public class StatisticsFragment extends Fragment {
             yAxisL.setAxisMaximum(5);
         } else {
             int axisMax;
-            maxValue+=1;
-            if(maxValue % 5 != 0) {
+            maxValue += 1;
+            if (maxValue % 5 != 0) {
                 granularity = (maxValue / 5) + 1;
                 axisMax = 5 * granularity;
-            }
-            else {
+            } else {
                 axisMax = maxValue;
                 granularity = maxValue / 5;
             }
