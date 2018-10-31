@@ -136,25 +136,25 @@ public class StatisticsFragment extends Fragment {
         BarData data = new BarData(set);
         data.setBarWidth(0.9f); // set custom bar width
 
-        XAxis xAxis = chart.getXAxis();
-        YAxis yAxisR = chart.getAxisRight();
-        YAxis yAxisL = chart.getAxisLeft();
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        yAxisR.setEnabled(false);
-        xAxis.setDrawGridLines(false);
-        yAxisR.setDrawGridLines(false);
-        xAxis.setDrawLabels(true);
-        xAxis.setTypeface(Typeface.DEFAULT_BOLD);
-        yAxisL.setTypeface(Typeface.DEFAULT_BOLD);
+        XAxis axisX = chart.getXAxis();
+        YAxis axisYR = chart.getAxisRight();
+        YAxis axisYL = chart.getAxisLeft();
+        axisX.setPosition(XAxis.XAxisPosition.BOTTOM);
+        axisYR.setEnabled(false);
+        axisX.setDrawGridLines(false);
+        axisYR.setDrawGridLines(false);
+        axisX.setDrawLabels(true);
+        axisX.setTypeface(Typeface.DEFAULT_BOLD);
+        axisYL.setTypeface(Typeface.DEFAULT_BOLD);
         String[] mValues = {"Sent", "Received", "Reviewed"};
-        xAxis.setLabelCount(3);
-        xAxis.setValueFormatter((value, axis) -> mValues[(int) (value)]);
-        yAxisL.setValueFormatter(new LargeValueFormatter());
-        yAxisL.setAxisMinimum(0);
+        axisX.setLabelCount(3);
+        axisX.setValueFormatter((value, axis) -> mValues[(int) (value)]);
+        axisYL.setValueFormatter(new LargeValueFormatter());
+        axisYL.setAxisMinimum(0);
         int maxValue = Math.max(Math.max(sentCount, receiveCount), reviewCount);
         int granularity = 1;
         if (maxValue <= 5) {
-            yAxisL.setAxisMaximum(5);
+            axisYL.setAxisMaximum(5);
         } else {
             int axisMax;
             maxValue += 1;
@@ -165,11 +165,11 @@ public class StatisticsFragment extends Fragment {
                 axisMax = maxValue;
                 granularity = maxValue / 5;
             }
-            yAxisL.setAxisMaximum(axisMax);
+            axisYL.setAxisMaximum(axisMax);
         }
-        yAxisL.setGranularity(granularity);
-        yAxisL.setLabelCount(6, true);
-        xAxis.setTextSize(13);
+        axisYL.setGranularity(granularity);
+        axisYL.setLabelCount(6, true);
+        axisX.setTextSize(13);
 
         chart.setData(data);
         chart.setFitBars(true); // make the x-axis fit exactly all bars
