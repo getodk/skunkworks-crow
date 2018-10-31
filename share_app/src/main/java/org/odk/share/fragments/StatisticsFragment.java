@@ -146,7 +146,7 @@ public class StatisticsFragment extends Fragment {
         axisYR.setDrawGridLines(false);
         axisX.setDrawLabels(true);
         axisX.setTypeface(Typeface.DEFAULT_BOLD);
-        String[] values = {"Sent", "Received", "Reviewed"};
+        String[] values = getResources().getStringArray(R.array.stats_field);
         axisX.setLabelCount(3);
         axisX.setValueFormatter((value, axis) -> values[(int) (value)]);
         axisYL.setValueFormatter(new LargeValueFormatter());

@@ -113,4 +113,9 @@
     <string name="rejected">Rejected</string>
     <string name="feedback_sent">\nFeedback sent by reviewer: %s</string>
     <string name="no_feedback_sent">\nNo feedback sent by the reviewer</string>
+    <string-array name="stats_field">
+        <item name="sent">Sent</item>
+        <item name="received">Received</item>
+        <item name="reviewed">Reviewed</item>
+    </string-array>
 </resources>
