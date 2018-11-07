@@ -11,7 +11,7 @@ public abstract class CursorRecyclerViewAdapter<T extends BaseCursorViewHolder> 
     protected Context context;
     private Cursor cursor;
     private boolean dataValid;
-    private OnItemClickListener listener;
+    public OnItemClickListener listener;
     private int rowIdColumn;
     private DataSetObserver dataSetObserver;
 

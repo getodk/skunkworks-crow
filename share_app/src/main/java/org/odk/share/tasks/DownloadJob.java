@@ -224,7 +224,7 @@ public class DownloadJob extends Job {
                 sbResult.append(getContext().getString(R.string.version, formVersion)).append(" ");
             }
             sbResult.append(getContext().getString(R.string.id, formId) + " " +
-                    getContext().getString(R.string.success, getContext().getString(R.string.blank_form,
+                    getContext().getString(R.string.success, getContext().getString(R.string.blank_form_count,
                             getContext().getString(R.string.received))));
         } catch (IOException e) {
             Timber.e(e);
