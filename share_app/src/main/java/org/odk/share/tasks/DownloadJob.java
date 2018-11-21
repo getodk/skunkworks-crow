@@ -356,9 +356,10 @@ public class DownloadJob extends Job {
             long fileSize = dis.readLong();
             Timber.d("Size of file " + filename + " " + fileSize);
 
-            int x = 0; boolean saved = false;
-            while(!saved && x < 3){
-                saved = persistFile(path,filename,fileSize,x);
+            int x = 0;
+            boolean saved = false;
+            while (!saved && x < 3) {
+                saved = persistFile(path, filename, fileSize, x);
                 x++;
             }
         } catch (Exception e) {
@@ -368,12 +369,12 @@ public class DownloadJob extends Job {
     }
 
     /**
-     Fix issue on some android phones loosing permission to write to disk
-     Happened on android lollipop
+     * Fix issue on some android phones loosing permission to write to disk
+     * Happened on android lollipop
      **/
-    private boolean persistFile(String path, String filename, long fileSize , int retry) throws Exception {
+    private boolean persistFile(String path, String filename, long fileSize, int retry) throws Exception {
 
-        if(retry > 0){
+        if (retry > 0) {
             if (ContextCompat.checkSelfPermission(getContext().getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
                     != PackageManager.PERMISSION_GRANTED) {
                 // Permission lost, retry after 2 seconds then retry
@@ -386,7 +387,7 @@ public class DownloadJob extends Job {
             }
         }
 
-        try{
+        try {
             File shareDir = new File(path);
 
             if (!shareDir.exists()) {
@@ -406,7 +407,7 @@ public class DownloadJob extends Job {
             fos.close();
             Timber.d("File created and saved " + newFile.getAbsolutePath() + " " + newFile.getName());
             return true;
-        }catch (Exception e){
+        } catch (Exception e) {
             Timber.e("Error occurred when saving file " + e.toString());
             return false;
         }
