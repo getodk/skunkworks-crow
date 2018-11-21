@@ -1,9 +1,12 @@
 package org.odk.share.tasks;
 
+import android.Manifest;
 import android.content.ContentValues;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 
 import com.evernote.android.job.Job;
 
@@ -352,6 +355,38 @@ public class DownloadJob extends Job {
             filename = dis.readUTF();
             long fileSize = dis.readLong();
             Timber.d("Size of file " + filename + " " + fileSize);
+
+            int x = 0; boolean saved = false;
+            while(!saved && x < 3){
+                saved = persistFile(path,filename,fileSize,x);
+                x++;
+            }
+        } catch (Exception e) {
+            Timber.e(e);
+        }
+        return filename;
+    }
+
+    /**
+     Fix issue on some android phones loosing permission to write to disk
+     Happened on android lollipop
+     **/
+    private boolean persistFile(String path, String filename, long fileSize , int retry) throws Exception {
+
+        if(retry > 0){
+            if (ContextCompat.checkSelfPermission(getContext().getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED) {
+                // Permission lost, retry after 2 seconds then retry
+                System.gc();
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    Timber.e("Thread sleep interrupted" + e.toString());
+                }
+            }
+        }
+
+        try{
             File shareDir = new File(path);
 
             if (!shareDir.exists()) {
@@ -370,9 +405,10 @@ public class DownloadJob extends Job {
             }
             fos.close();
             Timber.d("File created and saved " + newFile.getAbsolutePath() + " " + newFile.getName());
-        } catch (IOException e) {
-            Timber.e(e);
+            return true;
+        }catch (Exception e){
+            Timber.e("Error occurred when saving file " + e.toString());
+            return false;
         }
-        return filename;
     }
 }
