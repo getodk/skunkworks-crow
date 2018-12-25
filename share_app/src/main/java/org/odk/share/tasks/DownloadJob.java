@@ -52,6 +52,7 @@ import static org.odk.share.provider.InstanceProviderAPI.InstanceColumns.JR_FORM
 import static org.odk.share.provider.InstanceProviderAPI.InstanceColumns.JR_VERSION;
 import static org.odk.share.provider.InstanceProviderAPI.InstanceColumns.STATUS;
 import static org.odk.share.provider.InstanceProviderAPI.InstanceColumns.SUBMISSION_URI;
+import static org.odk.share.utilities.ApplicationConstants.SEND_FILL_FORM_MODE;
 
 public class DownloadJob extends Job {
 
@@ -99,13 +100,23 @@ public class DownloadJob extends Job {
             Timber.d("Socket connected");
             dis = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
             dos = new DataOutputStream(socket.getOutputStream());
-            total = dis.readInt();
-            int num = dis.readInt();
-            Timber.d("Number of forms : %d", num);
-            for (int i = 0; i < num; i++) {
-                Timber.d("Downloading form : %d", i + 1);
-                boolean result = readFormAndInstances();
-                Timber.d("Form %d downloaded = %s", i + 1, result);
+            int mode = dis.readInt();
+            if (mode == SEND_FILL_FORM_MODE) {
+                total = dis.readInt();
+                int num = dis.readInt();
+                Timber.d("Number of forms : %d", num);
+                for (int i = 0; i < num; i++) {
+                    Timber.d("Downloading form : %d", i + 1);
+                    boolean result = readFormAndInstances();
+                    Timber.d("Form %d downloaded = %s", i + 1, result);
+                }
+            } else {
+                total = dis.readInt();
+                for (int i = 0; i < total; i++) {
+                    Timber.d("Downloading blank form: %d", i + 1);
+                    readBlankForm();
+                    Timber.d("Downloaded blank form %d", i + 1);
+                }
             }
 
             // close connection
@@ -165,6 +176,31 @@ public class DownloadJob extends Job {
             Timber.e(e);
         }
         return false;
+    }
+
+    private void readBlankForm() {
+        String formId = null;
+        try {
+            Timber.d("Reading blank form");
+            formId = dis.readUTF();
+            String formVersion = dis.readUTF();
+            Timber.d(formId + " " + formVersion);
+            if (formVersion.equals("-1")) {
+                formVersion = null;
+            }
+
+            boolean formExists = isFormExits(formId, formVersion);
+            Timber.d("Form exists %s", formExists);
+
+            dos.writeBoolean(formExists);
+
+            if (!formExists) {
+                // read form
+                readForm();
+            }
+        } catch (IOException e) {
+            Timber.e(e);
+        }
     }
 
     private boolean isFormExits(String formId, String formVersion) {

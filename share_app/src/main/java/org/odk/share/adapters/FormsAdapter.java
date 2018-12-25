@@ -23,7 +23,7 @@ import butterknife.ButterKnife;
 public class FormsAdapter extends CursorRecyclerViewAdapter<FormsAdapter.FormHolder> {
 
     private LinkedHashSet<Long> selectedForms;
-    
+
     public FormsAdapter(Context context, Cursor cursor, OnItemClickListener listener, LinkedHashSet<Long> selectedForms) {
         super(context, cursor, listener);
         this.selectedForms = selectedForms;

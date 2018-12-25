@@ -46,6 +46,8 @@ import static org.odk.share.dto.TransferInstance.INSTANCE_ID;
 import static org.odk.share.dto.TransferInstance.STATUS_FORM_SENT;
 import static org.odk.share.dto.TransferInstance.TRANSFER_STATUS;
 import static org.odk.share.fragments.ReviewedInstancesFragment.MODE;
+import static org.odk.share.utilities.ApplicationConstants.SEND_BLANK_FORM_MODE;
+import static org.odk.share.utilities.ApplicationConstants.SEND_FILL_FORM_MODE;
 
 public class UploadJob extends Job {
 
@@ -135,109 +137,117 @@ public class UploadJob extends Job {
 
     private boolean processSelectedFiles(Long[] ids) {
 
-        // map that stores key as formId and value is another map which contains version as key and List with instances as value
-        Map<String, Map<String, List<String>>> formMap = new HashMap<>();
-        StringBuilder selectionBuf = new StringBuilder(InstanceProviderAPI.InstanceColumns._ID + " IN (");
-        String[] selectionArgs = new String[ids.length];
-        for (int i = 0; i < ids.length; i++) {
-            if (i > 0) {
-                selectionBuf.append(",");
-            }
-            selectionBuf.append("?");
-            selectionArgs[i] = ids[i].toString();
-        }
+        // send mode
+        if (mode == SEND_BLANK_FORM_MODE) {
+            try {
+                dos.writeInt(SEND_BLANK_FORM_MODE);
+                dos.writeInt(ids.length);
 
-        selectionBuf.append(")");
-        String selection = selectionBuf.toString();
-
-        int count = 0;
-        try (Cursor cursor = new InstancesDao().getInstancesCursor(selection, selectionArgs)) {
-            if (cursor != null && cursor.getCount() > 0) {
-                cursor.moveToPosition(-1);
-                while (cursor.moveToNext()) {
-                    String formId = cursor.getString(cursor.getColumnIndex(InstanceProviderAPI.InstanceColumns.JR_FORM_ID));
-                    String formVersion = cursor.getString(cursor.getColumnIndex(InstanceProviderAPI.InstanceColumns.JR_VERSION));
-
-                    Map<String, List<String>> instanceMap;
-                    if (formMap.containsKey(formId)) {
-                        instanceMap = formMap.get(formId);
-                    } else {
-                        instanceMap = new HashMap<>();
-                        formMap.put(formId, instanceMap);
+                StringBuilder selectionBuf = new StringBuilder(FormsProviderAPI.FormsColumns._ID + " IN (");
+                String[] selectionArgs = new String[ids.length];
+                for (int i = 0; i < ids.length; i++) {
+                    if (i > 0) {
+                        selectionBuf.append(",");
                     }
-
-                    List<String> instancesList;
-                    if (instanceMap.containsKey(formVersion)) {
-                        instancesList = instanceMap.get(formVersion);
-                    } else {
-                        instancesList = new ArrayList<>();
-                        instanceMap.put(formVersion, instancesList);
-                        count++;
-                    }
-
-                    instancesList.add(cursor.getString(cursor.getColumnIndex(InstanceProviderAPI.InstanceColumns._ID)));
+                    selectionBuf.append("?");
+                    selectionArgs[i] = ids[i].toString();
                 }
+
+                selectionBuf.append(")");
+                String selection = selectionBuf.toString();
+
+                try (Cursor cursor = new FormsDao().getFormsCursor(selection, selectionArgs)) {
+                    if (cursor != null && cursor.getCount() > 0) {
+                        cursor.moveToPosition(-1);
+                        while (cursor.moveToNext()) {
+                            sendBlankForm(cursor);
+                            progress++;
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                Timber.e(e);
             }
-            Timber.d(String.valueOf(formMap));
-        }
+        } else {
+            // map that stores key as formId and value is another map which contains version as key and List with instances as value
+            Map<String, Map<String, List<String>>> formMap = new HashMap<>();
+            StringBuilder selectionBuf = new StringBuilder(InstanceProviderAPI.InstanceColumns._ID + " IN (");
+            String[] selectionArgs = new String[ids.length];
+            for (int i = 0; i < ids.length; i++) {
+                if (i > 0) {
+                    selectionBuf.append(",");
+                }
+                selectionBuf.append("?");
+                selectionArgs[i] = ids[i].toString();
+            }
 
-        // send number of distinct forms
-        try {
-            dos.writeInt(ids.length);
-            dos.writeInt(count);
-        } catch (IOException e) {
-            Timber.e(e);
-        }
+            selectionBuf.append(")");
+            String selection = selectionBuf.toString();
 
-        total = ids.length;
-        // using iterators
+            int count = 0;
+            try (Cursor cursor = new InstancesDao().getInstancesCursor(selection, selectionArgs)) {
+                if (cursor != null && cursor.getCount() > 0) {
+                    cursor.moveToPosition(-1);
+                    while (cursor.moveToNext()) {
+                        String formId = cursor.getString(cursor.getColumnIndex(InstanceProviderAPI.InstanceColumns.JR_FORM_ID));
+                        String formVersion = cursor.getString(cursor.getColumnIndex(InstanceProviderAPI.InstanceColumns.JR_VERSION));
 
-        for (Map.Entry<String, Map<String, List<String>>> mapId : formMap.entrySet()) {
-            Map<String, List<String>> formVersionMap = mapId.getValue();
+                        Map<String, List<String>> instanceMap;
+                        if (formMap.containsKey(formId)) {
+                            instanceMap = formMap.get(formId);
+                        } else {
+                            instanceMap = new HashMap<>();
+                            formMap.put(formId, instanceMap);
+                        }
 
-            for (Map.Entry<String, List<String>> mapVersion : formVersionMap.entrySet()) {
-                List<String> instanceIds = mapVersion.getValue();
-                String formVers = mapVersion.getKey();
-                String formId = mapId.getKey();
-                sendFormWithInstance(formId, formVers, instanceIds);
-                progress += instanceIds.size();
+                        List<String> instancesList;
+                        if (instanceMap.containsKey(formVersion)) {
+                            instancesList = instanceMap.get(formVersion);
+                        } else {
+                            instancesList = new ArrayList<>();
+                            instanceMap.put(formVersion, instancesList);
+                            count++;
+                        }
+
+                        instancesList.add(cursor.getString(cursor.getColumnIndex(InstanceProviderAPI.InstanceColumns._ID)));
+                    }
+                }
+                Timber.d(String.valueOf(formMap));
+            }
+
+            // send number of distinct forms
+            try {
+                dos.writeInt(SEND_FILL_FORM_MODE);
+                dos.writeInt(ids.length);
+                dos.writeInt(count);
+            } catch (IOException e) {
+                Timber.e(e);
+            }
+
+            total = ids.length;
+            // using iterators
+
+            for (Map.Entry<String, Map<String, List<String>>> mapId : formMap.entrySet()) {
+                Map<String, List<String>> formVersionMap = mapId.getValue();
+
+                for (Map.Entry<String, List<String>> mapVersion : formVersionMap.entrySet()) {
+                    List<String> instanceIds = mapVersion.getValue();
+                    String formVers = mapVersion.getKey();
+                    String formId = mapId.getKey();
+                    sendFormWithInstance(formId, formVers, instanceIds);
+                    progress += instanceIds.size();
+                }
             }
         }
         return true;
     }
 
     private void sendFormWithInstance(String formId, String formVersion, List<String> instanceIds) {
-        try {
-            Timber.d("SendFormWithInstance");
-            dos.writeUTF(formId);
-
-            if (formVersion == null) {
-                dos.writeUTF("-1");
-            } else {
-                dos.writeUTF(formVersion);
-            }
-
-            dos.flush();
-
-            Timber.d("Waiting for response from the receiver for %s %s ", formId, formVersion);
-            while (dis.available() <= 0) {
-                continue;
-            }
-
-            boolean formExistAtReceiver = dis.readBoolean();
-            Timber.d("Form exists %b ", formExistAtReceiver);
-
-            if (!formExistAtReceiver) {
-                sendForm(formId, formVersion);
-                Timber.d("Form sent to the receiver");
-            }
-
-            Timber.d("Sending Instances");
-            sendInstances(instanceIds, progress, total);
-            Timber.d("Instanes sent");
-        } catch (IOException e) {
-            Timber.e(e);
-        }
+        Timber.d("SendFormWithInstance");
+        sendForm(formId, formVersion);
+        Timber.d("Sending Instances");
+        sendInstances(instanceIds, progress, total);
+        Timber.d("Instanes sent");
     }
 
     private void sendForm(String formId, String formVersion) {
@@ -258,54 +268,81 @@ public class UploadJob extends Job {
             cursor.moveToPosition(-1);
 
             if (cursor.moveToNext()) {
-                String displayName = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.DISPLAY_NAME));
-                String formMediaPath = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.FORM_MEDIA_PATH));
-                String formFilePath = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.FORM_FILE_PATH));
-                String submissionUri = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.SUBMISSION_URI));
-
-                try {
-                    dos.writeUTF(displayName);
-                    dos.writeUTF(formId);
-
-                    if (formVersion == null) {
-                        dos.writeUTF("-1");
-                    } else {
-                        dos.writeUTF(formVersion);
-                    }
-
-                    if (submissionUri == null) {
-                        dos.writeUTF("-1");
-                    } else {
-                        dos.writeUTF(submissionUri);
-                    }
-
-                    // form file sent
-                    sendFile(formFilePath);
-
-                    // send form resources
-                    File[] formRes = getFormResources(formMediaPath);
-
-                    if (formRes != null) {
-                        dos.writeInt(formRes.length);
-                        for (File f : formRes) {
-                            String fileName = f.getName();
-                            sendFile(formMediaPath + "/" + fileName);
-                        }
-                    } else {
-                        dos.writeInt(0);
-                    }
-
-                    sbResult.append(displayName + " ");
-                    if (formVersion != null) {
-                        sbResult.append(getContext().getString(R.string.version, formVersion)).append(" ");
-                    }
-                    sbResult.append(getContext().getString(R.string.id, formId) + " " +
-                            getContext().getString(R.string.success, getContext().getString(R.string.blank_form_count,
-                                    getContext().getString(R.string.sent))));
-                } catch (IOException e) {
-                    Timber.e(e);
-                }
+                sendBlankForm(cursor);
             }
+        }
+    }
+
+    private void sendBlankForm(Cursor cursor) {
+        String displayName = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.DISPLAY_NAME));
+        String formMediaPath = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.FORM_MEDIA_PATH));
+        String formFilePath = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.FORM_FILE_PATH));
+        String submissionUri = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.SUBMISSION_URI));
+        String formId = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.JR_FORM_ID));
+        String formVersion = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.JR_VERSION));
+
+        try {
+            dos.writeUTF(formId);
+            if (formVersion == null) {
+                dos.writeUTF("-1");
+            } else {
+                dos.writeUTF(formVersion);
+            }
+
+            dos.flush();
+
+            Timber.d("Waiting for response from the receiver for %s %s ", formId, formVersion);
+            while (dis.available() <= 0) {
+                continue;
+            }
+
+            boolean formExistAtReceiver = dis.readBoolean();
+            Timber.d("Form exists %b ", formExistAtReceiver);
+
+            if (!formExistAtReceiver) {
+                Timber.d("Form sent to the receiver");
+
+                dos.writeUTF(displayName);
+                dos.writeUTF(formId);
+
+                if (formVersion == null) {
+                    dos.writeUTF("-1");
+                } else {
+                    dos.writeUTF(formVersion);
+                }
+
+                if (submissionUri == null) {
+                    dos.writeUTF("-1");
+                } else {
+                    dos.writeUTF(submissionUri);
+                }
+
+                // form file sent
+                sendFile(formFilePath);
+
+                // send form resources
+                File[] formRes = getFormResources(formMediaPath);
+
+                if (formRes != null) {
+                    dos.writeInt(formRes.length);
+                    for (File f : formRes) {
+                        String fileName = f.getName();
+                        sendFile(formMediaPath + "/" + fileName);
+                    }
+                } else {
+                    dos.writeInt(0);
+                }
+
+                sbResult.append(displayName + " ");
+                if (formVersion != null) {
+                    sbResult.append(getContext().getString(R.string.version, formVersion)).append(" ");
+                }
+                sbResult.append(getContext().getString(R.string.id, formId) + " " +
+                        getContext().getString(R.string.success, getContext().getString(R.string.blank_form_count,
+                                getContext().getString(R.string.sent))));
+            }
+        } catch (IOException e) {
+            Timber.e(e);
         }
     }
 

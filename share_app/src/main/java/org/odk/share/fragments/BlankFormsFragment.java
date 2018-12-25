@@ -51,7 +51,7 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
 
     private static final String FORM_CHOOSER_LIST_SORTING_ORDER = "formChooserListSortingOrder";
 
-    public static final String INSTANCE_IDS = "instance_ids";
+    public static final String FORM_IDS = "form_ids";
 
     private static final int FORM_LOADER = 2;
     private FormsAdapter formAdapter;
@@ -131,8 +131,8 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
         Intent intent = new Intent(getActivity(), SendActivity.class);
         Long[] arr = selectedForms.toArray(new Long[selectedForms.size()]);
         long[] a = ArrayUtils.toPrimitive(arr);
-        intent.putExtra(INSTANCE_IDS, a);
-        intent.putExtra(MODE, ApplicationConstants.ASK_REVIEW_MODE);
+        intent.putExtra(FORM_IDS, a);
+        intent.putExtra(MODE, ApplicationConstants.SEND_BLANK_FORM_MODE);
         startActivity(intent);
         getActivity().finish();
     }
