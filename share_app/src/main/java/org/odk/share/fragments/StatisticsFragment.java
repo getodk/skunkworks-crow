@@ -1,12 +1,21 @@
 package org.odk.share.fragments;
 
 import android.database.Cursor;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.formatter.LargeValueFormatter;
 
 import org.odk.share.R;
 import org.odk.share.dao.InstancesDao;
@@ -15,6 +24,7 @@ import org.odk.share.dto.Instance;
 import org.odk.share.dto.TransferInstance;
 import org.odk.share.provider.InstanceProviderAPI;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -31,16 +41,12 @@ import static org.odk.share.activities.MainActivity.FORM_VERSION;
 
 public class StatisticsFragment extends Fragment {
 
-    @BindView(R.id.tvFormsSent)
-    TextView formsSent;
-    @BindView(R.id.tvFormsReceived)
-    TextView formsReceived;
-    @BindView(R.id.tvFormsReviewed)
-    TextView formsReviewed;
     @BindView(R.id.formTitle)
     TextView title;
     @BindView(R.id.formSubTitle)
     TextView subtitle;
+    @BindView(R.id.chart)
+    BarChart chart;
 
     private String formVersion;
     private String formId;
@@ -96,7 +102,6 @@ public class StatisticsFragment extends Fragment {
                 sentCount++;
             }
         }
-        formsSent.setText(String.valueOf(sentCount));
 
         transferCursor = new TransferDao().getReceiveInstancesCursor();
         transferInstances = new TransferDao().getInstancesFromCursor(transferCursor);
@@ -106,7 +111,6 @@ public class StatisticsFragment extends Fragment {
                 receiveCount++;
             }
         }
-        formsReceived.setText(String.valueOf(receiveCount));
 
         transferCursor = new TransferDao().getReviewedInstancesCursor();
         transferInstances = new TransferDao().getInstancesFromCursor(transferCursor);
@@ -116,8 +120,63 @@ public class StatisticsFragment extends Fragment {
                 reviewCount++;
             }
         }
-        formsReviewed.setText(String.valueOf(reviewCount));
-
+        drawGraph(sentCount, receiveCount, reviewCount);
         super.onResume();
+    }
+
+    public void drawGraph(int sentCount, int receiveCount, int reviewCount) {
+        List<BarEntry> entries = new ArrayList<>();
+        entries.add(new BarEntry(0, sentCount));
+        entries.add(new BarEntry(1, receiveCount));
+        entries.add(new BarEntry(2, reviewCount));
+
+        BarDataSet set = new BarDataSet(entries, "Counts");
+        set.setValueFormatter(new LargeValueFormatter());
+        set.setValueTextSize(10);
+        BarData data = new BarData(set);
+        data.setBarWidth(0.9f); // set custom bar width
+
+        XAxis axisX = chart.getXAxis();
+        YAxis axisYR = chart.getAxisRight();
+        YAxis axisYL = chart.getAxisLeft();
+        axisYL.setTypeface(Typeface.DEFAULT_BOLD);
+        axisX.setPosition(XAxis.XAxisPosition.BOTTOM);
+        axisYR.setEnabled(false);
+        axisX.setDrawGridLines(false);
+        axisYR.setDrawGridLines(false);
+        axisX.setDrawLabels(true);
+        axisX.setTypeface(Typeface.DEFAULT_BOLD);
+        String[] values = getResources().getStringArray(R.array.stats_field);
+        axisX.setLabelCount(3);
+        axisX.setValueFormatter((value, axis) -> values[(int) (value)]);
+        axisYL.setValueFormatter(new LargeValueFormatter());
+        axisYL.setAxisMinimum(0);
+        int maxValue = Math.max(Math.max(sentCount, receiveCount), reviewCount);
+        int granularity = 1;
+        if (maxValue <= 5) {
+            axisYL.setAxisMaximum(5);
+        } else {
+            int axisMax;
+            maxValue += 1;
+            if (maxValue % 5 != 0) {
+                granularity = (maxValue / 5) + 1;
+                axisMax = 5 * granularity;
+            } else {
+                axisMax = maxValue;
+                granularity = maxValue / 5;
+            }
+            axisYL.setAxisMaximum(axisMax);
+        }
+        axisYL.setGranularity(granularity);
+        axisYL.setLabelCount(6, true);
+        axisX.setTextSize(13);
+
+        chart.setData(data);
+        chart.setFitBars(true); // make the x-axis fit exactly all bars
+        chart.setDoubleTapToZoomEnabled(false);
+        chart.setPinchZoom(false);
+        chart.setTouchEnabled(false);
+        chart.setDescription(null);
+        chart.invalidate(); // refresh
     }
 }
