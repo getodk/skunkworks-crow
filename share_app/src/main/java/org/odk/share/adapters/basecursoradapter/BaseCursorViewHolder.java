@@ -6,7 +6,7 @@ import android.view.View;
 
 public class BaseCursorViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-    private OnItemClickListener listener;
+    private ItemClickListener listener;
 
     public BaseCursorViewHolder(View itemView) {
         super(itemView);
@@ -16,11 +16,11 @@ public class BaseCursorViewHolder extends RecyclerView.ViewHolder implements Vie
     @Override
     public void onClick(View v) {
         if (listener != null) {
-            listener.onItemClick(v, getAdapterPosition());
+            listener.onItemClick(this, getAdapterPosition());
         }
     }
 
-    public void setListener(OnItemClickListener listener) {
+    void setListener(ItemClickListener listener) {
         this.listener = listener;
     }
 }
