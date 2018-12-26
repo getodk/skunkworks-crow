@@ -11,14 +11,14 @@ import org.odk.share.R;
 import org.odk.share.application.Share;
 import org.odk.share.dao.FormsDao;
 import org.odk.share.dao.InstanceMapDao;
+import org.odk.share.dao.InstancesDao;
 import org.odk.share.dao.TransferDao;
+import org.odk.share.database.ShareDatabaseHelper;
 import org.odk.share.dto.TransferInstance;
 import org.odk.share.events.DownloadEvent;
 import org.odk.share.provider.FormsProviderAPI;
-import org.odk.share.rx.RxEventBus;
-import org.odk.share.dao.InstancesDao;
-import org.odk.share.database.ShareDatabaseHelper;
 import org.odk.share.provider.InstanceProviderAPI;
+import org.odk.share.rx.RxEventBus;
 import org.odk.share.utilities.ApplicationConstants;
 
 import java.io.BufferedInputStream;
@@ -257,7 +257,7 @@ public class DownloadJob extends Job {
 
             sbResult.append(displayName + " ");
             if (formVersion != null) {
-                sbResult.append(getContext().getString(R.string.version, formVersion)).append(" ");
+                sbResult.append(getContext().getString(R.string.version, formVersion));
             }
             sbResult.append(getContext().getString(R.string.id, formId) + " " +
                     getContext().getString(R.string.success, getContext().getString(R.string.blank_form_count,

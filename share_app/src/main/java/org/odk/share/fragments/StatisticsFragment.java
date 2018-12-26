@@ -69,7 +69,7 @@ public class StatisticsFragment extends Fragment {
         title.setText(formName);
         StringBuilder sb = new StringBuilder();
         if (formVersion != null) {
-            sb.append(getString(R.string.version, formVersion)).append(" ");
+            sb.append(getString(R.string.version, formVersion));
         }
         sb.append(getString(R.string.id, formId));
 
@@ -79,7 +79,7 @@ public class StatisticsFragment extends Fragment {
 
     @Override
     public void onResume() {
-        String []selectionArgs;
+        String[] selectionArgs;
         String selection;
 
         if (formVersion == null) {
