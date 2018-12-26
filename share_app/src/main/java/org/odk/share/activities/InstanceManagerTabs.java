@@ -1,11 +1,12 @@
 package org.odk.share.activities;
 
+import android.os.Bundle;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,7 +25,14 @@ import butterknife.ButterKnife;
 
 import static org.odk.share.activities.MainActivity.FORM_ID;
 
-public class InstanceManagerTabs extends AppCompatActivity {
+public class InstanceManagerTabs extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
+
+    private final Object[][] tabs = {
+            {R.string.statistics, R.drawable.ic_stats, new StatisticsFragment()},
+            {R.string.sent, R.drawable.ic_upload, new SentInstancesFragment()},
+            {R.string.received, R.drawable.ic_download, new ReceivedInstancesFragment()},
+            {R.string.reviewed, R.drawable.ic_assignment, new ReviewedInstancesFragment()}
+    };
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -47,45 +55,20 @@ public class InstanceManagerTabs extends AppCompatActivity {
             finish();
         }
 
-        setupViewPager(viewPager);
+        setupViewPager();
+        setupTabs();
+    }
+
+    private void setupTabs() {
         tabLayout.setupWithViewPager(viewPager);
-        setupTab();
-        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                View view = tab.getCustomView();
-                TextView title = view.findViewById(R.id.tvTabTitle);
-                title.setVisibility(View.VISIBLE);
-                ImageView imageView = view.findViewById(R.id.ivTabIcon);
-                DrawableCompat.setTint(imageView.getDrawable(), ContextCompat.getColor(InstanceManagerTabs.this,
-                        R.color.colorTabActive));
-            }
+        tabLayout.addOnTabSelectedListener(this);
 
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-                View view = tab.getCustomView();
-                TextView title = view.findViewById(R.id.tvTabTitle);
-                title.setVisibility(View.GONE);
-                ImageView imageView = view.findViewById(R.id.ivTabIcon);
-                DrawableCompat.setTint(imageView.getDrawable(), ContextCompat.getColor(InstanceManagerTabs.this,
-                        R.color.colorTabInactive));
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
-            }
-        });
+        for (int i = 0; i < tabs.length; i++) {
+            setupTabIcon(((int) tabs[i][0]), ((int) tabs[i][1]), i, i == 0);
+        }
     }
 
-    private void setupTab() {
-        setupTabIcon(getString(R.string.statistics), 0, R.drawable.ic_stats, true);
-        setupTabIcon(getString(R.string.sent), 1, R.drawable.ic_upload, false);
-        setupTabIcon(getString(R.string.received), 2, R.drawable.ic_download, false);
-        setupTabIcon(getString(R.string.reviewed), 3, R.drawable.ic_assignment, false);
-    }
-
-    private void setupTabIcon(String title, int position, int resId, boolean visible) {
+    private void setupTabIcon(int title, int resId, int position, boolean visible) {
         View view = LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
         TextView titleView = view.findViewById(R.id.tvTabTitle);
         ImageView iconView = view.findViewById(R.id.ivTabIcon);
@@ -106,12 +89,41 @@ public class InstanceManagerTabs extends AppCompatActivity {
         tabLayout.getTabAt(position).setCustomView(view);
     }
 
-    private void setupViewPager(ViewPager viewPager) {
+    private void setupViewPager() {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFrag(new StatisticsFragment(), getString(R.string.statistics));
-        adapter.addFrag(new SentInstancesFragment(), getString(R.string.sent));
-        adapter.addFrag(new ReceivedInstancesFragment(), getString(R.string.received));
-        adapter.addFrag(new ReviewedInstancesFragment(), getString(R.string.reviewed));
+
+        for (Object[] tab : tabs) {
+            adapter.addFrag(((Fragment) tab[2]), getString((int) tab[0]));
+        }
+
         viewPager.setAdapter(adapter);
+
+        // Prevent tabs from being destroyed on swipe. This makes the swipe across tabs smoother
+        viewPager.setOffscreenPageLimit(tabs.length - 1);
+    }
+
+    @Override
+    public void onTabSelected(TabLayout.Tab tab) {
+        View view = tab.getCustomView();
+        TextView title = view.findViewById(R.id.tvTabTitle);
+        title.setVisibility(View.VISIBLE);
+        ImageView imageView = view.findViewById(R.id.ivTabIcon);
+        DrawableCompat.setTint(imageView.getDrawable(), ContextCompat.getColor(InstanceManagerTabs.this,
+                R.color.colorTabActive));
+    }
+
+    @Override
+    public void onTabUnselected(TabLayout.Tab tab) {
+        View view = tab.getCustomView();
+        TextView title = view.findViewById(R.id.tvTabTitle);
+        title.setVisibility(View.GONE);
+        ImageView imageView = view.findViewById(R.id.ivTabIcon);
+        DrawableCompat.setTint(imageView.getDrawable(), ContextCompat.getColor(InstanceManagerTabs.this,
+                R.color.colorTabInactive));
+    }
+
+    @Override
+    public void onTabReselected(TabLayout.Tab tab) {
+
     }
 }
