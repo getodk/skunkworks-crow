@@ -108,8 +108,7 @@ public class InstanceManagerTabs extends AppCompatActivity implements TabLayout.
         TextView title = view.findViewById(R.id.tvTabTitle);
         title.setVisibility(View.VISIBLE);
         ImageView imageView = view.findViewById(R.id.ivTabIcon);
-        DrawableCompat.setTint(imageView.getDrawable(), ContextCompat.getColor(InstanceManagerTabs.this,
-                R.color.colorTabActive));
+        DrawableCompat.setTint(imageView.getDrawable(), ContextCompat.getColor(this, R.color.colorTabActive));
     }
 
     @Override
@@ -118,8 +117,7 @@ public class InstanceManagerTabs extends AppCompatActivity implements TabLayout.
         TextView title = view.findViewById(R.id.tvTabTitle);
         title.setVisibility(View.GONE);
         ImageView imageView = view.findViewById(R.id.ivTabIcon);
-        DrawableCompat.setTint(imageView.getDrawable(), ContextCompat.getColor(InstanceManagerTabs.this,
-                R.color.colorTabInactive));
+        DrawableCompat.setTint(imageView.getDrawable(), ContextCompat.getColor(this, R.color.colorTabInactive));
     }
 
     @Override
