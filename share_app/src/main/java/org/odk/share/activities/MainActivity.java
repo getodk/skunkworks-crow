@@ -83,7 +83,7 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
     }
 
     private void setupAdapter() {
-        formAdapter = new FormsAdapter(this, null, this::onItemClick);
+        formAdapter = new FormsAdapter(this, null, this::onItemClick, null);
         recyclerView.setAdapter(formAdapter);
     }
 
@@ -95,7 +95,7 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
 
     @OnClick(R.id.bSendForms)
     public void selectForms() {
-        Intent intent = new Intent(this, InstancesList.class);
+        Intent intent = new Intent(this, SendFormsActivity.class);
         startActivity(intent);
     }
 

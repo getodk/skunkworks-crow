@@ -18,6 +18,8 @@ import javax.inject.Singleton;
 
 import timber.log.Timber;
 
+import static org.odk.share.fragments.ReviewedInstancesFragment.MODE;
+
 @Singleton
 public class SenderService {
 
@@ -63,7 +65,7 @@ public class SenderService {
         PersistableBundleCompat extras = new PersistableBundleCompat();
         extras.putLongArray(UploadJob.INSTANCES, instancesToSend);
         extras.putInt(UploadJob.PORT, port);
-        extras.putInt("mode", mode);
+        extras.putInt(MODE, mode);
 
         // Build request
         JobRequest request = new JobRequest.Builder(UploadJob.TAG)
