@@ -36,11 +36,11 @@
         <activity android:name=".activities.WifiActivity" />
         <activity android:name=".activities.InstancesList" />
         <activity android:name=".preferences.SettingsPreference" />
-        <activity android:name=".activities.WebViewActivity"/>
-        <activity android:name=".activities.AboutActivity"/>
+        <activity android:name=".activities.WebViewActivity" />
+        <activity android:name=".activities.AboutActivity" />
         <activity
             android:name=".activities.SendActivity"
-            android:configChanges="orientation|screenSize"/>
+            android:configChanges="orientation|screenSize" />
 
         <service android:name=".services.HotspotService" />
 
@@ -55,10 +55,11 @@
         <provider
             android:name=".provider.TransferProvider"
             android:authorities="org.odk.share.provider.odk.instances" />
-
         <provider
             android:name=".provider.InstanceMapProvider"
             android:authorities="org.odk.share.provider.odk.map" />
+
+        <activity android:name=".activities.SendFormsActivity"></activity>
     </application>
 
 </manifest>
