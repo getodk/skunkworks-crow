@@ -19,6 +19,8 @@ import android.widget.TextView;
 import org.odk.share.R;
 import org.odk.share.activities.SendActivity;
 import org.odk.share.adapters.FormsAdapter;
+import org.odk.share.adapters.basecursoradapter.BaseCursorViewHolder;
+import org.odk.share.adapters.basecursoradapter.ItemClickListener;
 import org.odk.share.dao.FormsDao;
 import org.odk.share.provider.FormsProviderAPI;
 import org.odk.share.utilities.ApplicationConstants;
@@ -36,7 +38,7 @@ import static org.odk.share.fragments.ReviewedInstancesFragment.MODE;
  * Created by laksh on 10/29/2018.
  */
 
-public class BlankFormsFragment extends FormListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class BlankFormsFragment extends FormListFragment implements LoaderManager.LoaderCallbacks<Cursor>, ItemClickListener {
 
     @BindView(R.id.recyclerview)
     RecyclerView recyclerView;
@@ -91,7 +93,7 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
         cursor.moveToFirst();
-        formAdapter = new FormsAdapter(getActivity(), cursor, this::onListItemClick, selectedForms);
+        formAdapter = new FormsAdapter(getActivity(), cursor, this, selectedForms);
         recyclerView.setAdapter(formAdapter);
         if (formAdapter.getItemCount() > 0) {
             toggleButton.setText(getString(R.string.select_all));
@@ -106,15 +108,12 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
     public void onLoaderReset(@NonNull Loader loader) {
     }
 
-    private void onListItemClick(View view, int position) {
-        Cursor cursor = formAdapter.getCursor();
-        cursor.moveToPosition(position);
-
-        CheckBox checkBox = view.findViewById(R.id.checkbox);
+    @Override
+    public void onItemClick(BaseCursorViewHolder holder, int position) {
+        CheckBox checkBox = ((FormsAdapter.FormHolder) holder).checkBox;
         checkBox.setChecked(!checkBox.isChecked());
 
-        long id = cursor.getLong(cursor.getColumnIndex(FormsProviderAPI.FormsColumns._ID));
-
+        long id = ((FormsAdapter.FormHolder) holder).getForm().getIndex();
         if (selectedForms.contains(id)) {
             selectedForms.remove(id);
         } else {

@@ -13,7 +13,7 @@ import android.widget.TextView;
 import org.odk.share.R;
 import org.odk.share.adapters.basecursoradapter.BaseCursorViewHolder;
 import org.odk.share.adapters.basecursoradapter.CursorRecyclerViewAdapter;
-import org.odk.share.adapters.basecursoradapter.OnItemClickListener;
+import org.odk.share.adapters.basecursoradapter.ItemClickListener;
 import org.odk.share.dto.Form;
 import org.odk.share.provider.FormsProviderAPI;
 
@@ -27,11 +27,11 @@ public class FormsAdapter extends CursorRecyclerViewAdapter<FormsAdapter.FormHol
     @Nullable
     private LinkedHashSet<Long> selectedForms;
 
-    public FormsAdapter(Context context, Cursor cursor, OnItemClickListener listener) {
+    public FormsAdapter(Context context, Cursor cursor, ItemClickListener listener) {
         this(context, cursor, listener, null);
     }
 
-    public FormsAdapter(Context context, Cursor cursor, OnItemClickListener listener, @Nullable LinkedHashSet<Long> selectedForms) {
+    public FormsAdapter(Context context, Cursor cursor, ItemClickListener listener, @Nullable LinkedHashSet<Long> selectedForms) {
         super(context, cursor, listener);
         this.selectedForms = selectedForms;
     }
@@ -72,14 +72,14 @@ public class FormsAdapter extends CursorRecyclerViewAdapter<FormsAdapter.FormHol
         return new FormHolder(view);
     }
 
-    static class FormHolder extends BaseCursorViewHolder {
+    public static class FormHolder extends BaseCursorViewHolder {
 
         @BindView(R.id.tvTitle)
-        TextView tvTitle;
+        public TextView tvTitle;
         @BindView(R.id.tvSubtitle)
-        TextView tvSubtitle;
+        public TextView tvSubtitle;
         @BindView(R.id.checkbox)
-        CheckBox checkBox;
+        public CheckBox checkBox;
 
         private Form form;
 
