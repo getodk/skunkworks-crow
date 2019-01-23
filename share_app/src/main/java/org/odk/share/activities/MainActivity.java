@@ -21,17 +21,19 @@ import android.widget.TextView;
 
 import org.odk.share.R;
 import org.odk.share.adapters.FormsAdapter;
+import org.odk.share.adapters.basecursoradapter.BaseCursorViewHolder;
+import org.odk.share.adapters.basecursoradapter.ItemClickListener;
 import org.odk.share.application.Share;
 import org.odk.share.dao.FormsDao;
+import org.odk.share.dto.Form;
 import org.odk.share.preferences.SettingsPreference;
-import org.odk.share.provider.FormsProviderAPI;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import timber.log.Timber;
 
-public class MainActivity extends FormListActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class MainActivity extends FormListActivity implements LoaderManager.LoaderCallbacks<Cursor>, ItemClickListener {
 
     public static final String FORM_VERSION = "form_version";
     public static final String FORM_ID = "form_id";
@@ -83,7 +85,7 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
     }
 
     private void setupAdapter() {
-        formAdapter = new FormsAdapter(this, null, this::onItemClick);
+        formAdapter = new FormsAdapter(this, null, this);
         recyclerView.setAdapter(formAdapter);
     }
 
@@ -95,7 +97,7 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
 
     @OnClick(R.id.bSendForms)
     public void selectForms() {
-        Intent intent = new Intent(this, InstancesList.class);
+        Intent intent = new Intent(this, SendFormsActivity.class);
         startActivity(intent);
     }
 
@@ -157,18 +159,16 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
         }
     }
 
-    private void onItemClick(View view, int position) {
+    @Override
+    public void onItemClick(BaseCursorViewHolder holder, int position) {
+        Intent intent = new Intent(this, InstanceManagerTabs.class);
 
-        Intent intent  = new Intent(this, InstanceManagerTabs.class);
+        Form form = ((FormsAdapter.FormHolder) holder).getForm();
 
-        try (Cursor cursor = formAdapter.getCursor()) {
-            if (cursor != null) {
-                cursor.moveToPosition(position);
-                intent.putExtra(FORM_VERSION, cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.JR_VERSION)));
-                intent.putExtra(FORM_ID, cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.JR_FORM_ID)));
-                intent.putExtra(FORM_DISPLAY_NAME, cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.DISPLAY_NAME)));
-            }
-        }
+        intent.putExtra(FORM_VERSION, form.getJrVersion());
+        intent.putExtra(FORM_ID, form.getJrFormId());
+        intent.putExtra(FORM_DISPLAY_NAME, form.getDisplayName());
+
         startActivity(intent);
     }
 

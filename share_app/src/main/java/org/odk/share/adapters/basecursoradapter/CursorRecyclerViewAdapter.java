@@ -11,11 +11,11 @@ public abstract class CursorRecyclerViewAdapter<T extends BaseCursorViewHolder> 
     protected Context context;
     private Cursor cursor;
     private boolean dataValid;
-    private OnItemClickListener listener;
+    private ItemClickListener listener;
     private int rowIdColumn;
     private DataSetObserver dataSetObserver;
 
-    protected CursorRecyclerViewAdapter(Context context, Cursor cursor, OnItemClickListener listener) {
+    protected CursorRecyclerViewAdapter(Context context, Cursor cursor, ItemClickListener listener) {
         this.context = context;
         this.cursor = cursor;
         this.listener = listener;

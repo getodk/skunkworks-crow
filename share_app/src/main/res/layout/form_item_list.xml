@@ -23,21 +23,4 @@
         android:gravity="center_vertical"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
-
-    <TextView
-        android:id="@+id/tvReviewForm"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/tvSubtitle"
-        android:layout_marginEnd="10dp"
-        android:layout_marginRight="10dp" />
-
-    <TextView
-        android:id="@+id/tvUnReviewForm"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/tvSubtitle"
-        android:layout_toEndOf="@id/tvReviewForm"
-        android:layout_toRightOf="@id/tvReviewForm" />
-
 </RelativeLayout>

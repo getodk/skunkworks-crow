@@ -15,6 +15,8 @@ public class ApplicationConstants {
     public static final int SQLITE_MAX_VARIABLE_NUMBER = 999;
     public static final int ASK_REVIEW_MODE = 1;
     public static final int SEND_REVIEW_MODE = 2;
+    public static final int SEND_BLANK_FORM_MODE = 3;
+    public static final int SEND_FILL_FORM_MODE = 4;
 
     public abstract static class SortingOrder {
         public static final int BY_NAME_ASC = 0;

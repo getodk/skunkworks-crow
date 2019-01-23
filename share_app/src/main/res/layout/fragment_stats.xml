@@ -30,83 +30,10 @@
         android:textColor="@color/colorPrimary"
         android:textSize="18sp" />
 
-    <TableLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center">
-
-        <TableRow
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:gravity="center"
-            android:padding="10dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_column="1"
-                android:text="@string/num_forms_sent"
-                android:textSize="18sp" />
-
-            <TextView
-                android:id="@+id/tvFormsSent"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_column="2"
-                android:paddingLeft="10dp"
-                android:paddingStart="10dp"
-                android:textSize="18sp" />
-
-        </TableRow>
-
-        <TableRow
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:gravity="center"
-            android:padding="10dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_column="1"
-                android:text="@string/num_forms_received"
-                android:textSize="18sp" />
-
-            <TextView
-                android:id="@+id/tvFormsReceived"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_column="2"
-                android:paddingLeft="10dp"
-                android:paddingStart="10dp"
-                android:textSize="18dp" />
-
-        </TableRow>
-
-        <TableRow
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:gravity="center"
-            android:padding="10dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_column="1"
-                android:text="@string/num_forms_reviewed"
-                android:textSize="18sp" />
-
-            <TextView
-                android:id="@+id/tvFormsReviewed"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_column="2"
-                android:paddingLeft="10dp"
-                android:paddingStart="10dp"
-                android:textSize="18dp" />
-
-        </TableRow>
-    </TableLayout>
+    <com.github.mikephil.charting.charts.BarChart
+        android:id="@+id/chart"
+        android:layout_width="362dp"
+        android:layout_height="184dp" />
 
     <View
         android:layout_width="match_parent"

@@ -17,6 +17,7 @@
 package org.odk.share.dto;
 
 public class Form {
+    private long index;
     private String displayName;
     private String description;
     private String jrFormId;
@@ -32,6 +33,7 @@ public class Form {
     private String language;
 
     private Form(Builder builder) {
+        index = builder.index;
         displayName = builder.displayName;
         description = builder.description;
         jrFormId = builder.jrFormId;
@@ -48,6 +50,7 @@ public class Form {
     }
 
     public static class Builder {
+        private long index;
         private String displayName;
         private String description;
         private String jrFormId;
@@ -61,6 +64,11 @@ public class Form {
         private String jrCacheFilePath;
         private String formMediaPath;
         private String language;
+
+        public Builder index(long index) {
+            this.index = index;
+            return this;
+        }
 
         public Builder displayName(String displayName) {
             this.displayName = displayName;
@@ -132,6 +140,10 @@ public class Form {
         public Form build() {
             return new Form(this);
         }
+    }
+
+    public long getIndex() {
+        return index;
     }
 
     public String getDisplayName() {

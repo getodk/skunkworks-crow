@@ -19,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.odk.share.R;
+import org.odk.share.controller.WifiHelper;
 import org.odk.share.controller.WifiHotspotHelper;
 import org.odk.share.events.HotspotEvent;
 import org.odk.share.events.UploadEvent;
@@ -39,6 +40,7 @@ import timber.log.Timber;
 
 import static android.view.View.VISIBLE;
 import static org.odk.share.activities.InstancesList.INSTANCE_IDS;
+import static org.odk.share.fragments.BlankFormsFragment.FORM_IDS;
 import static org.odk.share.fragments.ReviewedInstancesFragment.MODE;
 import static org.odk.share.utilities.ApplicationConstants.ASK_REVIEW_MODE;
 
@@ -76,7 +78,7 @@ public class SendActivity extends InjectableActivity {
     private ProgressDialog progressDialog;
     private String alertMsg;
     private int port;
-    private long[] instancesIds;
+    private long[] formIds;
     private int mode;
 
     private WifiManager.LocalOnlyHotspotReservation hotspotReservation;
@@ -91,14 +93,22 @@ public class SendActivity extends InjectableActivity {
         setTitle(getString(R.string.send_forms));
         setSupportActionBar(toolbar);
 
-        instancesIds = getIntent().getLongArrayExtra(INSTANCE_IDS);
+        formIds = getIntent().getLongArrayExtra(INSTANCE_IDS);
         mode = getIntent().getIntExtra(MODE, ASK_REVIEW_MODE);
+        if (formIds == null) {
+            formIds = getIntent().getLongArrayExtra(FORM_IDS);
+        }
+
 
         port = SocketUtils.getPort();
 
         if (port == -1) {
             Timber.e("Port not available for socket communication");
             finish();
+        }
+        WifiHelper wifiHelper = new WifiHelper(this);
+        if (wifiHelper.getWifiManager().isWifiEnabled()) {
+            wifiHelper.disableWifi(null);
         }
 
         isHotspotInitiated = false;
@@ -207,17 +217,7 @@ public class SendActivity extends InjectableActivity {
         builder.setPositiveButton(getString(R.string.stop), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    turnOffHotspot();
-                }
-
-                if (isHotspotRunning) {
-                    wifiHotspot.disableHotspot();
-                }
-
-                senderService.cancel();
-                Timber.d("Hotspot Stopped");
-                compositeDisposable.dispose();
+                stopHotspot();
                 finish();
             }
         });
@@ -230,6 +230,20 @@ public class SendActivity extends InjectableActivity {
 
         builder.setCancelable(false);
         builder.show();
+    }
+
+    private void stopHotspot() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            turnOffHotspot();
+        }
+
+        if (isHotspotRunning) {
+            wifiHotspot.disableHotspot();
+        }
+
+        senderService.cancel();
+        Timber.d("Hotspot Stopped");
+        compositeDisposable.dispose();
     }
 
     @Override
@@ -329,7 +343,7 @@ public class SendActivity extends InjectableActivity {
     }
 
     private void startSending() {
-        senderService.startUploading(instancesIds, port, mode);
+        senderService.startUploading(formIds, port, mode);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -400,6 +414,7 @@ public class SendActivity extends InjectableActivity {
             public void onClick(DialogInterface dialog, int i) {
                 switch (i) {
                     case DialogInterface.BUTTON_POSITIVE:
+                        stopHotspot();
                         finish();
                         break;
                 }

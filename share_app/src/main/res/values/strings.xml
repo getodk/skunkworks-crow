@@ -100,7 +100,7 @@
     <string name="sent_on">Sent on %s</string>
     <string name="date_at_time">EEE, MMM dd, yyyy \'at\' HH:mm</string> <!-- http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html -->
 
-    <string name="blank_form">(Blank form %s)</string>
+    <string name="blank_form_count">(Blank form %s)</string>
     <string name="success">-Success %s\n</string>
     <string name="failed">-Failed %s\n</string>
     <string name="review_not_asked">(Review not asked by the receiver)</string>
@@ -116,6 +116,13 @@
     <string name="rejected">Rejected</string>
     <string name="feedback_sent">\nFeedback sent by reviewer: %s</string>
     <string name="no_feedback_sent">\nNo feedback sent by the reviewer</string>
+    <string-array name="stats_field">
+        <item name="sent">Sent</item>
+        <item name="received">Received</item>
+        <item name="reviewed">Reviewed</item>
+    </string-array>
+    <string name="filled_form">Filled forms</string>
+    <string name="blank_form">Blank Forms</string>
     <string name="num_reviewed">Reviewed: %s</string>
     <string name="num_unreviewed">Unreviewed: %s</string>
 </resources>
