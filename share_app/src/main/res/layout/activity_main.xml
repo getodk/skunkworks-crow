@@ -38,7 +38,7 @@
         android:layout_alignParentBottom="true"
         android:orientation="horizontal"
         android:weightSum="2">
-        
+
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
