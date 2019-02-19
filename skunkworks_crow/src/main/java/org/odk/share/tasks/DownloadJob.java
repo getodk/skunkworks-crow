@@ -51,7 +51,6 @@ import static org.odk.collect.android.provider.InstanceProviderAPI.InstanceColum
 import static org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns.SUBMISSION_URI;
 import static org.odk.share.application.Share.FORMS_DIR_NAME;
 import static org.odk.share.application.Share.INSTANCES_DIR_NAME;
-import static org.odk.share.application.Share.INSTANCES_PATH;
 import static org.odk.share.dto.InstanceMap.INSTANCE_UUID;
 import static org.odk.share.dto.TransferInstance.INSTANCE_ID;
 import static org.odk.share.dto.TransferInstance.INSTRUCTIONS;
