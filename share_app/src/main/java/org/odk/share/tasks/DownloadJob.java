@@ -238,11 +238,11 @@ public class DownloadJob extends Job {
             }
 
             Timber.d(displayName + " " + formId + " " + formVersion + " " + submissionUri);
-            String formName = receiveFile(FORMS_PATH);
+            String formName = receiveFile(FORMS_PATH, false);
             int numOfRes = dis.readInt();
             String formMediaPath = FORMS_PATH + "/" + displayName + "-media";
             while (numOfRes-- > 0) {
-                receiveFile(formMediaPath);
+                receiveFile(formMediaPath, false);
             }
 
             // Add row in forms db
@@ -320,11 +320,11 @@ public class DownloadJob extends Job {
                 int numRes = dis.readInt();
                 String time = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss-SSS",
                         Locale.ENGLISH).format(Calendar.getInstance().getTime());
-                String path = INSTANCES_PATH + "/" + formId + "_" + time;
-                String instanceFilePath = receiveFile(path);
+                String path = INSTANCES_PATH + "/" + formId + "_" + uuid;
+                String instanceFilePath = receiveFile(path, true);
 
                 while (--numRes > 0) {
-                    receiveFile(path);
+                    receiveFile(path, false);
                 }
 
                 // Add row in instances table
@@ -382,7 +382,24 @@ public class DownloadJob extends Job {
         }
     }
 
-    private String receiveFile(String path) {
+    private boolean clearDirectory(String path) {
+        try {
+            File directory = new File(path);
+            if (directory.exists()) {
+                directory.delete();
+
+                return true;
+            }
+        } catch (Exception e) {
+            Timber.e(e);
+        }
+
+        return false;
+    }
+
+    private String receiveFile(String path, boolean clearPath) {
+        if (clearPath) clearDirectory(path);
+
         String filename = null;
         try {
             filename = dis.readUTF();
