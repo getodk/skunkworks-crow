@@ -29,9 +29,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Locale;
 
 import javax.inject.Inject;
 
@@ -284,7 +281,7 @@ public class DownloadJob extends Job {
                 }
 
                 Timber.d("Received uuid %s mode %s displayname %s submissionUri %s", uuid, mode, displayName, submissionUri);
-                long id = new InstanceMapDao().getInstanceId(uuid);
+                final long id = new InstanceMapDao().getInstanceId(uuid);
 
                 if (mode == ApplicationConstants.SEND_REVIEW_MODE) {
                     try (Cursor cursor = new TransferDao().getSentInstanceInstanceCursorUsingUuid(uuid)) {
@@ -318,8 +315,6 @@ public class DownloadJob extends Job {
                 Timber.d("Feedback %s %s", feedbackStatus, feedback);
 
                 int numRes = dis.readInt();
-                String time = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss-SSS",
-                        Locale.ENGLISH).format(Calendar.getInstance().getTime());
                 String path = INSTANCES_PATH + "/" + formId + "_" + uuid;
                 String instanceFilePath = receiveFile(path, true);
 
@@ -399,7 +394,9 @@ public class DownloadJob extends Job {
     }
 
     private String receiveFile(String path, boolean clearPath) {
-        if (clearPath) clearDirectory(path);
+        if (clearPath) {
+            clearDirectory(path);
+        }
 
         String filename = null;
         try {

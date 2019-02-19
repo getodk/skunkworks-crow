@@ -7,29 +7,36 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class OdkInstanceUtils {
+
+    // single constructed
+    private OdkInstanceUtils() {
+
+    }
+
     /**
      * Uniquely identifiable ID for an instance would be a combination of the name of the directory
      * for the instance and the device id.
-     * @return
+     *
+     * @return String
      */
     public static String getInstanceUuid(String instancePath) throws UnsupportedEncodingException, NoSuchAlgorithmException {
-        return SHA1(getDeviceId() + instancePath);
+        return encryptSHA1(getDeviceId() + instancePath);
     }
 
     private static String convertToHex(byte[] data) {
         StringBuilder buf = new StringBuilder();
         for (byte b : data) {
             int halfbyte = (b >>> 4) & 0x0F;
-            int two_halfs = 0;
+            int twoHalves = 0;
             do {
                 buf.append((0 <= halfbyte) && (halfbyte <= 9) ? (char) ('0' + halfbyte) : (char) ('a' + (halfbyte - 10)));
                 halfbyte = b & 0x0F;
-            } while (two_halfs++ < 1);
+            } while (twoHalves++ < 1);
         }
         return buf.toString();
     }
 
-    private static String SHA1(String text) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+    private static String encryptSHA1(String text) throws NoSuchAlgorithmException, UnsupportedEncodingException {
         MessageDigest md = MessageDigest.getInstance("SHA-1");
         byte[] textBytes = text.getBytes("iso-8859-1");
         md.update(textBytes, 0, textBytes.length);
@@ -39,7 +46,8 @@ public class OdkInstanceUtils {
 
     /**
      * Same logic used within ODK Collect to obtain the device id in a form
-     * @return
+     *
+     * @return String
      */
     private static String getDeviceId() {
         PropertyManager propertyManager = new PropertyManager(Share.getInstance());

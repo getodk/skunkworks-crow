@@ -19,10 +19,11 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 
 import java.util.HashMap;
 import java.util.Locale;
+
+import timber.log.Timber;
 
 /**
  * Used to return JavaRosa type device properties
@@ -35,37 +36,34 @@ public class PropertyManager {
 
     public static final String ANDROID6_FAKE_MAC = "02:00:00:00:00:00";
 
-    private String t = "PropertyManager";
 
+    private HashMap<String, String> properties;
 
-    private HashMap<String, String> mProperties;
-
-    public final static String DEVICE_ID_PROPERTY = "deviceid"; // imei
-    public final static String SUBSCRIBER_ID_PROPERTY = "subscriberid"; // imsi
-    public final static String SIM_SERIAL_PROPERTY = "simserial";
-    public final static String PHONE_NUMBER_PROPERTY = "phonenumber";
+    static final String DEVICE_ID_PROPERTY = "deviceid"; // imei
+    private static final String SUBSCRIBER_ID_PROPERTY = "subscriberid"; // imsi
+    private static final String SIM_SERIAL_PROPERTY = "simserial";
+    private static final String PHONE_NUMBER_PROPERTY = "phonenumber";
 
     public PropertyManager(Context context) {
-        TelephonyManager mTelephonyManager;
-        Log.i(t, "calling constructor");
+        TelephonyManager telephonyManager;
+        String title = "PropertyManager";
+        Timber.tag(title).i("calling constructor");
 
-        Context mContext = context;
+        properties = new HashMap<>();
+        telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
 
-        mProperties = new HashMap<>();
-        mTelephonyManager = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
-
-        String deviceId = mTelephonyManager.getDeviceId();
+        String deviceId = telephonyManager.getDeviceId();
         if (deviceId != null && (deviceId.contains("*") || deviceId.contains("000000000000000"))) {
             deviceId =
                     Settings.Secure
-                            .getString(mContext.getContentResolver(), Settings.Secure.ANDROID_ID);
+                            .getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
 
         }
 
         if (deviceId == null) {
             // no SIM -- WiFi only
             // Retrieve WiFiManager
-            WifiManager wifi = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+            WifiManager wifi = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
             // Get WiFi status
             WifiInfo info = wifi.getConnectionInfo();
@@ -78,30 +76,30 @@ public class PropertyManager {
         if (deviceId == null) {
             deviceId =
                     Settings.Secure
-                            .getString(mContext.getContentResolver(), Settings.Secure.ANDROID_ID);
+                            .getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
         }
 
-        mProperties.put(DEVICE_ID_PROPERTY, deviceId);
+        properties.put(DEVICE_ID_PROPERTY, deviceId);
 
         String value;
 
-        value = mTelephonyManager.getSubscriberId();
+        value = telephonyManager.getSubscriberId();
         if (value != null) {
-            mProperties.put(SUBSCRIBER_ID_PROPERTY, value);
+            properties.put(SUBSCRIBER_ID_PROPERTY, value);
         }
-        value = mTelephonyManager.getSimSerialNumber();
+        value = telephonyManager.getSimSerialNumber();
         if (value != null) {
-            mProperties.put(SIM_SERIAL_PROPERTY, value);
+            properties.put(SIM_SERIAL_PROPERTY, value);
         }
-        value = mTelephonyManager.getLine1Number();
+        value = telephonyManager.getLine1Number();
         if (value != null) {
-            mProperties.put(PHONE_NUMBER_PROPERTY, value);
+            properties.put(PHONE_NUMBER_PROPERTY, value);
         }
     }
 
     public String getSingularProperty(String propertyName) {
         // for now, all property names are in english...
-        return mProperties.get(propertyName.toLowerCase(Locale.ENGLISH));
+        return properties.get(propertyName.toLowerCase(Locale.ENGLISH));
     }
 
 }

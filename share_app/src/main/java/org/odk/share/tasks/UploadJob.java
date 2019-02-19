@@ -9,7 +9,6 @@ import com.evernote.android.job.Job;
 import org.odk.share.R;
 import org.odk.share.application.Share;
 import org.odk.share.dao.FormsDao;
-import org.odk.share.dao.InstanceMapDao;
 import org.odk.share.dao.InstancesDao;
 import org.odk.share.dao.TransferDao;
 import org.odk.share.database.ShareDatabaseHelper;
@@ -37,7 +36,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.inject.Inject;
 
