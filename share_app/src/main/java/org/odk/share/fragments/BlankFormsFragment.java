@@ -92,16 +92,19 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
 
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
-        cursor.moveToFirst();
-        formAdapter = new FormsAdapter(getActivity(), cursor, this, selectedForms);
-        recyclerView.setAdapter(formAdapter);
-        setEmptyViewVisibility(cursor.getCount());
-        if (formAdapter.getItemCount() > 0) {
-            toggleButton.setText(getString(R.string.select_all));
-            toggleButton.setEnabled(true);
-        } else {
-            toggleButton.setEnabled(false);
-        }
+        if (cursor != null) {
+            cursor.moveToFirst();
+            formAdapter = new FormsAdapter(getActivity(), cursor, this, selectedForms);
+            recyclerView.setAdapter(formAdapter);
+            setEmptyViewVisibility(cursor.getCount());
+            if (formAdapter.getItemCount() > 0) {
+                toggleButton.setText(getString(R.string.select_all));
+                toggleButton.setEnabled(true);
+            } else {
+                toggleButton.setEnabled(false);
+            }
+        } else
+            setEmptyViewVisibility(0);
     }
 
 
