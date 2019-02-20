@@ -93,6 +93,7 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
         cursor.moveToFirst();
         instanceAdapter = new InstanceAdapter(getActivity(), cursor, this::onListItemClick, selectedInstances);
         recyclerView.setAdapter(instanceAdapter);
+        setEmptyViewVisibility(cursor.getCount());
         if (instanceAdapter.getItemCount() > 0) {
             toggleButton.setText(getString(R.string.select_all));
             toggleButton.setEnabled(true);
@@ -124,6 +125,17 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
         sendButton.setEnabled(selectedInstances.size() > 0);
 
         toggleButtonLabel();
+    }
+
+    private void setEmptyViewVisibility(int len) {
+        if (len > 0) {
+            recyclerView.setVisibility(View.VISIBLE);
+            emptyView.setVisibility(View.GONE);
+        } else {
+            recyclerView.setVisibility(View.GONE);
+            emptyView.setVisibility(View.VISIBLE);
+            emptyView.setText(getString(R.string.no_forms));
+        }
     }
 
     @OnClick(R.id.send_button)

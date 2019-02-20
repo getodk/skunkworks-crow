@@ -120,4 +120,5 @@
     </string-array>
     <string name="filled_form">Filled forms</string>
     <string name="blank_form">Blank Forms</string>
+    <string name="no_forms">No Forms Found</string>
 </resources>
