@@ -138,11 +138,11 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
         formAdapter.changeCursor(cursor);
-        if (cursor != null) {
-            if (!cursor.isClosed())
-                setEmptyViewVisibility(cursor.getCount());
-        } else
-            setEmptyViewVisibility(0);
+        if (cursor != null && !cursor.isClosed()) {
+            setEmptyViewVisibility(cursor.getCount());
+            return;
+        }
+        setEmptyViewVisibility(0);
     }
 
     @Override

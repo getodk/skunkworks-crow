@@ -101,8 +101,9 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
             } else {
                 toggleButton.setEnabled(false);
             }
-        } else
+        } else {
             setEmptyViewVisibility(0);
+        }
     }
 
 

@@ -103,8 +103,9 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
             } else {
                 toggleButton.setEnabled(false);
             }
-        } else
+        } else {
             setEmptyViewVisibility(0);
+        }
     }
 
 
