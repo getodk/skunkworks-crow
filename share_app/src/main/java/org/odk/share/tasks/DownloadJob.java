@@ -29,9 +29,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Locale;
 
 import javax.inject.Inject;
 
@@ -238,11 +235,11 @@ public class DownloadJob extends Job {
             }
 
             Timber.d(displayName + " " + formId + " " + formVersion + " " + submissionUri);
-            String formName = receiveFile(FORMS_PATH);
+            String formName = receiveFile(FORMS_PATH, false);
             int numOfRes = dis.readInt();
             String formMediaPath = FORMS_PATH + "/" + displayName + "-media";
             while (numOfRes-- > 0) {
-                receiveFile(formMediaPath);
+                receiveFile(formMediaPath, false);
             }
 
             // Add row in forms db
@@ -284,11 +281,11 @@ public class DownloadJob extends Job {
                 }
 
                 Timber.d("Received uuid %s mode %s displayname %s submissionUri %s", uuid, mode, displayName, submissionUri);
-                long id = new InstanceMapDao().getInstanceId(uuid);
+                final long id = new InstanceMapDao().getInstanceId(uuid);
 
                 if (mode == ApplicationConstants.SEND_REVIEW_MODE) {
-                    try (Cursor cursor = new TransferDao().getSentInstanceInstanceCursorUsingId(id)) {
-                        if (id != -1 && cursor != null && cursor.getCount() > 0) {
+                    try (Cursor cursor = new TransferDao().getSentInstanceInstanceCursorUsingUuid(uuid)) {
+                        if (cursor != null && cursor.getCount() > 0) {
                             // sent for review start receiving
                             Timber.d("Form sent for review");
                             dos.writeBoolean(true);
@@ -318,13 +315,11 @@ public class DownloadJob extends Job {
                 Timber.d("Feedback %s %s", feedbackStatus, feedback);
 
                 int numRes = dis.readInt();
-                String time = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss-SSS",
-                        Locale.ENGLISH).format(Calendar.getInstance().getTime());
-                String path = INSTANCES_PATH + "/" + formId + "_" + time;
-                String instanceFilePath = receiveFile(path);
+                String path = INSTANCES_PATH + "/" + formId + "_" + uuid;
+                String instanceFilePath = receiveFile(path, true);
 
                 while (--numRes > 0) {
-                    receiveFile(path);
+                    receiveFile(path, false);
                 }
 
                 // Add row in instances table
@@ -352,6 +347,7 @@ public class DownloadJob extends Job {
                     // Add row in share table
                     ContentValues shareValues = new ContentValues();
                     shareValues.put(INSTANCE_ID, Long.parseLong(uri.getLastPathSegment()));
+                    shareValues.put(TransferInstance.INSTANCE_UUID, uuid);
                     shareValues.put(TRANSFER_STATUS, STATUS_FORM_RECEIVE);
                     sbResult.append(displayName + getContext().getString(R.string.success,
                             getContext().getString(R.string.received_for_review)));
@@ -360,7 +356,7 @@ public class DownloadJob extends Job {
                     String selection = InstanceProviderAPI.InstanceColumns._ID + "=?";
                     String[] selectionArgs = {String.valueOf(id)};
                     new InstancesDao().updateInstance(values, selection, selectionArgs);
-                    TransferInstance transferInstance = new TransferDao().getSentTransferInstanceFromInstanceId(id);
+                    TransferInstance transferInstance = new TransferDao().getSentTransferInstanceFromInstanceUuid(uuid);
                     if (mode == ApplicationConstants.SEND_REVIEW_MODE) {
                         ContentValues shareValues = new ContentValues();
                         shareValues.put(INSTRUCTIONS, feedback);
@@ -382,7 +378,26 @@ public class DownloadJob extends Job {
         }
     }
 
-    private String receiveFile(String path) {
+    private boolean clearDirectory(String path) {
+        try {
+            File directory = new File(path);
+            if (directory.exists()) {
+                directory.delete();
+
+                return true;
+            }
+        } catch (Exception e) {
+            Timber.e(e);
+        }
+
+        return false;
+    }
+
+    private String receiveFile(String path, boolean clearPath) {
+        if (clearPath) {
+            clearDirectory(path);
+        }
+
         String filename = null;
         try {
             filename = dis.readUTF();

@@ -9,7 +9,6 @@ import com.evernote.android.job.Job;
 import org.odk.share.R;
 import org.odk.share.application.Share;
 import org.odk.share.dao.FormsDao;
-import org.odk.share.dao.InstanceMapDao;
 import org.odk.share.dao.InstancesDao;
 import org.odk.share.dao.TransferDao;
 import org.odk.share.database.ShareDatabaseHelper;
@@ -21,6 +20,7 @@ import org.odk.share.rx.RxEventBus;
 import org.odk.share.utilities.ApplicationConstants;
 import org.odk.share.utilities.ArrayUtils;
 import org.odk.share.utilities.FileUtils;
+import org.odk.share.utilities.OdkInstanceUtils;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
@@ -31,11 +31,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.inject.Inject;
 
@@ -362,24 +362,22 @@ public class UploadJob extends Job {
         Cursor c = null;
         try {
             c = new InstancesDao().getInstancesCursor(selection, selectionArgs);
-            HashMap<Long, String> instanceMap = new InstanceMapDao().getInstanceMap();
             if (c != null && c.getCount() > 0) {
                 dos.writeInt(c.getCount());
                 c.moveToPosition(-1);
                 while (c.moveToNext()) {
                     rxEventBus.post(new UploadEvent(UploadEvent.Status.UPLOADING, ++progress, total));
                     long id = c.getLong(c.getColumnIndex(InstanceProviderAPI.InstanceColumns._ID));
-                    if (!instanceMap.containsKey(id)) {
-                        String uuid = UUID.randomUUID().toString();
-                        ContentValues values = new ContentValues();
-                        values.put(INSTANCE_ID, id);
-                        values.put(INSTANCE_UUID, uuid);
-                        new ShareDatabaseHelper(getContext()).insertMapping(values);
-                        instanceMap.put(id, uuid);
-                    }
-                    dos.writeUTF(instanceMap.get(id));
+                    String instancePath = c.getString(c.getColumnIndex(InstanceProviderAPI.InstanceColumns.INSTANCE_FILE_PATH));
+                    String uuid = OdkInstanceUtils.getInstanceUuid(instancePath);
+                    ContentValues cv = new ContentValues();
+                    cv.put(INSTANCE_ID, id);
+                    cv.put(INSTANCE_UUID, uuid);
+                    new ShareDatabaseHelper(getContext()).insertMapping(cv);
+
+                    dos.writeUTF(uuid);
                     dos.writeInt(mode);
-                    Timber.d("Sent uuid %s and mode %s", instanceMap.get(id), mode);
+                    Timber.d("Sent uuid %s and mode %s", uuid, mode);
 
                     String displayName = c.getString(
                             c.getColumnIndex(InstanceProviderAPI.InstanceColumns.DISPLAY_NAME));
@@ -445,6 +443,7 @@ public class UploadJob extends Job {
                             ContentValues values = new ContentValues();
                             values.put(INSTANCE_ID,
                                     c.getLong(c.getColumnIndex(InstanceProviderAPI.InstanceColumns._ID)));
+                            values.put(TransferInstance.INSTANCE_UUID, uuid);
                             values.put(TRANSFER_STATUS, STATUS_FORM_SENT);
                             new ShareDatabaseHelper(getContext()).insertInstance(values);
                             sbResult.append(displayName + getContext().getString(R.string.success,
@@ -454,6 +453,8 @@ public class UploadJob extends Job {
                 }
             }
         } catch (IOException e) {
+            c.close();
+        } catch (NoSuchAlgorithmException e) {
             c.close();
         } finally {
             if (c != null) {
