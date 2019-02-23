@@ -1,5 +1,6 @@
 package org.odk.share.application;
 
+import android.content.Context;
 import android.os.Environment;
 
 import com.evernote.android.job.JobManager;
@@ -27,35 +28,33 @@ public class Share extends DaggerApplication {
     public static final String FORMS_PATH = ODK_COLLECT_ROOT + File.separator + "forms";
     public static final String INSTANCES_PATH = ODK_COLLECT_ROOT + File.separator + "instances";
     public static final String METADATA_PATH = ODK_ROOT + File.separator + "metadata";
-    private static Share singleton = null;
-    private AppComponent appComponent;
 
-    public static Share getInstance() {
-        return singleton;
-    }
+    private AppComponent appComponent;
 
     /**
      * Creates required directories on the SDCard (or other external storage)
      *
      * @throws RuntimeException if there is no SDCard or the directory exists as a non directory
      */
-    public static void createODKDirs() throws RuntimeException {
+    public static void createODKDirs(Context context) throws RuntimeException {
         String cardstatus = Environment.getExternalStorageState();
+
         if (!cardstatus.equals(Environment.MEDIA_MOUNTED)) {
-            throw new RuntimeException(Share.getInstance().getString(R.string.sdcard_unmounted, cardstatus));
+            throw new RuntimeException(context.getString(R.string.sdcard_unmounted, cardstatus));
         }
+
         String[] dirs = {ODK_ROOT, FORMS_PATH, INSTANCES_PATH, METADATA_PATH};
         for (String dirName : dirs) {
             File dir = new File(dirName);
             if (!dir.exists()) {
                 if (!dir.mkdirs()) {
-                    String message = getInstance().getString(R.string.cannot_create_directory, dirName);
+                    String message = context.getString(R.string.cannot_create_directory, dirName);
                     Timber.w(message);
                     throw new RuntimeException(message);
                 }
             } else {
                 if (!dir.isDirectory()) {
-                    String message = getInstance().getString(R.string.not_a_directory, dirName);
+                    String message = context.getString(R.string.not_a_directory, dirName);
                     Timber.w(message);
                     throw new RuntimeException(message);
                 }
@@ -67,7 +66,6 @@ public class Share extends DaggerApplication {
     public void onCreate() {
         super.onCreate();
 
-        singleton = this;
         Timber.plant(new Timber.DebugTree());
 
         try {

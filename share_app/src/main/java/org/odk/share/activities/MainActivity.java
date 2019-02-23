@@ -78,7 +78,7 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
 
         setTitle(getString(R.string.app_name));
         setSupportActionBar(toolbar);
-        Share.createODKDirs();
+        Share.createODKDirs(this);
 
         sendForms.setEnabled(false);
 
