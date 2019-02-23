@@ -6,6 +6,7 @@ import android.content.Context;
 
 import org.odk.share.controller.WifiHotspotHelper;
 import org.odk.share.dao.FormsDao;
+import org.odk.share.dao.InstanceMapDao;
 import org.odk.share.dao.InstancesDao;
 import org.odk.share.dao.TransferDao;
 import org.odk.share.injection.config.scopes.PerApplication;
@@ -74,5 +75,10 @@ class AppModule {
     @Provides
     InstancesDao provideInstancesDao(Context context) {
         return new InstancesDao(context);
+    }
+
+    @Provides
+    InstanceMapDao provideInstanceMapDao(Context context) {
+        return new InstanceMapDao(context);
     }
 }
