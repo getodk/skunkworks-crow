@@ -29,7 +29,6 @@ import android.view.View;
 
 import org.odk.share.R;
 import org.odk.share.adapters.SortDialogAdapter;
-import org.odk.share.application.Share;
 
 import java.util.LinkedHashSet;
 
@@ -146,7 +145,7 @@ abstract class AppListFragment extends Fragment {
 
     private void saveSelectedSortingOrder(int selectedStringOrder) {
         selectedSortingOrder = selectedStringOrder;
-        PreferenceManager.getDefaultSharedPreferences(Share.getInstance())
+        PreferenceManager.getDefaultSharedPreferences(getContext())
                 .edit()
                 .putInt(getSortingOrderKey(), selectedStringOrder)
                 .apply();
@@ -154,7 +153,7 @@ abstract class AppListFragment extends Fragment {
 
     protected void restoreSelectedSortingOrder() {
         selectedSortingOrder = PreferenceManager
-                .getDefaultSharedPreferences(Share.getInstance())
+                .getDefaultSharedPreferences(getContext())
                 .getInt(getSortingOrderKey(), BY_NAME_ASC);
     }
 
