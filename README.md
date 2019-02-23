@@ -1,7 +1,7 @@
 # Share
 ![Platform](https://img.shields.io/badge/platform-Android-blue.svg)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Build status](https://circleci.com/gh/opendatakit/share.svg?style=shield&circle-token=:circle-token)](https://circleci.com/gh/opendatakit/collect)
+[![Build status](https://circleci.com/gh/opendatakit/share.svg?style=shield&circle-token=:circle-token)](https://circleci.com/gh/opendatakit/share)
 [![Slack status](http://slack.opendatakit.org/badge.svg)](http://slack.opendatakit.org)
 
 ## Table of Contents
