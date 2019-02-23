@@ -3,7 +3,7 @@ package org.odk.share.fragments;
 import android.database.Cursor;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -39,7 +41,7 @@ import static org.odk.share.activities.MainActivity.FORM_VERSION;
  * Created by laksh on 6/27/2018.
  */
 
-public class StatisticsFragment extends Fragment {
+public class StatisticsFragment extends InjectableFragment {
 
     @BindView(R.id.formTitle)
     TextView title;
@@ -47,6 +49,11 @@ public class StatisticsFragment extends Fragment {
     TextView subtitle;
     @BindView(R.id.chart)
     BarChart chart;
+
+    @Inject
+    InstancesDao instancesDao;
+    @Inject
+    TransferDao transferDao;
 
     private String formVersion;
     private String formId;
@@ -57,7 +64,7 @@ public class StatisticsFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_stats, container, false);
         ButterKnife.bind(this, view);
@@ -91,11 +98,11 @@ public class StatisticsFragment extends Fragment {
             selection = InstanceProviderAPI.InstanceColumns.JR_FORM_ID + "=? AND "
                     + InstanceProviderAPI.InstanceColumns.JR_VERSION + "=?";
         }
-        Cursor cursor = new InstancesDao().getInstancesCursor(selection, selectionArgs);
-        HashMap<Long, Instance> instanceMap = new InstancesDao().getMapFromCursor(cursor);
+        Cursor cursor = instancesDao.getInstancesCursor(selection, selectionArgs);
+        HashMap<Long, Instance> instanceMap = instancesDao.getMapFromCursor(cursor);
 
-        Cursor transferCursor = new TransferDao().getSentInstancesCursor();
-        List<TransferInstance> transferInstances = new TransferDao().getInstancesFromCursor(transferCursor);
+        Cursor transferCursor = transferDao.getSentInstancesCursor();
+        List<TransferInstance> transferInstances = transferDao.getInstancesFromCursor(transferCursor);
         int sentCount = 0;
         for (TransferInstance instance : transferInstances) {
             if (instanceMap.containsKey(instance.getInstanceId())) {
@@ -103,8 +110,8 @@ public class StatisticsFragment extends Fragment {
             }
         }
 
-        transferCursor = new TransferDao().getReceiveInstancesCursor();
-        transferInstances = new TransferDao().getInstancesFromCursor(transferCursor);
+        transferCursor = transferDao.getReceiveInstancesCursor();
+        transferInstances = transferDao.getInstancesFromCursor(transferCursor);
         int receiveCount = 0;
         for (TransferInstance instance : transferInstances) {
             if (instanceMap.containsKey(instance.getInstanceId())) {
@@ -112,8 +119,8 @@ public class StatisticsFragment extends Fragment {
             }
         }
 
-        transferCursor = new TransferDao().getReviewedInstancesCursor();
-        transferInstances = new TransferDao().getInstancesFromCursor(transferCursor);
+        transferCursor = transferDao.getReviewedInstancesCursor();
+        transferInstances = transferDao.getInstancesFromCursor(transferCursor);
         int reviewCount = 0;
         for (TransferInstance instance : transferInstances) {
             if (instanceMap.containsKey(instance.getInstanceId())) {

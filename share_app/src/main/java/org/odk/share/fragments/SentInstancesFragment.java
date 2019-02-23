@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -38,6 +40,8 @@ import static org.odk.share.activities.MainActivity.FORM_VERSION;
 
 public class SentInstancesFragment extends InstanceListFragment {
 
+    private static final String SENT_INSTANCE_LIST_SORTING_ORDER = "sentInstanceListSortingOrder";
+
     @BindView(R.id.recyclerview)
     RecyclerView recyclerView;
     @BindView(R.id.bToggle)
@@ -49,12 +53,15 @@ public class SentInstancesFragment extends InstanceListFragment {
     @BindView(R.id.buttonholder)
     LinearLayout buttonLayout;
 
-    HashMap<Long, Instance> instanceMap;
+    @Inject
+    InstancesDao instancesDao;
 
+    @Inject
+    TransferDao transferDao;
+
+    HashMap<Long, Instance> instanceMap;
     TransferInstanceAdapter transferInstanceAdapter;
     List<TransferInstance> transferInstanceList;
-    private static final String SENT_INSTANCE_LIST_SORTING_ORDER = "sentInstanceListSortingOrder";
-
 
     public SentInstancesFragment() {
 
@@ -88,7 +95,7 @@ public class SentInstancesFragment extends InstanceListFragment {
     public void onResume() {
         getInstanceFromDB();
         setEmptyViewVisibility(getString(R.string.no_forms_sent,
-        getActivity().getIntent().getStringExtra(FORM_DISPLAY_NAME)));
+                getActivity().getIntent().getStringExtra(FORM_DISPLAY_NAME)));
         transferInstanceAdapter.notifyDataSetChanged();
         super.onResume();
     }
@@ -111,7 +118,7 @@ public class SentInstancesFragment extends InstanceListFragment {
         selectedInstances.clear();
         String formVersion = getActivity().getIntent().getStringExtra(FORM_VERSION);
         String formId = getActivity().getIntent().getStringExtra(FORM_ID);
-        String []selectionArgs;
+        String[] selectionArgs;
         String selection;
 
         if (formVersion == null) {
@@ -120,7 +127,7 @@ public class SentInstancesFragment extends InstanceListFragment {
             if (getFilterText().length() == 0) {
                 selectionArgs = new String[]{formId};
             } else {
-                selectionArgs = new String[] {formId,  "%" + getFilterText() + "%"};
+                selectionArgs = new String[]{formId, "%" + getFilterText() + "%"};
                 selection = "AND " + InstanceProviderAPI.InstanceColumns.DISPLAY_NAME + " LIKE ?";
             }
         } else {
@@ -129,16 +136,16 @@ public class SentInstancesFragment extends InstanceListFragment {
             if (getFilterText().length() == 0) {
                 selectionArgs = new String[]{formId, formVersion};
             } else {
-                selectionArgs = new String[] {formId,  "%" + getFilterText() + "%"};
+                selectionArgs = new String[]{formId, "%" + getFilterText() + "%"};
                 selection = "AND " + InstanceProviderAPI.InstanceColumns.DISPLAY_NAME + " LIKE ?";
             }
         }
 
-        Cursor cursor = new InstancesDao().getInstancesCursor(null, selection, selectionArgs, getSortingOrder());
-        instanceMap = new InstancesDao().getMapFromCursor(cursor);
+        Cursor cursor = instancesDao.getInstancesCursor(null, selection, selectionArgs, getSortingOrder());
+        instanceMap = instancesDao.getMapFromCursor(cursor);
 
-        Cursor transferCursor = new TransferDao().getSentInstancesCursor();
-        List<TransferInstance> transferInstances = new TransferDao().getInstancesFromCursor(transferCursor);
+        Cursor transferCursor = transferDao.getSentInstancesCursor();
+        List<TransferInstance> transferInstances = transferDao.getInstancesFromCursor(transferCursor);
         for (TransferInstance instance : transferInstances) {
             if (instanceMap.containsKey(instance.getInstanceId())) {
                 instance.setInstance(instanceMap.get(instance.getInstanceId()));

@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,13 +16,15 @@ import org.odk.share.dao.TransferDao;
 import org.odk.share.dto.TransferInstance;
 import org.odk.share.provider.InstanceProviderAPI;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import static org.odk.share.dto.TransferInstance.LAST_STATUS_CHANGE_DATE;
 
-public class ReviewFormActivity extends AppCompatActivity {
+public class ReviewFormActivity extends InjectableActivity {
 
     @BindView(R.id.bApprove)
     Button approveButton;
@@ -37,6 +38,12 @@ public class ReviewFormActivity extends AppCompatActivity {
     TextView description;
     @BindView(R.id.save_feedback)
     EditText feedback;
+
+    @Inject
+    InstancesDao instancesDao;
+
+    @Inject
+    TransferDao transferDao;
 
     public static final String TRANSFER_ID = "transfer_id";
     public static final String INSTANCE_ID = "instance_id";
@@ -58,7 +65,7 @@ public class ReviewFormActivity extends AppCompatActivity {
            finish();
         }
 
-        Cursor cursor = new TransferDao().getInstanceCursorFromId(transferID);
+        Cursor cursor = transferDao.getInstanceCursorFromId(transferID);
         if (cursor != null) {
             try {
                 cursor.moveToFirst();
@@ -82,7 +89,7 @@ public class ReviewFormActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        Cursor cursor = new InstancesDao().getInstancesCursorForId(String.valueOf(instanceID));
+        Cursor cursor = instancesDao.getInstancesCursorForId(String.valueOf(instanceID));
         if (cursor != null) {
             try {
                 cursor.moveToFirst();
@@ -121,7 +128,7 @@ public class ReviewFormActivity extends AppCompatActivity {
             String[] whereArgs = {
                     String.valueOf(transferID)
             };
-            new TransferDao().updateInstance(values, where, whereArgs);
+            transferDao.updateInstance(values, where, whereArgs);
         }
         Toast.makeText(this, getString(R.string.form_approved), Toast.LENGTH_LONG).show();
         finish();
@@ -141,7 +148,7 @@ public class ReviewFormActivity extends AppCompatActivity {
             String[] whereArgs = {
                     String.valueOf(transferID)
             };
-            new TransferDao().updateInstance(values, where, whereArgs);
+            transferDao.updateInstance(values, where, whereArgs);
         }
         Toast.makeText(this, getString(R.string.form_rejected), Toast.LENGTH_LONG).show();
         finish();
@@ -154,7 +161,7 @@ public class ReviewFormActivity extends AppCompatActivity {
 
     @OnClick(R.id.bViewAgain)
     public void viewFormInCollect() {
-        Cursor cursor = new TransferDao().getInstanceCursorFromId(transferID);
+        Cursor cursor = transferDao.getInstanceCursorFromId(transferID);
         if (cursor != null) {
             try {
                 cursor.moveToFirst();
@@ -169,7 +176,7 @@ public class ReviewFormActivity extends AppCompatActivity {
         String[] whereArgs = {
                 String.valueOf(transferID)
         };
-        new TransferDao().updateInstance(values, where, whereArgs);
+        transferDao.updateInstance(values, where, whereArgs);
         launchCollect();
     }
 }

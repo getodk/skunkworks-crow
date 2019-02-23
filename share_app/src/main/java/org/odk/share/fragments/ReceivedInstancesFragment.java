@@ -27,6 +27,8 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -42,6 +44,8 @@ import static org.odk.share.activities.ReviewFormActivity.TRANSFER_ID;
 
 public class ReceivedInstancesFragment extends InstanceListFragment implements OnItemClickListener {
 
+    private static final String RECEIVED_INSTANCE_LIST_SORTING_ORDER = "receivedInstanceListSortingOrder";
+
     @BindView(R.id.recyclerview)
     RecyclerView recyclerView;
     @BindView(R.id.buttonholder)
@@ -49,14 +53,17 @@ public class ReceivedInstancesFragment extends InstanceListFragment implements O
     @BindView(R.id.empty_view)
     TextView emptyView;
 
-    HashMap<Long, Instance> instanceMap;
+    @Inject
+    InstancesDao instancesDao;
 
+    @Inject
+    TransferDao transferDao;
+
+    HashMap<Long, Instance> instanceMap;
     TransferInstanceAdapter transferInstanceAdapter;
     List<TransferInstance> transferInstanceList;
 
     boolean showCheckBox = false;
-    private static final String RECEIVED_INSTANCE_LIST_SORTING_ORDER = "receivedInstanceListSortingOrder";
-
 
     public ReceivedInstancesFragment() {
     }
@@ -95,7 +102,7 @@ public class ReceivedInstancesFragment extends InstanceListFragment implements O
         selectedInstances.clear();
         String formVersion = getActivity().getIntent().getStringExtra(FORM_VERSION);
         String formId = getActivity().getIntent().getStringExtra(FORM_ID);
-        String []selectionArgs;
+        String[] selectionArgs;
         String selection;
 
         if (formVersion == null) {
@@ -104,7 +111,7 @@ public class ReceivedInstancesFragment extends InstanceListFragment implements O
             if (getFilterText().length() == 0) {
                 selectionArgs = new String[]{formId};
             } else {
-                selectionArgs = new String[] {formId,  "%" + getFilterText() + "%"};
+                selectionArgs = new String[]{formId, "%" + getFilterText() + "%"};
                 selection = "AND " + InstanceProviderAPI.InstanceColumns.DISPLAY_NAME + " LIKE ?";
             }
         } else {
@@ -113,15 +120,15 @@ public class ReceivedInstancesFragment extends InstanceListFragment implements O
             if (getFilterText().length() == 0) {
                 selectionArgs = new String[]{formId, formVersion};
             } else {
-                selectionArgs = new String[] {formId,  "%" + getFilterText() + "%"};
+                selectionArgs = new String[]{formId, "%" + getFilterText() + "%"};
                 selection = "AND " + InstanceProviderAPI.InstanceColumns.DISPLAY_NAME + " LIKE ?";
             }
         }
 
-        Cursor cursor = new InstancesDao().getInstancesCursor(null, selection, selectionArgs, getSortingOrder());
-        instanceMap = new InstancesDao().getMapFromCursor(cursor);
-        Cursor transferCursor = new TransferDao().getReceiveInstancesCursor();
-        List<TransferInstance> transferInstances = new TransferDao().getInstancesFromCursor(transferCursor);
+        Cursor cursor = instancesDao.getInstancesCursor(null, selection, selectionArgs, getSortingOrder());
+        instanceMap = instancesDao.getMapFromCursor(cursor);
+        Cursor transferCursor = transferDao.getReceiveInstancesCursor();
+        List<TransferInstance> transferInstances = transferDao.getInstancesFromCursor(transferCursor);
         for (TransferInstance instance : transferInstances) {
             if (instanceMap.containsKey(instance.getInstanceId())) {
                 instance.setInstance(instanceMap.get(instance.getInstanceId()));

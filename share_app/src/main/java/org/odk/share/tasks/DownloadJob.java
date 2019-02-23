@@ -64,6 +64,18 @@ public class DownloadJob extends Job {
     @Inject
     RxEventBus rxEventBus;
 
+    @Inject
+    InstancesDao instancesDao;
+
+    @Inject
+    FormsDao formsDao;
+
+    @Inject
+    InstanceMapDao instanceMapDao;
+
+    @Inject
+    TransferDao transferDao;
+
     private String ip;
     private int port;
     private int total;
@@ -217,8 +229,8 @@ public class DownloadJob extends Job {
                     + FormsProviderAPI.FormsColumns.JR_VERSION + "=?";
         }
 
-        Cursor cursor = new FormsDao().getFormsCursor(null, selection, selectionArgs, null);
 
+        Cursor cursor = formsDao.getFormsCursor(null, selection, selectionArgs, null);
         return cursor != null && cursor.getCount() > 0;
     }
 
@@ -253,7 +265,7 @@ public class DownloadJob extends Job {
             values.put(FormsProviderAPI.FormsColumns.JR_VERSION, formVersion);
             values.put(FormsProviderAPI.FormsColumns.SUBMISSION_URI, submissionUri);
             values.put(FormsProviderAPI.FormsColumns.FORM_MEDIA_PATH, formMediaPath);
-            new FormsDao().saveForm(values);
+            formsDao.saveForm(values);
 
             sbResult.append(displayName + " ");
             if (formVersion != null) {
@@ -284,10 +296,10 @@ public class DownloadJob extends Job {
                 }
 
                 Timber.d("Received uuid %s mode %s displayname %s submissionUri %s", uuid, mode, displayName, submissionUri);
-                long id = new InstanceMapDao().getInstanceId(uuid);
+                long id = instanceMapDao.getInstanceId(uuid);
 
                 if (mode == ApplicationConstants.SEND_REVIEW_MODE) {
-                    try (Cursor cursor = new TransferDao().getSentInstanceInstanceCursorUsingId(id)) {
+                    try (Cursor cursor = transferDao.getSentInstanceInstanceCursorUsingId(id)) {
                         if (id != -1 && cursor != null && cursor.getCount() > 0) {
                             // sent for review start receiving
                             Timber.d("Form sent for review");
@@ -342,7 +354,7 @@ public class DownloadJob extends Job {
                     dos.writeBoolean(false);
 
                     Timber.d("Sending response if it exists or not receiving first time");
-                    Uri uri = new InstancesDao().saveInstance(values);
+                    Uri uri = instancesDao.saveInstance(values);
 
                     ContentValues mapValues = new ContentValues();
                     mapValues.put(INSTANCE_UUID, uuid);
@@ -359,15 +371,15 @@ public class DownloadJob extends Job {
                 } else {
                     String selection = InstanceProviderAPI.InstanceColumns._ID + "=?";
                     String[] selectionArgs = {String.valueOf(id)};
-                    new InstancesDao().updateInstance(values, selection, selectionArgs);
-                    TransferInstance transferInstance = new TransferDao().getSentTransferInstanceFromInstanceId(id);
+                    instancesDao.updateInstance(values, selection, selectionArgs);
+                    TransferInstance transferInstance = transferDao.getSentTransferInstanceFromInstanceId(id);
                     if (mode == ApplicationConstants.SEND_REVIEW_MODE) {
                         ContentValues shareValues = new ContentValues();
                         shareValues.put(INSTRUCTIONS, feedback);
                         shareValues.put(RECEIVED_REVIEW_STATUS, feedbackStatus);
                         selection = TransferInstance.ID + " =?";
                         selectionArgs = new String[]{String.valueOf(transferInstance.getId())};
-                        new TransferDao().updateInstance(shareValues, selection, selectionArgs);
+                        transferDao.updateInstance(shareValues, selection, selectionArgs);
                         sbResult.append(displayName + getContext().getString(R.string.success, getContext().getString(R.string.review_received)));
                     } else {
 

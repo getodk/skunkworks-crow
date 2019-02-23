@@ -15,7 +15,6 @@ package org.odk.share.fragments;
 
 import android.preference.PreferenceManager;
 import android.support.design.widget.BottomSheetDialog;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -34,7 +33,7 @@ import java.util.LinkedHashSet;
 
 import static org.odk.share.utilities.ApplicationConstants.SortingOrder.BY_NAME_ASC;
 
-abstract class AppListFragment extends Fragment {
+abstract class AppListFragment extends InjectableFragment {
 
     protected String[] sortingOptions;
     protected LinkedHashSet<Long> selectedInstances = new LinkedHashSet<>();

@@ -22,11 +22,15 @@ import org.odk.share.adapters.FormsAdapter;
 import org.odk.share.adapters.basecursoradapter.BaseCursorViewHolder;
 import org.odk.share.adapters.basecursoradapter.ItemClickListener;
 import org.odk.share.dao.FormsDao;
+import org.odk.share.dao.InstancesDao;
+import org.odk.share.dao.TransferDao;
 import org.odk.share.provider.FormsProviderAPI;
 import org.odk.share.utilities.ApplicationConstants;
 import org.odk.share.utilities.ArrayUtils;
 
 import java.util.LinkedHashSet;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -40,6 +44,10 @@ import static org.odk.share.fragments.ReviewedInstancesFragment.MODE;
 
 public class BlankFormsFragment extends FormListFragment implements LoaderManager.LoaderCallbacks<Cursor>, ItemClickListener {
 
+    public static final String FORM_IDS = "form_ids";
+    private static final String FORM_CHOOSER_LIST_SORTING_ORDER = "formChooserListSortingOrder";
+    private static final int FORM_LOADER = 2;
+
     @BindView(R.id.recyclerview)
     RecyclerView recyclerView;
     @BindView(R.id.buttonholder)
@@ -51,11 +59,15 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
     @BindView(R.id.toggle_button)
     Button toggleButton;
 
-    private static final String FORM_CHOOSER_LIST_SORTING_ORDER = "formChooserListSortingOrder";
+    @Inject
+    InstancesDao instancesDao;
 
-    public static final String FORM_IDS = "form_ids";
+    @Inject
+    FormsDao formsDao;
 
-    private static final int FORM_LOADER = 2;
+    @Inject
+    TransferDao transferDao;
+
     private FormsAdapter formAdapter;
     private LinkedHashSet<Long> selectedForms;
 
@@ -64,7 +76,7 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         View view = inflater.inflate(R.layout.fragment_forms, container, false);
@@ -87,14 +99,14 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
     @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new FormsDao().getFormsCursorLoader(getFilterText(), getSortingOrder());
+        return formsDao.getFormsCursorLoader(getFilterText(), getSortingOrder());
     }
 
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
         if (cursor != null) {
             cursor.moveToFirst();
-            formAdapter = new FormsAdapter(getActivity(), cursor, this, selectedForms);
+            formAdapter = new FormsAdapter(getActivity(), cursor, this, selectedForms, instancesDao, transferDao);
             recyclerView.setAdapter(formAdapter);
             setEmptyViewVisibility(cursor.getCount());
             if (formAdapter.getItemCount() > 0) {
