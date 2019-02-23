@@ -19,10 +19,10 @@ import com.github.mikephil.charting.formatter.LargeValueFormatter;
 
 import org.odk.collect.android.dao.InstancesDao;
 import org.odk.collect.android.dto.Instance;
+import org.odk.collect.android.provider.InstanceProviderAPI;
 import org.odk.share.R;
 import org.odk.share.dao.TransferDao;
 import org.odk.share.dto.TransferInstance;
-import org.odk.share.provider.InstanceProviderAPI;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -1,6 +1,6 @@
 package org.odk.share.activities;
 
-import org.odk.share.provider.InstanceProviderAPI;
+import org.odk.collect.android.provider.InstanceProviderAPI;
 
 import static org.odk.share.utilities.ApplicationConstants.SortingOrder.BY_DATE_ASC;
 import static org.odk.share.utilities.ApplicationConstants.SortingOrder.BY_DATE_DESC;

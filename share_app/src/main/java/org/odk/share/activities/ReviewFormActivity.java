@@ -12,10 +12,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.odk.collect.android.dao.InstancesDao;
+import org.odk.collect.android.provider.InstanceProviderAPI;
 import org.odk.share.R;
 import org.odk.share.dao.TransferDao;
 import org.odk.share.dto.TransferInstance;
-import org.odk.share.provider.InstanceProviderAPI;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

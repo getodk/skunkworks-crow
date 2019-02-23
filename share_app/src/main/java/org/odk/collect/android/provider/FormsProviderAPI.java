@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.odk.share.provider;
+package org.odk.collect.android.provider;
 
 import android.net.Uri;
 import android.provider.BaseColumns;

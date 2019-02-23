@@ -14,9 +14,9 @@ import android.widget.Button;
 import android.widget.CheckBox;
 
 import org.odk.collect.android.dao.InstancesDao;
+import org.odk.collect.android.provider.InstanceProviderAPI;
 import org.odk.share.R;
 import org.odk.share.adapters.InstanceAdapter;
-import org.odk.share.provider.InstanceProviderAPI;
 import org.odk.share.utilities.ApplicationConstants;
 import org.odk.share.utilities.ArrayUtils;
 
