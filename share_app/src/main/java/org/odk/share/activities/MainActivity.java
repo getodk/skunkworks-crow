@@ -56,6 +56,7 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
 
     private FormsAdapter formAdapter;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,7 +79,6 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
     @Override
     protected void onResume() {
         super.onResume();
-
         if (isCollectInstalled()) {
             updateAdapter();
         } else {

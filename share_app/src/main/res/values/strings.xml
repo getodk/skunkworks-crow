@@ -14,7 +14,7 @@
     <string name="select_all">Select all</string>
     <string name="clear_all">Clear all</string>
     <string name="send_forms">Send</string>
-    <string name="version">Version: %1$s </string>
+    <string name="version">Version: %1$s</string>
     <string name="id">ID: %1s</string>
 
     <string name="connect_wifi">Connect to wifi</string>
@@ -120,5 +120,7 @@
     </string-array>
     <string name="filled_form">Filled forms</string>
     <string name="blank_form">Blank Forms</string>
+    <string name="num_reviewed">Reviewed: %s</string>
+    <string name="num_unreviewed">Unreviewed: %s</string>
     <string name="no_forms">No Forms Found</string>
 </resources>
