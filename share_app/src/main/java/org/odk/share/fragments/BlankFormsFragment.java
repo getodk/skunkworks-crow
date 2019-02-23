@@ -16,12 +16,12 @@ import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.odk.collect.android.dao.FormsDao;
 import org.odk.share.R;
 import org.odk.share.activities.SendActivity;
 import org.odk.share.adapters.FormsAdapter;
 import org.odk.share.adapters.basecursoradapter.BaseCursorViewHolder;
 import org.odk.share.adapters.basecursoradapter.ItemClickListener;
-import org.odk.share.dao.FormsDao;
 import org.odk.share.provider.FormsProviderAPI;
 import org.odk.share.utilities.ApplicationConstants;
 import org.odk.share.utilities.ArrayUtils;

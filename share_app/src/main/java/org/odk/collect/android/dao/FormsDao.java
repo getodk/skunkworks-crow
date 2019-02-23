@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.odk.share.dao;
+package org.odk.collect.android.dao;
 
 import android.content.ContentValues;
 import android.database.Cursor;

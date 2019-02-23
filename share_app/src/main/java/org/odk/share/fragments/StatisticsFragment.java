@@ -17,8 +17,8 @@ import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.formatter.LargeValueFormatter;
 
+import org.odk.collect.android.dao.InstancesDao;
 import org.odk.share.R;
-import org.odk.share.dao.InstancesDao;
 import org.odk.share.dao.TransferDao;
 import org.odk.share.dto.Instance;
 import org.odk.share.dto.TransferInstance;

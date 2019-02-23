@@ -6,11 +6,11 @@ import android.support.annotation.NonNull;
 
 import com.evernote.android.job.Job;
 
+import org.odk.collect.android.dao.FormsDao;
+import org.odk.collect.android.dao.InstancesDao;
 import org.odk.share.R;
 import org.odk.share.application.Share;
-import org.odk.share.dao.FormsDao;
 import org.odk.share.dao.InstanceMapDao;
-import org.odk.share.dao.InstancesDao;
 import org.odk.share.dao.TransferDao;
 import org.odk.share.database.ShareDatabaseHelper;
 import org.odk.share.dto.TransferInstance;

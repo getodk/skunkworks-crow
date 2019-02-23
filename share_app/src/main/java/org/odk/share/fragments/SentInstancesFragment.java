@@ -12,9 +12,9 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.odk.collect.android.dao.InstancesDao;
 import org.odk.share.R;
 import org.odk.share.adapters.TransferInstanceAdapter;
-import org.odk.share.dao.InstancesDao;
 import org.odk.share.dao.TransferDao;
 import org.odk.share.dto.Instance;
 import org.odk.share.dto.TransferInstance;
