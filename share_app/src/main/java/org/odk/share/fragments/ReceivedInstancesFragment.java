@@ -3,6 +3,7 @@ package org.odk.share.fragments;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -18,6 +19,7 @@ import org.odk.share.dao.InstancesDao;
 import org.odk.share.dao.TransferDao;
 import org.odk.share.dto.Instance;
 import org.odk.share.dto.TransferInstance;
+import org.odk.share.listeners.OnItemClickListener;
 import org.odk.share.provider.InstanceProviderAPI;
 
 import java.util.ArrayList;
@@ -38,7 +40,7 @@ import static org.odk.share.activities.ReviewFormActivity.TRANSFER_ID;
  * Created by laksh on 6/27/2018.
  */
 
-public class ReceivedInstancesFragment extends InstanceListFragment {
+public class ReceivedInstancesFragment extends InstanceListFragment implements OnItemClickListener {
 
     @BindView(R.id.recyclerview)
     RecyclerView recyclerView;
@@ -60,7 +62,7 @@ public class ReceivedInstancesFragment extends InstanceListFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         View view = inflater.inflate(R.layout.fragment_instances, container, false);
@@ -130,7 +132,7 @@ public class ReceivedInstancesFragment extends InstanceListFragment {
 
     private void setupAdapter() {
         transferInstanceAdapter = new TransferInstanceAdapter(getActivity(), transferInstanceList,
-                this::onItemClick, selectedInstances, showCheckBox);
+                this, selectedInstances, showCheckBox);
         recyclerView.setAdapter(transferInstanceAdapter);
     }
 
@@ -145,7 +147,8 @@ public class ReceivedInstancesFragment extends InstanceListFragment {
         }
     }
 
-    private void onItemClick(View view, int position) {
+    @Override
+    public void onItemClick(View view, int position) {
         Intent intent = new Intent(getContext(), ReviewFormActivity.class);
         intent.putExtra(INSTANCE_ID, transferInstanceList.get(position).getInstanceId());
         intent.putExtra(TRANSFER_ID, transferInstanceList.get(position).getId());
