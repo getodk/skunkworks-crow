@@ -21,6 +21,7 @@ import org.odk.share.activities.SendActivity;
 import org.odk.share.adapters.TransferInstanceAdapter;
 import org.odk.share.dao.TransferDao;
 import org.odk.share.dto.TransferInstance;
+import org.odk.share.listeners.OnItemClickListener;
 import org.odk.share.utilities.ApplicationConstants;
 import org.odk.share.utilities.ArrayUtils;
 
