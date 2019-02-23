@@ -90,15 +90,19 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
 
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
-        cursor.moveToFirst();
-        instanceAdapter = new InstanceAdapter(getActivity(), cursor, this::onListItemClick, selectedInstances);
-        recyclerView.setAdapter(instanceAdapter);
-        setEmptyViewVisibility(cursor.getCount());
-        if (instanceAdapter.getItemCount() > 0) {
-            toggleButton.setText(getString(R.string.select_all));
-            toggleButton.setEnabled(true);
+        if (cursor != null) {
+            cursor.moveToFirst();
+            instanceAdapter = new InstanceAdapter(getActivity(), cursor, this::onListItemClick, selectedInstances);
+            recyclerView.setAdapter(instanceAdapter);
+            setEmptyViewVisibility(cursor.getCount());
+            if (instanceAdapter.getItemCount() > 0) {
+                toggleButton.setText(getString(R.string.select_all));
+                toggleButton.setEnabled(true);
+            } else {
+                toggleButton.setEnabled(false);
+            }
         } else {
-            toggleButton.setEnabled(false);
+            setEmptyViewVisibility(0);
         }
     }
 

@@ -142,7 +142,9 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
         formAdapter.changeCursor(cursor);
         if (cursor != null && !cursor.isClosed()) {
             setEmptyViewVisibility(cursor.getCount());
+            return;
         }
+        setEmptyViewVisibility(0);
     }
 
     @Override
