@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.odk.share.dto;
+package org.odk.collect.android.dto;
 
 public class Instance {
 

@@ -11,12 +11,12 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 import org.odk.collect.android.dao.InstancesDao;
+import org.odk.collect.android.dto.Form;
 import org.odk.share.R;
 import org.odk.share.adapters.basecursoradapter.BaseCursorViewHolder;
 import org.odk.share.adapters.basecursoradapter.CursorRecyclerViewAdapter;
 import org.odk.share.adapters.basecursoradapter.ItemClickListener;
 import org.odk.share.dao.TransferDao;
-import org.odk.share.dto.Form;
 import org.odk.share.dto.TransferInstance;
 import org.odk.share.provider.FormsProviderAPI;
 import org.odk.share.provider.InstanceProviderAPI;

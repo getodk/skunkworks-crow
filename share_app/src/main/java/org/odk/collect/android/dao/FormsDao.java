@@ -21,8 +21,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.content.CursorLoader;
 
+import org.odk.collect.android.dto.Form;
 import org.odk.share.application.Share;
-import org.odk.share.dto.Form;
 import org.odk.share.provider.FormsProviderAPI;
 
 import java.util.ArrayList;

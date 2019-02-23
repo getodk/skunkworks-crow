@@ -21,8 +21,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.content.CursorLoader;
 
+import org.odk.collect.android.dto.Instance;
 import org.odk.share.application.Share;
-import org.odk.share.dto.Instance;
 import org.odk.share.provider.InstanceProviderAPI;
 import org.odk.share.utilities.ApplicationConstants;
 
