@@ -15,27 +15,26 @@ import dagger.android.ContributesAndroidInjector;
 public abstract class FragmentBuilder {
 
     @PerActivity
-    @ContributesAndroidInjector()
+    @ContributesAndroidInjector
     abstract StatisticsFragment provideStatisticsFragment();
 
-
     @PerActivity
-    @ContributesAndroidInjector()
+    @ContributesAndroidInjector
     abstract SentInstancesFragment provideSentInstancesFragment();
 
     @PerActivity
-    @ContributesAndroidInjector()
+    @ContributesAndroidInjector
     abstract ReceivedInstancesFragment provideReceivedInstancesFragment();
 
     @PerActivity
-    @ContributesAndroidInjector()
+    @ContributesAndroidInjector
     abstract ReviewedInstancesFragment provideReviewedInstancesFragment();
 
     @PerActivity
-    @ContributesAndroidInjector()
+    @ContributesAndroidInjector
     abstract BlankFormsFragment provideBlankFormsFragment();
 
     @PerActivity
-    @ContributesAndroidInjector()
+    @ContributesAndroidInjector
     abstract FilledFormsFragment provideFilledFormsFragment();
 }

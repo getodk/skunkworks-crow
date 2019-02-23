@@ -13,22 +13,22 @@ import dagger.android.ContributesAndroidInjector;
 @Module
 public abstract class ActivityBuilder {
     @PerActivity
-    @ContributesAndroidInjector()
+    @ContributesAndroidInjector
     abstract InstancesList provideInstancesList();
 
     @PerActivity
-    @ContributesAndroidInjector()
+    @ContributesAndroidInjector
     abstract MainActivity provideMainActivity();
 
     @PerActivity
-    @ContributesAndroidInjector()
+    @ContributesAndroidInjector
     abstract SendActivity provideSendActivity();
 
     @PerActivity
-    @ContributesAndroidInjector()
+    @ContributesAndroidInjector
     abstract WifiActivity provideWifiActivity();
 
     @PerActivity
-    @ContributesAndroidInjector()
+    @ContributesAndroidInjector
     abstract ReviewFormActivity provideReviewFormActivity();
 }
