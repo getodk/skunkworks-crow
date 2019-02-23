@@ -23,10 +23,10 @@ import butterknife.ButterKnife;
  * Created by laksh on 5/22/2018.
  */
 
-public class WifiResultAdapter extends RecyclerView.Adapter<WifiResultAdapter.WifiHolder>  {
+public class WifiResultAdapter extends RecyclerView.Adapter<WifiResultAdapter.WifiHolder> {
 
-    private Context context;
-    private List<ScanResult> wifiScanResult;
+    private final Context context;
+    private final List<ScanResult> wifiScanResult;
     private final OnItemClickListener listener;
 
     public WifiResultAdapter(Context context, List<ScanResult> wifiScanResult, OnItemClickListener listener) {
@@ -35,8 +35,9 @@ public class WifiResultAdapter extends RecyclerView.Adapter<WifiResultAdapter.Wi
         this.listener = listener;
     }
 
+    @NonNull
     @Override
-    public WifiHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public WifiHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.list_item_single, null);
         return new WifiHolder(view);
     }
@@ -56,8 +57,10 @@ public class WifiResultAdapter extends RecyclerView.Adapter<WifiResultAdapter.Wi
 
     static class WifiHolder extends RecyclerView.ViewHolder {
 
-        @BindView(R.id.tvTitle) public TextView title;
-        @BindView(R.id.ivWifi) public WifiView wifiIcon;
+        @BindView(R.id.tvTitle)
+        TextView title;
+        @BindView(R.id.ivWifi)
+        WifiView wifiIcon;
 
         WifiHolder(View view) {
             super(view);

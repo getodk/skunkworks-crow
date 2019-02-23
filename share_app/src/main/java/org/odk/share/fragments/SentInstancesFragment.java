@@ -2,6 +2,7 @@ package org.odk.share.fragments;
 
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -60,7 +61,7 @@ public class SentInstancesFragment extends InstanceListFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         View view = inflater.inflate(R.layout.fragment_instances, container, false);
@@ -147,7 +148,8 @@ public class SentInstancesFragment extends InstanceListFragment {
     }
 
     private void setupAdapter() {
-        transferInstanceAdapter = new TransferInstanceAdapter(getActivity(), transferInstanceList, this::onItemClick, selectedInstances, false);
+        transferInstanceAdapter = new TransferInstanceAdapter(getActivity(), transferInstanceList,
+                null, selectedInstances, false);
         recyclerView.setAdapter(transferInstanceAdapter);
     }
 
@@ -160,8 +162,5 @@ public class SentInstancesFragment extends InstanceListFragment {
             emptyView.setVisibility(View.VISIBLE);
             emptyView.setText(text);
         }
-    }
-
-    private void onItemClick(View view, int position) {
     }
 }

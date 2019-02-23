@@ -39,6 +39,7 @@ import org.odk.share.R;
 import org.odk.share.adapters.WifiResultAdapter;
 import org.odk.share.controller.WifiHelper;
 import org.odk.share.events.DownloadEvent;
+import org.odk.share.listeners.OnItemClickListener;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.rx.schedulers.BaseSchedulerProvider;
 import org.odk.share.services.ReceiverService;
@@ -61,7 +62,7 @@ import static org.odk.share.utilities.QRCodeUtils.PORT;
 import static org.odk.share.utilities.QRCodeUtils.PROTECTED;
 import static org.odk.share.utilities.QRCodeUtils.SSID;
 
-public class WifiActivity extends InjectableActivity {
+public class WifiActivity extends InjectableActivity implements OnItemClickListener {
 
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
@@ -130,7 +131,7 @@ public class WifiActivity extends InjectableActivity {
         }
 
         scanResultList = new ArrayList<>();
-        wifiResultAdapter = new WifiResultAdapter(this, scanResultList, this::onListItemClick);
+        wifiResultAdapter = new WifiResultAdapter(this, scanResultList, this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(wifiResultAdapter);
@@ -204,17 +205,18 @@ public class WifiActivity extends InjectableActivity {
         }
     }
 
-    private void onListItemClick(View view, int i) {
-        Timber.d("Clicked %s", scanResultList.get(i));
+    @Override
+    public void onItemClick(View view, int position) {
+        Timber.d("Clicked %s", scanResultList.get(position));
 
-        if (scanResultList.get(i).SSID.contains(getString(R.string.hotspot_name_prefix_oreo))) {
-          Toast.makeText(this, getString(R.string.scan_alert_oreo), Toast.LENGTH_LONG).show();
-        } else if (WifiHelper.isClose(scanResultList.get(i))) {
+        if (scanResultList.get(position).SSID.contains(getString(R.string.hotspot_name_prefix_oreo))) {
+            Toast.makeText(this, getString(R.string.scan_alert_oreo), Toast.LENGTH_LONG).show();
+        } else if (WifiHelper.isClose(scanResultList.get(position))) {
             // Show dialog and ask for password
-            showPasswordDialog(scanResultList.get(i));
+            showPasswordDialog(scanResultList.get(position));
         } else {
             // connect
-            connectToNetwork(scanResultList.get(i).SSID, null);
+            connectToNetwork(scanResultList.get(position).SSID, null);
         }
     }
 

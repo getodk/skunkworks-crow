@@ -20,6 +20,7 @@ import org.odk.share.dao.InstancesDao;
 import org.odk.share.dao.TransferDao;
 import org.odk.share.dto.Instance;
 import org.odk.share.dto.TransferInstance;
+import org.odk.share.listeners.OnItemClickListener;
 import org.odk.share.provider.InstanceProviderAPI;
 import org.odk.share.utilities.ApplicationConstants;
 import org.odk.share.utilities.ArrayUtils;
@@ -42,7 +43,7 @@ import static org.odk.share.activities.MainActivity.FORM_VERSION;
  * Created by laksh on 6/27/2018.
  */
 
-public class ReviewedInstancesFragment extends InstanceListFragment {
+public class ReviewedInstancesFragment extends InstanceListFragment implements OnItemClickListener {
 
 
     public ReviewedInstancesFragment() {
@@ -155,7 +156,7 @@ public class ReviewedInstancesFragment extends InstanceListFragment {
     }
 
     private void setupAdapter() {
-        transferInstanceAdapter = new TransferInstanceAdapter(getActivity(), transferInstanceList, this::onItemClick, selectedInstances, true);
+        transferInstanceAdapter = new TransferInstanceAdapter(getActivity(), transferInstanceList, this, selectedInstances, true);
         recyclerView.setAdapter(transferInstanceAdapter);
     }
 
@@ -170,7 +171,8 @@ public class ReviewedInstancesFragment extends InstanceListFragment {
         }
     }
 
-    private void onItemClick(View view, int position) {
+    @Override
+    public void onItemClick(View view, int position) {
         CheckBox checkBox = view.findViewById(R.id.checkbox);
         checkBox.setChecked(!checkBox.isChecked());
 
