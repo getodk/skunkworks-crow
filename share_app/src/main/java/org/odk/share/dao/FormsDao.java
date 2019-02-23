@@ -17,6 +17,7 @@
 package org.odk.share.dao;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.content.CursorLoader;
@@ -30,6 +31,12 @@ import java.util.List;
 
 
 public class FormsDao {
+
+    private Context context;
+
+    public FormsDao(Context context) {
+        this.context = context;
+    }
 
     public Cursor getFormsCursor() {
         return getFormsCursor(null, null, null, null);

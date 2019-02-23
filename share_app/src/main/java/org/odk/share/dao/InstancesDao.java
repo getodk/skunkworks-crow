@@ -17,6 +17,7 @@
 package org.odk.share.dao;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.content.CursorLoader;
@@ -31,6 +32,12 @@ import java.util.HashMap;
 import java.util.List;
 
 public class InstancesDao {
+
+    private Context context;
+
+    public InstancesDao(Context context) {
+        this.context = context;
+    }
 
     public Cursor getSentInstancesCursor() {
         String selection = InstanceProviderAPI.InstanceColumns.STATUS + " =? ";

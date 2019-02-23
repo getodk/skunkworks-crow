@@ -5,6 +5,9 @@ import android.app.Application;
 import android.content.Context;
 
 import org.odk.share.controller.WifiHotspotHelper;
+import org.odk.share.dao.FormsDao;
+import org.odk.share.dao.InstancesDao;
+import org.odk.share.dao.TransferDao;
 import org.odk.share.injection.config.scopes.PerApplication;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.rx.schedulers.BaseSchedulerProvider;
@@ -56,5 +59,20 @@ class AppModule {
     @PerApplication
     WifiHotspotHelper provideHotspotHelper(Context context) {
         return new WifiHotspotHelper(context);
+    }
+
+    @Provides
+    TransferDao provideTransferDao(Context context) {
+        return new TransferDao(context);
+    }
+
+    @Provides
+    FormsDao provideFormsDao(Context context) {
+        return new FormsDao(context);
+    }
+
+    @Provides
+    InstancesDao provideInstancesDao(Context context) {
+        return new InstancesDao(context);
     }
 }

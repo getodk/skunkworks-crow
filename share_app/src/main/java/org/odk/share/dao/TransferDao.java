@@ -1,6 +1,7 @@
 package org.odk.share.dao;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.content.CursorLoader;
 
@@ -17,6 +18,12 @@ import static org.odk.share.provider.TransferProvider.CONTENT_URI;
  */
 
 public class TransferDao {
+
+    private Context context;
+
+    public TransferDao(Context context) {
+        this.context = context;
+    }
 
     public Cursor getSentInstancesCursor() {
         String selection = TransferInstance.TRANSFER_STATUS + " =? ";
