@@ -67,6 +67,8 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
         setSupportActionBar(toolbar);
         Share.createODKDirs();
 
+        sendForms.setEnabled(false);
+
         LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(llm);
@@ -140,7 +142,9 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
         formAdapter.changeCursor(cursor);
         if (cursor != null && !cursor.isClosed()) {
             setEmptyViewVisibility(cursor.getCount());
+            return;
         }
+        setEmptyViewVisibility(0);
     }
 
     @Override
@@ -152,6 +156,7 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
         if (len > 0) {
             recyclerView.setVisibility(View.VISIBLE);
             emptyView.setVisibility(View.GONE);
+            sendForms.setEnabled(true);
         } else {
             recyclerView.setVisibility(View.GONE);
             emptyView.setVisibility(View.VISIBLE);

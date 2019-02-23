@@ -122,4 +122,5 @@
     <string name="blank_form">Blank Forms</string>
     <string name="num_reviewed">Reviewed: %s</string>
     <string name="num_unreviewed">Unreviewed: %s</string>
+    <string name="no_forms">No Forms Found</string>
 </resources>

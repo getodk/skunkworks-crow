@@ -92,14 +92,19 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
 
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
-        cursor.moveToFirst();
-        formAdapter = new FormsAdapter(getActivity(), cursor, this, selectedForms);
-        recyclerView.setAdapter(formAdapter);
-        if (formAdapter.getItemCount() > 0) {
-            toggleButton.setText(getString(R.string.select_all));
-            toggleButton.setEnabled(true);
+        if (cursor != null) {
+            cursor.moveToFirst();
+            formAdapter = new FormsAdapter(getActivity(), cursor, this, selectedForms);
+            recyclerView.setAdapter(formAdapter);
+            setEmptyViewVisibility(cursor.getCount());
+            if (formAdapter.getItemCount() > 0) {
+                toggleButton.setText(getString(R.string.select_all));
+                toggleButton.setEnabled(true);
+            } else {
+                toggleButton.setEnabled(false);
+            }
         } else {
-            toggleButton.setEnabled(false);
+            setEmptyViewVisibility(0);
         }
     }
 
@@ -123,6 +128,17 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
         sendButton.setEnabled(selectedForms.size() > 0);
 
         toggleButtonLabel();
+    }
+
+    private void setEmptyViewVisibility(int len) {
+        if (len > 0) {
+            recyclerView.setVisibility(View.VISIBLE);
+            emptyView.setVisibility(View.GONE);
+        } else {
+            recyclerView.setVisibility(View.GONE);
+            emptyView.setVisibility(View.VISIBLE);
+            emptyView.setText(getString(R.string.no_forms));
+        }
     }
 
     @OnClick(R.id.send_button)
