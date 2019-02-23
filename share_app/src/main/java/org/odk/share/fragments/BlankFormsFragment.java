@@ -12,7 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -115,8 +114,7 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
 
     @Override
     public void onItemClick(BaseCursorViewHolder holder, int position) {
-        CheckBox checkBox = ((FormsAdapter.FormHolder) holder).checkBox;
-        checkBox.setChecked(!checkBox.isChecked());
+        ((FormsAdapter.FormHolder) holder).toggleCheckbox();
 
         long id = ((FormsAdapter.FormHolder) holder).getForm().getId();
         if (selectedForms.contains(id)) {
