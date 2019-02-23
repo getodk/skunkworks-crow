@@ -23,22 +23,30 @@ import android.provider.BaseColumns;
  * Convenience definitions for NotePadProvider
  */
 public final class FormsProviderAPI {
-    public static final String AUTHORITY = "org.odk.collect.android.provider.odk.forms";
+    static final String AUTHORITY = "org.odk.collect.android.provider.odk.forms";
 
-    // This class cannot be instantiated
     private FormsProviderAPI() {
     }
 
     /**
-     * Notes table
+     * Columns for the Forms table.
      */
     public static final class FormsColumns implements BaseColumns {
-        // This class cannot be instantiated
         private FormsColumns() {
         }
 
-
+        /**
+         * The content:// style URL for accessing Forms.
+         */
         public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/forms");
+
+        /**
+         * The content:// style URL for accessing the newest versions of Forms. For each
+         * {@link FormsColumns#JR_FORM_ID}, only the version with the most recent
+         * {@link FormsColumns#DATE} is included.
+         */
+        public static final Uri CONTENT_NEWEST_FORMS_BY_FORMID_URI = Uri.parse("content://" + AUTHORITY + "/newest_forms_by_form_id");
+
         public static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.odk.form";
         public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.odk.form";
 
@@ -62,10 +70,7 @@ public final class FormsProviderAPI {
         public static final String JRCACHE_FILE_PATH = "jrcacheFilePath";
         public static final String FORM_MEDIA_PATH = "formMediaPath";
 
-
         // this is null on create, and can only be set on an update.
         public static final String LANGUAGE = "language";
-
-
     }
 }

@@ -17,17 +17,18 @@
 package org.odk.collect.android.dto;
 
 public class Instance {
+    private final String displayName;
+    private final String submissionUri;
+    private final String canEditWhenComplete;
+    private final String instanceFilePath;
+    private final String jrFormId;
+    private final String jrVersion;
+    private final String status;
+    private final Long lastStatusChangeDate;
+    private final String displaySubtext;
+    private final Long deletedDate;
 
-    private String displayName;
-    private String submissionUri;
-    private String canEditWhenComplete;
-    private String instanceFilePath;
-    private String jrFormId;
-    private String jrVersion;
-    private String status;
-    private Long lastStatusChangeDate;
-    private String displaySubtext;
-    private Long deletedDate;
+    private final Long databaseId;
 
     private Instance(Builder builder) {
         displayName = builder.displayName;
@@ -40,6 +41,8 @@ public class Instance {
         lastStatusChangeDate = builder.lastStatusChangeDate;
         displaySubtext = builder.displaySubtext;
         deletedDate = builder.deletedDate;
+
+        databaseId = builder.databaseId;
     }
 
     public static class Builder {
@@ -53,6 +56,8 @@ public class Instance {
         private Long lastStatusChangeDate;
         private String displaySubtext;
         private Long deletedDate;
+
+        private Long databaseId;
 
         public Builder displayName(String displayName) {
             this.displayName = displayName;
@@ -104,6 +109,11 @@ public class Instance {
             return this;
         }
 
+        public Builder databaseId(Long databaseId) {
+            this.databaseId = databaseId;
+            return this;
+        }
+
         public Instance build() {
             return new Instance(this);
         }
@@ -147,5 +157,9 @@ public class Instance {
 
     public Long getDeletedDate() {
         return deletedDate;
+    }
+
+    public Long getDatabaseId() {
+        return databaseId;
     }
 }

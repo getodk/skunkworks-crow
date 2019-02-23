@@ -42,13 +42,13 @@ public class FormsAdapter extends CursorRecyclerViewAdapter<FormsAdapter.FormHol
 
     @Override
     public void onBindViewHolder(FormHolder viewHolder, Cursor cursor) {
-        long index = cursor.getLong(cursor.getColumnIndex(FormsProviderAPI.FormsColumns._ID));
+        int index = cursor.getInt(cursor.getColumnIndex(FormsProviderAPI.FormsColumns._ID));
         String title = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.DISPLAY_NAME));
         String version = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.JR_VERSION));
         String id = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.JR_FORM_ID));
 
         Form form = new Form.Builder()
-                .index(index)
+                .id(index)
                 .displayName(title)
                 .jrVersion(version)
                 .jrFormId(id)

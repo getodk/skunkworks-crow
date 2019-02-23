@@ -118,7 +118,7 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
         CheckBox checkBox = ((FormsAdapter.FormHolder) holder).checkBox;
         checkBox.setChecked(!checkBox.isChecked());
 
-        long id = ((FormsAdapter.FormHolder) holder).getForm().getIndex();
+        long id = ((FormsAdapter.FormHolder) holder).getForm().getId();
         if (selectedForms.contains(id)) {
             selectedForms.remove(id);
         } else {
