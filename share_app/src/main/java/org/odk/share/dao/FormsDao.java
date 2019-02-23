@@ -22,7 +22,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.content.CursorLoader;
 
-import org.odk.share.application.Share;
 import org.odk.share.dto.Form;
 import org.odk.share.provider.FormsProviderAPI;
 
@@ -47,7 +46,7 @@ public class FormsDao {
     }
 
     public Cursor getFormsCursor(String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        return Share.getInstance().getContentResolver().query(FormsProviderAPI.FormsColumns.CONTENT_URI, projection, selection, selectionArgs, sortOrder);
+        return context.getContentResolver().query(FormsProviderAPI.FormsColumns.CONTENT_URI, projection, selection, selectionArgs, sortOrder);
     }
 
     public CursorLoader getFormsCursorLoader(String sortOrder) {
@@ -67,7 +66,7 @@ public class FormsDao {
     }
 
     public CursorLoader getFormsCursorLoader(String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        return new CursorLoader(Share.getInstance(), FormsProviderAPI.FormsColumns.CONTENT_URI, projection, selection, selectionArgs, sortOrder);
+        return new CursorLoader(context, FormsProviderAPI.FormsColumns.CONTENT_URI, projection, selection, selectionArgs, sortOrder);
     }
 
     public Cursor getFormsCursorForFormId(String formId) {
@@ -124,7 +123,7 @@ public class FormsDao {
     }
 
     public void deleteFormsDatabase() {
-        Share.getInstance().getContentResolver().delete(FormsProviderAPI.FormsColumns.CONTENT_URI, null, null);
+        context.getContentResolver().delete(FormsProviderAPI.FormsColumns.CONTENT_URI, null, null);
     }
 
     public void deleteFormsFromIDs(String[] idsToDelete) {
@@ -135,7 +134,7 @@ public class FormsDao {
         selection += "? )";
 
         //This will break if the number of forms to delete > SQLITE_MAX_VARIABLE_NUMBER (999)
-        Share.getInstance().getContentResolver().delete(FormsProviderAPI.FormsColumns.CONTENT_URI, selection, idsToDelete);
+        context.getContentResolver().delete(FormsProviderAPI.FormsColumns.CONTENT_URI, selection, idsToDelete);
     }
 
     public void deleteFormsFromMd5Hash(String... hashes) {
@@ -161,7 +160,7 @@ public class FormsDao {
     }
 
     public Uri saveForm(ContentValues values) {
-        return Share.getInstance().getContentResolver().insert(FormsProviderAPI.FormsColumns.CONTENT_URI, values);
+        return context.getContentResolver().insert(FormsProviderAPI.FormsColumns.CONTENT_URI, values);
     }
 
     public int updateForm(ContentValues values) {
@@ -169,7 +168,7 @@ public class FormsDao {
     }
 
     public int updateForm(ContentValues values, String where, String[] whereArgs) {
-        return Share.getInstance().getContentResolver().update(FormsProviderAPI.FormsColumns.CONTENT_URI, values, where, whereArgs);
+        return context.getContentResolver().update(FormsProviderAPI.FormsColumns.CONTENT_URI, values, where, whereArgs);
     }
 
     public List<Form> getFormsFromCursor(Cursor cursor) {

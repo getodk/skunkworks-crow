@@ -22,7 +22,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.content.CursorLoader;
 
-import org.odk.share.application.Share;
 import org.odk.share.dto.Instance;
 import org.odk.share.provider.InstanceProviderAPI;
 import org.odk.share.utilities.ApplicationConstants;
@@ -235,13 +234,13 @@ public class InstancesDao {
     }
 
     public Cursor getInstancesCursor(String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        return Share.getInstance().getContentResolver()
+        return context.getContentResolver()
                 .query(InstanceProviderAPI.InstanceColumns.CONTENT_URI, projection, selection, selectionArgs, sortOrder);
     }
 
     public CursorLoader getInstancesCursorLoader(String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         return new CursorLoader(
-                Share.getInstance(),
+                context,
                 InstanceProviderAPI.InstanceColumns.CONTENT_URI,
                 projection,
                 selection,
@@ -250,15 +249,15 @@ public class InstancesDao {
     }
 
     public Uri saveInstance(ContentValues values) {
-        return Share.getInstance().getContentResolver().insert(InstanceProviderAPI.InstanceColumns.CONTENT_URI, values);
+        return context.getContentResolver().insert(InstanceProviderAPI.InstanceColumns.CONTENT_URI, values);
     }
 
     public int updateInstance(ContentValues values, String where, String[] whereArgs) {
-        return Share.getInstance().getContentResolver().update(InstanceProviderAPI.InstanceColumns.CONTENT_URI, values, where, whereArgs);
+        return context.getContentResolver().update(InstanceProviderAPI.InstanceColumns.CONTENT_URI, values, where, whereArgs);
     }
 
     public void deleteInstancesDatabase() {
-        Share.getInstance().getContentResolver().delete(InstanceProviderAPI.InstanceColumns.CONTENT_URI, null, null);
+        context.getContentResolver().delete(InstanceProviderAPI.InstanceColumns.CONTENT_URI, null, null);
     }
 
     public void deleteInstancesFromIDs(List<String> ids) {
@@ -289,7 +288,7 @@ public class InstancesDao {
             counter++;
             count -= selectionArgs.length;
             selection.append(")");
-            Share.getInstance().getContentResolver()
+            context.getContentResolver()
                     .delete(InstanceProviderAPI.InstanceColumns.CONTENT_URI,
                             selection.toString(), selectionArgs);
 
