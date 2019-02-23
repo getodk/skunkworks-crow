@@ -35,13 +35,12 @@ import org.odk.share.adapters.SortDialogAdapter;
 
 import java.util.LinkedHashSet;
 
-import dagger.android.support.DaggerAppCompatActivity;
 import timber.log.Timber;
 
 import static org.odk.share.utilities.ApplicationConstants.SortingOrder.BY_NAME_ASC;
 
 
-abstract class AppListActivity extends DaggerAppCompatActivity {
+abstract class AppListActivity extends InjectableActivity {
 
     private static final String SELECTED_INSTANCES = "selectedInstances";
     private static final String IS_SEARCH_BOX_SHOWN = "isSearchBoxShown";

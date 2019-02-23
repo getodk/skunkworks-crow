@@ -1,9 +1,8 @@
 package org.odk.share.activities;
 
+import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 
 import org.odk.share.R;
@@ -14,7 +13,7 @@ import org.odk.share.fragments.FilledFormsFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class SendFormsActivity extends AppCompatActivity {
+public class SendFormsActivity extends InjectableActivity {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
