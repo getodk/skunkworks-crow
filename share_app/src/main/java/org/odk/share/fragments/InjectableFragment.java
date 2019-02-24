@@ -9,4 +9,8 @@ import dagger.android.support.DaggerFragment;
  * Those activities should also be registered in {@link org.odk.share.injection.FragmentBuilder}
  */
 public abstract class InjectableFragment extends DaggerFragment {
+
+    public InjectableFragment() {
+
+    }
 }
