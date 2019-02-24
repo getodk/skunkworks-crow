@@ -4,10 +4,10 @@ package org.odk.share.injection.config;
 import android.app.Application;
 import android.content.Context;
 
+import org.odk.collect.android.dao.FormsDao;
+import org.odk.collect.android.dao.InstancesDao;
 import org.odk.share.controller.WifiHotspotHelper;
-import org.odk.share.dao.FormsDao;
 import org.odk.share.dao.InstanceMapDao;
-import org.odk.share.dao.InstancesDao;
 import org.odk.share.dao.TransferDao;
 import org.odk.share.injection.config.scopes.PerApplication;
 import org.odk.share.rx.RxEventBus;

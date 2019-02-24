@@ -10,8 +10,8 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
+import org.odk.collect.android.provider.InstanceProviderAPI;
 import org.odk.share.R;
-import org.odk.share.provider.InstanceProviderAPI;
 
 import java.util.LinkedHashSet;
 

@@ -19,15 +19,15 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import org.odk.collect.android.dao.FormsDao;
+import org.odk.collect.android.dao.InstancesDao;
+import org.odk.collect.android.dto.Form;
 import org.odk.share.R;
 import org.odk.share.adapters.FormsAdapter;
 import org.odk.share.adapters.basecursoradapter.BaseCursorViewHolder;
 import org.odk.share.adapters.basecursoradapter.ItemClickListener;
 import org.odk.share.application.Share;
-import org.odk.share.dao.FormsDao;
-import org.odk.share.dao.InstancesDao;
 import org.odk.share.dao.TransferDao;
-import org.odk.share.dto.Form;
 import org.odk.share.preferences.SettingsPreference;
 
 import javax.inject.Inject;
