@@ -1,7 +1,7 @@
 package org.odk.share.activities;
 
 
-import org.odk.share.provider.FormsProviderAPI;
+import org.odk.collect.android.provider.FormsProviderAPI;
 
 import static org.odk.share.utilities.ApplicationConstants.SortingOrder.BY_DATE_ASC;
 import static org.odk.share.utilities.ApplicationConstants.SortingOrder.BY_DATE_DESC;

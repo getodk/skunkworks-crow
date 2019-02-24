@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.odk.share.provider;
+package org.odk.collect.android.provider;
 
 import android.net.Uri;
 import android.provider.BaseColumns;
@@ -62,7 +62,6 @@ public final class InstanceProviderAPI {
         public static final String DISPLAY_SUBTEXT = "displaySubtext";
         public static final String DELETED_DATE = "deletedDate";
         //public static final String DISPLAY_SUB_SUBTEXT = "displaySubSubtext";
-
 
         //        public static final String DEFAULT_SORT_ORDER = "modified DESC";
         //        public static final String TITLE = "title";

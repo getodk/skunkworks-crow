@@ -2,6 +2,7 @@ package org.odk.share.adapters;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -10,16 +11,16 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
+import org.odk.collect.android.dao.InstancesDao;
+import org.odk.collect.android.dto.Form;
+import org.odk.collect.android.provider.FormsProviderAPI;
+import org.odk.collect.android.provider.InstanceProviderAPI;
 import org.odk.share.R;
 import org.odk.share.adapters.basecursoradapter.BaseCursorViewHolder;
 import org.odk.share.adapters.basecursoradapter.CursorRecyclerViewAdapter;
 import org.odk.share.adapters.basecursoradapter.ItemClickListener;
-import org.odk.share.dao.InstancesDao;
 import org.odk.share.dao.TransferDao;
-import org.odk.share.dto.Form;
 import org.odk.share.dto.TransferInstance;
-import org.odk.share.provider.FormsProviderAPI;
-import org.odk.share.provider.InstanceProviderAPI;
 
 import java.util.LinkedHashSet;
 
@@ -42,42 +43,42 @@ public class FormsAdapter extends CursorRecyclerViewAdapter<FormsAdapter.FormHol
 
     @Override
     public void onBindViewHolder(FormHolder viewHolder, Cursor cursor) {
-        long index = cursor.getLong(cursor.getColumnIndex(FormsProviderAPI.FormsColumns._ID));
-        String title = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.DISPLAY_NAME));
-        String version = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.JR_VERSION));
-        String id = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.JR_FORM_ID));
+        int idColumnIndex = cursor.getColumnIndex(BaseColumns._ID);
+        int displayNameColumnIndex = cursor.getColumnIndex(FormsProviderAPI.FormsColumns.DISPLAY_NAME);
+        int jrFormIdColumnIndex = cursor.getColumnIndex(FormsProviderAPI.FormsColumns.JR_FORM_ID);
+        int jrVersionColumnIndex = cursor.getColumnIndex(FormsProviderAPI.FormsColumns.JR_VERSION);
 
         Form form = new Form.Builder()
-                .index(index)
-                .displayName(title)
-                .jrVersion(version)
-                .jrFormId(id)
+                .id(cursor.getInt(idColumnIndex))
+                .displayName(cursor.getString(displayNameColumnIndex))
+                .jrFormId(cursor.getString(jrFormIdColumnIndex))
+                .jrVersion(cursor.getString(jrVersionColumnIndex))
                 .build();
 
         viewHolder.setForm(form);
 
-        viewHolder.tvTitle.setText(title);
+        viewHolder.tvTitle.setText(form.getDisplayName());
 
         StringBuilder sb = new StringBuilder();
-        if (version != null) {
-            sb.append(context.getString(R.string.version, version));
+        if (form.getJrVersion() != null) {
+            sb.append(context.getString(R.string.version, form.getJrVersion()));
         }
-        sb.append(context.getString(R.string.id, id));
+        sb.append(context.getString(R.string.id, form.getJrFormId()));
 
         viewHolder.tvSubtitle.setText(sb.toString());
         viewHolder.checkBox.setVisibility(selectedForms != null ? View.VISIBLE : View.GONE);
-        viewHolder.checkBox.setChecked(selectedForms != null && selectedForms.contains(index));
+        viewHolder.checkBox.setChecked(selectedForms != null && selectedForms.contains(((long) form.getId())));
 
         if (selectedForms == null) {
             String[] selectionArgs;
             String selection;
 
-            if (version == null) {
-                selectionArgs = new String[]{id};
+            if (form.getJrVersion() == null) {
+                selectionArgs = new String[]{form.getJrFormId()};
                 selection = InstanceProviderAPI.InstanceColumns.JR_FORM_ID + "=? AND "
                         + InstanceProviderAPI.InstanceColumns.JR_VERSION + " IS NULL";
             } else {
-                selectionArgs = new String[]{id, version};
+                selectionArgs = new String[]{form.getJrFormId(), form.getJrVersion()};
                 selection = InstanceProviderAPI.InstanceColumns.JR_FORM_ID + "=? AND "
                         + InstanceProviderAPI.InstanceColumns.JR_VERSION + "=?";
             }
@@ -88,7 +89,7 @@ public class FormsAdapter extends CursorRecyclerViewAdapter<FormsAdapter.FormHol
                 StringBuilder selectionBuf = new StringBuilder(InstanceProviderAPI.InstanceColumns._ID + " IN (");
                 selectionArgs = new String[len + 1];
                 int i = 0;
-                if (instanceCursor != null && instanceCursor.getCount() > 0) {
+                if (instanceCursor.getCount() > 0) {
                     instanceCursor.moveToPosition(-1);
                     while (instanceCursor.moveToNext()) {
                         if (i > 0) {
@@ -136,7 +137,7 @@ public class FormsAdapter extends CursorRecyclerViewAdapter<FormsAdapter.FormHol
     public static class FormHolder extends BaseCursorViewHolder {
 
         @BindView(R.id.tvTitle)
-        public TextView tvTitle;
+        TextView tvTitle;
         @BindView(R.id.tvSubtitle)
         TextView tvSubtitle;
         @BindView(R.id.tvReviewForm)
@@ -144,7 +145,7 @@ public class FormsAdapter extends CursorRecyclerViewAdapter<FormsAdapter.FormHol
         @BindView(R.id.tvUnReviewForm)
         TextView unReviewedForms;
         @BindView(R.id.checkbox)
-        public CheckBox checkBox;
+        CheckBox checkBox;
 
         private Form form;
 
@@ -159,6 +160,10 @@ public class FormsAdapter extends CursorRecyclerViewAdapter<FormsAdapter.FormHol
 
         public void setForm(Form form) {
             this.form = form;
+        }
+
+        public void toggleCheckbox() {
+            checkBox.setChecked(!checkBox.isChecked());
         }
     }
 }

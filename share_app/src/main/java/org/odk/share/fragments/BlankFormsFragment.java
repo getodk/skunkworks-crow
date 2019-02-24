@@ -12,17 +12,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.odk.collect.android.dao.FormsDao;
+import org.odk.collect.android.provider.FormsProviderAPI;
 import org.odk.share.R;
 import org.odk.share.activities.SendActivity;
 import org.odk.share.adapters.FormsAdapter;
 import org.odk.share.adapters.basecursoradapter.BaseCursorViewHolder;
 import org.odk.share.adapters.basecursoradapter.ItemClickListener;
-import org.odk.share.dao.FormsDao;
-import org.odk.share.provider.FormsProviderAPI;
 import org.odk.share.utilities.ApplicationConstants;
 import org.odk.share.utilities.ArrayUtils;
 
@@ -115,10 +114,9 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
 
     @Override
     public void onItemClick(BaseCursorViewHolder holder, int position) {
-        CheckBox checkBox = ((FormsAdapter.FormHolder) holder).checkBox;
-        checkBox.setChecked(!checkBox.isChecked());
+        ((FormsAdapter.FormHolder) holder).toggleCheckbox();
 
-        long id = ((FormsAdapter.FormHolder) holder).getForm().getIndex();
+        long id = ((FormsAdapter.FormHolder) holder).getForm().getId();
         if (selectedForms.contains(id)) {
             selectedForms.remove(id);
         } else {

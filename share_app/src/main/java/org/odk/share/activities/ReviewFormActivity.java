@@ -4,18 +4,18 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.odk.collect.android.dao.InstancesDao;
+import org.odk.collect.android.provider.InstanceProviderAPI;
 import org.odk.share.R;
-import org.odk.share.dao.InstancesDao;
 import org.odk.share.dao.TransferDao;
 import org.odk.share.dto.TransferInstance;
-import org.odk.share.provider.InstanceProviderAPI;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

@@ -7,17 +7,17 @@ import android.support.annotation.NonNull;
 
 import com.evernote.android.job.Job;
 
+import org.odk.collect.android.dao.FormsDao;
+import org.odk.collect.android.dao.InstancesDao;
+import org.odk.collect.android.provider.FormsProviderAPI;
+import org.odk.collect.android.provider.InstanceProviderAPI;
 import org.odk.share.R;
 import org.odk.share.application.Share;
-import org.odk.share.dao.FormsDao;
 import org.odk.share.dao.InstanceMapDao;
-import org.odk.share.dao.InstancesDao;
 import org.odk.share.dao.TransferDao;
 import org.odk.share.database.ShareDatabaseHelper;
 import org.odk.share.dto.TransferInstance;
 import org.odk.share.events.DownloadEvent;
-import org.odk.share.provider.FormsProviderAPI;
-import org.odk.share.provider.InstanceProviderAPI;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.utilities.ApplicationConstants;
 
@@ -37,6 +37,13 @@ import javax.inject.Inject;
 
 import timber.log.Timber;
 
+import static org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns.CAN_EDIT_WHEN_COMPLETE;
+import static org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns.DISPLAY_NAME;
+import static org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns.INSTANCE_FILE_PATH;
+import static org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns.JR_FORM_ID;
+import static org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns.JR_VERSION;
+import static org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns.STATUS;
+import static org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns.SUBMISSION_URI;
 import static org.odk.share.application.Share.FORMS_PATH;
 import static org.odk.share.application.Share.INSTANCES_PATH;
 import static org.odk.share.dto.InstanceMap.INSTANCE_UUID;
@@ -45,13 +52,6 @@ import static org.odk.share.dto.TransferInstance.INSTRUCTIONS;
 import static org.odk.share.dto.TransferInstance.RECEIVED_REVIEW_STATUS;
 import static org.odk.share.dto.TransferInstance.STATUS_FORM_RECEIVE;
 import static org.odk.share.dto.TransferInstance.TRANSFER_STATUS;
-import static org.odk.share.provider.InstanceProviderAPI.InstanceColumns.CAN_EDIT_WHEN_COMPLETE;
-import static org.odk.share.provider.InstanceProviderAPI.InstanceColumns.DISPLAY_NAME;
-import static org.odk.share.provider.InstanceProviderAPI.InstanceColumns.INSTANCE_FILE_PATH;
-import static org.odk.share.provider.InstanceProviderAPI.InstanceColumns.JR_FORM_ID;
-import static org.odk.share.provider.InstanceProviderAPI.InstanceColumns.JR_VERSION;
-import static org.odk.share.provider.InstanceProviderAPI.InstanceColumns.STATUS;
-import static org.odk.share.provider.InstanceProviderAPI.InstanceColumns.SUBMISSION_URI;
 import static org.odk.share.utilities.ApplicationConstants.SEND_FILL_FORM_MODE;
 
 public class DownloadJob extends Job {

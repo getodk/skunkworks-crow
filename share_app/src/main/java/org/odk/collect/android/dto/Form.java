@@ -14,26 +14,29 @@
  * limitations under the License.
  */
 
-package org.odk.share.dto;
+package org.odk.collect.android.dto;
 
 public class Form {
-    private long index;
-    private String displayName;
-    private String description;
-    private String jrFormId;
-    private String jrVersion;
-    private String formFilePath;
-    private String submissionUri;
-    private String base64RSAPublicKey;
-    private String displaySubtext;
-    private String md5Hash;
-    private Long date;
-    private String jrCacheFilePath;
-    private String formMediaPath;
-    private String language;
+    private final int id;
+    private final String displayName;
+    private final String description;
+    private final String jrFormId;
+    private final String jrVersion;
+    private final String formFilePath;
+    private final String submissionUri;
+    private final String base64RSAPublicKey;
+    private final String displaySubtext;
+    private final String md5Hash;
+    private final Long date;
+    private final String jrCacheFilePath;
+    private final String formMediaPath;
+    private final String language;
+    private final String autoSend;
+    private final String autoDelete;
+    private final String lastDetectedFormVersionHash;
 
-    private Form(Builder builder) {
-        index = builder.index;
+    private Form(Form.Builder builder) {
+        id = builder.id;
         displayName = builder.displayName;
         description = builder.description;
         jrFormId = builder.jrFormId;
@@ -47,10 +50,13 @@ public class Form {
         jrCacheFilePath = builder.jrCacheFilePath;
         formMediaPath = builder.formMediaPath;
         language = builder.language;
+        autoSend = builder.autoSend;
+        autoDelete = builder.autoDelete;
+        lastDetectedFormVersionHash = builder.lastDetectedFormVersionHash;
     }
 
     public static class Builder {
-        private long index;
+        private int id;
         private String displayName;
         private String description;
         private String jrFormId;
@@ -64,9 +70,12 @@ public class Form {
         private String jrCacheFilePath;
         private String formMediaPath;
         private String language;
+        private String autoSend;
+        private String autoDelete;
+        private String lastDetectedFormVersionHash;
 
-        public Builder index(long index) {
-            this.index = index;
+        public Builder id(int id) {
+            this.id = id;
             return this;
         }
 
@@ -90,7 +99,6 @@ public class Form {
             return this;
         }
 
-
         public Builder formFilePath(String formFilePath) {
             this.formFilePath = formFilePath;
             return this;
@@ -100,7 +108,6 @@ public class Form {
             this.submissionUri = submissionUri;
             return this;
         }
-
 
         public Builder base64RSAPublicKey(String base64RSAPublicKey) {
             this.base64RSAPublicKey = base64RSAPublicKey;
@@ -137,13 +144,28 @@ public class Form {
             return this;
         }
 
+        public Builder autoSend(String autoSend) {
+            this.autoSend = autoSend;
+            return this;
+        }
+
+        public Builder autoDelete(String autoDelete) {
+            this.autoDelete = autoDelete;
+            return this;
+        }
+
+        public Builder lastDetectedFormVersionHash(String lastDetectedFormVersionHash) {
+            this.lastDetectedFormVersionHash = lastDetectedFormVersionHash;
+            return this;
+        }
+
         public Form build() {
             return new Form(this);
         }
     }
 
-    public long getIndex() {
-        return index;
+    public int getId() {
+        return id;
     }
 
     public String getDisplayName() {
@@ -196,5 +218,17 @@ public class Form {
 
     public String getLanguage() {
         return language;
+    }
+
+    public String getAutoSend() {
+        return autoSend;
+    }
+
+    public String getAutoDelete() {
+        return autoDelete;
+    }
+
+    public String getLastDetectedFormVersionHash() {
+        return lastDetectedFormVersionHash;
     }
 }
