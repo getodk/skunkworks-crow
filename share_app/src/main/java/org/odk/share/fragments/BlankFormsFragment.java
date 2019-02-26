@@ -1,3 +1,5 @@
+
+
 package org.odk.share.fragments;
 
 import android.content.Intent;
@@ -6,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -105,6 +108,7 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
         } else {
             setEmptyViewVisibility(0);
         }
+        addListItemDivider();
     }
 
 
@@ -186,5 +190,13 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
     @Override
     protected String getSortingOrderKey() {
         return FORM_CHOOSER_LIST_SORTING_ORDER;
+    }
+
+    private void addListItemDivider() {
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(
+                recyclerView.getContext(),
+                DividerItemDecoration.VERTICAL);
+
+        recyclerView.addItemDecoration(dividerItemDecoration);
     }
 }
