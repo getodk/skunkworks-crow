@@ -48,6 +48,7 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
 
     public static final String FORM_IDS = "form_ids";
     private static final String FORM_CHOOSER_LIST_SORTING_ORDER = "formChooserListSortingOrder";
+    private static final String SELECTED_INSTANCES_KEY = "ROTATION_SELECTED_INSTANCES";
     private static final int FORM_LOADER = 2;
 
     @BindView(R.id.recyclerview)
@@ -88,6 +89,15 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(llm);
+
+        if (savedInstanceState != null) {
+            long[] previousSelectedInstances = savedInstanceState.getLongArray(SELECTED_INSTANCES_KEY);
+            for (long previousSelectedInstance : previousSelectedInstances) {
+                selectedForms.add(previousSelectedInstance);
+            }
+            sendButton.setEnabled(selectedForms.size() > 0);
+        }
+
         return view;
     }
 
@@ -101,6 +111,14 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         return formsDao.getFormsCursorLoader(getFilterText(), getSortingOrder());
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putLongArray(SELECTED_INSTANCES_KEY, ArrayUtils.toPrimitive(
+                selectedForms.toArray(new Long[selectedForms.size()])));
+
     }
 
     @Override
