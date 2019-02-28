@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="org.odk.share">
+    package="org.odk.skunkworks_crow">
 
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -19,47 +19,47 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
-        android:name=".application.Share"
+        android:name="org.odk.skunkworks_crow.application.Share"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.MainActivity">
+        <activity android:name="org.odk.skunkworks_crow.activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.WifiActivity" />
-        <activity android:name=".activities.InstancesList" />
-        <activity android:name=".preferences.SettingsPreference" />
-        <activity android:name=".activities.WebViewActivity" />
-        <activity android:name=".activities.AboutActivity" />
+        <activity android:name="org.odk.skunkworks_crow.activities.WifiActivity" />
+        <activity android:name="org.odk.skunkworks_crow.activities.InstancesList" />
+        <activity android:name="org.odk.skunkworks_crow.preferences.SettingsPreference" />
+        <activity android:name="org.odk.skunkworks_crow.activities.WebViewActivity" />
+        <activity android:name="org.odk.skunkworks_crow.activities.AboutActivity" />
         <activity
-            android:name=".activities.SendActivity"
+            android:name="org.odk.skunkworks_crow.activities.SendActivity"
             android:configChanges="orientation|screenSize" />
 
-        <service android:name=".services.HotspotService" />
+        <service android:name="org.odk.skunkworks_crow.services.HotspotService" />
 
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="portrait"
             android:stateNotNeeded="true"
             tools:replace="android:screenOrientation" />
-        <activity android:name=".activities.InstanceManagerTabs" />
-        <activity android:name=".activities.ReviewFormActivity" />
+        <activity android:name="org.odk.skunkworks_crow.activities.InstanceManagerTabs" />
+        <activity android:name="org.odk.skunkworks_crow.activities.ReviewFormActivity" />
 
         <provider
-            android:name=".provider.TransferProvider"
-            android:authorities="org.odk.share.provider.odk.instances" />
+            android:name="org.odk.skunkworks_crow.provider.TransferProvider"
+            android:authorities="org.odk.skunkworks_crow.provider.odk.instances" />
         <provider
-            android:name=".provider.InstanceMapProvider"
-            android:authorities="org.odk.share.provider.odk.map" />
+            android:name="org.odk.skunkworks_crow.provider.InstanceMapProvider"
+            android:authorities="org.odk.skunkworks_crow.provider.odk.map" />
 
-        <activity android:name=".activities.SendFormsActivity"></activity>
+        <activity android:name="org.odk.skunkworks_crow.activities.SendFormsActivity"></activity>
     </application>
 
 </manifest>

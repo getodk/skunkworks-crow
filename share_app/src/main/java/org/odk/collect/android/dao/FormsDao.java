@@ -24,7 +24,7 @@ import android.support.v4.content.CursorLoader;
 
 import org.odk.collect.android.dto.Form;
 import org.odk.collect.android.provider.FormsProviderAPI;
-import org.odk.share.application.Share;
+import org.odk.skunkworks_crow.application.Share;
 
 import java.util.ArrayList;
 import java.util.List;

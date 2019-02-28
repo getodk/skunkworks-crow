@@ -23,8 +23,8 @@ import android.support.v4.content.CursorLoader;
 
 import org.odk.collect.android.dto.Instance;
 import org.odk.collect.android.provider.InstanceProviderAPI;
-import org.odk.share.application.Share;
-import org.odk.share.utilities.ApplicationConstants;
+import org.odk.skunkworks_crow.application.Share;
+import org.odk.skunkworks_crow.utilities.ApplicationConstants;
 
 import java.util.ArrayList;
 import java.util.HashMap;

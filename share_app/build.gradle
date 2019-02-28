@@ -4,7 +4,7 @@ apply from: '../config/quality.gradle'
 android {
     compileSdkVersion 27
     defaultConfig {
-        applicationId "org.odk.share"
+        applicationId "org.odk.skunkworks_crow"
         minSdkVersion 16
         targetSdkVersion 22
         versionCode 1
