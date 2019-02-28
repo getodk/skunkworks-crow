@@ -4,8 +4,8 @@
     <string name="hotspot_start">Starting hotspot</string>
     <string name="stop">Stop</string>
     <string name="hotspot_settings_dialog">Enable portable hotspot from the settings.</string>
-    <string name="hotspot_name_suffix">-odk-skunkworkscrow</string>
-    <string name="hotspot_name_prefix_oreo">Androidskunkworkscrow</string>
+    <string name="hotspot_name_suffix">-odk-share</string>
+    <string name="hotspot_name_prefix_oreo">AndroidShare</string>
     <string name="hotspot_already_running">Hotspot already running</string>
     <string name="scan_alert_oreo">Scan QR Code to connect to this network</string>
 
