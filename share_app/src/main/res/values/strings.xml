@@ -1,11 +1,11 @@
 <resources>
-    <string name="app_name">Share</string>
+    <string name="app_name">skunkworks-crow</string>
     <string name="hotspot_running">Running Hotspot</string>
     <string name="hotspot_start">Starting hotspot</string>
     <string name="stop">Stop</string>
     <string name="hotspot_settings_dialog">Enable portable hotspot from the settings.</string>
-    <string name="hotspot_name_suffix">-odk-share</string>
-    <string name="hotspot_name_prefix_oreo">AndroidShare</string>
+    <string name="hotspot_name_suffix">-odk-skunkworkscrow</string>
+    <string name="hotspot_name_prefix_oreo">Androidskunkworkscrow</string>
     <string name="hotspot_already_running">Hotspot already running</string>
     <string name="scan_alert_oreo">Scan QR Code to connect to this network</string>
 
@@ -86,7 +86,7 @@
     <string name="add_feedback">Add Feeback</string>
     <string name="view_form_in_collect">View in ODK Collect</string>
     <string name="collect_not_installed">Install ODK Collect to view the form</string>
-    <string name="install_collect">Share app requires ODK Collect to be installed in the device</string>
+    <string name="install_collect">skunkworks-crow app requires ODK Collect to be installed in the device</string>
     <string name="install">Install</string>
     <string name="no_blank_forms">No blank forms available</string>
     <string name="form_approved">Form approved</string>
