@@ -64,7 +64,10 @@ public class InstanceAdapter extends RecyclerView.Adapter<InstanceAdapter.Instan
 
     @Override
     public int getItemCount() {
-        return cursor.getCount();
+        if (!cursor.isClosed()) {
+            return cursor.getCount();
+        }
+        return 0;
     }
 
 
