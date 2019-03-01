@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -74,6 +75,7 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
         recyclerView.setLayoutManager(llm);
         setupAdapter();
         getSupportLoaderManager().initLoader(FORM_LOADER, null, this);
+        addListItemDivider();
     }
 
     @Override
@@ -212,4 +214,14 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
         builder.setCancelable(false);
         builder.show();
     }
+
+    private void addListItemDivider() {
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(
+                recyclerView.getContext(),
+                DividerItemDecoration.VERTICAL);
+
+        recyclerView.addItemDecoration(dividerItemDecoration);
+
+    }
+
 }

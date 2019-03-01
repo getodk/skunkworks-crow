@@ -5,7 +5,7 @@ references:
   ## Cache
 
   cache_key: &cache_key
-    key: jars-{{ checksum "build.gradle" }}-{{ checksum "share_app/build.gradle" }}
+    key: jars-{{ checksum "build.gradle" }}-{{ checksum "skunkworks_crow/build.gradle" }}
   restore_cache: &restore_cache
     restore_cache:
       <<: *cache_key
@@ -31,10 +31,10 @@ references:
     persist_to_workspace:
       root: *workspace
       paths:
-        - share_app/build/outputs/androidTest-results
-        - share_app/build/outputs/apk
-        - share_app/build/outputs/code-coverage
-        - share_app/build/test-results
+        - skunkworks_crow/build/outputs/androidTest-results
+        - skunkworks_crow/build/outputs/apk
+        - skunkworks_crow/build/outputs/code-coverage
+        - skunkworks_crow/build/test-results
 
   ## Docker image configurations
 
@@ -70,7 +70,7 @@ jobs:
             name: Run code quality checks
             command: ./gradlew pmd checkstyle lint findbugs
         - store_artifacts:
-            path: share_app/build/reports
+            path: skunkworks_crow/build/reports
             destination: reports
         - run:
             name: Assemble debug and test builds
@@ -98,10 +98,10 @@ jobs:
             command: ./gradlew testDebugUnitTest
         - *persist_debug_workspace
         - store_artifacts:
-            path: share_app/build/reports
+            path: skunkworks_crow/build/reports
             destination: reports
         - store_test_results:
-            path: share_app/build/test-results
+            path: skunkworks_crow/build/test-results
 
 workflows:
   version: 2
