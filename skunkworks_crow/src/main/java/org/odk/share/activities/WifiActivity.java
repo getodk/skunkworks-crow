@@ -40,11 +40,15 @@ import org.odk.share.adapters.WifiResultAdapter;
 import org.odk.share.controller.WifiHelper;
 import org.odk.share.events.DownloadEvent;
 import org.odk.share.listeners.OnItemClickListener;
+import org.odk.share.network.WifiBroadcastReceiver;
+import org.odk.share.network.WifiConnector;
+import org.odk.share.network.WifiNetworkInfo;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.rx.schedulers.BaseSchedulerProvider;
 import org.odk.share.services.ReceiverService;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -64,6 +68,10 @@ import static org.odk.share.utilities.QRCodeUtils.SSID;
 
 public class WifiActivity extends InjectableActivity implements OnItemClickListener {
 
+    private static final int DIALOG_DOWNLOAD_PROGRESS = 1;
+    private static final int DIALOG_CONNECTING = 2;
+    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
+
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
     @BindView(R.id.empty_view)
@@ -75,35 +83,119 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
     @BindView(R.id.bScan)
     Button scanWifi;
 
+    @Inject
+    ReceiverService receiverService;
+
+    @Inject
+    RxEventBus rxEventBus;
+
+    @Inject
+    BaseSchedulerProvider schedulerProvider;
+
     private WifiManager wifiManager;
     private WifiResultAdapter wifiResultAdapter;
     private List<ScanResult> scanResultList;
     private boolean isReceiverRegistered;
     private boolean isWifiReceiverRegisterd;
     private AlertDialog alertDialog;
-
     private ProgressDialog progressDialog = null;
-    private static final int DIALOG_DOWNLOAD_PROGRESS = 1;
-    private static final int DIALOG_CONNECTING = 2;
     private WifiHelper wifiHelper;
     private String wifiNetworkSSID;
     private WifiInfo lastConnectedWifiInfo;
-
     private String alertMsg;
     private int port;
+
+    public BroadcastReceiver wifiReceiver = new BroadcastReceiver() {
+        boolean isConnected = false;
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Timber.d("RECEIVER CONNECTION ");
+            ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (cm != null) {
+                NetworkInfo info = cm.getActiveNetworkInfo();
+                if (info != null) {
+                    Timber.d(info + " " + info.getTypeName() + " " + info.getType() + " " + wifiNetworkSSID + " " + isConnected);
+                    if (info.getState() == NetworkInfo.State.CONNECTED
+                            && info.getTypeName().compareTo("WIFI") == 0
+                            && info.getExtraInfo() != null) {
+                        if (!isConnected && info.getExtraInfo().equals("\"" + wifiNetworkSSID + "\"")) {
+                            Timber.d("Connected");
+                            isConnected = true;
+                            isWifiReceiverRegisterd = false;
+                            unregisterReceiver(this);
+                            Toast.makeText(getApplicationContext(), "Connected to " + wifiNetworkSSID, Toast.LENGTH_LONG).show();
+                            removeDialog(DIALOG_CONNECTING);
+
+                            if (port != -1) {
+                                startReceiveTask();
+                            } else {
+                                showPortDialog();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    };
+
     private boolean isQRCodeScanned;
     private String ssidScanned;
     private boolean isProtected;
     private String passwordScanned;
 
-    @Inject
-    ReceiverService receiverService;
-    @Inject
-    RxEventBus rxEventBus;
-    @Inject
-    BaseSchedulerProvider schedulerProvider;
+    BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context c, Intent intent) {
+            for (ScanResult scanResult : wifiManager.getScanResults()) {
+                if (scanResult.SSID.contains(getString(R.string.hotspot_name_suffix)) ||
+                        scanResult.SSID.contains(getString(R.string.hotspot_name_prefix_oreo))) {
+                    scanResultList.add(scanResult);
+                }
+            }
+            isReceiverRegistered = false;
+            unregisterReceiver(this);
+            wifiResultAdapter.notifyDataSetChanged();
+            scanWifi.setEnabled(true);
+            setEmptyViewVisibility(getString(R.string.no_wifi_available));
 
-    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
+
+            /*
+                Adding a double verification to check whether the ssid returned by scanned QR Code
+                actually exists or not.
+            */
+            if (isQRCodeScanned) {
+                isQRCodeScanned = false;
+                for (ScanResult scanResult : scanResultList) {
+                    if (scanResult.SSID.equals(ssidScanned)) {
+                        connectToNetwork(ssidScanned, passwordScanned);
+                        return;
+                    }
+                }
+
+                Toast.makeText(c, getString(R.string.no_wifi_available), Toast.LENGTH_LONG).show();
+            }
+        }
+    };
+
+    public BroadcastReceiver wifiStateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int wifiState = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE, WifiManager.WIFI_STATE_UNKNOWN);
+
+            switch (wifiState) {
+                case WifiManager.WIFI_STATE_DISABLED:
+                    scanResultList.clear();
+                    setEmptyViewVisibility(getString(R.string.enable_wifi));
+                    break;
+                case WifiManager.WIFI_STATE_ENABLED:
+                    startScan();
+                    break;
+            }
+        }
+    };
+
+    private WifiConnector wifiConnector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,11 +227,42 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(wifiResultAdapter);
+
+        wifiConnector = new WifiConnector(this, new WifiBroadcastReceiver.WifiBroadcastListener() {
+            @Override
+            public void onStateUpdate(NetworkInfo.DetailedState detailedState) {
+                Timber.d(detailedState.toString());
+            }
+
+            @Override
+            public void onScanResultsAvailable() {
+                List<ScanResult> scanResults = wifiConnector.getWifiManager().getScanResults();
+                ArrayList<WifiNetworkInfo> list = new ArrayList<>();
+
+                for (ScanResult scanResult : scanResults) {
+                    if (isPossibleHotspot(scanResult.SSID)) {
+                        WifiNetworkInfo wifiNetworkInfo = new WifiNetworkInfo();
+                        wifiNetworkInfo.setSsid(scanResult.SSID);
+                        wifiNetworkInfo.setRssi(WifiManager.calculateSignalLevel(scanResult.level, 100));
+                        wifiNetworkInfo.setSecurityType(wifiConnector.getScanResultSecurity(scanResult));
+                        list.add(wifiNetworkInfo);
+                    }
+                }
+
+                Timber.d(Arrays.toString(list.toArray()));
+            }
+        });
+    }
+
+    private boolean isPossibleHotspot(String ssid) {
+        return ssid.contains(getString(R.string.hotspot_name_suffix)) ||
+                ssid.contains(getString(R.string.hotspot_name_prefix_oreo));
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        wifiConnector.registerReceiver();
         startScan();
         registerReceiver(wifiStateReceiver, new IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION));
         compositeDisposable.add(addDownloadEventSubscription());
@@ -147,6 +270,7 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
 
     @Override
     protected void onPause() {
+        wifiConnector.unregisterReceiver();
         compositeDisposable.clear();
         super.onPause();
     }
@@ -337,40 +461,6 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
         wifiManager.startScan();
     }
 
-    BroadcastReceiver receiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context c, Intent intent) {
-            for (ScanResult scanResult : wifiManager.getScanResults()) {
-                if (scanResult.SSID.contains(getString(R.string.hotspot_name_suffix)) ||
-                        scanResult.SSID.contains(getString(R.string.hotspot_name_prefix_oreo))) {
-                    scanResultList.add(scanResult);
-                }
-            }
-            isReceiverRegistered = false;
-            unregisterReceiver(this);
-            wifiResultAdapter.notifyDataSetChanged();
-            scanWifi.setEnabled(true);
-            setEmptyViewVisibility(getString(R.string.no_wifi_available));
-
-
-            /*
-                Adding a double verification to check whether the ssid returned by scanned QR Code
-                actually exists or not.
-            */
-            if (isQRCodeScanned) {
-                isQRCodeScanned = false;
-                for (ScanResult scanResult: scanResultList) {
-                    if (scanResult.SSID.equals(ssidScanned)) {
-                        connectToNetwork(ssidScanned, passwordScanned);
-                        return;
-                    }
-                }
-
-                Toast.makeText(c, getString(R.string.no_wifi_available), Toast.LENGTH_LONG).show();
-            }
-        }
-    };
-
     private void setEmptyViewVisibility(String text) {
         if (scanResultList.size() > 0) {
             recyclerView.setVisibility(View.VISIBLE);
@@ -381,57 +471,6 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
             emptyView.setText(text);
         }
     }
-
-    public BroadcastReceiver wifiStateReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            int wifiState = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE, WifiManager.WIFI_STATE_UNKNOWN);
-
-            switch (wifiState) {
-                case WifiManager.WIFI_STATE_DISABLED:
-                    scanResultList.clear();
-                    setEmptyViewVisibility(getString(R.string.enable_wifi));
-                    break;
-                case WifiManager.WIFI_STATE_ENABLED:
-                    startScan();
-                    break;
-            }
-        }
-    };
-
-    public BroadcastReceiver wifiReceiver = new BroadcastReceiver() {
-        boolean isConnected = false;
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Timber.d("RECEIVER CONNECTION ");
-            ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-            if (cm != null) {
-                NetworkInfo info = cm.getActiveNetworkInfo();
-                if (info != null) {
-                    Timber.d(info + " " + info.getTypeName() + " " + info.getType() + " " + wifiNetworkSSID + " " + isConnected);
-                    if (info.getState() == NetworkInfo.State.CONNECTED
-                            && info.getTypeName().compareTo("WIFI") == 0
-                            && info.getExtraInfo() != null) {
-                        if (!isConnected && info.getExtraInfo().equals("\"" + wifiNetworkSSID + "\"")) {
-                            Timber.d("Connected");
-                            isConnected = true;
-                            isWifiReceiverRegisterd = false;
-                            unregisterReceiver(this);
-                            Toast.makeText(getApplicationContext(), "Connected to " + wifiNetworkSSID, Toast.LENGTH_LONG).show();
-                            removeDialog(DIALOG_CONNECTING);
-
-                            if (port != -1) {
-                                startReceiveTask();
-                            } else {
-                                showPortDialog();
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    };
 
     private void startReceiveTask() {
         showDialog(DIALOG_DOWNLOAD_PROGRESS);
