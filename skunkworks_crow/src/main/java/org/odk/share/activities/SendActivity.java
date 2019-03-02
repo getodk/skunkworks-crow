@@ -50,7 +50,7 @@ import static org.odk.share.utilities.ApplicationConstants.ASK_REVIEW_MODE;
 
 public class SendActivity extends InjectableActivity {
 
-    public static final String DEFAULT_SSID = "ODK-Share";
+    public static final String DEFAULT_SSID = "ODK-SKUNKWORKS";
     private static final int PROGRESS_DIALOG = 1;
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
