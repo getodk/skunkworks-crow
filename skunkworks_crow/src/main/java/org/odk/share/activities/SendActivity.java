@@ -109,7 +109,7 @@ public class SendActivity extends InjectableActivity {
 
         WifiConnector wifiConnector = new WifiConnector(this);
         if (wifiConnector.isWifiEnabled()) {
-            wifiConnector.disableWifi();
+            wifiConnector.disableWifi(null);
         }
 
         isHotspotInitiated = false;

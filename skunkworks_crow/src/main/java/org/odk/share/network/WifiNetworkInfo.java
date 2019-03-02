@@ -3,48 +3,12 @@ package org.odk.share.network;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiConfiguration;
 
-import java.io.Serializable;
-
-public class WifiNetworkInfo implements Serializable {
-
-    private static final String DEFAULT_SSID = "\"<unknown ssid>\"";
+public class WifiNetworkInfo {
 
     private NetworkInfo.DetailedState state = NetworkInfo.DetailedState.DISCONNECTED;
     private int securityType = WifiConfiguration.KeyMgmt.WPA_PSK;
-    private String ssid = DEFAULT_SSID;
+    private String ssid = "unknown";
     private int rssi = -1;
-    private String ip = "0.0.0.0";
-    private boolean untrusted;
-    private int netId;
-
-    @Override
-    public String toString() {
-        return ssid + " " + state + " " + rssi + " " + ip + " " + untrusted + " " + netId;
-    }
-
-    public int getNetId() {
-        return netId;
-    }
-
-    public void setNetId(int netId) {
-        this.netId = netId;
-    }
-
-    public boolean isUntrusted() {
-        return untrusted;
-    }
-
-    public void setUntrusted(boolean untrusted) {
-        this.untrusted = untrusted;
-    }
-
-    public String getIp() {
-        return ip;
-    }
-
-    public void setIp(String ip) {
-        this.ip = ip;
-    }
 
     public int getRssi() {
         return rssi;

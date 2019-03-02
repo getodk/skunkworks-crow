@@ -120,7 +120,7 @@ public final class WifiConnector {
      *
      * @return Returns the service set identifier (SSID) of the current 802.11 network
      */
-    public final String getWifiSSID() {
+    public String getWifiSSID() {
         if (wifiManager.getConnectionInfo().getSupplicantState() == SupplicantState.COMPLETED) {
             return unquoted(wifiManager.getConnectionInfo().getSSID());
         }
@@ -132,7 +132,7 @@ public final class WifiConnector {
      *
      * @return the boolean
      */
-    public final boolean isWifiEnabled() {
+    public boolean isWifiEnabled() {
         return wifiManager.isWifiEnabled();
     }
 
@@ -147,10 +147,6 @@ public final class WifiConnector {
 
     public void enableWifi() {
         wifiManager.setWifiEnabled(true);
-    }
-
-    public void disableWifi() {
-        wifiManager.setWifiEnabled(false);
     }
 
     private void removeNetworkAndEnableOther(String ssid) {

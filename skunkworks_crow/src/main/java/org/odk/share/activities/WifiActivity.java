@@ -411,8 +411,6 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
                 } catch (JSONException e) {
                     Timber.e(e);
                 }
-
-                return;
             }
         }
     }
@@ -498,11 +496,11 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
                     } else {
                         Toast.makeText(this, "already connected to " + ssidScanned, Toast.LENGTH_SHORT).show();
                     }
-//                    return;
+                    return;
                 }
             }
 
-//            Toast.makeText(this, getString(R.string.no_wifi_available), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.no_wifi_available), Toast.LENGTH_LONG).show();
         }
     }
 
