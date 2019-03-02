@@ -128,7 +128,7 @@ Tap on the wifi network available to connect and after successful connection ent
 
 Connecting to the sender’s network will disable all the wifi network available so that no other network can interrupt the current connection. After receiving the forms it will restore the last saved state.
 
-For some devices, the user is not allowed to configure the wifi hotspot from the app. Currently for Android versions < 8, “ODK-SHARE-crow-odk-share” is set as the default network name and for versions >= 8 it is AndroidShare-XXXX which is set by Android.
+For some devices, the user is not allowed to configure the wifi hotspot from the app. Currently for Android versions < 8, “ODK-SHARE-odk-share” is set as the default network name and for versions >= 8 it is AndroidShare-XXXX which is set by Android.
 
 <p float="left" align="center">
   <img src="/screenshots/received_for_review.gif" width="280" height="500"/>
