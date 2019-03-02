@@ -21,7 +21,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -242,34 +241,22 @@ public class WifiActivity extends InjectableActivity implements
         builder.setView(input);
 
         builder.setPositiveButton(getString(R.string.ok), null);
-        builder.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
+        builder.setNegativeButton(getString(R.string.cancel), (dialog, which) -> dialog.cancel());
 
         alertDialog = builder.create();
-        alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(DialogInterface dialog) {
-                Button button = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE);
-                button.setOnClickListener(new View.OnClickListener() {
-
-                    @Override
-                    public void onClick(View view) {
-                        String portInput = input.getText().toString();
-                        Timber.d("Port : %s", portInput);
-                        if (portInput.length() > 0) {
-                            dialog.dismiss();
-                            port = Integer.parseInt(portInput);
-                            startReceiveTask();
-                        } else {
-                            input.setError(getString(R.string.port_empty));
-                        }
-                    }
-                });
-            }
+        alertDialog.setOnShowListener(dialog -> {
+            Button button = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE);
+            button.setOnClickListener(view -> {
+                String portInput = input.getText().toString();
+                Timber.d("Port : %s", portInput);
+                if (portInput.length() > 0) {
+                    dialog.dismiss();
+                    port = Integer.parseInt(portInput);
+                    startReceiveTask();
+                } else {
+                    input.setError(getString(R.string.port_empty));
+                }
+            });
         });
         alertDialog.show();
     }
@@ -281,50 +268,35 @@ public class WifiActivity extends InjectableActivity implements
         final View dialogView = factory.inflate(R.layout.dialog_password, null);
         final EditText passwordEditText = dialogView.findViewById(R.id.etPassword);
         final CheckBox passwordCheckBox = dialogView.findViewById(R.id.checkBox);
-        passwordCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if (!passwordCheckBox.isChecked()) {
-                    passwordEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                } else {
-                    passwordEditText.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                }
+        passwordCheckBox.setOnCheckedChangeListener((compoundButton, b) -> {
+            if (!passwordCheckBox.isChecked()) {
+                passwordEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            } else {
+                passwordEditText.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
             }
         });
         builder.setTitle(scanResult.getSsid());
         builder.setView(dialogView);
         builder.setPositiveButton(getString(R.string.connect), null);
-        builder.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
+        builder.setNegativeButton(getString(R.string.cancel), (dialog, which) -> dialog.dismiss());
 
         builder.setCancelable(false);
         alertDialog = builder.create();
         alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-        alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(DialogInterface dialog) {
-                Button button = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE);
-                button.setOnClickListener(new View.OnClickListener() {
-
-                    @Override
-                    public void onClick(View view) {
-                        String pw = passwordEditText.getText().toString();
-                        if (!pw.equals("")) {
-                            Timber.d(pw);
-                            dialog.dismiss();
-                            wifiNetworkSSID = scanResult.getSsid();
-                            wifiHelper.connectToWifi(scanResult.getSsid(), pw);
-                            removeDialog(DIALOG_CONNECTING);
-                        } else {
-                            passwordEditText.setError(getString(R.string.password_empty));
-                        }
-                    }
-                });
-            }
+        alertDialog.setOnShowListener(dialog -> {
+            Button button = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE);
+            button.setOnClickListener(view -> {
+                String pw = passwordEditText.getText().toString();
+                if (!pw.equals("")) {
+                    Timber.d(pw);
+                    dialog.dismiss();
+                    wifiNetworkSSID = scanResult.getSsid();
+                    wifiHelper.connectToWifi(scanResult.getSsid(), pw);
+                    removeDialog(DIALOG_CONNECTING);
+                } else {
+                    passwordEditText.setError(getString(R.string.password_empty));
+                }
+            });
         });
         alertDialog.show();
     }
@@ -431,14 +403,11 @@ public class WifiActivity extends InjectableActivity implements
         alertDialog = new AlertDialog.Builder(this).create();
         alertDialog.setTitle(title);
         alertDialog.setMessage(message);
-        DialogInterface.OnClickListener quitListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int i) {
-                switch (i) {
-                    case DialogInterface.BUTTON_POSITIVE:
-                        finish();
-                        break;
-                }
+        DialogInterface.OnClickListener quitListener = (dialog, i) -> {
+            switch (i) {
+                case DialogInterface.BUTTON_POSITIVE:
+                    finish();
+                    break;
             }
         };
         alertDialog.setCancelable(false);
