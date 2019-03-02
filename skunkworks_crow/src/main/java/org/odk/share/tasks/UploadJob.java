@@ -58,6 +58,18 @@ public class UploadJob extends Job {
     @Inject
     RxEventBus rxEventBus;
 
+    @Inject
+    InstancesDao instancesDao;
+
+    @Inject
+    FormsDao formsDao;
+
+    @Inject
+    InstanceMapDao instanceMapDao;
+
+    @Inject
+    TransferDao transferDao;
+
     private int port;
     private Long[] instancesToSend;
     private Socket socket;
@@ -156,7 +168,7 @@ public class UploadJob extends Job {
                 selectionBuf.append(")");
                 String selection = selectionBuf.toString();
 
-                try (Cursor cursor = new FormsDao().getFormsCursor(selection, selectionArgs)) {
+                try (Cursor cursor = formsDao.getFormsCursor(selection, selectionArgs)) {
                     if (cursor != null && cursor.getCount() > 0) {
                         cursor.moveToPosition(-1);
                         while (cursor.moveToNext()) {
@@ -185,7 +197,7 @@ public class UploadJob extends Job {
             String selection = selectionBuf.toString();
 
             int count = 0;
-            try (Cursor cursor = new InstancesDao().getInstancesCursor(selection, selectionArgs)) {
+            try (Cursor cursor = instancesDao.getInstancesCursor(selection, selectionArgs)) {
                 if (cursor != null && cursor.getCount() > 0) {
                     cursor.moveToPosition(-1);
                     while (cursor.moveToNext()) {
@@ -264,7 +276,7 @@ public class UploadJob extends Job {
                     + FormsProviderAPI.FormsColumns.JR_VERSION + "=?";
         }
 
-        try (Cursor cursor = new FormsDao().getFormsCursor(null, selection, selectionArgs, null)) {
+        try (Cursor cursor = formsDao.getFormsCursor(null, selection, selectionArgs, null)) {
             cursor.moveToPosition(-1);
 
             if (cursor.moveToNext()) {
@@ -361,8 +373,8 @@ public class UploadJob extends Job {
         String selection = selectionBuf.toString();
         Cursor c = null;
         try {
-            c = new InstancesDao().getInstancesCursor(selection, selectionArgs);
-            HashMap<Long, String> instanceMap = new InstanceMapDao().getInstanceMap();
+            c = instancesDao.getInstancesCursor(selection, selectionArgs);
+            HashMap<Long, String> instanceMap = instanceMapDao.getInstanceMap();
             if (c != null && c.getCount() > 0) {
                 dos.writeInt(c.getCount());
                 c.moveToPosition(-1);
@@ -407,7 +419,7 @@ public class UploadJob extends Job {
                                     getContext().getString(R.string.review_not_asked)));
                             continue;
                         } else {
-                            TransferInstance transferInstance = new TransferDao().getReceivedTransferInstanceFromInstanceId(id);
+                            TransferInstance transferInstance = transferDao.getReceivedTransferInstanceFromInstanceId(id);
                             dos.writeInt(transferInstance.getReviewed());
                             if (transferInstance.getInstructions() != null && transferInstance.getInstructions().length() > 0) {
                                 dos.writeUTF(transferInstance.getInstructions());

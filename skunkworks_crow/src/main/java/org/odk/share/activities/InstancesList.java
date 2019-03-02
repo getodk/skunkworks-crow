@@ -22,6 +22,8 @@ import org.odk.share.utilities.ArrayUtils;
 
 import java.util.LinkedHashSet;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -42,6 +44,9 @@ public class InstancesList extends InstanceListActivity implements LoaderManager
     private static final int INSTANCE_LOADER = 1;
     private InstanceAdapter instanceAdapter;
     private LinkedHashSet<Long> selectedInstances;
+
+    @Inject
+    InstancesDao instancesDao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +73,7 @@ public class InstancesList extends InstanceListActivity implements LoaderManager
     @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new InstancesDao().getSavedInstancesCursorLoader(getFilterText(), getSortingOrder());
+        return instancesDao.getSavedInstancesCursorLoader(getFilterText(), getSortingOrder());
     }
 
     @Override

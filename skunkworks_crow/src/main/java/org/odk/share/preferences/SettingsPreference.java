@@ -15,7 +15,6 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import org.odk.share.R;
-import org.odk.share.application.Share;
 
 
 /**
@@ -74,14 +73,14 @@ public class SettingsPreference extends PreferenceActivity {
                 case PreferenceKeys.KEY_HOTSPOT_NAME:
                     String name = newValue.toString();
                     if (name.length() == 0) {
-                        Toast.makeText(Share.getInstance(), getString(R.string.hotspot_name_error), Toast.LENGTH_LONG).show();
+                        Toast.makeText(getBaseContext(), getString(R.string.hotspot_name_error), Toast.LENGTH_LONG).show();
                         return false;
                     }
                     break;
                 case PreferenceKeys.KEY_HOTSPOT_PASSWORD:
                     String password = newValue.toString();
                     if (password.length() < 8) {
-                        Toast.makeText(Share.getInstance(), getString(R.string.hotspot_password_error), Toast.LENGTH_LONG).show();
+                        Toast.makeText(getBaseContext(), getString(R.string.hotspot_password_error), Toast.LENGTH_LONG).show();
                         return false;
                     }
                     break;

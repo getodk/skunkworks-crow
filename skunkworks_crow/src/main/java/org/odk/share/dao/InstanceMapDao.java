@@ -1,9 +1,8 @@
 package org.odk.share.dao;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
-
-import org.odk.share.application.Share;
 
 import java.util.HashMap;
 
@@ -20,8 +19,14 @@ import static org.odk.share.provider.InstanceMapProvider.CONTENT_URI;
 
 public class InstanceMapDao {
 
+    private Context context;
+
+    public InstanceMapDao(Context context) {
+        this.context = context;
+    }
+
     public int updateInstance(ContentValues values, String where, String[] whereArgs) {
-        return Share.getInstance().getContentResolver().update(CONTENT_URI, values, where, whereArgs);
+        return context.getContentResolver().update(CONTENT_URI, values, where, whereArgs);
     }
 
     public HashMap<Long, String> getInstanceMap() {
@@ -62,8 +67,7 @@ public class InstanceMapDao {
     }
 
     public Cursor getInstancesCursor(String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        return Share.getInstance().getContentResolver()
-                .query(CONTENT_URI, projection, selection, selectionArgs, sortOrder);
+        return context.getContentResolver().query(CONTENT_URI, projection, selection, selectionArgs, sortOrder);
     }
 
     public long getInstanceId(String uuid) {

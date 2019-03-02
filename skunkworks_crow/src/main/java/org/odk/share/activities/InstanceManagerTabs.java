@@ -6,7 +6,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,7 +24,7 @@ import butterknife.ButterKnife;
 
 import static org.odk.share.activities.MainActivity.FORM_ID;
 
-public class InstanceManagerTabs extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
+public class InstanceManagerTabs extends InjectableActivity implements TabLayout.OnTabSelectedListener {
 
     private final Object[][] tabs = {
             {R.string.statistics, R.drawable.ic_stats, new StatisticsFragment()},

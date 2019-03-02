@@ -21,13 +21,17 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import org.odk.collect.android.dao.FormsDao;
+import org.odk.collect.android.dao.InstancesDao;
 import org.odk.collect.android.dto.Form;
 import org.odk.share.R;
 import org.odk.share.adapters.FormsAdapter;
 import org.odk.share.adapters.basecursoradapter.BaseCursorViewHolder;
 import org.odk.share.adapters.basecursoradapter.ItemClickListener;
 import org.odk.share.application.Share;
+import org.odk.share.dao.TransferDao;
 import org.odk.share.preferences.SettingsPreference;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -55,6 +59,15 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
     @BindView(R.id.empty_view)
     TextView emptyView;
 
+    @Inject
+    InstancesDao instancesDao;
+
+    @Inject
+    FormsDao formsDao;
+
+    @Inject
+    TransferDao transferDao;
+
     private FormsAdapter formAdapter;
 
 
@@ -66,7 +79,7 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
 
         setTitle(getString(R.string.app_name));
         setSupportActionBar(toolbar);
-        Share.createODKDirs();
+        Share.createODKDirs(this);
 
         sendForms.setEnabled(false);
 
@@ -89,7 +102,7 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
     }
 
     private void setupAdapter() {
-        formAdapter = new FormsAdapter(this, null, this);
+        formAdapter = new FormsAdapter(this, null, this, instancesDao, transferDao);
         recyclerView.setAdapter(formAdapter);
     }
 
@@ -136,7 +149,7 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
     @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new FormsDao().getFormsCursorLoader(getFilterText(), getSortingOrder());
+        return formsDao.getFormsCursorLoader(getFilterText(), getSortingOrder());
     }
 
     @Override

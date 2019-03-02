@@ -37,7 +37,7 @@ public class InstanceMapProvider extends ContentProvider {
     private ShareDatabaseHelper getDbHelper() {
 
         try {
-            Share.createODKDirs();
+            Share.createODKDirs(getContext());
         } catch (RuntimeException e) {
             databaseHelper = null;
             return null;
