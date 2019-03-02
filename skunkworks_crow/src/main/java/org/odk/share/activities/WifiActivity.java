@@ -146,44 +146,6 @@ public class WifiActivity extends InjectableActivity
     private boolean isProtected;
     private String passwordScanned;
 
-/*
-    BroadcastReceiver receiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context c, Intent intent) {
-            for (ScanResult scanResult : wifiManager.getScanResults()) {
-                if (scanResult.SSID.contains(getString(R.string.hotspot_name_suffix)) ||
-                        scanResult.SSID.contains(getString(R.string.hotspot_name_prefix_oreo))) {
-                    scanResultList.add(scanResult);
-                }
-            }
-            isReceiverRegistered = false;
-            unregisterReceiver(this);
-            wifiResultAdapter.notifyDataSetChanged();
-            scanWifi.setEnabled(true);
-            setEmptyViewVisibility(getString(R.string.no_wifi_available));
-
-
-            */
-/*
-                Adding a double verification to check whether the ssid returned by scanned QR Code
-                actually exists or not.
-            *//*
-
-            if (isQRCodeScanned) {
-                isQRCodeScanned = false;
-                for (ScanResult scanResult : scanResultList) {
-                    if (scanResult.SSID.equals(ssidScanned)) {
-                        connectToNetwork(ssidScanned, passwordScanned);
-                        return;
-                    }
-                }
-
-                Toast.makeText(c, getString(R.string.no_wifi_available), Toast.LENGTH_LONG).show();
-            }
-        }
-    };
-*/
-
     private WifiConnector wifiConnector;
     public BroadcastReceiver wifiStateReceiver = new BroadcastReceiver() {
         @Override
@@ -201,6 +163,8 @@ public class WifiActivity extends InjectableActivity
             }
         }
     };
+
+    private boolean isConnected = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -318,11 +282,11 @@ public class WifiActivity extends InjectableActivity
         if (scanResultList.get(position).getSsid().contains(getString(R.string.hotspot_name_prefix_oreo))) {
             Toast.makeText(this, getString(R.string.scan_alert_oreo), Toast.LENGTH_LONG).show();
         } else if (scanResultList.get(position).getSecurityType() != WifiConfiguration.KeyMgmt.NONE) {
-            // Show dialog and ask for password
             showPasswordDialog(scanResultList.get(position));
-        } else {
-            // connect
+        } else if (scanResultList.get(position).getState() != NetworkInfo.DetailedState.CONNECTED) {
             connectToNetwork(scanResultList.get(position).getSsid(), null);
+        } else {
+            Toast.makeText(this, "already connected to wifi network", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -590,7 +554,36 @@ public class WifiActivity extends InjectableActivity
 
     @Override
     public void onStateUpdate(NetworkInfo.DetailedState detailedState) {
-        Timber.d(detailedState.toString());
+
+        String connectedSsid = wifiConnector.getSsid();
+
+        Timber.d(wifiNetworkSSID + " " + connectedSsid + " " + detailedState.toString());
+
+        for (WifiNetworkInfo wifiNetworkInfo : scanResultList) {
+            if (wifiNetworkInfo.getSsid().equals(connectedSsid) && wifiNetworkInfo.getSsid().equals(wifiNetworkSSID)) {
+                wifiNetworkInfo.setState(detailedState);
+                wifiResultAdapter.notifyItemChanged(scanResultList.indexOf(wifiNetworkInfo));
+
+                if (!isConnected) {
+                    isConnected = true;
+                    onConnected();
+                }
+
+                break;
+            }
+        }
+    }
+
+    private void onConnected() {
+        Toast.makeText(getApplicationContext(), "Connected to " + wifiNetworkSSID, Toast.LENGTH_LONG).show();
+
+        removeDialog(DIALOG_CONNECTING);
+
+        if (port != -1) {
+            startReceiveTask();
+        } else {
+            showPortDialog();
+        }
     }
 
     @Override
@@ -619,7 +612,10 @@ public class WifiActivity extends InjectableActivity
     }
 
     private void wifiListAvailable(ArrayList<WifiNetworkInfo> list) {
-        wifiResultAdapter.setList(list);
+        scanResultList.clear();
+        scanResultList.addAll(list);
+        wifiResultAdapter.notifyDataSetChanged();
+//        wifiResultAdapter.setList(list);
 
         scanWifi.setEnabled(true);
         setEmptyViewVisibility(getString(R.string.no_wifi_available));

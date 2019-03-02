@@ -19,7 +19,7 @@ public class WifiNetworkInfo implements Serializable {
 
     @Override
     public String toString() {
-        return ssid + " " + rssi + " " + ip + " " + untrusted + " " + netId;
+        return ssid + " " + state + " " + rssi + " " + ip + " " + untrusted + " " + netId;
     }
 
     public int getNetId() {

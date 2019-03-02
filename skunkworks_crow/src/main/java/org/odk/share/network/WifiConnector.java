@@ -5,6 +5,7 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
+import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -29,6 +30,13 @@ public final class WifiConnector {
         wifiBroadcastReceiver = new WifiBroadcastReceiver(listener);
 
         wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+    }
+
+    public static String unquoted(String name) {
+        if (name.startsWith("\"") && name.endsWith("\"")) {
+            return name.substring(1, name.length() - 1);
+        }
+        return name;
     }
 
     public void registerReceiver() {
@@ -81,6 +89,13 @@ public final class WifiConnector {
             }
         }
         return result;
+    }
+
+    public String getSsid() {
+        if (wifiManager.getConnectionInfo().getSupplicantState() == SupplicantState.COMPLETED) {
+            return unquoted(wifiManager.getConnectionInfo().getSSID());
+        }
+        return "";
     }
 
     /**
