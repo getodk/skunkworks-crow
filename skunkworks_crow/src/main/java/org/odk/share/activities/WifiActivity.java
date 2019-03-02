@@ -42,6 +42,7 @@ import org.odk.share.controller.WifiHelper;
 import org.odk.share.events.DownloadEvent;
 import org.odk.share.listeners.OnItemClickListener;
 import org.odk.share.network.WifiBroadcastReceiver;
+import org.odk.share.network.WifiConnectionNotifier;
 import org.odk.share.network.WifiConnector;
 import org.odk.share.network.WifiNetworkInfo;
 import org.odk.share.rx.RxEventBus;
@@ -67,8 +68,10 @@ import static org.odk.share.utilities.QRCodeUtils.PORT;
 import static org.odk.share.utilities.QRCodeUtils.PROTECTED;
 import static org.odk.share.utilities.QRCodeUtils.SSID;
 
-public class WifiActivity extends InjectableActivity
-        implements OnItemClickListener, WifiBroadcastReceiver.WifiBroadcastListener {
+public class WifiActivity extends InjectableActivity implements
+        OnItemClickListener,
+        WifiBroadcastReceiver.WifiBroadcastListener,
+        WifiConnectionNotifier.WifiConnectionListener {
 
     private static final int DIALOG_DOWNLOAD_PROGRESS = 1;
     private static final int DIALOG_CONNECTING = 2;
@@ -146,24 +149,8 @@ public class WifiActivity extends InjectableActivity
     private boolean isProtected;
     private String passwordScanned;
 
+    private WifiConnectionNotifier wifiConnectionNotifier;
     private WifiConnector wifiConnector;
-    public BroadcastReceiver wifiStateReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            int wifiState = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE, WifiManager.WIFI_STATE_UNKNOWN);
-
-            switch (wifiState) {
-                case WifiManager.WIFI_STATE_DISABLED:
-                    scanResultList.clear();
-                    setEmptyViewVisibility(getString(R.string.enable_wifi));
-                    break;
-                case WifiManager.WIFI_STATE_ENABLED:
-                    startScan();
-                    break;
-            }
-        }
-    };
-
     private boolean isConnected = false;
 
     @Override
@@ -197,6 +184,7 @@ public class WifiActivity extends InjectableActivity
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(wifiResultAdapter);
 
+        wifiConnectionNotifier = new WifiConnectionNotifier(this, this);
         wifiConnector = new WifiConnector(this, this);
     }
 
@@ -209,7 +197,6 @@ public class WifiActivity extends InjectableActivity
     protected void onResume() {
         super.onResume();
         startScan();
-        registerReceiver(wifiStateReceiver, new IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION));
         compositeDisposable.add(addDownloadEventSubscription());
     }
 
@@ -260,9 +247,9 @@ public class WifiActivity extends InjectableActivity
         }
 
         wifiConnector.unregisterReceiver();
+        wifiConnectionNotifier.stop();
 
         try {
-            unregisterReceiver(wifiStateReceiver);
             if (isReceiverRegistered) {
 //                unregisterReceiver(receiver);
             }
@@ -406,6 +393,7 @@ public class WifiActivity extends InjectableActivity
 //        registerReceiver(receiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
         wifiConnector.registerReceiver();
         wifiManager.startScan();
+        wifiConnectionNotifier.start();
     }
 
     private void setEmptyViewVisibility(String text) {
@@ -639,6 +627,17 @@ public class WifiActivity extends InjectableActivity
             }
 
 //            Toast.makeText(this, getString(R.string.no_wifi_available), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
+    public void onWifiStateToggle(boolean isEnabled) {
+        if (isEnabled) {
+            startScan();
+        } else {
+            scanResultList.clear();
+            wifiResultAdapter.notifyDataSetChanged();
+            setEmptyViewVisibility(getString(R.string.enable_wifi));
         }
     }
 }
