@@ -60,6 +60,7 @@
     <string name="error_while_uploading">Error occurred while uploading form: %1$s</string>
     <string name="download_queued">Downloading queued…</string>
     <string name="upload_queued">Uploading queued…</string>
+    <string name="finished_downloading">Forms are already available</string>
 
     <string name="cannot_create_directory">Cannot create directory: %s</string>
     <string name="not_a_directory">%s exists, but is not a directory</string>
