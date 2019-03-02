@@ -156,12 +156,16 @@ public class WifiActivity extends InjectableActivity implements
     @Override
     protected void onResume() {
         super.onResume();
+        wifiConnector.registerReceiver();
+        wifiConnectionNotifier.start();
         startScan();
         compositeDisposable.add(addDownloadEventSubscription());
     }
 
     @Override
     protected void onPause() {
+        wifiConnector.unregisterReceiver();
+        wifiConnectionNotifier.stop();
         compositeDisposable.clear();
         super.onPause();
     }
@@ -205,9 +209,6 @@ public class WifiActivity extends InjectableActivity implements
         if (alertDialog != null && alertDialog.isShowing()) {
             alertDialog.dismiss();
         }
-
-        wifiConnector.unregisterReceiver();
-        wifiConnectionNotifier.stop();
     }
 
     @Override
@@ -333,9 +334,7 @@ public class WifiActivity extends InjectableActivity implements
         scanResultList.clear();
         wifiResultAdapter.notifyDataSetChanged();
         setEmptyViewVisibility(getString(R.string.scanning));
-        wifiConnector.registerReceiver();
         wifiManager.startScan();
-        wifiConnectionNotifier.start();
     }
 
     private void setEmptyViewVisibility(String text) {
