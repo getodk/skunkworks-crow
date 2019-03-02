@@ -219,17 +219,17 @@ public class WifiActivity extends InjectableActivity implements
         } else if (scanResultList.get(position).getSecurityType() != WifiConfiguration.KeyMgmt.NONE) {
             showPasswordDialog(scanResultList.get(position));
         } else if (scanResultList.get(position).getState() != NetworkInfo.DetailedState.CONNECTED) {
-            connectToNetwork(scanResultList.get(position).getSsid(), null);
+            connectToNetwork(scanResultList.get(position).getSecurityType(), scanResultList.get(position).getSsid(), null);
         } else {
             Toast.makeText(this, "already connected to wifi network", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void connectToNetwork(String ssid, String password) {
+    private void connectToNetwork(int securityType, String ssid, String password) {
         alertMsg = getString(R.string.connecting_wifi);
         showDialog(DIALOG_CONNECTING);
         wifiNetworkSSID = ssid;
-        wifiHelper.connectToWifi(wifiNetworkSSID, password);
+        wifiConnector.connectToWifi(securityType, wifiNetworkSSID, password);
     }
 
     private void showPortDialog() {
@@ -291,7 +291,7 @@ public class WifiActivity extends InjectableActivity implements
                     Timber.d(pw);
                     dialog.dismiss();
                     wifiNetworkSSID = scanResult.getSsid();
-                    wifiHelper.connectToWifi(scanResult.getSsid(), pw);
+                    wifiConnector.connectToWifi(scanResult.getSecurityType(), scanResult.getSsid(), pw);
                     removeDialog(DIALOG_CONNECTING);
                 } else {
                     passwordEditText.setError(getString(R.string.password_empty));
@@ -355,15 +355,11 @@ public class WifiActivity extends InjectableActivity implements
                 progressDialog.setMessage(alertMsg);
                 progressDialog.setIndeterminate(true);
                 progressDialog.setCancelable(false);
-
                 progressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.cancel),
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                receiverService.cancel();
-                                dialog.dismiss();
-                                finish();
-                            }
+                        (dialog, which) -> {
+                            receiverService.cancel();
+                            dialog.dismiss();
+                            finish();
                         });
                 progressDialog.show();
                 return progressDialog;
@@ -373,12 +369,9 @@ public class WifiActivity extends InjectableActivity implements
                 progressDialog.setIndeterminate(true);
                 progressDialog.setCancelable(false);
                 progressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.cancel),
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                                startScan();
-                            }
+                        (dialog, which) -> {
+                            dialog.dismiss();
+                            startScan();
                         });
                 progressDialog.show();
                 return progressDialog;
@@ -389,12 +382,10 @@ public class WifiActivity extends InjectableActivity implements
 
     @Override
     protected void onDestroy() {
-
         if (lastConnectedWifiInfo != null) {
-            wifiHelper.getWifiManager().enableNetwork(lastConnectedWifiInfo.getNetworkId(), true);
-            wifiHelper.getWifiManager().reconnect();
+            wifiConnector.connect(lastConnectedWifiInfo.getNetworkId());
         } else {
-            wifiHelper.disableWifi(wifiNetworkSSID);
+            wifiConnector.disableWifi(wifiNetworkSSID);
         }
         super.onDestroy();
     }
@@ -403,15 +394,8 @@ public class WifiActivity extends InjectableActivity implements
         alertDialog = new AlertDialog.Builder(this).create();
         alertDialog.setTitle(title);
         alertDialog.setMessage(message);
-        DialogInterface.OnClickListener quitListener = (dialog, i) -> {
-            switch (i) {
-                case DialogInterface.BUTTON_POSITIVE:
-                    finish();
-                    break;
-            }
-        };
         alertDialog.setCancelable(false);
-        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.ok), quitListener);
+        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.ok), (dialog, i) -> finish());
         alertDialog.show();
     }
 
@@ -451,7 +435,7 @@ public class WifiActivity extends InjectableActivity implements
     @Override
     public void onStateUpdate(NetworkInfo.DetailedState detailedState) {
 
-        String connectedSsid = wifiConnector.getSsid();
+        String connectedSsid = wifiConnector.getWifiSSID();
 
         Timber.d(wifiNetworkSSID + " " + connectedSsid + " " + detailedState.toString());
 
@@ -525,7 +509,7 @@ public class WifiActivity extends InjectableActivity implements
                 if (info.getSsid().equals(ssidScanned)) {
                     if (info.getState() != NetworkInfo.DetailedState.CONNECTED) {
                         Toast.makeText(this, "attempting connection", Toast.LENGTH_SHORT).show();
-                        connectToNetwork(ssidScanned, passwordScanned);
+                        connectToNetwork(info.getSecurityType(), ssidScanned, passwordScanned);
                     } else {
                         Toast.makeText(this, "already connected to " + ssidScanned, Toast.LENGTH_SHORT).show();
                     }
