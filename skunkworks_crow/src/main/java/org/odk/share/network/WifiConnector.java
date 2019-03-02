@@ -1,8 +1,6 @@
 package org.odk.share.network;
 
 import android.content.Context;
-import android.content.IntentFilter;
-import android.net.ConnectivityManager;
 import android.net.DhcpInfo;
 import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
@@ -10,7 +8,6 @@ import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.support.annotation.Nullable;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -20,16 +17,9 @@ import timber.log.Timber;
 
 public final class WifiConnector {
 
-    private final Context context;
     private final WifiManager wifiManager;
 
-    private WifiBroadcastReceiver wifiBroadcastReceiver;
-    private IntentFilter wifiIntentFilter;
-
-    private boolean isWifiBroadcastRegistered;
-
     public WifiConnector(Context context) {
-        this.context = context;
         wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
     }
 
@@ -38,28 +28,6 @@ public final class WifiConnector {
             return name.substring(1, name.length() - 1);
         }
         return name;
-    }
-
-    public void setWifiBroadcastListener(@Nullable WifiBroadcastReceiver.WifiBroadcastListener listener) {
-        wifiIntentFilter = new IntentFilter();
-        wifiIntentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
-        wifiIntentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
-
-        wifiBroadcastReceiver = new WifiBroadcastReceiver(listener);
-    }
-
-    public void registerReceiver() {
-        if (!isWifiBroadcastRegistered) {
-            context.getApplicationContext().registerReceiver(wifiBroadcastReceiver, wifiIntentFilter);
-            isWifiBroadcastRegistered = true;
-        }
-    }
-
-    public void unregisterReceiver() {
-        if (isWifiBroadcastRegistered) {
-            context.getApplicationContext().unregisterReceiver(wifiBroadcastReceiver);
-            isWifiBroadcastRegistered = false;
-        }
     }
 
     public WifiInfo getActiveConnection() {
@@ -160,21 +128,6 @@ public final class WifiConnector {
     }
 
     /**
-     * Is network available boolean.
-     *
-     * @return the boolean
-     */
-    public final boolean isNetworkAvailable() {
-        final ConnectivityManager cm = (ConnectivityManager) this.context.getApplicationContext()
-                .getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (cm != null) {
-            final NetworkInfo netInfo = cm.getActiveNetworkInfo();
-            return (netInfo != null) && netInfo.isConnected();
-        }
-        return false;
-    }
-
-    /**
      * Is wifi enabled.
      *
      * @return the boolean
@@ -192,8 +145,8 @@ public final class WifiConnector {
         wifiManager.reconnect();
     }
 
-    public boolean enableWifi() {
-        return wifiManager.setWifiEnabled(true);
+    public void enableWifi() {
+        wifiManager.setWifiEnabled(true);
     }
 
     public void disableWifi() {

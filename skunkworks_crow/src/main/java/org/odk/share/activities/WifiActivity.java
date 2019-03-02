@@ -35,10 +35,10 @@ import org.odk.share.R;
 import org.odk.share.adapters.WifiResultAdapter;
 import org.odk.share.events.DownloadEvent;
 import org.odk.share.listeners.OnItemClickListener;
-import org.odk.share.network.WifiBroadcastReceiver;
-import org.odk.share.network.WifiConnectionNotifier;
 import org.odk.share.network.WifiConnector;
 import org.odk.share.network.WifiNetworkInfo;
+import org.odk.share.network.listeners.WifiStateListener;
+import org.odk.share.network.receivers.WifiStateBroadcastReceiver;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.rx.schedulers.BaseSchedulerProvider;
 import org.odk.share.services.ReceiverService;
@@ -62,10 +62,7 @@ import static org.odk.share.utilities.QRCodeUtils.PORT;
 import static org.odk.share.utilities.QRCodeUtils.PROTECTED;
 import static org.odk.share.utilities.QRCodeUtils.SSID;
 
-public class WifiActivity extends InjectableActivity implements
-        OnItemClickListener,
-        WifiBroadcastReceiver.WifiBroadcastListener,
-        WifiConnectionNotifier.WifiConnectionListener {
+public class WifiActivity extends InjectableActivity implements OnItemClickListener, WifiStateListener {
 
     private static final int DIALOG_DOWNLOAD_PROGRESS = 1;
     private static final int DIALOG_CONNECTING = 2;
@@ -105,8 +102,8 @@ public class WifiActivity extends InjectableActivity implements
     private boolean isProtected;
     private String passwordScanned;
 
-    private WifiConnectionNotifier wifiConnectionNotifier;
     private WifiConnector wifiConnector;
+    private WifiStateBroadcastReceiver wifiStateBroadcastReceiver;
     private boolean isConnected = false;
 
     @Override
@@ -131,9 +128,8 @@ public class WifiActivity extends InjectableActivity implements
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(wifiResultAdapter);
 
-        wifiConnectionNotifier = new WifiConnectionNotifier(this, this);
         wifiConnector = new WifiConnector(this);
-        wifiConnector.setWifiBroadcastListener(this);
+        wifiStateBroadcastReceiver = new WifiStateBroadcastReceiver(this, this);
 
         if (!wifiConnector.isWifiEnabled()) {
             wifiConnector.enableWifi();
@@ -150,16 +146,14 @@ public class WifiActivity extends InjectableActivity implements
     @Override
     protected void onResume() {
         super.onResume();
-        wifiConnector.registerReceiver();
-        wifiConnectionNotifier.start();
+        wifiStateBroadcastReceiver.register();
         startScan();
         compositeDisposable.add(addDownloadEventSubscription());
     }
 
     @Override
     protected void onPause() {
-        wifiConnector.unregisterReceiver();
-        wifiConnectionNotifier.stop();
+        wifiStateBroadcastReceiver.unregister();
         compositeDisposable.clear();
         super.onPause();
     }
