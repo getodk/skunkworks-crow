@@ -10,6 +10,7 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
+import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -95,7 +96,7 @@ public class WifiActivity extends InjectableActivity
 
     private WifiManager wifiManager;
     private WifiResultAdapter wifiResultAdapter;
-    private List<ScanResult> scanResultList;
+    private List<WifiNetworkInfo> scanResultList;
     private boolean isReceiverRegistered;
     private boolean isWifiReceiverRegisterd;
     private AlertDialog alertDialog;
@@ -145,6 +146,7 @@ public class WifiActivity extends InjectableActivity
     private boolean isProtected;
     private String passwordScanned;
 
+/*
     BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context c, Intent intent) {
@@ -161,10 +163,12 @@ public class WifiActivity extends InjectableActivity
             setEmptyViewVisibility(getString(R.string.no_wifi_available));
 
 
-            /*
+            */
+/*
                 Adding a double verification to check whether the ssid returned by scanned QR Code
                 actually exists or not.
-            */
+            *//*
+
             if (isQRCodeScanned) {
                 isQRCodeScanned = false;
                 for (ScanResult scanResult : scanResultList) {
@@ -178,7 +182,9 @@ public class WifiActivity extends InjectableActivity
             }
         }
     };
+*/
 
+    private WifiConnector wifiConnector;
     public BroadcastReceiver wifiStateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -195,8 +201,6 @@ public class WifiActivity extends InjectableActivity
             }
         }
     };
-
-    private WifiConnector wifiConnector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -240,7 +244,6 @@ public class WifiActivity extends InjectableActivity
     @Override
     protected void onResume() {
         super.onResume();
-        wifiConnector.registerReceiver();
         startScan();
         registerReceiver(wifiStateReceiver, new IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION));
         compositeDisposable.add(addDownloadEventSubscription());
@@ -248,7 +251,6 @@ public class WifiActivity extends InjectableActivity
 
     @Override
     protected void onPause() {
-        wifiConnector.unregisterReceiver();
         compositeDisposable.clear();
         super.onPause();
     }
@@ -293,10 +295,12 @@ public class WifiActivity extends InjectableActivity
             alertDialog.dismiss();
         }
 
+        wifiConnector.unregisterReceiver();
+
         try {
             unregisterReceiver(wifiStateReceiver);
             if (isReceiverRegistered) {
-                unregisterReceiver(receiver);
+//                unregisterReceiver(receiver);
             }
 
             if (isWifiReceiverRegisterd) {
@@ -311,14 +315,14 @@ public class WifiActivity extends InjectableActivity
     public void onItemClick(View view, int position) {
         Timber.d("Clicked %s", scanResultList.get(position));
 
-        if (scanResultList.get(position).SSID.contains(getString(R.string.hotspot_name_prefix_oreo))) {
+        if (scanResultList.get(position).getSsid().contains(getString(R.string.hotspot_name_prefix_oreo))) {
             Toast.makeText(this, getString(R.string.scan_alert_oreo), Toast.LENGTH_LONG).show();
-        } else if (WifiHelper.isClose(scanResultList.get(position))) {
+        } else if (scanResultList.get(position).getSecurityType() != WifiConfiguration.KeyMgmt.NONE) {
             // Show dialog and ask for password
             showPasswordDialog(scanResultList.get(position));
         } else {
             // connect
-            connectToNetwork(scanResultList.get(position).SSID, null);
+            connectToNetwork(scanResultList.get(position).getSsid(), null);
         }
     }
 
@@ -372,7 +376,7 @@ public class WifiActivity extends InjectableActivity
         alertDialog.show();
     }
 
-    private void showPasswordDialog(ScanResult scanResult) {
+    private void showPasswordDialog(WifiNetworkInfo scanResult) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         LayoutInflater factory = LayoutInflater.from(this);
@@ -389,7 +393,7 @@ public class WifiActivity extends InjectableActivity
                 }
             }
         });
-        builder.setTitle(scanResult.SSID);
+        builder.setTitle(scanResult.getSsid());
         builder.setView(dialogView);
         builder.setPositiveButton(getString(R.string.connect), null);
         builder.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
@@ -414,8 +418,8 @@ public class WifiActivity extends InjectableActivity
                         if (!pw.equals("")) {
                             Timber.d(pw);
                             dialog.dismiss();
-                            wifiNetworkSSID = scanResult.SSID;
-                            wifiHelper.connectToWifi(scanResult.SSID, pw);
+                            wifiNetworkSSID = scanResult.getSsid();
+                            wifiHelper.connectToWifi(scanResult.getSsid(), pw);
                             isWifiReceiverRegisterd = true;
                             registerReceiver(wifiReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
                             removeDialog(DIALOG_CONNECTING);
@@ -435,7 +439,8 @@ public class WifiActivity extends InjectableActivity
         wifiResultAdapter.notifyDataSetChanged();
         setEmptyViewVisibility(getString(R.string.scanning));
         isReceiverRegistered = true;
-        registerReceiver(receiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+//        registerReceiver(receiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+        wifiConnector.registerReceiver();
         wifiManager.startScan();
     }
 
@@ -609,5 +614,35 @@ public class WifiActivity extends InjectableActivity
         }
 
         Timber.d(Arrays.toString(list.toArray()));
+
+        wifiListAvailable(list);
+    }
+
+    private void wifiListAvailable(ArrayList<WifiNetworkInfo> list) {
+        wifiResultAdapter.setList(list);
+
+        scanWifi.setEnabled(true);
+        setEmptyViewVisibility(getString(R.string.no_wifi_available));
+
+        /*
+         * Adding a double verification to check whether the ssid returned by scanned QR Code
+         * actually exists or not.
+         */
+        if (isQRCodeScanned) {
+            isQRCodeScanned = false;
+            for (WifiNetworkInfo info : list) {
+                if (info.getSsid().equals(ssidScanned)) {
+                    if (info.getState() != NetworkInfo.DetailedState.CONNECTED) {
+                        Toast.makeText(this, "attempting connection", Toast.LENGTH_SHORT).show();
+                        connectToNetwork(ssidScanned, passwordScanned);
+                    } else {
+                        Toast.makeText(this, "already connected to " + ssidScanned, Toast.LENGTH_SHORT).show();
+                    }
+//                    return;
+                }
+            }
+
+//            Toast.makeText(this, getString(R.string.no_wifi_available), Toast.LENGTH_LONG).show();
+        }
     }
 }
