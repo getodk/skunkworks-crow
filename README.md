@@ -23,7 +23,7 @@
 ## 1. Introduction<a name="introduction"></a>
 ### 1.1 About skunkworks-crow<a name="about-skunkworks-crow"></a>
 
-skunkworks-crow is a Android application which is a companion app to ODK Collect and it helps different enumerators to share the filled and blanks forms with each other, it also helps organization’s supervisor in reviewing the forms before actually submitting to the server.
+skunkworks-crow is an Android application which is a companion app to ODK Collect and it helps different enumerators to share the filled and blanks forms with each other, it also helps organization’s supervisor in reviewing the forms before actually submitting to the server.
 
 ### 1.2 Why skunkworks-crow<a name="why-skunkworks-crow"></a>
 
