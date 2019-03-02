@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -107,6 +108,7 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
         } else {
             setEmptyViewVisibility(0);
         }
+        addListItemDivider();
     }
 
 
@@ -192,5 +194,13 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
     @Override
     protected String getSortingOrderKey() {
         return INSTANCE_LIST_ACTIVITY_SORTING_ORDER;
+    }
+
+    private void addListItemDivider() {
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(
+                recyclerView.getContext(),
+                DividerItemDecoration.VERTICAL);
+
+        recyclerView.addItemDecoration(dividerItemDecoration);
     }
 }
