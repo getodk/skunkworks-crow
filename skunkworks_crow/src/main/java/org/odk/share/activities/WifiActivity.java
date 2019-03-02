@@ -207,10 +207,8 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
             Toast.makeText(this, getString(R.string.scan_alert_oreo), Toast.LENGTH_LONG).show();
         } else if (scanResultList.get(position).getSecurityType() != WifiConfiguration.KeyMgmt.NONE) {
             showPasswordDialog(scanResultList.get(position));
-        } else if (scanResultList.get(position).getState() != NetworkInfo.DetailedState.CONNECTED) {
-            connectToNetwork(scanResultList.get(position).getSecurityType(), scanResultList.get(position).getSsid(), null);
         } else {
-            Toast.makeText(this, "already connected to wifi network", Toast.LENGTH_SHORT).show();
+            connectToNetwork(scanResultList.get(position).getSecurityType(), scanResultList.get(position).getSsid(), null);
         }
     }
 
@@ -222,32 +220,29 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
     }
 
     private void showPortDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Enter port number");
-
         final EditText input = new EditText(this);
         input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_CLASS_NUMBER);
-        builder.setView(input);
 
-        builder.setPositiveButton(getString(R.string.ok), null);
-        builder.setNegativeButton(getString(R.string.cancel), (dialog, which) -> dialog.cancel());
-
-        alertDialog = builder.create();
-        alertDialog.setOnShowListener(dialog -> {
-            Button button = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE);
-            button.setOnClickListener(view -> {
-                String portInput = input.getText().toString();
-                Timber.d("Port : %s", portInput);
-                if (portInput.length() > 0) {
-                    dialog.dismiss();
-                    port = Integer.parseInt(portInput);
-                    startReceiveTask();
-                } else {
-                    input.setError(getString(R.string.port_empty));
-                }
-            });
-        });
-        alertDialog.show();
+        new AlertDialog.Builder(this)
+                .setTitle("Enter port number")
+                .setView(input)
+                .setPositiveButton(getString(R.string.ok), (dialog, which) -> {
+                    String portInput = input.getText().toString();
+                    Timber.d("Port : %s", portInput);
+                    if (portInput.length() > 0) {
+                        dialog.dismiss();
+                        port = Integer.parseInt(portInput);
+                        startReceiveTask();
+                    } else {
+                        input.setError(getString(R.string.port_empty));
+                    }
+                })
+                .setNegativeButton(getString(R.string.cancel), (dialog, which) -> {
+                    isConnected = false;
+                    dialog.cancel();
+                })
+                .create()
+                .show();
     }
 
     private void showPasswordDialog(WifiNetworkInfo scanResult) {
