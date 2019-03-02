@@ -2,12 +2,8 @@ package org.odk.share.activities;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
@@ -100,8 +96,6 @@ public class WifiActivity extends InjectableActivity implements
     private WifiManager wifiManager;
     private WifiResultAdapter wifiResultAdapter;
     private List<WifiNetworkInfo> scanResultList;
-    private boolean isReceiverRegistered;
-    private boolean isWifiReceiverRegisterd;
     private AlertDialog alertDialog;
     private ProgressDialog progressDialog = null;
     private WifiHelper wifiHelper;
@@ -109,40 +103,6 @@ public class WifiActivity extends InjectableActivity implements
     private WifiInfo lastConnectedWifiInfo;
     private String alertMsg;
     private int port;
-
-    public BroadcastReceiver wifiReceiver = new BroadcastReceiver() {
-        boolean isConnected = false;
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Timber.d("RECEIVER CONNECTION ");
-            ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-            if (cm != null) {
-                NetworkInfo info = cm.getActiveNetworkInfo();
-                if (info != null) {
-                    Timber.d(info + " " + info.getTypeName() + " " + info.getType() + " " + wifiNetworkSSID + " " + isConnected);
-                    if (info.getState() == NetworkInfo.State.CONNECTED
-                            && info.getTypeName().compareTo("WIFI") == 0
-                            && info.getExtraInfo() != null) {
-                        if (!isConnected && info.getExtraInfo().equals("\"" + wifiNetworkSSID + "\"")) {
-                            Timber.d("Connected");
-                            isConnected = true;
-                            isWifiReceiverRegisterd = false;
-                            unregisterReceiver(this);
-                            Toast.makeText(getApplicationContext(), "Connected to " + wifiNetworkSSID, Toast.LENGTH_LONG).show();
-                            removeDialog(DIALOG_CONNECTING);
-
-                            if (port != -1) {
-                                startReceiveTask();
-                            } else {
-                                showPortDialog();
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    };
 
     private boolean isQRCodeScanned;
     private String ssidScanned;
@@ -248,18 +208,6 @@ public class WifiActivity extends InjectableActivity implements
 
         wifiConnector.unregisterReceiver();
         wifiConnectionNotifier.stop();
-
-        try {
-            if (isReceiverRegistered) {
-//                unregisterReceiver(receiver);
-            }
-
-            if (isWifiReceiverRegisterd) {
-                unregisterReceiver(wifiReceiver);
-            }
-        } catch (IllegalArgumentException e) {
-            Timber.e(e);
-        }
     }
 
     @Override
@@ -282,8 +230,6 @@ public class WifiActivity extends InjectableActivity implements
         showDialog(DIALOG_CONNECTING);
         wifiNetworkSSID = ssid;
         wifiHelper.connectToWifi(wifiNetworkSSID, password);
-        isWifiReceiverRegisterd = true;
-        registerReceiver(wifiReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
     }
 
     private void showPortDialog() {
@@ -371,8 +317,6 @@ public class WifiActivity extends InjectableActivity implements
                             dialog.dismiss();
                             wifiNetworkSSID = scanResult.getSsid();
                             wifiHelper.connectToWifi(scanResult.getSsid(), pw);
-                            isWifiReceiverRegisterd = true;
-                            registerReceiver(wifiReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
                             removeDialog(DIALOG_CONNECTING);
                         } else {
                             passwordEditText.setError(getString(R.string.password_empty));
@@ -389,8 +333,6 @@ public class WifiActivity extends InjectableActivity implements
         scanResultList.clear();
         wifiResultAdapter.notifyDataSetChanged();
         setEmptyViewVisibility(getString(R.string.scanning));
-        isReceiverRegistered = true;
-//        registerReceiver(receiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
         wifiConnector.registerReceiver();
         wifiManager.startScan();
         wifiConnectionNotifier.start();
@@ -463,8 +405,6 @@ public class WifiActivity extends InjectableActivity implements
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                isWifiReceiverRegisterd = false;
-                                unregisterReceiver(wifiReceiver);
                                 dialog.dismiss();
                                 startScan();
                             }
@@ -603,7 +543,6 @@ public class WifiActivity extends InjectableActivity implements
         scanResultList.clear();
         scanResultList.addAll(list);
         wifiResultAdapter.notifyDataSetChanged();
-//        wifiResultAdapter.setList(list);
 
         scanWifi.setEnabled(true);
         setEmptyViewVisibility(getString(R.string.no_wifi_available));
