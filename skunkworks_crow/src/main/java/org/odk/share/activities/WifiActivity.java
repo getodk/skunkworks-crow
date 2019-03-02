@@ -33,7 +33,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.odk.share.R;
 import org.odk.share.adapters.WifiResultAdapter;
-import org.odk.share.controller.WifiHelper;
 import org.odk.share.events.DownloadEvent;
 import org.odk.share.listeners.OnItemClickListener;
 import org.odk.share.network.WifiBroadcastReceiver;
@@ -92,12 +91,10 @@ public class WifiActivity extends InjectableActivity implements
     @Inject
     BaseSchedulerProvider schedulerProvider;
 
-    private WifiManager wifiManager;
     private WifiResultAdapter wifiResultAdapter;
     private List<WifiNetworkInfo> scanResultList;
     private AlertDialog alertDialog;
     private ProgressDialog progressDialog = null;
-    private WifiHelper wifiHelper;
     private String wifiNetworkSSID;
     private WifiInfo lastConnectedWifiInfo;
     private String alertMsg;
@@ -127,15 +124,6 @@ public class WifiActivity extends InjectableActivity implements
         passwordScanned = null;
         lastConnectedWifiInfo = null;
         port = -1;
-        wifiHelper = new WifiHelper(this);
-
-        wifiManager = wifiHelper.getWifiManager();
-
-        if (!wifiManager.isWifiEnabled()) {
-            wifiManager.setWifiEnabled(true);
-        } else {
-            lastConnectedWifiInfo = wifiManager.getConnectionInfo();
-        }
 
         scanResultList = new ArrayList<>();
         wifiResultAdapter = new WifiResultAdapter(this, scanResultList, this);
@@ -144,7 +132,14 @@ public class WifiActivity extends InjectableActivity implements
         recyclerView.setAdapter(wifiResultAdapter);
 
         wifiConnectionNotifier = new WifiConnectionNotifier(this, this);
-        wifiConnector = new WifiConnector(this, this);
+        wifiConnector = new WifiConnector(this);
+        wifiConnector.setWifiBroadcastListener(this);
+
+        if (!wifiConnector.isWifiEnabled()) {
+            wifiConnector.enableWifi();
+        } else {
+            lastConnectedWifiInfo = wifiConnector.getActiveConnection();
+        }
     }
 
     private boolean isPossibleHotspot(String ssid) {
@@ -306,7 +301,7 @@ public class WifiActivity extends InjectableActivity implements
         scanResultList.clear();
         wifiResultAdapter.notifyDataSetChanged();
         setEmptyViewVisibility(getString(R.string.scanning));
-        wifiManager.startScan();
+        wifiConnector.startScan();
     }
 
     private void setEmptyViewVisibility(String text) {
@@ -322,17 +317,13 @@ public class WifiActivity extends InjectableActivity implements
 
     private void startReceiveTask() {
         showDialog(DIALOG_DOWNLOAD_PROGRESS);
-        String dstAddress = wifiHelper.getAccessPointIpAddress();
+        String dstAddress = wifiConnector.getAccessPointIpAddress();
         receiverService.startDownloading(dstAddress, port);
     }
 
     @OnClick(R.id.bScan)
     public void scanWifi() {
-        if (wifiManager.isWifiEnabled()) {
-            startScan();
-        } else {
-            Toast.makeText(this, getString(R.string.enable_wifi), Toast.LENGTH_LONG).show();
-        }
+        startScan();
     }
 
     @OnClick(R.id.bScanQRCode)

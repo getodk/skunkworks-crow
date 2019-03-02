@@ -3,13 +3,17 @@ package org.odk.share.network;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
+import android.net.DhcpInfo;
 import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.support.annotation.Nullable;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.List;
 
 import timber.log.Timber;
@@ -18,20 +22,14 @@ public final class WifiConnector {
 
     private final Context context;
     private final WifiManager wifiManager;
-    private final WifiBroadcastReceiver wifiBroadcastReceiver;
-    private final IntentFilter wifiIntentFilter;
+
+    private WifiBroadcastReceiver wifiBroadcastReceiver;
+    private IntentFilter wifiIntentFilter;
 
     private boolean isWifiBroadcastRegistered;
 
-    public WifiConnector(Context context, WifiBroadcastReceiver.WifiBroadcastListener listener) {
+    public WifiConnector(Context context) {
         this.context = context;
-
-        wifiIntentFilter = new IntentFilter();
-        wifiIntentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
-        wifiIntentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
-
-        wifiBroadcastReceiver = new WifiBroadcastReceiver(listener);
-
         wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
     }
 
@@ -40,6 +38,14 @@ public final class WifiConnector {
             return name.substring(1, name.length() - 1);
         }
         return name;
+    }
+
+    public void setWifiBroadcastListener(@Nullable WifiBroadcastReceiver.WifiBroadcastListener listener) {
+        wifiIntentFilter = new IntentFilter();
+        wifiIntentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+        wifiIntentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
+
+        wifiBroadcastReceiver = new WifiBroadcastReceiver(listener);
     }
 
     public void registerReceiver() {
@@ -56,7 +62,7 @@ public final class WifiConnector {
         }
     }
 
-    private WifiInfo getActiveConnection() {
+    public WifiInfo getActiveConnection() {
         return wifiManager.getConnectionInfo();
     }
 
@@ -215,5 +221,32 @@ public final class WifiConnector {
         }
 
         wifiManager.setWifiEnabled(false);
+    }
+
+    public void startScan() {
+        if (!isWifiEnabled()) {
+            enableWifi();
+        }
+
+        wifiManager.startScan();
+    }
+
+    public String getAccessPointIpAddress() {
+        DhcpInfo dhcpInfo = wifiManager.getDhcpInfo();
+        byte[] ipAddress = convertToBytes(dhcpInfo.serverAddress);
+        try {
+            String ip = InetAddress.getByAddress(ipAddress).getHostAddress();
+            return ip.replace("/", "");
+        } catch (UnknownHostException e) {
+            Timber.e(e);
+        }
+        return null;
+    }
+
+    private byte[] convertToBytes(int hostAddress) {
+        return new byte[]{(byte) (0xff & hostAddress),
+                (byte) (0xff & (hostAddress >> 8)),
+                (byte) (0xff & (hostAddress >> 16)),
+                (byte) (0xff & (hostAddress >> 24))};
     }
 }
