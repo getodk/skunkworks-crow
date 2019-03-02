@@ -66,7 +66,8 @@ import static org.odk.share.utilities.QRCodeUtils.PORT;
 import static org.odk.share.utilities.QRCodeUtils.PROTECTED;
 import static org.odk.share.utilities.QRCodeUtils.SSID;
 
-public class WifiActivity extends InjectableActivity implements OnItemClickListener {
+public class WifiActivity extends InjectableActivity
+        implements OnItemClickListener, WifiBroadcastReceiver.WifiBroadcastListener {
 
     private static final int DIALOG_DOWNLOAD_PROGRESS = 1;
     private static final int DIALOG_CONNECTING = 2;
@@ -228,30 +229,7 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(wifiResultAdapter);
 
-        wifiConnector = new WifiConnector(this, new WifiBroadcastReceiver.WifiBroadcastListener() {
-            @Override
-            public void onStateUpdate(NetworkInfo.DetailedState detailedState) {
-                Timber.d(detailedState.toString());
-            }
-
-            @Override
-            public void onScanResultsAvailable() {
-                List<ScanResult> scanResults = wifiConnector.getWifiManager().getScanResults();
-                ArrayList<WifiNetworkInfo> list = new ArrayList<>();
-
-                for (ScanResult scanResult : scanResults) {
-                    if (isPossibleHotspot(scanResult.SSID)) {
-                        WifiNetworkInfo wifiNetworkInfo = new WifiNetworkInfo();
-                        wifiNetworkInfo.setSsid(scanResult.SSID);
-                        wifiNetworkInfo.setRssi(WifiManager.calculateSignalLevel(scanResult.level, 100));
-                        wifiNetworkInfo.setSecurityType(wifiConnector.getScanResultSecurity(scanResult));
-                        list.add(wifiNetworkInfo);
-                    }
-                }
-
-                Timber.d(Arrays.toString(list.toArray()));
-            }
-        });
+        wifiConnector = new WifiConnector(this, this);
     }
 
     private boolean isPossibleHotspot(String ssid) {
@@ -603,5 +581,33 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
                 return;
             }
         }
+    }
+
+    @Override
+    public void onStateUpdate(NetworkInfo.DetailedState detailedState) {
+        Timber.d(detailedState.toString());
+    }
+
+    @Override
+    public void onRssiChanged(int rssi) {
+        Timber.d(String.valueOf(rssi));
+    }
+
+    @Override
+    public void onScanResultsAvailable() {
+        List<ScanResult> scanResults = wifiConnector.getWifiManager().getScanResults();
+        ArrayList<WifiNetworkInfo> list = new ArrayList<>();
+
+        for (ScanResult scanResult : scanResults) {
+            if (isPossibleHotspot(scanResult.SSID)) {
+                WifiNetworkInfo wifiNetworkInfo = new WifiNetworkInfo();
+                wifiNetworkInfo.setSsid(scanResult.SSID);
+                wifiNetworkInfo.setRssi(WifiManager.calculateSignalLevel(scanResult.level, 100));
+                wifiNetworkInfo.setSecurityType(wifiConnector.getScanResultSecurity(scanResult));
+                list.add(wifiNetworkInfo);
+            }
+        }
+
+        Timber.d(Arrays.toString(list.toArray()));
     }
 }
