@@ -158,4 +158,5 @@ For some devices, the user is not allowed to configure the wifi hotspot from the
 Any and all contributions to the project are welcome. Skunkworks-Crow is used across the world primarily by organizations with a social purpose so you can have real impact!
 
 Issues tagged as [good first issue](https://github.com/opendatakit/skunkworks-crow/labels/good%20first%20issue) should be a good place to start. There are also currently many issues tagged as [needs reproduction](https://github.com/opendatakit/skunkworks-crow/labels/needs%20reproduction) which need someone to try to reproduce them with the current version of Skunkwork-Crow and comment on the issue with their findings.
+If you're ready to contribute code, see [the contribution guide](CONTRIBUTING.md).
 
