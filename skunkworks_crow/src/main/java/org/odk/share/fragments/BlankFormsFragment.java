@@ -191,14 +191,11 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
         if (selectedForms.size() == formAdapter.getItemCount()) {
             toggleButton.setText(getString(R.string.clear_all));
             filledcount = selectedForms.size();
-            sendButton.setText("Send("+(selectedForms.size()+FilledFormsFragment.instancescount)+")");
-
-
+            sendButton.setText("Send(" + (selectedForms.size() + FilledFormsFragment.instancescount) + ")");
         } else {
             toggleButton.setText(getString(R.string.select_all));
-            filledcount= selectedForms.size();
-            sendButton.setText("Send("+(selectedForms.size()+FilledFormsFragment.instancescount)+")");
-
+            filledcount = selectedForms.size();
+            sendButton.setText("Send(" + (selectedForms.size() + FilledFormsFragment.instancescount) + ")");
         }
     }
 
