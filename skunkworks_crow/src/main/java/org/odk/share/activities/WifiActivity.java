@@ -114,6 +114,8 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
         setTitle(getString(R.string.connect_wifi));
         setSupportActionBar(toolbar);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         isQRCodeScanned = false;
         ssidScanned = null;
         isProtected = false;

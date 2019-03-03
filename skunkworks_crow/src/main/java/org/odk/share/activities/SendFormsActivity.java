@@ -29,6 +29,7 @@ public class SendFormsActivity extends InjectableActivity {
         ButterKnife.bind(this);
 
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         setupViewPager(viewPager);
         tabLayout.setupWithViewPager(viewPager);
