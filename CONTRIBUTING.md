@@ -80,8 +80,8 @@ Work in progress pull requests:
 - Should include `[WIP]` in front of the pull request title.
 - Should specifically describe the proposed solution and feedback wanted.
 - Will not be merged until you remove `[WIP]` from the title.
-or
-- Pull request can be raised in draft mode directly by chosing an option from the drop down that is available while making pull request. Read more about [Draft pull requests](https://help.github.com/en/articles/creating-a-pull-request).
+
+Pull request can be raised in draft mode directly by chosing an option from the drop down that is available while making pull request. Read more about [Draft pull requests](https://help.github.com/en/articles/creating-a-pull-request).
 
 ## Code style guidelines
 Follow the [Android style rules](http://source.android.com/source/code-style.html) and the [Google Java style guide](https://google.github.io/styleguide/javaguide.html).
