@@ -61,6 +61,8 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
     private FormsAdapter formAdapter;
     private LinkedHashSet<Long> selectedForms;
 
+    public static int filledcount;
+
 
     public BlankFormsFragment() {
     }
@@ -177,8 +179,15 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
     private void toggleButtonLabel() {
         if (selectedForms.size() == formAdapter.getItemCount()) {
             toggleButton.setText(getString(R.string.clear_all));
+            filledcount = selectedForms.size();
+            sendButton.setText("Send("+(selectedForms.size()+FilledFormsFragment.instancescount)+")");
+
+
         } else {
             toggleButton.setText(getString(R.string.select_all));
+            filledcount= selectedForms.size();
+            sendButton.setText("Send("+(selectedForms.size()+FilledFormsFragment.instancescount)+")");
+
         }
     }
 
