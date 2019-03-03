@@ -29,16 +29,20 @@ import butterknife.ButterKnife;
 
 public class FormsAdapter extends CursorRecyclerViewAdapter<FormsAdapter.FormHolder> {
 
+    private final InstancesDao instancesDao;
+    private final TransferDao transferDao;
     @Nullable
-    private LinkedHashSet<Long> selectedForms;
+    private final LinkedHashSet<Long> selectedForms;
 
-    public FormsAdapter(Context context, Cursor cursor, ItemClickListener listener) {
-        this(context, cursor, listener, null);
+    public FormsAdapter(Context context, Cursor cursor, ItemClickListener listener, InstancesDao instancesDao, TransferDao transferDao) {
+        this(context, cursor, listener, null, instancesDao, transferDao);
     }
 
-    public FormsAdapter(Context context, Cursor cursor, ItemClickListener listener, @Nullable LinkedHashSet<Long> selectedForms) {
+    public FormsAdapter(Context context, Cursor cursor, ItemClickListener listener, @Nullable LinkedHashSet<Long> selectedForms, InstancesDao instancesDao, TransferDao transferDao) {
         super(context, cursor, listener);
         this.selectedForms = selectedForms;
+        this.instancesDao = instancesDao;
+        this.transferDao = transferDao;
     }
 
     @Override
@@ -84,7 +88,7 @@ public class FormsAdapter extends CursorRecyclerViewAdapter<FormsAdapter.FormHol
             }
             int reviewed = 0;
             int unreviewed = 0;
-            try (Cursor instanceCursor = new InstancesDao().getInstancesCursor(selection, selectionArgs)) {
+            try (Cursor instanceCursor = instancesDao.getInstancesCursor(selection, selectionArgs)) {
                 int len = instanceCursor.getCount();
                 StringBuilder selectionBuf = new StringBuilder(InstanceProviderAPI.InstanceColumns._ID + " IN (");
                 selectionArgs = new String[len + 1];
@@ -105,7 +109,7 @@ public class FormsAdapter extends CursorRecyclerViewAdapter<FormsAdapter.FormHol
                 selection = selectionBuf.toString();
                 selectionArgs[i] = TransferInstance.STATUS_FORM_RECEIVE;
 
-                try (Cursor transferCursor = new TransferDao().getInstancesCursor(null, selection, selectionArgs, null)) {
+                try (Cursor transferCursor = transferDao.getInstancesCursor(null, selection, selectionArgs, null)) {
                     if (transferCursor != null && transferCursor.getCount() > 0) {
                         transferCursor.moveToPosition(-1);
                         while (transferCursor.moveToNext()) {

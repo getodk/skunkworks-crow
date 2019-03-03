@@ -32,17 +32,15 @@ import android.view.View;
 
 import org.odk.share.R;
 import org.odk.share.adapters.SortDialogAdapter;
-import org.odk.share.application.Share;
 
 import java.util.LinkedHashSet;
 
-import dagger.android.support.DaggerAppCompatActivity;
 import timber.log.Timber;
 
 import static org.odk.share.utilities.ApplicationConstants.SortingOrder.BY_NAME_ASC;
 
 
-abstract class AppListActivity extends DaggerAppCompatActivity {
+abstract class AppListActivity extends InjectableActivity {
 
     private static final String SELECTED_INSTANCES = "selectedInstances";
     private static final String IS_SEARCH_BOX_SHOWN = "isSearchBoxShown";
@@ -168,7 +166,7 @@ abstract class AppListActivity extends DaggerAppCompatActivity {
 
     private void saveSelectedSortingOrder(int selectedStringOrder) {
         selectedSortingOrder = selectedStringOrder;
-        PreferenceManager.getDefaultSharedPreferences(Share.getInstance())
+        PreferenceManager.getDefaultSharedPreferences(this)
                 .edit()
                 .putInt(getSortingOrderKey(), selectedStringOrder)
                 .apply();
@@ -176,7 +174,7 @@ abstract class AppListActivity extends DaggerAppCompatActivity {
 
     protected void restoreSelectedSortingOrder() {
         selectedSortingOrder = PreferenceManager
-                .getDefaultSharedPreferences(Share.getInstance())
+                .getDefaultSharedPreferences(this)
                 .getInt(getSortingOrderKey(), BY_NAME_ASC);
     }
 

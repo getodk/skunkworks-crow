@@ -1,10 +1,10 @@
 package org.odk.share.dao;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.content.CursorLoader;
 
-import org.odk.share.application.Share;
 import org.odk.share.dto.TransferInstance;
 
 import java.util.ArrayList;
@@ -17,6 +17,12 @@ import static org.odk.share.provider.TransferProvider.CONTENT_URI;
  */
 
 public class TransferDao {
+
+    private Context context;
+
+    public TransferDao(Context context) {
+        this.context = context;
+    }
 
     public Cursor getSentInstancesCursor() {
         String selection = TransferInstance.TRANSFER_STATUS + " =? ";
@@ -72,7 +78,7 @@ public class TransferDao {
     }
 
     public Cursor getInstancesCursor(String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        return Share.getInstance().getContentResolver()
+        return context.getContentResolver()
                 .query(CONTENT_URI, projection, selection, selectionArgs, sortOrder);
     }
 
@@ -83,11 +89,11 @@ public class TransferDao {
     }
 
     public CursorLoader getInstancesCursorLoader(String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        return new CursorLoader(Share.getInstance(), CONTENT_URI, projection, selection, selectionArgs, sortOrder);
+        return new CursorLoader(context, CONTENT_URI, projection, selection, selectionArgs, sortOrder);
     }
 
     public int updateInstance(ContentValues values, String where, String[] whereArgs) {
-        return Share.getInstance().getContentResolver().update(CONTENT_URI, values, where, whereArgs);
+        return context.getContentResolver().update(CONTENT_URI, values, where, whereArgs);
     }
 
     public TransferInstance getReceivedTransferInstanceFromInstanceId(long instanceId) {

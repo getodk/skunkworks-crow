@@ -27,6 +27,8 @@ import org.odk.share.utilities.ArrayUtils;
 
 import java.util.LinkedHashSet;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -39,6 +41,10 @@ import static org.odk.share.fragments.ReviewedInstancesFragment.MODE;
 
 public class FilledFormsFragment extends InstanceListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
+    public static final String INSTANCE_IDS = "instance_ids";
+    private static final String INSTANCE_LIST_ACTIVITY_SORTING_ORDER = "instanceListActivitySortingOrder";
+    private static final int INSTANCE_LOADER = 1;
+
     @BindView(R.id.recyclerview)
     RecyclerView recyclerView;
     @BindView(R.id.buttonholder)
@@ -50,21 +56,18 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
     @BindView(R.id.toggle_button)
     Button toggleButton;
 
-    private static final String INSTANCE_LIST_ACTIVITY_SORTING_ORDER = "instanceListActivitySortingOrder";
+    @Inject
+    InstancesDao instancesDao;
 
-    public static final String INSTANCE_IDS = "instance_ids";
-
-    private static final int INSTANCE_LOADER = 1;
     private InstanceAdapter instanceAdapter;
     private LinkedHashSet<Long> selectedInstances;
     public  static int instancescount;
-
 
     public FilledFormsFragment() {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         View view = inflater.inflate(R.layout.fragment_forms, container, false);
@@ -87,7 +90,7 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
     @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new InstancesDao().getSavedInstancesCursorLoader(getFilterText(), getSortingOrder());
+        return instancesDao.getSavedInstancesCursorLoader(getFilterText(), getSortingOrder());
     }
 
     @Override

@@ -4,6 +4,7 @@ import android.app.Application;
 
 import org.odk.share.application.Share;
 import org.odk.share.injection.ActivityBuilder;
+import org.odk.share.injection.FragmentBuilder;
 import org.odk.share.injection.config.scopes.PerApplication;
 import org.odk.share.services.HotspotService;
 import org.odk.share.tasks.DownloadJob;
@@ -25,7 +26,8 @@ import dagger.android.support.AndroidSupportInjectionModule;
 @Component(modules = {
         AndroidSupportInjectionModule.class,
         AppModule.class,
-        ActivityBuilder.class
+        ActivityBuilder.class,
+        FragmentBuilder.class
 })
 public interface AppComponent extends AndroidInjector<Share> {
 

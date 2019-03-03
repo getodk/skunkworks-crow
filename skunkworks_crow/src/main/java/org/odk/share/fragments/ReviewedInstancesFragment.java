@@ -3,6 +3,7 @@ package org.odk.share.fragments;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -30,6 +31,8 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -45,10 +48,8 @@ import static org.odk.share.activities.MainActivity.FORM_VERSION;
 
 public class ReviewedInstancesFragment extends InstanceListFragment implements OnItemClickListener {
 
-
-    public ReviewedInstancesFragment() {
-
-    }
+    public static final String MODE = "mode";
+    private static final String REVIEWED_INSTANCE_LIST_SORTING_ORDER = "reviewedInstanceListSortingOrder";
 
     @BindView(R.id.recyclerview)
     RecyclerView recyclerView;
@@ -61,16 +62,22 @@ public class ReviewedInstancesFragment extends InstanceListFragment implements O
     @BindView(R.id.buttonholder)
     LinearLayout buttonLayout;
 
-    HashMap<Long, Instance> instanceMap;
+    @Inject
+    InstancesDao instancesDao;
 
+    @Inject
+    TransferDao transferDao;
+
+    HashMap<Long, Instance> instanceMap;
     TransferInstanceAdapter transferInstanceAdapter;
     List<TransferInstance> transferInstanceList;
-    private static final String REVIEWED_INSTANCE_LIST_SORTING_ORDER = "reviewedInstanceListSortingOrder";
-    public static final String MODE = "mode";
 
+    public ReviewedInstancesFragment() {
+
+    }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         View view = inflater.inflate(R.layout.fragment_instances, container, false);
@@ -119,7 +126,7 @@ public class ReviewedInstancesFragment extends InstanceListFragment implements O
         selectedInstances.clear();
         String formVersion = getActivity().getIntent().getStringExtra(FORM_VERSION);
         String formId = getActivity().getIntent().getStringExtra(FORM_ID);
-        String []selectionArgs;
+        String[] selectionArgs;
         String selection;
 
         if (formVersion == null) {
@@ -128,7 +135,7 @@ public class ReviewedInstancesFragment extends InstanceListFragment implements O
             if (getFilterText().length() == 0) {
                 selectionArgs = new String[]{formId};
             } else {
-                selectionArgs = new String[] {formId,  "%" + getFilterText() + "%"};
+                selectionArgs = new String[]{formId, "%" + getFilterText() + "%"};
                 selection = "AND " + InstanceProviderAPI.InstanceColumns.DISPLAY_NAME + " LIKE ?";
             }
         } else {
@@ -137,16 +144,16 @@ public class ReviewedInstancesFragment extends InstanceListFragment implements O
             if (getFilterText().length() == 0) {
                 selectionArgs = new String[]{formId, formVersion};
             } else {
-                selectionArgs = new String[] {formId,  "%" + getFilterText() + "%"};
+                selectionArgs = new String[]{formId, "%" + getFilterText() + "%"};
                 selection = "AND " + InstanceProviderAPI.InstanceColumns.DISPLAY_NAME + " LIKE ?";
             }
         }
 
-        Cursor cursor = new InstancesDao().getInstancesCursor(null, selection, selectionArgs, getSortingOrder());
-        instanceMap = new InstancesDao().getMapFromCursor(cursor);
+        Cursor cursor = instancesDao.getInstancesCursor(null, selection, selectionArgs, getSortingOrder());
+        instanceMap = instancesDao.getMapFromCursor(cursor);
 
-        Cursor transferCursor = new TransferDao().getReviewedInstancesCursor();
-        List<TransferInstance> transferInstances = new TransferDao().getInstancesFromCursor(transferCursor);
+        Cursor transferCursor = transferDao.getReviewedInstancesCursor();
+        List<TransferInstance> transferInstances = transferDao.getInstancesFromCursor(transferCursor);
         for (TransferInstance instance : transferInstances) {
             if (instanceMap.containsKey(instance.getInstanceId())) {
                 instance.setInstance(instanceMap.get(instance.getInstanceId()));
@@ -192,7 +199,7 @@ public class ReviewedInstancesFragment extends InstanceListFragment implements O
         boolean newState = transferInstanceAdapter.getItemCount() > selectedInstances.size();
 
         if (newState) {
-            for (TransferInstance instance: transferInstanceList) {
+            for (TransferInstance instance : transferInstanceList) {
                 selectedInstances.add(instance.getId());
             }
         } else {
@@ -212,7 +219,7 @@ public class ReviewedInstancesFragment extends InstanceListFragment implements O
     @OnClick(R.id.bAction)
     public void sendForms() {
         List<Long> instanceIds = new ArrayList<>();
-        for (TransferInstance transferInstance: transferInstanceList) {
+        for (TransferInstance transferInstance : transferInstanceList) {
             if (selectedInstances.contains(transferInstance.getId())) {
                 instanceIds.add(transferInstance.getInstanceId());
             }

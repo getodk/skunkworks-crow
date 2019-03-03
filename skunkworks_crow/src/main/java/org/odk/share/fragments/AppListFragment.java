@@ -15,7 +15,6 @@ package org.odk.share.fragments;
 
 import android.preference.PreferenceManager;
 import android.support.design.widget.BottomSheetDialog;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -29,13 +28,12 @@ import android.view.View;
 
 import org.odk.share.R;
 import org.odk.share.adapters.SortDialogAdapter;
-import org.odk.share.application.Share;
 
 import java.util.LinkedHashSet;
 
 import static org.odk.share.utilities.ApplicationConstants.SortingOrder.BY_NAME_ASC;
 
-abstract class AppListFragment extends Fragment {
+abstract class AppListFragment extends InjectableFragment {
 
     protected String[] sortingOptions;
     protected LinkedHashSet<Long> selectedInstances = new LinkedHashSet<>();
@@ -146,7 +144,7 @@ abstract class AppListFragment extends Fragment {
 
     private void saveSelectedSortingOrder(int selectedStringOrder) {
         selectedSortingOrder = selectedStringOrder;
-        PreferenceManager.getDefaultSharedPreferences(Share.getInstance())
+        PreferenceManager.getDefaultSharedPreferences(getContext())
                 .edit()
                 .putInt(getSortingOrderKey(), selectedStringOrder)
                 .apply();
@@ -154,7 +152,7 @@ abstract class AppListFragment extends Fragment {
 
     protected void restoreSelectedSortingOrder() {
         selectedSortingOrder = PreferenceManager
-                .getDefaultSharedPreferences(Share.getInstance())
+                .getDefaultSharedPreferences(getContext())
                 .getInt(getSortingOrderKey(), BY_NAME_ASC);
     }
 
