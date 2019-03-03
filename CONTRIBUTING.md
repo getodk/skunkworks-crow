@@ -31,8 +31,6 @@ To contribute code to Skunkworks-Crow, you will need to open a [pull request](ht
 1. Push changes to your fork at any time to make them publicly available:
 
         git push
-        
-1. Once you have completed your code changes, verify that you have followed the [style guidelines](https://github.com/opendatakit/skunkworks-crow/blob/master/CONTRIBUTING.md#style-guidelines).
 
 1. When your changes are ready to be added to the core Skunkworks-Crow project, [open a pull request](https://help.github.com/articles/creating-a-pull-request/). Make sure to set the base fork to `opendatakit/skunkworks-crow`. Describe your changes in the comment, refer to any relevant issues using [keywords for closing issues](https://help.github.com/articles/closing-issues-via-commit-messages/) and tag any person you think might need to know about the changes.
 
@@ -82,6 +80,8 @@ Work in progress pull requests:
 - Should include `[WIP]` in front of the pull request title.
 - Should specifically describe the proposed solution and feedback wanted.
 - Will not be merged until you remove `[WIP]` from the title.
+or
+- Pull request can be raised in draft mode directly by chosing an option from the drop down that is available while making pull request. Read more about [Draft pull requests](https://help.github.com/en/articles/creating-a-pull-request).
 
 ## Code style guidelines
 Follow the [Android style rules](http://source.android.com/source/code-style.html) and the [Google Java style guide](https://google.github.io/styleguide/javaguide.html).
