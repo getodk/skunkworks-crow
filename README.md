@@ -19,6 +19,9 @@
         4. [Review forms](#review-forms)
     2. [Send filled forms](#send-filled-forms)
     3. [Receive filled forms](#receive-filled-forms)
+4. [Setting up your development environment](#setting-up-your-development-environment)
+5. [Contributing code](#contributing-code)
+
 
 ## 1. Introduction<a name="introduction"></a>
 ### 1.1 About skunkworks-crow<a name="about-skunkworks-crow"></a>
@@ -134,4 +137,26 @@ For some devices, the user is not allowed to configure the wifi hotspot from the
   <img src="/screenshots/received_for_review.gif" width="280" height="500"/>
   <img src="/screenshots/received_qr_code.gif" width="280" height="500"/>
 </p>
+
+## 4. Setting up your development environment<a name="setting-up-your-development-environment"/>
+
+1. Download and install [Git](https://git-scm.com/downloads) and add it to your PATH
+
+1. Download and install [Android Studio](https://developer.android.com/studio/index.html)
+
+1. Fork the Skunkworks-crow project ([why and how to fork](https://help.github.com/articles/fork-a-repo/))
+
+1. Clone your fork of the project locally. At the command line:
+
+        git clone https://github.com/YOUR-GITHUB-USERNAME/skunkworks-crow
+
+    If you prefer not to use the command line, you can use Android Studio to create a new project from version control using `https://github.com/YOUR-GITHUB-USERNAME/skunkworks-crow`.
+
+1. Open the project in the folder of your clone from Android Studio. To run the project, click on the green arrow at the top of the screen.
+
+## 5. Contributing code<a name="contributing-code"/>
+Any and all contributions to the project are welcome. Skunkworks-Crow is used across the world primarily by organizations with a social purpose so you can have real impact!
+
+Issues tagged as [good first issue](https://github.com/opendatakit/skunkworks-crow/labels/good%20first%20issue) should be a good place to start. There are also currently many issues tagged as [needs reproduction](https://github.com/opendatakit/skunkworks-crow/labels/needs%20reproduction) which need someone to try to reproduce them with the current version of Skunkwork-Crow and comment on the issue with their findings.
+If you're ready to contribute code, see [the contribution guide](CONTRIBUTING.md).
 
