@@ -168,8 +168,8 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
                             break;
                         case FINISHED:
                             dismissDialog(DIALOG_DOWNLOAD_PROGRESS);
-                            //String result = downloadEvent.getResult();
-                            createAlertDialog(getString(R.string.transfer_result), getString(R.string.finished_downloading));
+                            String result = downloadEvent.getResult();
+                            createAlertDialog(getString(R.string.transfer_result), result);
                             break;
                         case ERROR:
                             dismissDialog(DIALOG_DOWNLOAD_PROGRESS);
