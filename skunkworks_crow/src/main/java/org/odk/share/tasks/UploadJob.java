@@ -352,9 +352,7 @@ public class UploadJob extends Job {
                 sbResult.append(getContext().getString(R.string.id, formId) + " " +
                         getContext().getString(R.string.success, getContext().getString(R.string.blank_form_count,
                                 getContext().getString(R.string.sent))));
-            }
-
-            else {
+            } else {
                 sbResult.append(getContext().getString(R.string.id, formId) + " " + getContext().getString(R.string.version, formVersion +
                         getContext().getString(R.string.form_available)));
             }
