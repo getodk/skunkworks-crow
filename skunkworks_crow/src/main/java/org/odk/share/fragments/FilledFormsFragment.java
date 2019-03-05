@@ -178,13 +178,22 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
         toggleButtonLabel();
     }
 
+
     private void toggleButtonLabel() {
         if (selectedInstances.size() == instanceAdapter.getItemCount()) {
             toggleButton.setText(getString(R.string.clear_all));
             sendButton.setText(getString(R.string.send_count)+selectedInstances.size() + getString(R.string.closed_bracket));
+<<<<<<< HEAD
         } else {
             toggleButton.setText(getString(R.string.select_all));
             sendButton.setText(getString(R.string.send_count)+selectedInstances.size() + getString(R.string.closed_bracket));
+=======
+
+        } else {
+            toggleButton.setText(getString(R.string.select_all));
+            sendButton.setText(getString(R.string.send_count)+selectedInstances.size() + getString(R.string.closed_bracket));
+
+>>>>>>> 4607a45ad36fd3f8d4bbe2fd2fa6e073fb07760b
         }
     }
 
