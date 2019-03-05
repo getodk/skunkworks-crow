@@ -61,7 +61,6 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
 
     private InstanceAdapter instanceAdapter;
     private LinkedHashSet<Long> selectedInstances;
-    public static int instancescount;
 
     public FilledFormsFragment() {
     }
@@ -183,12 +182,12 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
     private void toggleButtonLabel() {
         if (selectedInstances.size() == instanceAdapter.getItemCount()) {
             toggleButton.setText(getString(R.string.clear_all));
-            instancescount = selectedInstances.size();
-            sendButton.setText("Send(" + (selectedInstances.size() + BlankFormsFragment.filledcount) + ")");
+            sendButton.setText(getString(R.string.send_count)+selectedInstances.size() + getString(R.string.closed_bracket));
+
         } else {
             toggleButton.setText(getString(R.string.select_all));
-            instancescount = selectedInstances.size();
-            sendButton.setText("Send(" + (selectedInstances.size() + BlankFormsFragment.filledcount) + ")");
+            sendButton.setText(getString(R.string.send_count)+selectedInstances.size() + getString(R.string.closed_bracket));
+
         }
     }
 
