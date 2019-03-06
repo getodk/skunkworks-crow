@@ -10,8 +10,8 @@
         android:id="@+id/relativeLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/toolbar"
         android:layout_above="@+id/buttonholder"
+        android:layout_below="@id/toolbar"
         android:orientation="vertical">
 
         <TextView
@@ -21,37 +21,60 @@
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:gravity="center"
-            android:textSize="22sp"
-            android:padding="10dp"/>
+            android:padding="10dp"
+            android:textSize="22sp" />
 
         <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerview"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/recyclerview"/>
+            android:layout_height="match_parent" />
 
     </RelativeLayout>
 
     <LinearLayout
         android:id="@+id/buttonholder"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="?android:actionBarSize"
+        android:background="#ffffff"
         android:layout_alignParentBottom="true"
-        android:orientation="horizontal"
-        android:weightSum="2">
+        android:orientation="horizontal">
 
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/send_forms"
-            android:id="@+id/bSendForms"
-            android:layout_weight="1"/>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            >
 
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/receive_forms"
-            android:id="@+id/bViewWifi"
-            android:layout_weight="1"/>
+            <Button
+                android:id="@+id/bSendForms"
+                android:layout_width="150dp"
+                android:layout_height="36dp"
+                android:background="@drawable/selector_bottom_text_common"
+                android:gravity="center"
+                android:text="@string/send_forms"
+                android:textColor="@color/colorPrimary"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/bViewWifi"
+                android:layout_width="150dp"
+                android:layout_height="36dp"
+                android:background="@drawable/selector_bottom_recive"
+                android:gravity="center"
+                android:text="@string/receive_forms"
+                android:textColor="@color/colorPrimary"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
     </LinearLayout>
 
 </RelativeLayout>
