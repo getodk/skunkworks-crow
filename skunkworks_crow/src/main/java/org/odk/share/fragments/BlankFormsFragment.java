@@ -187,11 +187,10 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
     private void toggleButtonLabel() {
         if (selectedForms.size() == formAdapter.getItemCount()) {
             toggleButton.setText(getString(R.string.clear_all));
-            sendButton.setText(getString(R.string.send_count)+selectedForms.size() + getString(R.string.closed_bracket));
         } else {
             toggleButton.setText(getString(R.string.select_all));
-            sendButton.setText(getString(R.string.send_count)+selectedForms.size() + getString(R.string.closed_bracket));
         }
+        sendButton.setText(String.format(getString(R.string.send_count), selectedForms.size()));
     }
 
     @Override
