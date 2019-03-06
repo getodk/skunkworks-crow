@@ -7,7 +7,7 @@
     android:background="?attr/colorPrimary"
     android:minHeight="?attr/actionBarSize"
     app:contentInsetEnd="0dp"
-    app:contentInsetStart="0dp"
+    app:contentInsetStart="16dp"
     app:contentInsetStartWithNavigation="0dp"
     app:titleTextColor="@android:color/white"
     app:theme="@style/AppTheme.ActionBar" />
