@@ -53,8 +53,6 @@ public class InstancesList extends InstanceListActivity implements LoaderManager
         setSupportActionBar(toolbar);
 
         selectedInstances = new LinkedHashSet<>();
-        recyclerView.getLayoutManager().setMeasurementCacheEnabled(false);
-
         LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(llm);
@@ -116,7 +114,6 @@ public class InstancesList extends InstanceListActivity implements LoaderManager
         Long[] arr = selectedInstances.toArray(new Long[selectedInstances.size()]);
         long[] a = ArrayUtils.toPrimitive(arr);
         intent.putExtra(INSTANCE_IDS, a);
-
         intent.putExtra(MODE, ApplicationConstants.ASK_REVIEW_MODE);
         startActivity(intent);
         finish();

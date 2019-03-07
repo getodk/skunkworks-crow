@@ -90,7 +90,6 @@ public class InstanceAdapter extends RecyclerView.Adapter<InstanceAdapter.Instan
         InstanceHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
-
         }
     }
 }
