@@ -57,6 +57,9 @@ public class InstanceAdapter extends RecyclerView.Adapter<InstanceAdapter.Instan
         holder.subtitle.setText(cursor.getString(cursor.getColumnIndex(InstanceProviderAPI.InstanceColumns.DISPLAY_SUBTEXT)));
         long id = cursor.getLong(cursor.getColumnIndex(InstanceProviderAPI.InstanceColumns._ID));
         holder.checkBox.setChecked(selectedInstances.contains(id));
+        holder.reviewedForms.setVisibility(View.GONE);
+        holder.unReviewedForms.setVisibility(View.GONE);
+
     }
 
     @Override
@@ -79,6 +82,10 @@ public class InstanceAdapter extends RecyclerView.Adapter<InstanceAdapter.Instan
         @BindView(R.id.tvTitle) public TextView title;
         @BindView(R.id.tvSubtitle) public TextView subtitle;
         @BindView(R.id.checkbox) public CheckBox checkBox;
+        @BindView(R.id.tvReviewForm)
+        TextView reviewedForms;
+        @BindView(R.id.tvUnReviewForm)
+        TextView unReviewedForms;
 
         InstanceHolder(View view) {
             super(view);
