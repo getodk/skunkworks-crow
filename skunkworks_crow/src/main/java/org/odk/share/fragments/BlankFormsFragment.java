@@ -73,6 +73,7 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
     private FormsAdapter formAdapter;
     private LinkedHashSet<Long> selectedForms;
 
+
     public BlankFormsFragment() {
     }
 
