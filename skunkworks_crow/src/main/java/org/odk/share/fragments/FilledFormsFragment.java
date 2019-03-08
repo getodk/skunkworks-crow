@@ -184,7 +184,7 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
         } else {
             toggleButton.setText(getString(R.string.select_all));
         }
-        sendButton.setText(String.format(getString(R.string.send_count),selectedInstances.size()));
+        sendButton.setText(String.format(getString(R.string.send_count), selectedInstances.size()));
     }
 
     @Override
