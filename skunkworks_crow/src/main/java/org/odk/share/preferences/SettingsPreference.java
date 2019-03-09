@@ -100,7 +100,7 @@ public class SettingsPreference extends PreferenceActivity {
                 case PreferenceKeys.KEY_ODK_DESTINATION_DIR:
                     String dir = newValue.toString();
                     if (dir.length() == 0) {
-                        Toast.makeText(Share.getInstance(), getString(R.string.odk_destination_dir_error), Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), getString(R.string.odk_destination_dir_error), Toast.LENGTH_LONG).show();
                         return false;
                     } else {
                         odkDestinationDirPreference.setSummary(dir);

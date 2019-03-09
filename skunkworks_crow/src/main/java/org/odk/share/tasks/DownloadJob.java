@@ -21,8 +21,6 @@ import org.odk.share.database.ShareDatabaseHelper;
 import org.odk.share.dto.TransferInstance;
 import org.odk.share.events.DownloadEvent;
 import org.odk.share.preferences.PreferenceKeys;
-import org.odk.share.provider.FormsProviderAPI;
-import org.odk.share.provider.InstanceProviderAPI;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.utilities.ApplicationConstants;
 
