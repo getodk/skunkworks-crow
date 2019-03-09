@@ -191,7 +191,11 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
         } else {
             toggleButton.setText(getString(R.string.select_all));
         }
-        sendButton.setText(String.format(getString(R.string.send_count), selectedForms.size()));
+        if (selectedForms.size() == 0) {
+            sendButton.setText(getString(R.string.send_forms));
+        } else {
+            sendButton.setText(String.format(getString(R.string.send_count), selectedForms.size()));
+        }
     }
 
     @Override
