@@ -162,7 +162,7 @@ public class SentInstancesFragment extends InstanceListFragment {
 
     private void setEmptyViewVisibility(String text) {
         if (transferInstanceList.size() > 0) {
-            buttonLayout.setVisibility(View.VISIBLE);
+            buttonLayout.setVisibility(View.INVISIBLE);
             emptyView.setVisibility(View.GONE);
         } else {
             buttonLayout.setVisibility(View.GONE);
