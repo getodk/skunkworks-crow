@@ -30,7 +30,6 @@ import org.odk.share.R;
 public class WebViewActivity extends AppCompatActivity {
 
     public static final String OPEN_URL = "url";
-    public static final String OPEN_SOURCE = "Open Source Licenses";
 
     private WebView webView;
     private ProgressBar progressBar;
