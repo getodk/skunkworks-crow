@@ -30,8 +30,6 @@ import org.odk.share.dao.TransferDao;
 import org.odk.share.utilities.ApplicationConstants;
 import org.odk.share.utilities.ArrayUtils;
 
-import java.util.LinkedHashSet;
-
 import javax.inject.Inject;
 
 import butterknife.BindView;
@@ -48,7 +46,6 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
 
     public static final String FORM_IDS = "form_ids";
     private static final String FORM_CHOOSER_LIST_SORTING_ORDER = "formChooserListSortingOrder";
-    private static final String SELECTED_INSTANCES_KEY = "ROTATION_SELECTED_INSTANCES";
     private static final int FORM_LOADER = 2;
 
     @BindView(R.id.recyclerview)
@@ -72,8 +69,6 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
     TransferDao transferDao;
 
     private FormsAdapter formAdapter;
-    private LinkedHashSet<Long> selectedForms;
-
 
     public BlankFormsFragment() {
     }
@@ -84,19 +79,11 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
         View view = inflater.inflate(R.layout.fragment_forms, container, false);
         ButterKnife.bind(this, view);
 
-        selectedForms = new LinkedHashSet<>();
-
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(llm);
 
-        if (savedInstanceState != null) {
-            long[] previousSelectedInstances = savedInstanceState.getLongArray(SELECTED_INSTANCES_KEY);
-            for (long previousSelectedInstance : previousSelectedInstances) {
-                selectedForms.add(previousSelectedInstance);
-            }
-            sendButton.setEnabled(selectedForms.size() > 0);
-        }
+        restoreState(savedInstanceState);
 
         return view;
     }
@@ -114,18 +101,10 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
     }
 
     @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putLongArray(SELECTED_INSTANCES_KEY, ArrayUtils.toPrimitive(
-                selectedForms.toArray(new Long[selectedForms.size()])));
-
-    }
-
-    @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
         if (cursor != null) {
             cursor.moveToFirst();
-            formAdapter = new FormsAdapter(getActivity(), cursor, this, selectedForms, instancesDao, transferDao);
+            formAdapter = new FormsAdapter(getActivity(), cursor, this, selectedInstances, instancesDao, transferDao);
             recyclerView.setAdapter(formAdapter);
             setEmptyViewVisibility(cursor.getCount());
             if (formAdapter.getItemCount() > 0) {
@@ -150,13 +129,13 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
         ((FormsAdapter.FormHolder) holder).toggleCheckbox();
 
         long id = ((FormsAdapter.FormHolder) holder).getForm().getId();
-        if (selectedForms.contains(id)) {
-            selectedForms.remove(id);
+        if (selectedInstances.contains(id)) {
+            selectedInstances.remove(id);
         } else {
-            selectedForms.add(id);
+            selectedInstances.add(id);
         }
 
-        sendButton.setEnabled(selectedForms.size() > 0);
+        sendButton.setEnabled(selectedInstances.size() > 0);
 
         toggleButtonLabel();
     }
@@ -175,7 +154,7 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
     @OnClick(R.id.send_button)
     public void send() {
         Intent intent = new Intent(getActivity(), SendActivity.class);
-        Long[] arr = selectedForms.toArray(new Long[selectedForms.size()]);
+        Long[] arr = selectedInstances.toArray(new Long[selectedInstances.size()]);
         long[] a = ArrayUtils.toPrimitive(arr);
         intent.putExtra(FORM_IDS, a);
         intent.putExtra(MODE, ApplicationConstants.SEND_BLANK_FORM_MODE);
@@ -185,18 +164,18 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
 
     @OnClick(R.id.toggle_button)
     public void toggle() {
-        boolean newState = formAdapter.getItemCount() > selectedForms.size();
+        boolean newState = formAdapter.getItemCount() > selectedInstances.size();
         sendButton.setEnabled(newState);
 
         if (newState) {
             Cursor cursor = formAdapter.getCursor();
             if (cursor.moveToFirst()) {
                 do {
-                    selectedForms.add(cursor.getLong(cursor.getColumnIndex(FormsProviderAPI.FormsColumns._ID)));
+                    selectedInstances.add(cursor.getLong(cursor.getColumnIndex(FormsProviderAPI.FormsColumns._ID)));
                 } while (cursor.moveToNext());
             }
         } else {
-            selectedForms.clear();
+            selectedInstances.clear();
         }
 
         formAdapter.notifyDataSetChanged();
@@ -204,7 +183,7 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
     }
 
     private void toggleButtonLabel() {
-        if (selectedForms.size() == formAdapter.getItemCount()) {
+        if (selectedInstances.size() == formAdapter.getItemCount()) {
             toggleButton.setText(getString(R.string.clear_all));
         } else {
             toggleButton.setText(getString(R.string.select_all));

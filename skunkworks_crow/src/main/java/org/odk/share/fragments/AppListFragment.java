@@ -13,7 +13,9 @@ limitations under the License.
 
 package org.odk.share.fragments;
 
+import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
@@ -26,8 +28,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import android.widget.Button;
+import butterknife.BindView;
 import org.odk.share.R;
 import org.odk.share.adapters.SortDialogAdapter;
+import org.odk.share.utilities.ArrayUtils;
 
 import java.util.LinkedHashSet;
 
@@ -40,6 +45,19 @@ abstract class AppListFragment extends InjectableFragment {
     private Integer selectedSortingOrder;
     private BottomSheetDialog bottomSheetDialog;
     private String filterText;
+
+    private static final String SELECTED_INSTANCES_KEY = "ROTATION_SELECTED_INSTANCES";
+
+    @BindView(R.id.send_button)
+    Button sendButton;
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putLongArray(SELECTED_INSTANCES_KEY, ArrayUtils.toPrimitive(
+                selectedInstances.toArray(new Long[selectedInstances.size()])));
+
+    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -113,6 +131,16 @@ abstract class AppListFragment extends InjectableFragment {
         }
     }
 
+    public void restoreState(Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            long[] previousSelectedInstances = savedInstanceState.getLongArray(SELECTED_INSTANCES_KEY);
+            for (long previousSelectedInstance : previousSelectedInstances) {
+                selectedInstances.add(previousSelectedInstance);
+            }
+            sendButton.setEnabled(selectedInstances.size() > 0);
+        }
+    }
+    
     private void setupBottomSheet() {
         bottomSheetDialog = new BottomSheetDialog(getActivity());
         View sheetView = getActivity().getLayoutInflater().inflate(R.layout.bottom_sheet, null);
