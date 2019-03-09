@@ -123,5 +123,5 @@
     <string name="num_reviewed">Reviewed: %s</string>
     <string name="num_unreviewed">Unreviewed: %s</string>
     <string name="no_forms">No Forms Found</string>
-    <string name="form_available">already available at the receiver</string>
+
 </resources>
