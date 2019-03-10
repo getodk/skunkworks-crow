@@ -88,7 +88,7 @@ public class ReviewedInstancesFragment extends InstanceListFragment implements O
         selectedInstances = new LinkedHashSet<>();
 
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
-        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        llm.setOrientation(RecyclerView.VERTICAL);
         recyclerView.setLayoutManager(llm);
 
         toggleButton.setText(getString(R.string.select_all));

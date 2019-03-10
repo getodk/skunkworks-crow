@@ -76,7 +76,7 @@ public class SentInstancesFragment extends InstanceListFragment {
         buttonLayout.setVisibility(View.GONE);
 
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
-        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        llm.setOrientation(RecyclerView.VERTICAL);
         recyclerView.setLayoutManager(llm);
 
 
