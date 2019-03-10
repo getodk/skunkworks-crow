@@ -193,8 +193,10 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
         }
         if (selectedForms.isEmpty()) {
             sendButton.setText(getString(R.string.send_forms));
+            sendButton.setBackground(getResources().getDrawable(R.drawable.selector_bottom_recive));
         } else {
             sendButton.setText(String.format(getString(R.string.send_count), selectedForms.size()));
+            sendButton.setBackground(getResources().getDrawable(R.drawable.selector_bottom_text_common));
         }
     }
 

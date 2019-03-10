@@ -186,8 +186,10 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
         }
         if (selectedInstances.isEmpty()) {
             sendButton.setText(getString(R.string.send_forms));
+            sendButton.setBackground(getResources().getDrawable(R.drawable.selector_bottom_recive));
         } else {
             sendButton.setText(String.format(getString(R.string.send_count), selectedInstances.size()));
+            sendButton.setBackground(getResources().getDrawable(R.drawable.selector_bottom_text_common));
         }
     }
 

@@ -67,7 +67,7 @@
                 android:id="@+id/bViewWifi"
                 android:layout_width="150dp"
                 android:layout_height="36dp"
-                android:background="@drawable/selector_bottom_recive"
+                android:background="@drawable/selector_bottom_text_common"
                 android:gravity="center"
                 android:text="@string/receive_forms"
                 android:textColor="@color/colorPrimary"
