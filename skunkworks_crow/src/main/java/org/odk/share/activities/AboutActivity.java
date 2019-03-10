@@ -39,7 +39,7 @@ public class AboutActivity extends AppCompatActivity implements OnItemClickListe
         setSupportActionBar(toolbar);
 
         LinearLayoutManager llm = new LinearLayoutManager(this);
-        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        llm.setOrientation(RecyclerView.VERTICAL);
         recyclerView.setLayoutManager(llm);
         int[][] listItems = {{R.string.open_source_licenses, R.drawable.ic_stars}};
         adapter = new AboutAdapter(this, listItems, this);

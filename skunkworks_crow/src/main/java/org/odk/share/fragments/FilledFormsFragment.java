@@ -75,7 +75,7 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
         selectedInstances = new LinkedHashSet<>();
 
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
-        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        llm.setOrientation(RecyclerView.VERTICAL);
         recyclerView.setLayoutManager(llm);
         return view;
     }
