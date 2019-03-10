@@ -2,7 +2,7 @@ package org.odk.share.activities;
 
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
-import android.support.v4.view.ViewPager;
+import androidx.core.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 
 import org.odk.share.R;

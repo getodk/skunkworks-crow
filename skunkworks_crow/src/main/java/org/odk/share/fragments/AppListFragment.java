@@ -15,8 +15,8 @@ package org.odk.share.fragments;
 
 import android.preference.PreferenceManager;
 import android.support.design.widget.BottomSheetDialog;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.MenuItemCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.MenuItemCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
