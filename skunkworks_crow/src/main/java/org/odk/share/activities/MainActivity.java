@@ -84,7 +84,7 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
         sendForms.setEnabled(false);
 
         LinearLayoutManager llm = new LinearLayoutManager(this);
-        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        llm.setOrientation(RecyclerView.VERTICAL);
         recyclerView.setLayoutManager(llm);
         setupAdapter();
         getSupportLoaderManager().initLoader(FORM_LOADER, null, this);

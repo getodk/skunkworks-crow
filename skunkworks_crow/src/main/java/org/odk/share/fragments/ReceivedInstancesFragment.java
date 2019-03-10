@@ -82,7 +82,7 @@ public class ReceivedInstancesFragment extends InstanceListFragment implements O
         buttonLayout.setVisibility(View.GONE);
 
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
-        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        llm.setOrientation(RecyclerView.VERTICAL);
         recyclerView.setLayoutManager(llm);
         setupAdapter();
         return view;

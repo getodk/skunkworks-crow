@@ -62,7 +62,7 @@ public class InstancesList extends InstanceListActivity implements LoaderManager
 
         selectedInstances = new LinkedHashSet<>();
         LinearLayoutManager llm = new LinearLayoutManager(this);
-        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        llm.setOrientation(RecyclerView.VERTICAL);
         recyclerView.setLayoutManager(llm);
     }
 
