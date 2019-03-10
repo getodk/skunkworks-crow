@@ -37,6 +37,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+
 import static org.odk.share.fragments.ReviewedInstancesFragment.MODE;
 
 /**
