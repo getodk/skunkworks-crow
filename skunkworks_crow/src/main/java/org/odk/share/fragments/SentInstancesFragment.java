@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -44,10 +43,6 @@ public class SentInstancesFragment extends InstanceListFragment {
 
     @BindView(R.id.recyclerview)
     RecyclerView recyclerView;
-    @BindView(R.id.bToggle)
-    Button toggleButton;
-    @BindView(R.id.bAction)
-    Button sendButton;
     @BindView(R.id.empty_view)
     TextView emptyView;
     @BindView(R.id.buttonholder)
@@ -84,8 +79,6 @@ public class SentInstancesFragment extends InstanceListFragment {
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(llm);
 
-        toggleButton.setText(getString(R.string.select_all));
-        sendButton.setText(getString(R.string.send_forms));
 
         setupAdapter();
         return view;
@@ -162,10 +155,8 @@ public class SentInstancesFragment extends InstanceListFragment {
 
     private void setEmptyViewVisibility(String text) {
         if (transferInstanceList.size() > 0) {
-            buttonLayout.setVisibility(View.VISIBLE);
             emptyView.setVisibility(View.GONE);
         } else {
-            buttonLayout.setVisibility(View.GONE);
             emptyView.setVisibility(View.VISIBLE);
             emptyView.setText(text);
         }
