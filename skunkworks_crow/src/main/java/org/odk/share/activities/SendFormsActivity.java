@@ -1,15 +1,16 @@
 package org.odk.share.activities;
 
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
-import androidx.core.view.ViewPager;
-import android.support.v7.widget.Toolbar;
+
+import com.google.android.material.tabs.TabLayout;
 
 import org.odk.share.R;
 import org.odk.share.adapters.ViewPagerAdapter;
 import org.odk.share.fragments.BlankFormsFragment;
 import org.odk.share.fragments.FilledFormsFragment;
 
+import androidx.appcompat.widget.Toolbar;
+import androidx.viewpager.widget.ViewPager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 

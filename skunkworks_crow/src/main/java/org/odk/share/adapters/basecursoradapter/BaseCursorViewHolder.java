@@ -1,7 +1,8 @@
 package org.odk.share.adapters.basecursoradapter;
 
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 
 public class BaseCursorViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

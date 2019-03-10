@@ -21,7 +21,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.BaseColumns;
-import androidx.core.content.CursorLoader;
+import androidx.loader.content.CursorLoader;
 
 import org.odk.collect.android.dto.Form;
 import org.odk.collect.android.provider.FormsProviderAPI;
