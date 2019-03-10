@@ -32,6 +32,7 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.internal.operators.maybe.MaybeIsEmpty;
 
 import static org.odk.share.fragments.ReviewedInstancesFragment.MODE;
 
@@ -184,7 +185,7 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
         } else {
             toggleButton.setText(getString(R.string.select_all));
         }
-        if (selectedInstances.size() == 0) {
+        if (selectedInstances.isEmpty()) {
             sendButton.setText(getString(R.string.send_forms));
         } else {
             sendButton.setText(String.format(getString(R.string.send_count), selectedInstances.size()));
