@@ -67,21 +67,21 @@ To view details of any form category tap on any category shown on home screen.
 
 #### 3.1.1 View statistics of forms received<a name="view-statistics"></a>
 
-To view the statistics of any specific blank form on the device, tap on any item on the home screen. The statistics screen will show the number of filled forms sent, filled forms reviewed and unreviewed. This will give the supervisor a glimpse of all the details of form transfer happened through the device.
+To view the statistics of any specific blank form on the device, tap on any item on the home screen. The statistics screen will show the number of filled forms sent, filled forms reviewed and unreviewed. This will give the supervisor a glimpse of all the details of form transfer that happened through the device.
 <p align="center">
   <img src="/screenshots/statistics_tab.png" width="280" height="500"/>
 </p>
 
 #### 3.1.2 View sent forms<a name="view-sent-forms"></a>
 
-To view the details of the form sent from the device navigate to ‘Sent’ tabs, the screen shows the details of sent filled forms if any forms were sent for a review and the supervisor sent back the forms with feedback then the user will be able to see the form reviewed status with feedback.
+To view the details of the form sent from the device, navigate to ‘Sent’ tabs, the screen shows the details of sent filled forms. If any forms were sent for a review and the supervisor sent back the forms with feedback, then the user will be able to see the form reviewed status with feedback.
 <p align="center">
   <img src="/screenshots/send_tab.png" width="280" height="500"/>
 </p>
 
 #### 3.1.3 View Received forms<a name="view-received-forms"></a>
 
-To view the details of forms received navigate to the ‘Received’ tab. To review the forms, tap on any received form to open the filled form in ODK Collect. After viewing the form, the user will be navigated to a screen asking for feedback and can mark the form as accepted or rejected. If the user is not ready to provide feedback,  even if wants to review later can tap on “Review later”. Using this option user will be navigated back to the receive screen so that user can review other forms. If supervisor already opened the form previously then the user will be navigated to a feedback screen directly if the supervisor wants to view the form again then tap on “View from in ODK Collect” to view it again.
+To view the details of forms received, navigate to the ‘Received’ tab. To review the forms, tap on any received form to open the filled form in ODK Collect. After viewing the form, the user will be navigated to a screen asking for feedback and can mark the form as approved or rejected. If the user is not ready to provide feedback, he can review later tap by tapping “Review later”. Using this option user will be navigated back to the receive screen so that user can review other forms. If supervisor already opened the form previously then the user will be navigated to a feedback screen directly. If the supervisor wants to view the form again then he can tap on “View from in ODK Collect” to view it again.
 
 <p float="left" align="center">
   <img src="/screenshots/review.gif" width="280" height="500"/>
@@ -91,7 +91,7 @@ To view the details of forms received navigate to the ‘Received’ tab. To rev
 
 #### 3.1.4 Review forms<a name="review-forms"></a>
 
-To view the details of forms reviewed, tap on the ‘Reviewed’ tab. This shows all the forms reviewed by you with the form status. To send it back to the enumerator who asked for the feedback, select the forms and tap on ‘Send’ this will send all the forms with reviewed status as well as feedback back to the enumerator. If the enumerator didn’t send those forms for review then it won’t send any forms back only those enumerators will get the feedback who asked for it.
+To view the details of forms reviewed, tap on the ‘Reviewed’ tab. This shows all the forms reviewed by you with the form status. To send it back to the enumerator who asked for the feedback, select the forms and tap on ‘Send’. This will send all the forms with reviewed status as well as feedback back to the enumerator. If the enumerator didn’t send those forms for review then it won’t send any forms back, only those enumerators will get the feedback who asked for it.
 
 
 
@@ -99,19 +99,19 @@ To view the details of forms reviewed, tap on the ‘Reviewed’ tab. This shows
 
 ### 3.2 Send filled forms<a name="send-filled-forms"></a>
 
-After the launch of the app, on the home screen a send button is shown at the bottom. Tap on that button to open the screen which consists of a list showing all the filled forms available in Collect and user can select any number of forms of any version of blank form which is required to be sent. It contains all the filled forms irrespective of its send/receive status.
+After the launch of the app, on the home screen a 'Send' button is shown at the bottom. Tap on that button to open the screen which consists of a list showing all the filled forms available in ODK Collect and user can select any number of forms of any version of blank form which is required to be sent. It contains all the filled forms irrespective of its send/receive status.
 
 It will display all the filled forms available in ODK Collect (it also contains the received forms so that user can pass that to another enumerator for further form filling)
 
-After selecting the forms, press ‘send’ to initiate the connection process so that receiver can connect to your device and start receiving.
+After selecting the forms, press ‘Send’ to initiate the connection process so that receiver can connect to your device and start receiving.
 
 Tapping on ‘Send’ button opens up the screen which will initiate the communication process and start the wifi hotspot so that receiver can connect to it and start receiving the forms.
 
-A Wifi Hotspot is used as the sender’s communication method. which creates a wifi network and sends files using the socket connection. When the wifi hotspot is initiated, it turns off the wifi if already enabled and creates new wifi configuration and saves the last saved hotspot configuration which is restored at the end of a transfer.
+A Wifi Hotspot is used as the sender’s communication method, which creates a wifi network and sends files using the socket connection. When the wifi hotspot is initiated, it turns off the wifi if already enabled and creates new wifi configuration and saves the last saved hotspot configuration which is restored at the end of a transfer.
 
 If hotspot initiation is successful then the screen will show the QR Code generated so that receiver can scan the QR Code to connect to it and start receiving the forms.
 
-Is user wants to manually connect to it then the screen shows the network name so that user can connect to it by tapping on the network, and after wifi is connected it will ask for a port number which is required to create the connection.
+If user wants to manually connect to it then the screen shows the network name so that user can connect to it by tapping on the network, and after wifi is connected it will ask for a port number which is required to create the connection.
 
 <p align="center">
   <img src="/screenshots/send_normal_mode.gif" width="280" height="500"/>
@@ -123,11 +123,11 @@ And for other device it will be enabled automatically.
 
 ### 3.3 Receive filled forms<a name="receive-filled-forms"></a>
 
-Tap on the “Receive” button shown at the bottom of the home screen to see a list of all wifi networks available in the nearby area which are started by only skunkworks-crow app.
+Tap on the 'Receive' button shown at the bottom of the home screen to see a list of all wifi networks available in the nearby area which are started by only skunkworks-crow app.
 
 A receiver will need to connect to the network the sender has created. There are two ways to connect to the network:
-A QR code generated by the sender can be scanned by a receiver, it will get all the information required to connect to the sender (wifi name, port,  and password if the connection is protected).
-Tap on the wifi network available to connect and after successful connection enter port number to start receiving the forms.
+A QR code generated by the sender that can be scanned by a receiver, it will get all the information required to connect to the sender (wifi name, port,  and password if the connection is protected).
+Or else, tap on the wifi network available to connect and after successful connection enter port number to start receiving the forms.
 
 Connecting to the sender’s network will disable all the wifi network available so that no other network can interrupt the current connection. After receiving the forms it will restore the last saved state.
 

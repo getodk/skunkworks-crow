@@ -13,6 +13,7 @@
     <string name="send_selected">Send</string>
     <string name="select_all">Select all</string>
     <string name="clear_all">Clear all</string>
+    <string name="send_count">Send (%d)</string>
     <string name="send_forms">Send</string>
     <string name="version">Version: %1$s</string>
     <string name="id">ID: %1s</string>
@@ -113,6 +114,7 @@
     <string name="rejected">Rejected</string>
     <string name="feedback_sent">\nFeedback sent by reviewer: %s</string>
     <string name="no_feedback_sent">\nNo feedback sent by the reviewer</string>
+
     <string-array name="stats_field">
         <item name="sent">Sent</item>
         <item name="received">Received</item>
@@ -123,4 +125,8 @@
     <string name="num_reviewed">Reviewed: %s</string>
     <string name="num_unreviewed">Unreviewed: %s</string>
     <string name="no_forms">No Forms Found</string>
+
+    <string name="default_odk_destination_dir">\/sdcard\/odk</string>
+    <string name="title_odk_destination_dir">ODK Destination Directory</string>
+    <string name="odk_destination_dir_error">The destination should not be empty</string>
 </resources>
