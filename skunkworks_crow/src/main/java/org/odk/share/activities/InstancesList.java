@@ -33,8 +33,10 @@ import static org.odk.share.fragments.ReviewedInstancesFragment.MODE;
 
 public class InstancesList extends InstanceListActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    @BindView(R.id.recyclerview) RecyclerView recyclerView;
-    @BindView(R.id.toolbar) Toolbar toolbar;
+    @BindView(R.id.recyclerview)
+    RecyclerView recyclerView;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
     @BindView(R.id.send_button) Button sendButton;
     @BindView(R.id.toggle_button) Button toggleButton;
 

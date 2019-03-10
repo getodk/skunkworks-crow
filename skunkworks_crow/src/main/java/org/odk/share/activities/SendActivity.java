@@ -294,7 +294,7 @@ public class SendActivity extends InjectableActivity {
         Timber.d("Hotspot Stopped");
         compositeDisposable.dispose();
     }
-  
+
     @Override
     protected void onResume() {
         super.onResume();
