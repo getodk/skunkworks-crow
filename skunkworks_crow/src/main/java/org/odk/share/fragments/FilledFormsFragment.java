@@ -32,7 +32,6 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import io.reactivex.internal.operators.maybe.MaybeIsEmpty;
 
 import static org.odk.share.fragments.ReviewedInstancesFragment.MODE;
 
