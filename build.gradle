@@ -28,7 +28,7 @@ task clean(type: Delete) {
 }
 
 ext {
-    supportLibraryVersion = '1.0.0-beta01'
+    supportLibraryVersion = '1.0.2'
     butterknifeVersion = '10.1.0'
-    daggerVersion = '2.19'
+    daggerVersion = '2.20'
 }
