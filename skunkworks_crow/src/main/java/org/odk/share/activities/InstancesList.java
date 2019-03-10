@@ -58,7 +58,6 @@ public class InstancesList extends InstanceListActivity implements LoaderManager
         setSupportActionBar(toolbar);
 
         selectedInstances = new LinkedHashSet<>();
-
         LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(llm);
