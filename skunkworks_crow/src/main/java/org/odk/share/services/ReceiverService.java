@@ -1,10 +1,5 @@
 package org.odk.share.services;
 
-import com.evernote.android.job.Job;
-import com.evernote.android.job.JobManager;
-import com.evernote.android.job.JobRequest;
-import com.evernote.android.job.util.support.PersistableBundleCompat;
-
 import org.odk.share.events.DownloadEvent;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.rx.schedulers.BaseSchedulerProvider;
@@ -13,15 +8,20 @@ import org.odk.share.tasks.DownloadJob;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import androidx.work.Data;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
+import androidx.work.WorkRequest;
 import timber.log.Timber;
 
 public class ReceiverService {
 
-    private final Queue<JobRequest> jobs = new LinkedList<>();
+    private final Queue<WorkRequest> jobs = new LinkedList<>();
     private final RxEventBus rxEventBus;
     private final BaseSchedulerProvider schedulerProvider;
 
-    private JobRequest currentJob;
+    private WorkRequest currentJob;
+    private WorkManager workManager;
 
     public ReceiverService(RxEventBus rxEventBus, BaseSchedulerProvider schedulerProvider) {
         this.rxEventBus = rxEventBus;
@@ -56,14 +56,14 @@ public class ReceiverService {
     }
 
     public void startDownloading(String ip, int port) {
-        PersistableBundleCompat extras = new PersistableBundleCompat();
-        extras.putString(DownloadJob.IP, ip);
-        extras.putInt(DownloadJob.PORT, port);
+        Data extras = new Data.Builder()
+                .putString(DownloadJob.IP, ip)
+                .putInt(DownloadJob.PORT, port)
+                .build();
 
         // Build request
-        JobRequest request = new JobRequest.Builder(DownloadJob.TAG)
-                .addExtras(extras)
-                .startNow()
+        WorkRequest request = new OneTimeWorkRequest.Builder(DownloadJob.class)
+                .setInputData(extras)
                 .build();
 
         if (currentJob != null) {
@@ -75,22 +75,20 @@ public class ReceiverService {
         rxEventBus.post(new DownloadEvent(DownloadEvent.Status.QUEUED));
     }
 
-    private void startJob(JobRequest request) {
-        request.schedule();
-        Timber.d("Starting download job %d : ", request.getJobId());
+    private void startJob(WorkRequest request) {
+        workManager.enqueue(request);
+        Timber.d("Starting download job %s : ", request.getId());
         currentJob = request;
     }
 
     public void cancel() {
         if (currentJob != null) {
-            Job job = JobManager.instance().getJob(currentJob.getJobId());
-            if (job != null) {
-                job.cancel();
+                workManager.cancelWorkById(currentJob.getId());
                 rxEventBus.post(new DownloadEvent(DownloadEvent.Status.CANCELLED));
             } else {
                 Timber.e("Pending job not found : %s", currentJob);
             }
             currentJob = null;
-        }
     }
+
 }

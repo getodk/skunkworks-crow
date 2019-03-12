@@ -1,10 +1,5 @@
 package org.odk.share.services;
 
-import com.evernote.android.job.Job;
-import com.evernote.android.job.JobManager;
-import com.evernote.android.job.JobRequest;
-import com.evernote.android.job.util.support.PersistableBundleCompat;
-
 import org.odk.share.events.UploadEvent;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.rx.schedulers.BaseSchedulerProvider;
@@ -16,6 +11,10 @@ import java.util.Queue;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import androidx.work.Data;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
+import androidx.work.WorkRequest;
 import timber.log.Timber;
 
 import static org.odk.share.fragments.ReviewedInstancesFragment.MODE;
@@ -23,10 +22,11 @@ import static org.odk.share.fragments.ReviewedInstancesFragment.MODE;
 @Singleton
 public class SenderService {
 
-    private final Queue<JobRequest> jobs = new LinkedList<>();
+    private final Queue<WorkRequest> jobs = new LinkedList<>();
     private final RxEventBus rxEventBus;
     private final BaseSchedulerProvider schedulerProvider;
-    private JobRequest currentJob;
+    private WorkRequest currentJob;
+    private WorkManager workManager = WorkManager.getInstance();
 
     @Inject
     public SenderService(RxEventBus rxEventBus, BaseSchedulerProvider schedulerProvider) {
@@ -62,15 +62,15 @@ public class SenderService {
     }
 
     public void startUploading(long[] instancesToSend, int port, int mode) {
-        PersistableBundleCompat extras = new PersistableBundleCompat();
-        extras.putLongArray(UploadJob.INSTANCES, instancesToSend);
-        extras.putInt(UploadJob.PORT, port);
-        extras.putInt(MODE, mode);
+        Data extras = new Data.Builder()
+                .putLongArray(UploadJob.INSTANCES, instancesToSend)
+                .putInt(UploadJob.PORT, port)
+                .putInt(MODE, mode)
+                .build();
 
         // Build request
-        JobRequest request = new JobRequest.Builder(UploadJob.TAG)
-                .addExtras(extras)
-                .startNow()
+        WorkRequest request = new OneTimeWorkRequest.Builder(UploadJob.class)
+                .setInputData(extras)
                 .build();
 
         if (currentJob != null) {
@@ -80,17 +80,15 @@ public class SenderService {
         }
     }
 
-    private void startJob(JobRequest request) {
-        request.schedule();
-        Timber.d("Starting upload job %d : ", request.getJobId());
+    private void startJob(WorkRequest request) {
+        workManager.enqueue(request);
+        Timber.d("Starting upload job %s : ", request.getId().toString());
         currentJob = request;
     }
 
     public void cancel() {
         if (currentJob != null) {
-            Job job = JobManager.instance().getJob(currentJob.getJobId());
-            if (job != null) {
-                job.cancel();
+                workManager.cancelWorkById(currentJob.getId());
                 rxEventBus.post(new UploadEvent(UploadEvent.Status.CANCELLED));
             } else {
                 Timber.e("Pending job not found : %s", currentJob);
@@ -98,4 +96,4 @@ public class SenderService {
             currentJob = null;
         }
     }
-}
+

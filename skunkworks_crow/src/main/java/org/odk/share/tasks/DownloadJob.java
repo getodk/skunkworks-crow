@@ -1,11 +1,11 @@
 package org.odk.share.tasks;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.preference.PreferenceManager;
-import com.evernote.android.job.Job;
 
 import org.odk.collect.android.dao.FormsDao;
 import org.odk.collect.android.dao.InstancesDao;
@@ -37,6 +37,9 @@ import java.util.Locale;
 import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
+import androidx.work.Data;
+import androidx.work.Worker;
+import androidx.work.WorkerParameters;
 import timber.log.Timber;
 
 import static org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns.CAN_EDIT_WHEN_COMPLETE;
@@ -56,7 +59,7 @@ import static org.odk.share.dto.TransferInstance.STATUS_FORM_RECEIVE;
 import static org.odk.share.dto.TransferInstance.TRANSFER_STATUS;
 import static org.odk.share.utilities.ApplicationConstants.SEND_FILL_FORM_MODE;
 
-public class DownloadJob extends Job {
+public class DownloadJob extends Worker {
 
     public static final String TAG = "formDownloadJob";
     public static final String IP = "ip";
@@ -85,23 +88,31 @@ public class DownloadJob extends Job {
     private Socket socket;
     private DataInputStream dis;
     private DataOutputStream dos;
-
+    private Data downloadData;
     private StringBuilder sbResult;
+    private Data params;
+
+
+    public DownloadJob(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+        super(context, workerParams);
+        params = workerParams.getInputData();
+    }
 
     @NonNull
     @Override
-    protected Result onRunJob(@NonNull Params params) {
-        ((Share) getContext().getApplicationContext()).getAppComponent().inject(this);
+    public Result doWork() {
 
-        initJob(params);
+        ((Share) getApplicationContext()).getAppComponent().inject(this);
+
+        initJob();
         rxEventBus.post(receiveForms());
 
-        return null;
+        return Result.success();
     }
 
-    private void initJob(Params params) {
-        ip = params.getExtras().getString(IP, "");
-        port = params.getExtras().getInt(PORT, -1);
+    private void initJob() {
+        ip = params.getString(IP);
+        port = params.getInt(PORT, -1);
         sbResult = new StringBuilder();
     }
 
@@ -147,8 +158,9 @@ public class DownloadJob extends Job {
     }
 
     @Override
-    protected void onCancel() {
-        try {
+    public void onStopped() {
+        super.onStopped();
+    try {
             if (socket != null) {
                 socket.close();
             }
@@ -271,11 +283,11 @@ public class DownloadJob extends Job {
 
             sbResult.append(displayName + " ");
             if (formVersion != null) {
-                sbResult.append(getContext().getString(R.string.version, formVersion));
+                sbResult.append(getApplicationContext().getString(R.string.version, formVersion));
             }
-            sbResult.append(getContext().getString(R.string.id, formId) + " " +
-                    getContext().getString(R.string.success, getContext().getString(R.string.blank_form_count,
-                            getContext().getString(R.string.received))));
+            sbResult.append(getApplicationContext().getString(R.string.id, formId) + " " +
+                    getApplicationContext().getString(R.string.success, getApplicationContext().getString(R.string.blank_form_count,
+                            getApplicationContext().getString(R.string.received))));
         } catch (IOException e) {
             Timber.e(e);
         }
@@ -290,10 +302,10 @@ public class DownloadJob extends Job {
     }
 
     private String getOdkDestinationDir() {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext().getApplicationContext());
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext().getApplicationContext());
 
         return prefs.getString(PreferenceKeys.KEY_ODK_DESTINATION_DIR,
-                getContext().getString(R.string.default_odk_destination_dir));
+                getApplicationContext().getString(R.string.default_odk_destination_dir));
     }
 
     private void readInstances(String formId, String formVersion) {
@@ -325,8 +337,8 @@ public class DownloadJob extends Job {
                             // send acknowledgement that form is not needed here
                             Timber.d("Form not sent from this device for review");
                             dos.writeBoolean(false);
-                            sbResult.append(displayName + " " + getContext().getString(R.string.failed,
-                                    getContext().getString(R.string.not_sent_for_review)));
+                            sbResult.append(displayName + " " + getApplicationContext().getString(R.string.failed,
+                                    getApplicationContext().getString(R.string.not_sent_for_review)));
                             continue;
                         }
                     }
@@ -377,15 +389,15 @@ public class DownloadJob extends Job {
                     ContentValues mapValues = new ContentValues();
                     mapValues.put(INSTANCE_UUID, uuid);
                     mapValues.put(INSTANCE_ID, Long.parseLong(uri.getLastPathSegment()));
-                    new ShareDatabaseHelper(getContext()).insertMapping(mapValues);
+                    new ShareDatabaseHelper(getApplicationContext()).insertMapping(mapValues);
 
                     // Add row in share table
                     ContentValues shareValues = new ContentValues();
                     shareValues.put(INSTANCE_ID, Long.parseLong(uri.getLastPathSegment()));
                     shareValues.put(TRANSFER_STATUS, STATUS_FORM_RECEIVE);
-                    sbResult.append(displayName + getContext().getString(R.string.success,
-                            getContext().getString(R.string.received_for_review)));
-                    new ShareDatabaseHelper(getContext()).insertInstance(shareValues);
+                    sbResult.append(displayName + getApplicationContext().getString(R.string.success,
+                            getApplicationContext().getString(R.string.received_for_review)));
+                    new ShareDatabaseHelper(getApplicationContext()).insertInstance(shareValues);
                 } else {
                     String selection = InstanceProviderAPI.InstanceColumns._ID + "=?";
                     String[] selectionArgs = {String.valueOf(id)};
@@ -398,12 +410,12 @@ public class DownloadJob extends Job {
                         selection = TransferInstance.ID + " =?";
                         selectionArgs = new String[]{String.valueOf(transferInstance.getId())};
                         transferDao.updateInstance(shareValues, selection, selectionArgs);
-                        sbResult.append(displayName + getContext().getString(R.string.success, getContext().getString(R.string.review_received)));
+                        sbResult.append(displayName + getApplicationContext().getString(R.string.success, getApplicationContext().getString(R.string.review_received)));
                     } else {
 
                         Timber.d("Writing received not first time");
                         dos.writeBoolean(true);
-                        sbResult.append(displayName + getContext().getString(R.string.success, getContext().getString(R.string.updated)));
+                        sbResult.append(displayName + getApplicationContext().getString(R.string.success, getApplicationContext().getString(R.string.updated)));
                     }
                 }
             }
