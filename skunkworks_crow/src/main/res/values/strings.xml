@@ -129,5 +129,4 @@
     <string name="default_odk_destination_dir">\/sdcard\/odk</string>
     <string name="title_odk_destination_dir">ODK Destination Directory</string>
     <string name="odk_destination_dir_error">The destination should not be empty</string>
-    <string name="form_available">already available at the receiver</string>
 </resources>
