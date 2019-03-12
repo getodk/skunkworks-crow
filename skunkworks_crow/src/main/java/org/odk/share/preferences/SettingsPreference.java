@@ -76,6 +76,9 @@ public class SettingsPreference extends PreferenceActivity {
                         Toast.makeText(getBaseContext(), getString(R.string.hotspot_name_error), Toast.LENGTH_LONG).show();
                         return false;
                     }
+                    else{
+                        hotspotNamePreference.setSummary(name);
+                    }
                     break;
                 case PreferenceKeys.KEY_HOTSPOT_PASSWORD:
                     String password = newValue.toString();
