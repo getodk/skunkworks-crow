@@ -96,9 +96,7 @@ public class UploadJob extends Worker {
     public Result doWork() {
 
         ((Share) getApplicationContext()).getAppComponent().inject(this);
-
         initJob();
-
         rxEventBus.post(uploadInstances());
 
         return Result.success();

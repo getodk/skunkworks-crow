@@ -21,7 +21,7 @@ public class ReceiverService {
     private final BaseSchedulerProvider schedulerProvider;
 
     private WorkRequest currentJob;
-    private WorkManager workManager;
+    private WorkManager workManager = WorkManager.getInstance();
 
     public ReceiverService(RxEventBus rxEventBus, BaseSchedulerProvider schedulerProvider) {
         this.rxEventBus = rxEventBus;
