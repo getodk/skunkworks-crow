@@ -75,8 +75,7 @@ public class SettingsPreference extends PreferenceActivity {
                     if (name.length() == 0) {
                         Toast.makeText(getBaseContext(), getString(R.string.hotspot_name_error), Toast.LENGTH_LONG).show();
                         return false;
-                    }
-                    else{
+                    } else {
                         hotspotNamePreference.setSummary(name);
                     }
                     break;
