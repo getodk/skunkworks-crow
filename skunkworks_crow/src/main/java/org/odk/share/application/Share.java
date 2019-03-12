@@ -71,14 +71,6 @@ public class Share extends DaggerApplication {
 
         Timber.plant(new Timber.DebugTree());
 
-//        try {
-//            JobManager jobManager = JobManager.create(this);
-//            jobManager.cancelAll();
-//            jobManager.addJobCreator(new ShareJobCreator());
-//        } catch (JobManagerCreateException e) {
-//            Timber.e(e);
-//        }
-
         WorkManager workManager = WorkManager.getInstance();
         workManager.cancelAllWork();
 
