@@ -30,7 +30,6 @@ import org.odk.share.R;
 public class WebViewActivity extends AppCompatActivity {
 
     public static final String OPEN_URL = "url";
-    public static final String OPEN_SOURCE = "Open Source Licenses";
 
     private WebView webView;
     private ProgressBar progressBar;
@@ -53,7 +52,7 @@ public class WebViewActivity extends AppCompatActivity {
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 super.onPageStarted(view, url, favicon);
-                getSupportActionBar().setTitle(OPEN_SOURCE);
+                getSupportActionBar().setTitle(getString(R.string.open_source_licenses));
                 progressBar.setVisibility(View.VISIBLE);
                 invalidateOptionsMenu();
             }
