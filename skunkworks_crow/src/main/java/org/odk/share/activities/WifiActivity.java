@@ -26,6 +26,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -68,6 +69,8 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
     RecyclerView recyclerView;
     @BindView(R.id.empty_view)
     TextView emptyView;
+    @BindView(R.id.wifi_progress_bar)
+    ProgressBar wifiProgressBar;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     @BindView(R.id.bScanQRCode)
@@ -332,6 +335,7 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
         scanResultList.clear();
         wifiResultAdapter.notifyDataSetChanged();
         setEmptyViewVisibility(getString(R.string.scanning));
+        wifiProgressBar.setVisibility(View.VISIBLE);
         isReceiverRegistered = true;
         registerReceiver(receiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
         wifiManager.startScan();
@@ -380,6 +384,7 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
             emptyView.setVisibility(View.VISIBLE);
             emptyView.setText(text);
         }
+        wifiProgressBar.setVisibility(View.GONE);
     }
 
     public BroadcastReceiver wifiStateReceiver = new BroadcastReceiver() {
