@@ -88,7 +88,6 @@ public class DownloadJob extends Worker {
     private Socket socket;
     private DataInputStream dis;
     private DataOutputStream dos;
-    private Data downloadData;
     private StringBuilder sbResult;
     private Data params;
 
@@ -101,7 +100,6 @@ public class DownloadJob extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-
         ((Share) getApplicationContext()).getAppComponent().inject(this);
 
         initJob();
