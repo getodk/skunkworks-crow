@@ -1,9 +1,8 @@
 package org.odk.share.tasks;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
-
-import com.evernote.android.job.Job;
 
 import org.odk.collect.android.dao.FormsDao;
 import org.odk.collect.android.dao.InstancesDao;
@@ -39,6 +38,9 @@ import java.util.UUID;
 import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
+import androidx.work.Data;
+import androidx.work.Worker;
+import androidx.work.WorkerParameters;
 import timber.log.Timber;
 
 import static org.odk.share.dto.InstanceMap.INSTANCE_UUID;
@@ -49,7 +51,7 @@ import static org.odk.share.fragments.ReviewedInstancesFragment.MODE;
 import static org.odk.share.utilities.ApplicationConstants.SEND_BLANK_FORM_MODE;
 import static org.odk.share.utilities.ApplicationConstants.SEND_FILL_FORM_MODE;
 
-public class UploadJob extends Job {
+public class UploadJob extends Worker {
 
     public static final String TAG = "formUploadJob";
     public static final String INSTANCES = "instances";
@@ -79,25 +81,34 @@ public class UploadJob extends Job {
     private int progress;
     private int total;
     private int mode;
+    private Data params;
 
     private StringBuilder sbResult;
 
+    public UploadJob(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+        super(context, workerParams);
+        params = workerParams.getInputData();
+    }
+
+
     @NonNull
     @Override
-    protected Result onRunJob(@NonNull Params params) {
-        ((Share) getContext().getApplicationContext()).getAppComponent().inject(this);
+    public Result doWork() {
 
-        initJob(params);
+        ((Share) getApplicationContext()).getAppComponent().inject(this);
+
+        initJob();
 
         rxEventBus.post(uploadInstances());
 
-        return null;
+        return Result.success();
     }
 
-    private void initJob(Params params) {
-        instancesToSend = ArrayUtils.toObject(params.getExtras().getLongArray(INSTANCES));
-        port = params.getExtras().getInt(PORT, -1);
-        mode = params.getExtras().getInt(MODE, ApplicationConstants.ASK_REVIEW_MODE);
+    private void initJob() {
+
+        instancesToSend = ArrayUtils.toObject(params.getLongArray(INSTANCES));
+        port = params.getInt(PORT, -1);
+        mode = params.getInt(MODE, ApplicationConstants.ASK_REVIEW_MODE);
         sbResult = new StringBuilder();
     }
 
@@ -128,7 +139,8 @@ public class UploadJob extends Job {
     }
 
     @Override
-    protected void onCancel() {
+    public void onStopped() {
+        super.onStopped();
         try {
             if (socket != null) {
                 socket.close();
@@ -347,11 +359,11 @@ public class UploadJob extends Job {
 
                 sbResult.append(displayName + " ");
                 if (formVersion != null) {
-                    sbResult.append(getContext().getString(R.string.version, formVersion));
+                    sbResult.append(getApplicationContext().getString(R.string.version, formVersion));
                 }
-                sbResult.append(getContext().getString(R.string.id, formId) + " " +
-                        getContext().getString(R.string.success, getContext().getString(R.string.blank_form_count,
-                                getContext().getString(R.string.sent))));
+                sbResult.append(getApplicationContext().getString(R.string.id, formId) + " " +
+                        getApplicationContext().getString(R.string.success, getApplicationContext().getString(R.string.blank_form_count,
+                                getApplicationContext().getString(R.string.sent))));
             }
         } catch (IOException e) {
             Timber.e(e);
@@ -386,7 +398,7 @@ public class UploadJob extends Job {
                         ContentValues values = new ContentValues();
                         values.put(INSTANCE_ID, id);
                         values.put(INSTANCE_UUID, uuid);
-                        new ShareDatabaseHelper(getContext()).insertMapping(values);
+                        new ShareDatabaseHelper(getApplicationContext()).insertMapping(values);
                         instanceMap.put(id, uuid);
                     }
                     dos.writeUTF(instanceMap.get(id));
@@ -415,8 +427,8 @@ public class UploadJob extends Job {
                         boolean isFormSentForReview = dis.readBoolean();
                         Timber.d("isFormSentForReview " + isFormSentForReview);
                         if (!isFormSentForReview) {
-                            sbResult.append(displayName + getContext().getString(R.string.failed,
-                                    getContext().getString(R.string.review_not_asked)));
+                            sbResult.append(displayName + getApplicationContext().getString(R.string.failed,
+                                    getApplicationContext().getString(R.string.review_not_asked)));
                             continue;
                         } else {
                             TransferInstance transferInstance = transferDao.getReceivedTransferInstanceFromInstanceId(id);
@@ -438,8 +450,8 @@ public class UploadJob extends Job {
 
                     if (mode == ApplicationConstants.SEND_REVIEW_MODE) {
                         // sent the review with the updated files
-                        sbResult.append(displayName + getContext().getString(R.string.success,
-                                getContext().getString(R.string.review_sent)));
+                        sbResult.append(displayName + getApplicationContext().getString(R.string.success,
+                                getApplicationContext().getString(R.string.review_sent)));
                     } else {
                         // sent for review and update in transfer.db
                         // check if it already exists at receiver end or not
@@ -451,16 +463,16 @@ public class UploadJob extends Job {
                         boolean isFormAlreadySentForReview = dis.readBoolean();
                         Timber.d("isFormAlreadySentForReview " + isFormAlreadySentForReview);
                         if (isFormAlreadySentForReview) {
-                            sbResult.append(displayName + getContext().getString(R.string.success,
-                                    getContext().getString(R.string.sent_again)));
+                            sbResult.append(displayName + getApplicationContext().getString(R.string.success,
+                                    getApplicationContext().getString(R.string.sent_again)));
                         } else {
                             ContentValues values = new ContentValues();
                             values.put(INSTANCE_ID,
                                     c.getLong(c.getColumnIndex(InstanceProviderAPI.InstanceColumns._ID)));
                             values.put(TRANSFER_STATUS, STATUS_FORM_SENT);
-                            new ShareDatabaseHelper(getContext()).insertInstance(values);
-                            sbResult.append(displayName + getContext().getString(R.string.success,
-                                    getContext().getString(R.string.sent_for_review)));
+                            new ShareDatabaseHelper(getApplicationContext()).insertInstance(values);
+                            sbResult.append(displayName + getApplicationContext().getString(R.string.success,
+                                    getApplicationContext().getString(R.string.sent_for_review)));
                         }
                     }
                 }

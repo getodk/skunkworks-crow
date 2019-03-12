@@ -3,16 +3,16 @@ package org.odk.share.application;
 import android.content.Context;
 import android.os.Environment;
 
-import com.evernote.android.job.JobManager;
-import com.evernote.android.job.JobManagerCreateException;
-
 import org.odk.share.R;
 import org.odk.share.injection.config.AppComponent;
 import org.odk.share.injection.config.DaggerAppComponent;
-import org.odk.share.tasks.ShareJobCreator;
+import org.odk.share.tasks.UploadJob;
 
 import java.io.File;
 
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
+import androidx.work.WorkRequest;
 import dagger.android.AndroidInjector;
 import dagger.android.DaggerApplication;
 import timber.log.Timber;
@@ -71,13 +71,21 @@ public class Share extends DaggerApplication {
 
         Timber.plant(new Timber.DebugTree());
 
-        try {
-            JobManager jobManager = JobManager.create(this);
-            jobManager.cancelAll();
-            jobManager.addJobCreator(new ShareJobCreator());
-        } catch (JobManagerCreateException e) {
-            Timber.e(e);
-        }
+//        try {
+//            JobManager jobManager = JobManager.create(this);
+//            jobManager.cancelAll();
+//            jobManager.addJobCreator(new ShareJobCreator());
+//        } catch (JobManagerCreateException e) {
+//            Timber.e(e);
+//        }
+
+        WorkManager workManager = WorkManager.getInstance();
+        workManager.cancelAllWork();
+
+        WorkRequest uploadWorkRequest = new OneTimeWorkRequest.Builder(UploadJob.class)
+                .build();
+
+        workManager.enqueue(uploadWorkRequest);
     }
 
     public AppComponent getAppComponent() {
