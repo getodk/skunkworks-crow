@@ -57,6 +57,9 @@ dependencies {
     // evernote's job scheduler
     implementation "com.evernote:android-job:1.2.5"
 
+    //WorkManager
+    implementation "androidx.work:work-runtime:2.0.0-rc01"
+
     //MPAndroidChart
     implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
 }
