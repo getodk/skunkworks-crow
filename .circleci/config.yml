@@ -68,7 +68,7 @@ jobs:
         - *save_cache
         - run:
             name: Run code quality checks
-            command: ./gradlew pmd checkstyle lint findbugs
+            command: ./gradlew checkCode
         - store_artifacts:
             path: skunkworks_crow/build/reports
             destination: reports
