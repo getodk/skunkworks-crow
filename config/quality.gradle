@@ -105,3 +105,8 @@ android {
         xmlOutput file("$reportsDir/lint/lint-result.xml")
     }
 }
+
+//------------------------ ALL ------------------------//
+task checkCode(type: GradleBuild) {
+    tasks = ['pmd', 'checkstyle', 'lint', 'findbugs']
+}
