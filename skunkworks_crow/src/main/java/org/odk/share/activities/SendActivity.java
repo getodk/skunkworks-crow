@@ -1,11 +1,13 @@
 package org.odk.share.activities;
 
+import android.Manifest;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Build;
@@ -29,6 +31,7 @@ import org.odk.share.utilities.SocketUtils;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
@@ -53,6 +56,7 @@ public class SendActivity extends InjectableActivity {
     public static final String DEFAULT_SSID = "ODK-SKUNKWORKS";
     private static final int PROGRESS_DIALOG = 1;
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 102;
 
     @Inject
     RxEventBus rxEventBus;
@@ -252,24 +256,8 @@ public class SendActivity extends InjectableActivity {
         compositeDisposable.add(addHotspotEventSubscription());
         compositeDisposable.add(addUploadEventSubscription());
 
-        if (!isHotspotInitiated) {
-            isHotspotInitiated = true;
-            startHotspot();
-        }
-
-        if (openSettings) {
-            openSettings = false;
-            Intent serviceIntent = new Intent(getApplicationContext(), HotspotService.class);
-            serviceIntent.setAction(HotspotService.ACTION_START);
-            startService(serviceIntent);
-
-            Intent intent = new Intent(getApplicationContext(), HotspotService.class);
-            intent.setAction(HotspotService.ACTION_STATUS);
-            startService(intent);
-            Timber.d("Started hotspot N");
-            currentConfig = wifiHotspot.getCurrConfig();            
-            startSending();
-        }
+        //location permission is needed for using hotspot
+        checkLocationPermission();
     }
 
     private Disposable addUploadEventSubscription() {
@@ -423,5 +411,57 @@ public class SendActivity extends InjectableActivity {
         alertDialog.setCancelable(false);
         alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.ok), quitListener);
         alertDialog.show();
+    }
+
+    private void checkLocationPermission(){
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
+                checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)  {
+            
+                toggleHotspot();
+            }
+            else{
+            requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION} , LOCATION_PERMISSION_REQUEST_CODE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        switch(requestCode){
+
+            case LOCATION_PERMISSION_REQUEST_CODE:
+                if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    toggleHotspot();
+                } else{
+
+                    Toast.makeText(this, "Location Permission needed", Toast.LENGTH_SHORT).show();
+                    this.finish();
+                }
+                break;
+        }
+    }
+
+    private void toggleHotspot(){
+
+        if (!isHotspotInitiated) {
+            isHotspotInitiated = true;
+            startHotspot();
+        }
+
+        if (openSettings) {
+            openSettings = false;
+            Intent serviceIntent = new Intent(getApplicationContext(), HotspotService.class);
+            serviceIntent.setAction(HotspotService.ACTION_START);
+            startService(serviceIntent);
+
+            Intent intent = new Intent(getApplicationContext(), HotspotService.class);
+            intent.setAction(HotspotService.ACTION_STATUS);
+            startService(intent);
+            Timber.d("Started hotspot N");
+            currentConfig = wifiHotspot.getCurrConfig();
+            startSending();
+        }
     }
 }

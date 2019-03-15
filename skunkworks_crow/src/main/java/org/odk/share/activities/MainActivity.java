@@ -47,7 +47,7 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
     public static final String FORM_DISPLAY_NAME = "form_display_name";
     private static final String FORM_CHOOSER_LIST_SORTING_ORDER = "formChooserListSortingOrder";
     private static final String COLLECT_PACKAGE = "org.odk.collect.android";
-
+    private static final int STORAGE_PERMISSION_REQUEST_CODE = 101;
     private static final int FORM_LOADER = 2;
 
     @BindView(R.id.toolbar)
@@ -157,20 +157,21 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                formAdapter.changeCursor(cursor);
-                if (cursor != null && !cursor.isClosed()) {
-                    setEmptyViewVisibility(cursor.getCount());
-                    return;
-                }
-                setEmptyViewVisibility(0);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
+                checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)  {
+
+            formAdapter.changeCursor(cursor);
+            if (cursor != null && !cursor.isClosed()) {
+                setEmptyViewVisibility(cursor.getCount());
+                return;
             }
-            else{
-                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE , Manifest.permission.READ_EXTERNAL_STORAGE}
-                , 100);
-            }
+            setEmptyViewVisibility(0);
         }
+        else{
+            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE , Manifest.permission.READ_EXTERNAL_STORAGE}
+            , STORAGE_PERMISSION_REQUEST_CODE);
+        }
+
     }
 
     @Override
@@ -253,7 +254,7 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         switch(requestCode){
-            case 100:
+            case STORAGE_PERMISSION_REQUEST_CODE:
                 if(grantResults[0] == PackageManager.PERMISSION_GRANTED){
                     updateAdapter();
                 }
