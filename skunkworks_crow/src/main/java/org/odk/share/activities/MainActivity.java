@@ -1,10 +1,12 @@
 package org.odk.share.activities;
 
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -154,12 +156,21 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
 
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
-        formAdapter.changeCursor(cursor);
-        if (cursor != null && !cursor.isClosed()) {
-            setEmptyViewVisibility(cursor.getCount());
-            return;
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                formAdapter.changeCursor(cursor);
+                if (cursor != null && !cursor.isClosed()) {
+                    setEmptyViewVisibility(cursor.getCount());
+                    return;
+                }
+                setEmptyViewVisibility(0);
+            }
+            else{
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE , Manifest.permission.READ_EXTERNAL_STORAGE}
+                , 100);
+            }
         }
-        setEmptyViewVisibility(0);
     }
 
     @Override
@@ -237,4 +248,15 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
 
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        switch(requestCode){
+            case 100:
+                if(grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    updateAdapter();
+                }
+        }
+    }
 }
