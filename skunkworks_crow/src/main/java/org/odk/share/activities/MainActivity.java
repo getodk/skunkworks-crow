@@ -265,9 +265,7 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
 
             if (isCollectInstalled()) {
                 updateAdapter();
-            } else {
-                showAlertDialog();
-            }
+            } else { showAlertDialog(); }
         }
         else {
             requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE , Manifest.permission.READ_EXTERNAL_STORAGE}
