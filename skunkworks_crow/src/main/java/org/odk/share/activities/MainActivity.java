@@ -157,7 +157,7 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                 formAdapter.changeCursor(cursor);
                 if (cursor != null && !cursor.isClosed()) {
