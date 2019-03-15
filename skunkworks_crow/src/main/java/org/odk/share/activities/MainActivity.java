@@ -88,19 +88,15 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
         LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setOrientation(RecyclerView.VERTICAL);
         recyclerView.setLayoutManager(llm);
-        setupAdapter();
-        getSupportLoaderManager().initLoader(FORM_LOADER, null, this);
-        addListItemDivider();
-    }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (isCollectInstalled()) {
-            updateAdapter();
-        } else {
-            showAlertDialog();
-        }
+        //check the storage permission and start the loader
+        setUpLoader();
+
+        emptyView.setOnClickListener((View view) -> {
+            setUpLoader();
+        });
+
+        addListItemDivider();
     }
 
     private void setupAdapter() {
@@ -157,21 +153,12 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
-                checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)  {
-
             formAdapter.changeCursor(cursor);
             if (cursor != null && !cursor.isClosed()) {
                 setEmptyViewVisibility(cursor.getCount());
                 return;
             }
             setEmptyViewVisibility(0);
-        }
-        else{
-            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE , Manifest.permission.READ_EXTERNAL_STORAGE}
-            , STORAGE_PERMISSION_REQUEST_CODE);
-        }
-
     }
 
     @Override
@@ -256,8 +243,35 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
         switch(requestCode){
             case STORAGE_PERMISSION_REQUEST_CODE:
                 if(grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    updateAdapter();
+                    setUpLoader();
                 }
+                else{ showNoPermissionView(); }
+        }
+    }
+
+    private void showNoPermissionView(){
+
+        setEmptyViewVisibility(0);
+        emptyView.setText(getString(R.string.require_storage_permission));
+    }
+
+    private void setUpLoader(){
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
+                checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+
+            setupAdapter();
+            getSupportLoaderManager().initLoader(FORM_LOADER, null, this);
+
+            if (isCollectInstalled()) {
+                updateAdapter();
+            } else {
+                showAlertDialog();
+            }
+        }
+        else {
+            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE , Manifest.permission.READ_EXTERNAL_STORAGE}
+                    , STORAGE_PERMISSION_REQUEST_CODE);
         }
     }
 }
