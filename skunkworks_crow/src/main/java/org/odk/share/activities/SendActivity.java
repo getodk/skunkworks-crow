@@ -413,14 +413,13 @@ public class SendActivity extends InjectableActivity {
         alertDialog.show();
     }
 
-    private void checkLocationPermission(){
+    private void checkLocationPermission() {
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
-                checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)  {
+                checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             
                 toggleHotspot();
-            }
-            else{
+            } else {
             requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION} , LOCATION_PERMISSION_REQUEST_CODE);
         }
     }
@@ -429,13 +428,12 @@ public class SendActivity extends InjectableActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        switch(requestCode){
+        switch (requestCode) {
 
             case LOCATION_PERMISSION_REQUEST_CODE:
-                if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     toggleHotspot();
-                } else{
-
+                } else {
                     Toast.makeText(this, getString(R.string.location_permission_needed), Toast.LENGTH_SHORT).show();
                     this.finish();
                 }
@@ -443,7 +441,7 @@ public class SendActivity extends InjectableActivity {
         }
     }
 
-    private void toggleHotspot(){
+    private void toggleHotspot() {
 
         if (!isHotspotInitiated) {
             isHotspotInitiated = true;

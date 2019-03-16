@@ -240,22 +240,23 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        switch(requestCode){
+        switch (requestCode) {
             case STORAGE_PERMISSION_REQUEST_CODE:
-                if(grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     setUpLoader();
+                } else {
+                    showNoPermissionView();
                 }
-                else{ showNoPermissionView(); }
         }
     }
 
-    private void showNoPermissionView(){
+    private void showNoPermissionView() {
 
         setEmptyViewVisibility(0);
         emptyView.setText(getString(R.string.require_storage_permission));
     }
 
-    private void setUpLoader(){
+    private void setUpLoader() {
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
                 checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
@@ -265,11 +266,12 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
 
             if (isCollectInstalled()) {
                 updateAdapter();
-            } else { showAlertDialog(); }
-        }
-        else {
-            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE , Manifest.permission.READ_EXTERNAL_STORAGE}
-                    , STORAGE_PERMISSION_REQUEST_CODE);
+            } else {
+                    showAlertDialog();
+                }
+        } else {
+            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE , Manifest.permission.READ_EXTERNAL_STORAGE},
+                    STORAGE_PERMISSION_REQUEST_CODE);
         }
     }
 }
