@@ -31,6 +31,8 @@ import android.view.View;
 import android.widget.Button;
 import butterknife.BindView;
 import org.odk.share.R;
+import org.odk.share.adapters.FormsAdapter;
+import org.odk.share.adapters.InstanceAdapter;
 import org.odk.share.adapters.SortDialogAdapter;
 import org.odk.share.utilities.ArrayUtils;
 
@@ -45,18 +47,25 @@ abstract class AppListFragment extends InjectableFragment {
     private Integer selectedSortingOrder;
     private BottomSheetDialog bottomSheetDialog;
     private String filterText;
+    public FormsAdapter formAdapter;
+    public InstanceAdapter instanceAdapter;
 
     private static final String SELECTED_INSTANCES_KEY = "ROTATION_SELECTED_INSTANCES";
+    private static final String TOGGLE_BUTTON_STATUS_KEY = "TOGGLE_BUTTON_STATUS";
+    private static final String TOGGLE_BUTTON_TEXT_KEY = "TOGGLE_BUTTON_TEXT";
 
     @BindView(R.id.send_button)
     Button sendButton;
+    @BindView(R.id.toggle_button)
+    Button toggleButton;
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putLongArray(SELECTED_INSTANCES_KEY, ArrayUtils.toPrimitive(
                 selectedInstances.toArray(new Long[selectedInstances.size()])));
-
+        outState.putBoolean(TOGGLE_BUTTON_STATUS_KEY, toggleButton.isEnabled());
+        outState.putString(TOGGLE_BUTTON_TEXT_KEY, toggleButton.getText().toString());
     }
 
     @Override
@@ -138,9 +147,12 @@ abstract class AppListFragment extends InjectableFragment {
                 selectedInstances.add(previousSelectedInstance);
             }
             sendButton.setEnabled(selectedInstances.size() > 0);
+            toggleButton.setEnabled(savedInstanceState.getBoolean(TOGGLE_BUTTON_STATUS_KEY));
+            toggleButton.setText(savedInstanceState.getString(TOGGLE_BUTTON_TEXT_KEY));
         }
     }
-    
+
+
     private void setupBottomSheet() {
         bottomSheetDialog = new BottomSheetDialog(getActivity());
         View sheetView = getActivity().getLayoutInflater().inflate(R.layout.bottom_sheet, null);
