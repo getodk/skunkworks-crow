@@ -34,7 +34,6 @@ public class SettingsPreference extends PreferenceActivity {
         ViewGroup root = getRootView();
         Toolbar toolbar = (Toolbar) View.inflate(this, R.layout.toolbar, null);
         toolbar.setTitle(getString(R.string.settings));
-
         root.addView(toolbar, 0);
 
         addPreferencesFromResource(R.xml.preferences_menu);
