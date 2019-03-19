@@ -21,6 +21,8 @@ def reportsDir = "${project.buildDir}/reports"
 
 apply plugin: 'checkstyle'
 
+checkstyle.toolVersion = '8.18'
+
 task checkstyle(type: Checkstyle) {
     configFile file("$configDir/checkstyle.xml")
 
@@ -102,4 +104,9 @@ android {
         htmlOutput file("$reportsDir/lint/lint-result.html")
         xmlOutput file("$reportsDir/lint/lint-result.xml")
     }
+}
+
+//------------------------ ALL ------------------------//
+task checkCode(type: GradleBuild) {
+    tasks = ['pmd', 'checkstyle', 'lint', 'findbugs']
 }
