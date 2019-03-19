@@ -41,18 +41,35 @@
         android:orientation="horizontal"
         android:weightSum="2">
 
-        <Button
-            android:id="@+id/bScan"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/scan" />
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_weight="1">
 
-        <Button
-            android:id="@+id/bScanQRCode"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/scan_qr_code" />
+            <Button
+                android:id="@+id/bScan"
+                android:layout_width="175dp"
+                android:layout_height="36dp"
+                android:background="@drawable/selector_bottom_text_common"
+                android:gravity="center"
+                android:text="@string/scan"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_weight="1">
+
+            <Button
+                android:id="@+id/bScanQRCode"
+                android:layout_width="175dp"
+                android:layout_height="36dp"
+                android:background="@drawable/selector_bottom_text_common"
+                android:gravity="center"
+                android:text="@string/scan_qr_code" />
+        </LinearLayout>
     </LinearLayout>
 </RelativeLayout>

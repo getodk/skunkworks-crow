@@ -35,20 +35,19 @@
         android:id="@+id/buttonholder"
         android:layout_width="match_parent"
         android:layout_height="?android:actionBarSize"
-        android:background="#ffffff"
         android:layout_alignParentBottom="true"
+        android:background="#ffffff"
         android:orientation="horizontal">
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:gravity="center"
-            >
+            android:gravity="center">
 
             <Button
                 android:id="@+id/bSendForms"
-                android:layout_width="150dp"
+                android:layout_width="175dp"
                 android:layout_height="36dp"
                 android:background="@drawable/selector_bottom_text_common"
                 android:gravity="center"
@@ -65,7 +64,7 @@
 
             <Button
                 android:id="@+id/bViewWifi"
-                android:layout_width="150dp"
+                android:layout_width="175dp"
                 android:layout_height="36dp"
                 android:background="@drawable/selector_bottom_text_common"
                 android:gravity="center"

@@ -62,7 +62,7 @@ public class ReviewFormActivity extends InjectableActivity {
         instanceID = getIntent().getLongExtra(INSTANCE_ID, -1);
 
         if (transferID == -1 || instanceID == -1) {
-           finish();
+            finish();
         }
 
         Cursor cursor = transferDao.getInstanceCursorFromId(transferID);
@@ -85,6 +85,11 @@ public class ReviewFormActivity extends InjectableActivity {
                 cursor.close();
             }
         }
+
+        approveButton.setBackground(getResources().getDrawable(R.drawable.selector_bottom_text_common));
+        rejectButton.setBackground(getResources().getDrawable(R.drawable.selector_bottom_text_common));
+        reviewLaterButton.setBackground(getResources().getDrawable(R.drawable.selector_bottom_text_common));
+        viewForm.setBackground(getResources().getDrawable(R.drawable.selector_bottom_text_common));
     }
 
     @Override

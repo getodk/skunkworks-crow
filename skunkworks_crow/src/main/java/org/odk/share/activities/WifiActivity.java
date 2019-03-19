@@ -331,6 +331,7 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
 
     public void startScan() {
         scanWifi.setEnabled(false);
+        scanWifi.setBackground(getResources().getDrawable(R.drawable.selector_bottom_recive));
         scanResultList.clear();
         wifiResultAdapter.notifyDataSetChanged();
         setEmptyViewVisibility(getString(R.string.scanning));
@@ -352,6 +353,7 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
             unregisterReceiver(this);
             wifiResultAdapter.notifyDataSetChanged();
             scanWifi.setEnabled(true);
+            scanWifi.setBackground(getResources().getDrawable(R.drawable.selector_bottom_text_common));
             setEmptyViewVisibility(getString(R.string.no_wifi_available));
 
 
@@ -361,7 +363,7 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
             */
             if (isQRCodeScanned) {
                 isQRCodeScanned = false;
-                for (ScanResult scanResult: scanResultList) {
+                for (ScanResult scanResult : scanResultList) {
                     if (scanResult.SSID.equals(ssidScanned)) {
                         connectToNetwork(ssidScanned, passwordScanned);
                         return;
