@@ -24,7 +24,7 @@ apply plugin: 'checkstyle'
 checkstyle.toolVersion = '8.18'
 
 task checkstyle(type: Checkstyle) {
-    configFile file("$configDir/checkstyle.xml")
+    configDir file("$configDir/checkstyle.xml")
 
     ignoreFailures false // Fail early
     showViolations true
