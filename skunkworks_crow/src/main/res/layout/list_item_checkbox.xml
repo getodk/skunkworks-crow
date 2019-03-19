@@ -8,8 +8,7 @@
         android:layout_height="match_parent"
         android:src="@drawable/ic_assignment_black_24dp" />
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/selectableItemBackground"
