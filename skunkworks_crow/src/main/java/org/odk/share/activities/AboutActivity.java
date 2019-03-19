@@ -37,6 +37,8 @@ public class AboutActivity extends AppCompatActivity implements OnItemClickListe
         setTitle(getString(R.string.about));
         setSupportActionBar(toolbar);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(llm);

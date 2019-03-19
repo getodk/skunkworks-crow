@@ -34,7 +34,6 @@ public class SettingsPreference extends PreferenceActivity {
         ViewGroup root = getRootView();
         Toolbar toolbar = (Toolbar) View.inflate(this, R.layout.toolbar, null);
         toolbar.setTitle(getString(R.string.settings));
-
         root.addView(toolbar, 0);
 
         addPreferencesFromResource(R.xml.preferences_menu);
@@ -80,6 +79,8 @@ public class SettingsPreference extends PreferenceActivity {
                     if (name.length() == 0) {
                         Toast.makeText(getBaseContext(), getString(R.string.hotspot_name_error), Toast.LENGTH_LONG).show();
                         return false;
+                    } else {
+                        hotspotNamePreference.setSummary(name);
                     }
                     break;
                 case PreferenceKeys.KEY_HOTSPOT_PASSWORD:
