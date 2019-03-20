@@ -72,10 +72,6 @@ task findbugs(type: FindBugs, dependsOn: "assembleDebug") {
 
 apply plugin: 'pmd'
 
-pmd {
-    toolVersion = '6.12.0'
-}
-
 task pmd(type: Pmd) {
     ignoreFailures = false // Fail early
     ruleSetFiles = files("$configDir/pmd-ruleset.xml")
