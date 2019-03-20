@@ -24,14 +24,14 @@ apply plugin: 'checkstyle'
 checkstyle.toolVersion = '8.18'
 
 task checkstyle(type: Checkstyle) {
-    configFile new File("${rootProject.rootDir}/config/checkstyle.xml")
+    configFile = rootProject.file('config/checkstyle.xml')
     ignoreFailures false // Fail early
     showViolations true
 
     source 'src'
     include '**/*.java'
     exclude '**/gen/**'
-    classpath = files()
+    classpath = rootProject.files()
 }
 
 //------------------------Findbugs------------------------//
