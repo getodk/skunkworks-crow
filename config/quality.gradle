@@ -23,6 +23,10 @@ apply plugin: 'checkstyle'
 
 task checkstyle(type: Checkstyle) {
     configFile file("$configDir/checkstyle.xml")
+
+    ignoreFailures false // Fail early
+    showViolations true
+
     source 'src'
     include '**/*.java'
     exclude '**/gen/**'
