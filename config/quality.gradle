@@ -21,17 +21,13 @@ def reportsDir = "${project.buildDir}/reports"
 
 apply plugin: 'checkstyle'
 
-checkstyle.toolVersion = '8.18'
-
 task checkstyle(type: Checkstyle) {
-    configFile = rootProject.file('config/checkstyle.xml')
-    ignoreFailures false // Fail early
-    showViolations true
-
+    configFile file("$configDir/checkstyle.xml")
+    configProperties.checkstyleSuppressionsPath = file("$configDir/suppressions.xml").absolutePath
     source 'src'
     include '**/*.java'
     exclude '**/gen/**'
-    classpath = rootProject.files()
+    classpath = files()
 }
 
 //------------------------Findbugs------------------------//
