@@ -175,7 +175,8 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
             if (cursor.moveToFirst()) {
                 do {
                     selectedForms.add(cursor.getLong(cursor.getColumnIndex(FormsProviderAPI.FormsColumns._ID)));
-                } while (cursor.moveToNext());}
+                } while (cursor.moveToNext());
+            }
         } else {
             selectedForms.clear();
         }
