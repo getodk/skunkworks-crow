@@ -16,8 +16,6 @@
             android:title="@string/title_hotspot_password"
             android:key="hotspot_password"
             android:enabled="false"
-            android:inputType="textPassword"
-            app:passwordToggleEnabled="true"
             android:icon="@drawable/ic_vpn_key_black_24dp"/>
 
         <CheckBoxPreference
