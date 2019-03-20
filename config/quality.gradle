@@ -21,6 +21,8 @@ def reportsDir = "${project.buildDir}/reports"
 
 apply plugin: 'checkstyle'
 
+checkstyle.toolVersion = '7.6.1'
+
 task checkstyle(type: Checkstyle) {
     configFile file("$configDir/checkstyle.xml")
 
