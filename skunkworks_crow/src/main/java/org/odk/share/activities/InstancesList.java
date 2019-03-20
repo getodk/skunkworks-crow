@@ -134,7 +134,7 @@ public class InstancesList extends InstanceListActivity implements LoaderManager
             if (cursor.moveToFirst()) {
                 do {
                     selectedInstances.add(cursor.getLong(cursor.getColumnIndex(InstanceProviderAPI.InstanceColumns._ID)));
-                } while (cursor.moveToNext());
+                } while (cursor.moveToNext()) ;
             }
         } else {
             selectedInstances.clear();
