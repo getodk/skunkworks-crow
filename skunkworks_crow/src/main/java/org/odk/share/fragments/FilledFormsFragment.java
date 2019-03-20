@@ -168,8 +168,7 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
             if (cursor.moveToFirst()) {
                 do {
                     selectedInstances.add(cursor.getLong(cursor.getColumnIndex(InstanceProviderAPI.InstanceColumns._ID)));
-                } while (cursor.moveToNext());
-            }
+                } while (cursor.moveToNext()); }
         } else {
             selectedInstances.clear();
         }
