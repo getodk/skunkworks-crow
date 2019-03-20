@@ -175,8 +175,7 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
         }
 
         instanceAdapter.notifyDataSetChanged();
-        toggleButtonLabel();
-    }
+        toggleButtonLabel();}
 
     private void toggleButtonLabel() {
         if (selectedInstances.size() == instanceAdapter.getItemCount()) {
