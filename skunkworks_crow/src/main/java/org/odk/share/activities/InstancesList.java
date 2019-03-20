@@ -32,21 +32,21 @@ import static org.odk.share.fragments.ReviewedInstancesFragment.MODE;
 
 public class InstancesList extends InstanceListActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    @BindView(R.id.recyclerview) RecyclerView recyclerView;
-    @BindView(R.id.toolbar) Toolbar toolbar;
-    @BindView(R.id.send_button) Button sendButton;
-    @BindView(R.id.toggle_button) Button toggleButton;
-
-    private static final String INSTANCE_LIST_ACTIVITY_SORTING_ORDER = "instanceListActivitySortingOrder";
-
     public static final String INSTANCE_IDS = "instance_ids";
-
+    private static final String INSTANCE_LIST_ACTIVITY_SORTING_ORDER = "instanceListActivitySortingOrder";
     private static final int INSTANCE_LOADER = 1;
-    private InstanceAdapter instanceAdapter;
-    private LinkedHashSet<Long> selectedInstances;
-
+    @BindView(R.id.recyclerview)
+    RecyclerView recyclerView;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.send_button)
+    Button sendButton;
+    @BindView(R.id.toggle_button)
+    Button toggleButton;
     @Inject
     InstancesDao instancesDao;
+    private InstanceAdapter instanceAdapter;
+    private LinkedHashSet<Long> selectedInstances;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,8 +81,8 @@ public class InstancesList extends InstanceListActivity implements LoaderManager
         instanceAdapter = new InstanceAdapter(this, cursor, this::onListItemClick, selectedInstances);
         recyclerView.setAdapter(instanceAdapter);
         if (instanceAdapter.getItemCount() > 0) {
-           toggleButton.setText(getString(R.string.select_all));
-           toggleButton.setEnabled(true);
+            toggleButton.setText(getString(R.string.select_all));
+            toggleButton.setEnabled(true);
         } else {
             toggleButton.setEnabled(false);
         }
@@ -134,7 +134,8 @@ public class InstancesList extends InstanceListActivity implements LoaderManager
             if (cursor.moveToFirst()) {
                 do {
                     selectedInstances.add(cursor.getLong(cursor.getColumnIndex(InstanceProviderAPI.InstanceColumns._ID)));
-                } while (cursor.moveToNext());}
+                } while (cursor.moveToNext());
+            }
         } else {
             selectedInstances.clear();
         }
