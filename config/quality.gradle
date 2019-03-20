@@ -48,7 +48,7 @@ task findbugs(type: FindBugs, dependsOn: "assembleDebug") {
     reportLevel = 'high'
 
     excludeFilter = new File("$configDir/findbugs-filter.xml")
-    classes = files("${project.rootDir}/skunkworks_crow/build/intermediates/classes")
+    classes = files("${project.rootDir}/skunkworks_crow/build/intermediates/javac")
 
     source 'src'
     include '**/*.java'
