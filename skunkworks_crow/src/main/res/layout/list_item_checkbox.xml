@@ -6,13 +6,13 @@
 
     <ImageView
         android:id="@+id/iconfilledform"
-        android:layout_width="49dp"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
+        android:paddingStart="5dp"
+        android:paddingLeft="5dp"
         android:paddingEnd="10dp"
-        android:src="@drawable/ic_assignment_black_24dp"
         android:paddingRight="10dp"
-        android:paddingLeft="0dp"
-        android:paddingStart="0dp"/>
+        android:src="@drawable/ic_assignment_black_24dp" />
 
     <RelativeLayout
         android:layout_width="match_parent"
