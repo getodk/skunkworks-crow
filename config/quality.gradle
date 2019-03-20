@@ -23,7 +23,6 @@ apply plugin: 'checkstyle'
 
 task checkstyle(type: Checkstyle) {
     configFile file("$configDir/checkstyle.xml")
-    configProperties.checkstyleSuppressionsPath = file("$configDir/suppressions.xml").absolutePath
     source 'src'
     include '**/*.java'
     exclude '**/gen/**'
