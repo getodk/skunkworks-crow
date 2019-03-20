@@ -32,8 +32,7 @@ task checkstyle(type: Checkstyle) {
     source 'src'
     include '**/*.java'
     exclude '**/gen/**'
-    classpath = files()
-    
+    classpath = files()    
 }
 
 //------------------------Findbugs------------------------//
