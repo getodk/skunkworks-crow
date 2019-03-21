@@ -13,6 +13,7 @@
             android:summary="********"
             android:title="@string/title_hotspot_password"
             android:key="hotspot_password"
+            android:inputType="textPassword"
             android:enabled="false" />
 
         <CheckBoxPreference
