@@ -6,11 +6,13 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.LocationManager;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
@@ -156,8 +158,23 @@ public class SendActivity extends InjectableActivity {
         }
     }
 
+    private boolean isGPSEnabled() {
+        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        boolean gpsEnabled = false;
+        if (locationManager != null) {
+            gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        }
+
+        return gpsEnabled;
+    }
+
     private void initiateHotspot() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (!isGPSEnabled()) {
+                isHotspotInitiated = false;
+                showLocationAlertDialog();
+                return;
+            }
             turnOnHotspot();
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             // In devices having Android version = 7, created hotspot having some issues with connecting to other devices.
@@ -174,10 +191,32 @@ public class SendActivity extends InjectableActivity {
             Intent intent = new Intent(getApplicationContext(), HotspotService.class);
             intent.setAction(HotspotService.ACTION_STATUS);
             startService(intent);
-            
+
             currentConfig = wifiHotspot.getCurrConfig();
             startSending();
         }
+    }
+
+    private void showLocationAlertDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.location_settings_dialog);
+        builder.setPositiveButton(getString(R.string.settings), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                startActivity(intent);
+            }
+        });
+
+        builder.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                finish();
+            }
+        });
+        builder.setCancelable(false);
+        builder.show();
     }
 
     private void showAlertDialog() {
@@ -267,7 +306,7 @@ public class SendActivity extends InjectableActivity {
             intent.setAction(HotspotService.ACTION_STATUS);
             startService(intent);
             Timber.d("Started hotspot N");
-            currentConfig = wifiHotspot.getCurrConfig();            
+            currentConfig = wifiHotspot.getCurrConfig();
             startSending();
         }
     }
