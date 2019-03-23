@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.odk.collect.android.dao.InstancesDao;
@@ -72,6 +73,7 @@ public class FormsAdapter extends CursorRecyclerViewAdapter<FormsAdapter.FormHol
         viewHolder.tvSubtitle.setText(sb.toString());
         viewHolder.checkBox.setVisibility(selectedForms != null ? View.VISIBLE : View.GONE);
         viewHolder.checkBox.setChecked(selectedForms != null && selectedForms.contains(((long) form.getId())));
+        viewHolder.filledicon.setImageResource(R.drawable.blank_form);
 
         if (selectedForms == null) {
             String[] selectionArgs;
@@ -150,6 +152,8 @@ public class FormsAdapter extends CursorRecyclerViewAdapter<FormsAdapter.FormHol
         TextView unReviewedForms;
         @BindView(R.id.checkbox)
         CheckBox checkBox;
+        @BindView(R.id.iconfilledform)
+        ImageView filledicon;
 
         private Form form;
 
