@@ -179,21 +179,21 @@ public class SendActivity extends InjectableActivity {
     }
 
     private void initiateHotspot() {
+        String hotspotName = DEFAULT_SSID + getString(R.string.hotspot_name_suffix);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (!isGPSEnabled()) {
                 isHotspotInitiated = false;
                 showLocationAlertDialog();
-                return;
+            } else {
+                turnOnHotspot();
             }
-            turnOnHotspot();
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             // In devices having Android version = 7, created hotspot having some issues with connecting to other devices.
             // Open settings to trigger the hotspot manually.
             showAlertDialog();
         } else {
-
-            Timber.d("Started hotspot below N");
-            wifiHotspot.enableHotspot(DEFAULT_SSID + getString(R.string.hotspot_name_suffix));
+            wifiHotspot.enableHotspot(hotspotName);
             Intent serviceIntent = new Intent(getApplicationContext(), HotspotService.class);
             serviceIntent.setAction(HotspotService.ACTION_START);
             startService(serviceIntent);
@@ -382,31 +382,33 @@ public class SendActivity extends InjectableActivity {
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void turnOnHotspot() {
         WifiManager manager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        manager.startLocalOnlyHotspot(new WifiManager.LocalOnlyHotspotCallback() {
+        if (manager != null) {
+            manager.startLocalOnlyHotspot(new WifiManager.LocalOnlyHotspotCallback() {
 
-            @Override
-            public void onStarted(WifiManager.LocalOnlyHotspotReservation reservation) {
-                super.onStarted(reservation);
-                hotspotReservation = reservation;
-                currentConfig = reservation.getWifiConfiguration();
-                startSending();
-                rxEventBus.post(new HotspotEvent(HotspotEvent.Status.ENABLED));
-                Toast.makeText(SendActivity.this, "Hotspot started", Toast.LENGTH_SHORT).show();
-            }
+                @Override
+                public void onStarted(WifiManager.LocalOnlyHotspotReservation reservation) {
+                    super.onStarted(reservation);
+                    hotspotReservation = reservation;
+                    currentConfig = reservation.getWifiConfiguration();
+                    startSending();
+                    rxEventBus.post(new HotspotEvent(HotspotEvent.Status.ENABLED));
+                    Toast.makeText(SendActivity.this, "Hotspot started", Toast.LENGTH_SHORT).show();
+                }
 
-            @Override
-            public void onStopped() {
-                super.onStopped();
-                rxEventBus.post(new HotspotEvent(HotspotEvent.Status.DISABLED));
-                Toast.makeText(SendActivity.this, "Hotspot stopped", Toast.LENGTH_SHORT).show();
-            }
+                @Override
+                public void onStopped() {
+                    super.onStopped();
+                    rxEventBus.post(new HotspotEvent(HotspotEvent.Status.DISABLED));
+                    Toast.makeText(SendActivity.this, "Hotspot stopped", Toast.LENGTH_SHORT).show();
+                }
 
-            @Override
-            public void onFailed(int reason) {
-                super.onFailed(reason);
-                Toast.makeText(SendActivity.this, "Failed to start hotspot", Toast.LENGTH_SHORT).show();
-            }
-        }, new Handler());
+                @Override
+                public void onFailed(int reason) {
+                    super.onFailed(reason);
+                    Toast.makeText(SendActivity.this, "Failed to start hotspot", Toast.LENGTH_SHORT).show();
+                }
+            }, new Handler());
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
