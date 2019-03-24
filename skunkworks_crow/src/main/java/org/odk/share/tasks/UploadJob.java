@@ -107,6 +107,7 @@ public class UploadJob extends Job {
 
             serverSocket = new ServerSocket(port);
             socket = serverSocket.accept();
+            socket.setSoTimeout(0);
             dos = new DataOutputStream(socket.getOutputStream());
             dis = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
 

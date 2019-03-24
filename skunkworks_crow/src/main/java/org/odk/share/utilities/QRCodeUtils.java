@@ -25,6 +25,7 @@ import io.reactivex.Observable;
 
 public class QRCodeUtils {
 
+    public static final String IP = "ip";
     public static final String SSID = "ssid";
     public static final String PORT = "port";
     public static final String PROTECTED = "protected";
@@ -33,16 +34,17 @@ public class QRCodeUtils {
     private QRCodeUtils() {
     }
 
-    public static Observable<Bitmap> generateQRCode(String ssid, int port, String password) {
+    public static Observable<Bitmap> generateQRCode(String ip, String ssid, int port, String password) {
         return Observable.create(emitter -> {
-            String qrCodeInfo = createHotspotInfo(ssid, port, password);
+            String qrCodeInfo = createHotspotInfo(ip, ssid, port, password);
             emitter.onNext(generateQRBitMap(qrCodeInfo, 400));
             emitter.onComplete();
         });
     }
 
-    public static String createHotspotInfo(String ssid, int port, String password) throws JSONException {
+    public static String createHotspotInfo(String ip, String ssid, int port, String password) throws JSONException {
         JSONObject hotspotQRCode = new JSONObject();
+        hotspotQRCode.put(IP, ip);
         hotspotQRCode.put(SSID, ssid);
         hotspotQRCode.put(PORT, port);
 
@@ -55,7 +57,7 @@ public class QRCodeUtils {
         return hotspotQRCode.toString();
     }
 
-    public static Bitmap generateQRBitMap(String data, int sideLength) throws IOException, WriterException {
+    private static Bitmap generateQRBitMap(String data, int sideLength) throws IOException, WriterException {
         Map<EncodeHintType, ErrorCorrectionLevel> hints = new HashMap<>();
         hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.L);
         QRCodeWriter qrCodeWriter = new QRCodeWriter();

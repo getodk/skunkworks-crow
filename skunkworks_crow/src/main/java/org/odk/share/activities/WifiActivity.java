@@ -40,7 +40,6 @@ import org.odk.share.rx.schedulers.BaseSchedulerProvider;
 import org.odk.share.services.ReceiverService;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -58,6 +57,7 @@ import io.reactivex.disposables.Disposable;
 import timber.log.Timber;
 
 import static com.google.zxing.integration.android.IntentIntegrator.QR_CODE_TYPES;
+import static org.odk.share.utilities.QRCodeUtils.IP;
 import static org.odk.share.utilities.QRCodeUtils.PASSWORD;
 import static org.odk.share.utilities.QRCodeUtils.PORT;
 import static org.odk.share.utilities.QRCodeUtils.PROTECTED;
@@ -101,6 +101,7 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
     private int port;
 
     private boolean isQRCodeScanned;
+    private String ip;
     private String ssidScanned;
     private boolean isProtected;
     private String passwordScanned;
@@ -145,7 +146,7 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
 
     private boolean isPossibleHotspot(String ssid) {
         return ssid.contains(getString(R.string.hotspot_name_suffix)) ||
-                ssid.contains(getString(R.string.hotspot_name_prefix_oreo));
+                ssid.startsWith(getString(R.string.hotspot_name_prefix_oreo));
     }
 
     @Override
@@ -313,8 +314,7 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
 
     private void startReceiveTask() {
         showDialog(DIALOG_DOWNLOAD_PROGRESS);
-        String dstAddress = wifiConnector.getAccessPointIpAddress();
-        receiverService.startDownloading(dstAddress, port);
+        receiverService.startDownloading(ip, port);
     }
 
     @OnClick(R.id.bScan)
@@ -397,9 +397,10 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
                 // request was canceled...
                 Timber.i("QR code scanning cancelled");
             } else {
-                Timber.d("RESULT " + result);
+                Timber.d("Result: %s", result);
                 try {
                     JSONObject obj = new JSONObject(result.getContents());
+                    ip = (String) obj.get(IP);
                     ssidScanned = (String) obj.get(SSID);
                     port = (Integer) obj.get(PORT);
                     isProtected = (boolean) obj.get(PROTECTED);
@@ -470,8 +471,6 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
                 list.add(wifiNetworkInfo);
             }
         }
-
-        Timber.d(Arrays.toString(list.toArray()));
 
         wifiListAvailable(list);
     }

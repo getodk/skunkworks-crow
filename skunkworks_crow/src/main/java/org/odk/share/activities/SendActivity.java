@@ -313,7 +313,8 @@ public class SendActivity extends InjectableActivity {
                     switch (uploadEvent.getStatus()) {
                         case QUEUED:
                             Toast.makeText(this, R.string.upload_queued, Toast.LENGTH_SHORT).show();
-                            setupConnectionInfo(currentConfig.SSID, port, currentConfig.preSharedKey);
+                            String ip = new WifiConnector(this).getWifiApIp();
+                            setupConnectionInfo(ip, currentConfig.SSID, port, currentConfig.preSharedKey);
                             break;
                         case UPLOADING:
                             int progress = uploadEvent.getCurrentProgress();
@@ -338,15 +339,15 @@ public class SendActivity extends InjectableActivity {
                 }, Timber::e);
     }
 
-    private void setupConnectionInfo(String ssid, int port, String password) {
-        Timber.d("setupConnectionInfo() called with: ssid = [" + ssid + "], port = [" + port + "], password = [" + password + "]");
+    private void setupConnectionInfo(String ip, String ssid, int port, String password) {
+        Timber.d("setupConnectionInfo() called with: ip = [" + ip + "], ssid = [" + ssid + "], port = [" + port + "], password = [" + password + "]");
 
         // display connection info
         connectInfo.setText(getString(R.string.connection_info, String.valueOf(this.port), ssid));
 
         // setup QR code
         compositeDisposable.add(
-                QRCodeUtils.generateQRCode(ssid, port, password)
+                QRCodeUtils.generateQRCode(ip, ssid, port, password)
                         .subscribeOn(schedulerProvider.io())
                         .observeOn(schedulerProvider.androidThread())
                         .subscribe(bitmap -> {
