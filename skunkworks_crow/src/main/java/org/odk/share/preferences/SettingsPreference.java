@@ -1,13 +1,11 @@
 package org.odk.share.preferences;
 
-import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,7 +30,7 @@ public class SettingsPreference extends PreferenceActivity {
     Preference hotspotPasswordPreference;
     CheckBoxPreference passwordRequirePreference;
     EditTextPreference odkDestinationDirPreference;
-    private SharedPreferences prefs;
+    private SharedPreferencesHelper sharedPreferencesHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +39,8 @@ public class SettingsPreference extends PreferenceActivity {
         Toolbar toolbar = (Toolbar) View.inflate(this, R.layout.toolbar, null);
         toolbar.setTitle(getString(R.string.settings));
         root.addView(toolbar, 0);
+
+        sharedPreferencesHelper = new SharedPreferencesHelper(getApplicationContext());
 
         addPreferencesFromResource(R.xml.preferences_menu);
         addPreferences();
@@ -60,13 +60,9 @@ public class SettingsPreference extends PreferenceActivity {
         passwordRequirePreference = (CheckBoxPreference) findPreference(PreferenceKeys.KEY_HOTSPOT_PWD_REQUIRE);
         odkDestinationDirPreference = (EditTextPreference) findPreference(PreferenceKeys.KEY_ODK_DESTINATION_DIR);
 
-        prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-
-        hotspotNamePreference.setSummary(prefs.getString(PreferenceKeys.KEY_HOTSPOT_NAME,
-                getString(R.string.default_hotspot_ssid)));
-        boolean isPasswordSet = prefs.getBoolean(PreferenceKeys.KEY_HOTSPOT_PWD_REQUIRE, false);
-        odkDestinationDirPreference.setSummary(prefs.getString(PreferenceKeys.KEY_ODK_DESTINATION_DIR,
-                getString(R.string.default_odk_destination_dir)));
+        hotspotNamePreference.setSummary(sharedPreferencesHelper.getHotspotName());
+        boolean isPasswordSet = sharedPreferencesHelper.isHotspotPasswordProtected();
+        odkDestinationDirPreference.setSummary(sharedPreferencesHelper.getDestinationDir());
 
         hotspotPasswordPreference.setEnabled(isPasswordSet);
         passwordRequirePreference.setChecked(isPasswordSet);
@@ -145,13 +141,13 @@ public class SettingsPreference extends PreferenceActivity {
 
         View dialogView = factory.inflate(R.layout.dialog_password_til, null);
         TextInputLayout tlPassword = dialogView.findViewById(R.id.et_password_layout);
-        tlPassword.getEditText().setText(prefs.getString(PreferenceKeys.KEY_HOTSPOT_PASSWORD, getString(R.string.default_hotspot_password)));
+        tlPassword.getEditText().setText(sharedPreferencesHelper.getHotspotPassword());
 
         builder.setTitle(getString(R.string.title_hotspot_password));
         builder.setView(dialogView);
         builder.setPositiveButton(getString(R.string.ok), (dialog, which) -> {
             String password = tlPassword.getEditText().getText().toString();
-            prefs.edit().putString(PreferenceKeys.KEY_HOTSPOT_PASSWORD, password).apply();
+            sharedPreferencesHelper.setHotspotPassword(password);
         });
         builder.setNegativeButton(getString(R.string.cancel), (dialog, which) -> dialog.dismiss());
 
