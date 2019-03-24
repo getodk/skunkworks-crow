@@ -92,10 +92,6 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
         //check the storage permission and start the loader
         setUpLoader();
 
-        emptyView.setOnClickListener((View view) -> {
-            setUpLoader();
-        });
-
         addListItemDivider();
     }
 
@@ -152,7 +148,6 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
 
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
-
         formAdapter.changeCursor(cursor);
         if (cursor != null && !cursor.isClosed()) {
             setEmptyViewVisibility(cursor.getCount());
@@ -245,15 +240,10 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     setUpLoader();
                 } else {
-                    showNoPermissionView();
+                    //close the app if the permission is denied
+                    finish();
                 }
         }
-    }
-
-    private void showNoPermissionView() {
-
-        setEmptyViewVisibility(0);
-        emptyView.setText(getString(R.string.provide_storage_permission));
     }
 
     private void setUpLoader() {
