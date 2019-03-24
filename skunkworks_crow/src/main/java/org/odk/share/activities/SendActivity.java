@@ -390,12 +390,14 @@ public class SendActivity extends InjectableActivity {
                 hotspotReservation = reservation;
                 currentConfig = reservation.getWifiConfiguration();
                 startSending();
+                rxEventBus.post(new HotspotEvent(HotspotEvent.Status.ENABLED));
                 Toast.makeText(SendActivity.this, "Hotspot started", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onStopped() {
                 super.onStopped();
+                rxEventBus.post(new HotspotEvent(HotspotEvent.Status.DISABLED));
                 Toast.makeText(SendActivity.this, "Hotspot stopped", Toast.LENGTH_SHORT).show();
             }
 
