@@ -32,6 +32,9 @@ dependencies {
     androidTestImplementation 'androidx.test:runner:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-alpha4'
 
+    // For android 9 support using evernote's android-job
+    implementation 'com.google.android.gms:play-services-gcm:16.1.0'
+
     // butterknife
     implementation "com.jakewharton:butterknife:${rootProject.butterknifeVersion}"
     annotationProcessor "com.jakewharton:butterknife-compiler:${rootProject.butterknifeVersion}"

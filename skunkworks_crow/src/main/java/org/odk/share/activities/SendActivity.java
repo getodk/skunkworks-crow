@@ -390,18 +390,19 @@ public class SendActivity extends InjectableActivity {
                 hotspotReservation = reservation;
                 currentConfig = reservation.getWifiConfiguration();
                 startSending();
+                Toast.makeText(SendActivity.this, "Hotspot started", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onStopped() {
                 super.onStopped();
-                Timber.d("Local Hotspot Stopped");
+                Toast.makeText(SendActivity.this, "Hotspot stopped", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFailed(int reason) {
                 super.onFailed(reason);
-                Timber.d("Local Hotspot failed to start");
+                Toast.makeText(SendActivity.this, "Failed to start hotspot", Toast.LENGTH_SHORT).show();
             }
         }, new Handler());
     }
