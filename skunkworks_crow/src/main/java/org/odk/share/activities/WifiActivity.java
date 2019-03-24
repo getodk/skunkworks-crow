@@ -142,18 +142,20 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
         } else {
             lastConnectedWifiInfo = wifiConnector.getActiveConnection();
         }
+
+        startScan();
     }
 
     private boolean isPossibleHotspot(String ssid) {
-        return ssid.contains(getString(R.string.hotspot_name_suffix)) ||
-                ssid.startsWith(getString(R.string.hotspot_name_prefix_oreo));
+        return true;
+        /*return ssid.contains(getString(R.string.hotspot_name_suffix)) ||
+                ssid.startsWith(getString(R.string.hotspot_name_prefix_oreo));*/
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         wifiStateBroadcastReceiver.register();
-        startScan();
         compositeDisposable.add(addDownloadEventSubscription());
     }
 
@@ -314,6 +316,11 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
 
     private void startReceiveTask() {
         showDialog(DIALOG_DOWNLOAD_PROGRESS);
+
+        if (ip == null || ip.isEmpty()) {
+            ip = wifiConnector.getAccessPointIpAddress();
+        }
+
         receiverService.startDownloading(ip, port);
     }
 
@@ -410,7 +417,12 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
 
                     Timber.d("Scanned results " + ssidScanned + " " + port + " " + isProtected + " " + passwordScanned);
                     isQRCodeScanned = true;
-                    startScan();
+
+                    if (wifiConnector.getAccessPointIpAddress() != null && wifiConnector.getAccessPointIpAddress().equals(ip)) {
+                        onConnected();
+                    } else {
+                        startScan();
+                    }
                 } catch (JSONException e) {
                     Timber.e(e);
                 }
@@ -420,7 +432,6 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
 
     @Override
     public void onStateUpdate(NetworkInfo.DetailedState detailedState) {
-
         String connectedSsid = wifiConnector.getWifiSSID();
 
         Timber.d(wifiNetworkSSID + " " + connectedSsid + " " + detailedState.toString());
@@ -431,7 +442,6 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
                 wifiResultAdapter.notifyItemChanged(scanResultList.indexOf(wifiNetworkInfo));
 
                 if (!isConnected) {
-                    isConnected = true;
                     onConnected();
                 }
 
@@ -441,6 +451,8 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
     }
 
     private void onConnected() {
+        isConnected = true;
+
         Toast.makeText(getApplicationContext(), "Connected to " + wifiNetworkSSID, Toast.LENGTH_LONG).show();
 
         removeDialog(DIALOG_CONNECTING);
