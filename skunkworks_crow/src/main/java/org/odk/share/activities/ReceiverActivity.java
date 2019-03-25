@@ -63,7 +63,7 @@ import static org.odk.share.utilities.QRCodeUtils.PORT;
 import static org.odk.share.utilities.QRCodeUtils.PROTECTED;
 import static org.odk.share.utilities.QRCodeUtils.SSID;
 
-public class WifiActivity extends InjectableActivity implements OnItemClickListener, WifiStateListener {
+public class ReceiverActivity extends InjectableActivity implements OnItemClickListener, WifiStateListener {
 
     private static final int DIALOG_DOWNLOAD_PROGRESS = 1;
     private static final int DIALOG_CONNECTING = 2;

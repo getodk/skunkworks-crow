@@ -107,7 +107,7 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
 
     @OnClick(R.id.bViewWifi)
     public void viewWifiNetworks() {
-        Intent intent = new Intent(this, WifiActivity.class);
+        Intent intent = new Intent(this, ReceiverActivity.class);
         startActivity(intent);
     }
 
