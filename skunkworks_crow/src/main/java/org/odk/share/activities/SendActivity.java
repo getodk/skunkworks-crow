@@ -7,9 +7,7 @@ import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.LocationManager;
 import android.net.wifi.WifiConfiguration;
-import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -22,6 +20,7 @@ import org.odk.share.events.HotspotEvent;
 import org.odk.share.events.UploadEvent;
 import org.odk.share.network.WifiConnector;
 import org.odk.share.network.WifiHospotConnector;
+import org.odk.share.network.WifiHotspotManager;
 import org.odk.share.preferences.SharedPreferencesHelper;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.rx.schedulers.BaseSchedulerProvider;
@@ -67,6 +66,8 @@ public class SendActivity extends InjectableActivity {
     SenderService senderService;
     @Inject
     SharedPreferencesHelper sharedPreferencesHelper;
+    @Inject
+    WifiHotspotManager wifiHotspotManager;
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -85,9 +86,6 @@ public class SendActivity extends InjectableActivity {
     private int port;
     private long[] formIds;
     private int mode;
-
-    private WifiManager.LocalOnlyHotspotReservation hotspotReservation;
-    private WifiConfiguration currentConfig;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,7 +106,7 @@ public class SendActivity extends InjectableActivity {
         port = SocketUtils.getPort();
 
         if (port == -1) {
-            Timber.e("Port not available for socket communication");
+            Toast.makeText(this, "Port not available for socket communication", Toast.LENGTH_SHORT).show();
             finish();
         }
 
@@ -121,9 +119,7 @@ public class SendActivity extends InjectableActivity {
         isHotspotRunning = false;
         openSettings = false;
 
-        if (wifiHotspot.isHotspotEnabled()) {
-            wifiHotspot.disableHotspot();
-        }
+        wifiHotspotManager.stopHotspot();
     }
 
     @Override
@@ -166,95 +162,60 @@ public class SendActivity extends InjectableActivity {
         }
     }
 
-    private boolean isGPSEnabled() {
-        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        boolean gpsEnabled = false;
-        if (locationManager != null) {
-            gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        }
-
-        return gpsEnabled;
-    }
-
     private void initiateHotspot() {
-        String hotspotName = DEFAULT_SSID + getString(R.string.hotspot_name_suffix);
+        // String hotspotName = DEFAULT_SSID + getString(R.string.hotspot_name_suffix);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            if (!isGPSEnabled()) {
-                isHotspotInitiated = false;
-                showLocationAlertDialog();
-            } else {
-                showAlertDialog();
-            }
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            // In devices having Android version = 7, created hotspot having some issues with connecting to other devices.
-            // Open settings to trigger the hotspot manually.
-            showAlertDialog();
-        } else {
-            wifiHotspot.enableHotspot(hotspotName);
-            Intent serviceIntent = new Intent(getApplicationContext(), HotspotService.class);
-            serviceIntent.setAction(HotspotService.ACTION_START);
-            startService(serviceIntent);
+        try {
+            wifiHotspotManager.startHotspot();
 
-            Intent intent = new Intent(getApplicationContext(), HotspotService.class);
-            intent.setAction(HotspotService.ACTION_STATUS);
-            startService(intent);
-
-            currentConfig = wifiHotspot.getCurrConfig();
+            isHotspotInitiated = true;
             startSending();
+        } catch (WifiHotspotManager.GpsNotEnabledException e) {
+            isHotspotInitiated = false;
+            showLocationAlertDialog();
+        } catch (WifiHotspotManager.TriggerHotspotException e) {
+            showAlertDialog();
         }
     }
 
     private void showLocationAlertDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(R.string.location_settings_dialog);
-        builder.setPositiveButton(getString(R.string.settings), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                startActivity(intent);
-            }
-        });
-
-        builder.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-                finish();
-            }
-        });
-        builder.setCancelable(false);
-        builder.show();
+        new AlertDialog.Builder(this)
+                .setMessage(R.string.location_settings_dialog)
+                .setPositiveButton(getString(R.string.settings), (dialog, which) -> {
+                    Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    startActivity(intent);
+                })
+                .setNegativeButton(getString(R.string.cancel), (dialog, which) -> {
+                    dialog.dismiss();
+                    finish();
+                })
+                .setCancelable(false)
+                .show();
     }
 
     private void showAlertDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(R.string.hotspot_settings_dialog);
-        builder.setPositiveButton(getString(R.string.settings), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    // do nothing
-                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    wifiHotspot.saveLastConfig();
-                    WifiConfiguration newWifiConfig = wifiHotspot.createNewConfig(DEFAULT_SSID + getString(R.string.hotspot_name_suffix));
-                    wifiHotspot.setCurrConfig(newWifiConfig);
-                    wifiHotspot.setWifiConfig(newWifiConfig);
-                }
+        new AlertDialog.Builder(this)
+                .setMessage(R.string.hotspot_settings_dialog)
+                .setPositiveButton(getString(R.string.settings), (dialog, which) -> {
+                    isHotspotInitiated = true;
 
-                openTetheringIntent();
-            }
-        });
-        builder.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-                finish();
-            }
-        });
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        // do nothing
+                    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        wifiHotspot.saveLastConfig();
+                        WifiConfiguration newWifiConfig = wifiHotspot.createNewConfig(DEFAULT_SSID + getString(R.string.hotspot_name_suffix));
+                        wifiHotspot.setCurrConfig(newWifiConfig);
+                        wifiHotspot.setWifiConfig(newWifiConfig);
+                    }
 
-        builder.setCancelable(false);
-        builder.show();
+                    openTetheringIntent();
+                })
+                .setNegativeButton(getString(R.string.cancel), (dialog, which) -> {
+                    dialog.dismiss();
+                    finish();
+                })
+                .setCancelable(false)
+                .show();
     }
 
     private void openTetheringIntent() {
@@ -268,24 +229,15 @@ public class SendActivity extends InjectableActivity {
     }
 
     private void stopHotspotAlertDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(R.string.stop_sending);
-        builder.setPositiveButton(getString(R.string.stop), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                stopHotspot();
-                finish();
-            }
-        });
-        builder.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-
-        builder.setCancelable(false);
-        builder.show();
+        new AlertDialog.Builder(this)
+                .setMessage(R.string.stop_sending)
+                .setPositiveButton(getString(R.string.stop), (dialog, which) -> {
+                    stopHotspot();
+                    finish();
+                })
+                .setNegativeButton(getString(R.string.cancel), (dialog, which) -> dialog.dismiss())
+                .setCancelable(false)
+                .show();
     }
 
     private void stopHotspot() {
@@ -294,8 +246,9 @@ public class SendActivity extends InjectableActivity {
         }
 
         senderService.cancel();
-        Timber.d("Hotspot Stopped");
         compositeDisposable.dispose();
+
+        Timber.d("Hotspot Stopped");
     }
 
     @Override
@@ -317,7 +270,9 @@ public class SendActivity extends InjectableActivity {
                         case QUEUED:
                             Toast.makeText(this, R.string.upload_queued, Toast.LENGTH_SHORT).show();
                             String ip = new WifiConnector(this).getWifiApIp();
-                            setupConnectionInfo(ip, currentConfig.SSID, port, currentConfig.preSharedKey);
+                            String ssid = sharedPreferencesHelper.getHotspotName();
+                            String password = sharedPreferencesHelper.getHotspotPassword();
+                            setupConnectionInfo(ip, ssid, port, password);
                             break;
                         case UPLOADING:
                             int progress = uploadEvent.getCurrentProgress();
@@ -346,7 +301,7 @@ public class SendActivity extends InjectableActivity {
         Timber.d("setupConnectionInfo() called with: ip = [" + ip + "], ssid = [" + ssid + "], port = [" + port + "], password = [" + password + "]");
 
         // display connection info
-        connectInfo.setText(getString(R.string.connection_info, String.valueOf(this.port), ssid));
+        connectInfo.setText(getString(R.string.connection_info, String.valueOf(port), ssid));
 
         // setup QR code
         compositeDisposable.add(
@@ -380,6 +335,17 @@ public class SendActivity extends InjectableActivity {
     }
 
     private void startSending() {
+        Intent serviceIntent = new Intent(getApplicationContext(), HotspotService.class);
+        serviceIntent.setAction(HotspotService.ACTION_START);
+        startService(serviceIntent);
+
+        Intent intent = new Intent(getApplicationContext(), HotspotService.class);
+        intent.setAction(HotspotService.ACTION_STATUS);
+        startService(intent);
+
+        // required for generating QR Code
+        wifiHotspotManager.saveCurrentSettings();
+
         senderService.startUploading(formIds, port, mode);
     }
 
@@ -393,15 +359,11 @@ public class SendActivity extends InjectableActivity {
                 progressDialog.setIndeterminate(true);
                 progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                 progressDialog.setCancelable(false);
-                progressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.cancel),
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                senderService.cancel();
-                                dialog.dismiss();
-                                finish();
-                            }
-                        });
+                progressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.cancel), (dialog, which) -> {
+                    senderService.cancel();
+                    dialog.dismiss();
+                    finish();
+                });
                 return progressDialog;
         }
 
@@ -409,23 +371,16 @@ public class SendActivity extends InjectableActivity {
     }
 
     private void createAlertDialog(String title, String message) {
-        AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-        alertDialog.setTitle(title);
-        alertDialog.setMessage(message);
-        DialogInterface.OnClickListener quitListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int i) {
-                switch (i) {
-                    case DialogInterface.BUTTON_POSITIVE:
-                        stopHotspot();
-                        finish();
-                        break;
-                }
-            }
-        };
-        alertDialog.setCancelable(false);
-        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.ok), quitListener);
-        alertDialog.show();
+        new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setMessage(message)
+                .setCancelable(false)
+                .setPositiveButton(getString(R.string.ok), (dialog, i) -> {
+                    stopHotspot();
+                    finish();
+                })
+                .create()
+                .show();
     }
 
     private void checkLocationPermission() {
@@ -458,31 +413,9 @@ public class SendActivity extends InjectableActivity {
 
     private void toggleHotspot() {
         if (!isHotspotInitiated) {
-            isHotspotInitiated = true;
             startHotspot();
-        }
-
-        if (openSettings) {
+        } else if (openSettings) {
             openSettings = false;
-            Intent serviceIntent = new Intent(getApplicationContext(), HotspotService.class);
-            serviceIntent.setAction(HotspotService.ACTION_START);
-            startService(serviceIntent);
-
-            Intent intent = new Intent(getApplicationContext(), HotspotService.class);
-            intent.setAction(HotspotService.ACTION_STATUS);
-            startService(intent);
-            currentConfig = wifiHotspot.getCurrConfig();
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                currentConfig = new WifiConfiguration();
-                currentConfig.SSID = sharedPreferencesHelper.getHotspotName();
-
-                if (sharedPreferencesHelper.isHotspotPasswordProtected()) {
-                    currentConfig.preSharedKey = sharedPreferencesHelper.getHotspotPassword();
-                    currentConfig.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
-                }
-            }
-
             startSending();
         }
     }
