@@ -1,4 +1,4 @@
-package org.odk.share.controller;
+package org.odk.share.network;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -14,7 +14,7 @@ import timber.log.Timber;
  * Created by laksh on 5/17/2018.
  */
 
-public class WifiHotspotHelper {
+public class WifiHospotConnector {
 
     private Method getWifiApConfig;
     private Method setWifiApEnable;
@@ -25,7 +25,7 @@ public class WifiHotspotHelper {
     private WifiConfiguration lastConfig;
     private WifiConfiguration currConfig;
 
-    public WifiHotspotHelper(Context context) {
+    public WifiHospotConnector(Context context) {
         wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         for (Method method : wifiManager.getClass().getMethods()) {
             switch (method.getName()) {

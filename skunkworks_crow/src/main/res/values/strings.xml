@@ -27,7 +27,6 @@
     <string name="scan_qr_code">Scan QR Code</string>
     <string name="show_password">Show Password</string>
     <string name="connect">Connect</string>
-    <string name="already_connected">Already connected to</string>
     <string name="cancel">Cancel</string>
     <string name="password_empty">Password field is empty</string>
     <string name="port_empty">Port cannot be empty</string>
@@ -129,4 +128,6 @@
     <string name="default_odk_destination_dir">\/sdcard\/odk</string>
     <string name="title_odk_destination_dir">ODK Destination Directory</string>
     <string name="odk_destination_dir_error">The destination should not be empty</string>
+    <string name="location_permission_needed">Location Permission Needed</string>
+    <string name="location_settings_dialog">Enable location from the settings.</string>
 </resources>
