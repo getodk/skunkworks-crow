@@ -102,7 +102,6 @@ public class SendActivity extends InjectableActivity {
             formIds = getIntent().getLongArrayExtra(FORM_IDS);
         }
 
-
         port = SocketUtils.getPort();
 
         if (port == -1) {

@@ -124,8 +124,6 @@ public class ReceiverActivity extends InjectableActivity implements OnItemClickL
         isQRCodeScanned = false;
         ssidScanned = null;
         isProtected = false;
-        passwordScanned = null;
-        lastConnectedWifiInfo = null;
         port = -1;
 
         scanResultList = new ArrayList<>();

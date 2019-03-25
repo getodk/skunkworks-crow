@@ -3,7 +3,6 @@ package org.odk.share.network;
 import android.content.Context;
 import android.location.LocationManager;
 import android.net.wifi.WifiConfiguration;
-import android.net.wifi.WifiManager;
 import android.os.Build;
 
 import org.odk.share.preferences.SharedPreferencesHelper;
@@ -50,13 +49,7 @@ public final class WifiHotspotManager {
     }
 
     public void stopHotspot() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-            if (wifiManager != null) {
-                wifiManager.setWifiEnabled(true);
-                wifiManager.setWifiEnabled(false);
-            }
-        } else {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
             wifiHotspot.disableHotspot();
         }
     }
