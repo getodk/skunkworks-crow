@@ -22,10 +22,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.odk.share.R;
-import org.odk.share.controller.WifiHelper;
-import org.odk.share.controller.WifiHotspotHelper;
 import org.odk.share.events.HotspotEvent;
 import org.odk.share.events.UploadEvent;
+import org.odk.share.network.WifiConnector;
+import org.odk.share.network.WifiHospotConnector;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.rx.schedulers.BaseSchedulerProvider;
 import org.odk.share.services.HotspotService;
@@ -63,7 +63,7 @@ public class SendActivity extends InjectableActivity {
     @Inject
     BaseSchedulerProvider schedulerProvider;
     @Inject
-    WifiHotspotHelper wifiHotspot;
+    WifiHospotConnector wifiHotspot;
     @Inject
     SenderService senderService;
 
@@ -110,9 +110,10 @@ public class SendActivity extends InjectableActivity {
             Timber.e("Port not available for socket communication");
             finish();
         }
-        WifiHelper wifiHelper = new WifiHelper(this);
-        if (wifiHelper.getWifiManager().isWifiEnabled()) {
-            wifiHelper.disableWifi(null);
+
+        WifiConnector wifiConnector = new WifiConnector(this);
+        if (wifiConnector.isWifiEnabled()) {
+            wifiConnector.disableWifi(null);
         }
 
         isHotspotInitiated = false;
