@@ -102,7 +102,6 @@ public class ReceiverActivity extends InjectableActivity implements OnItemClickL
 
     private boolean isQRCodeScanned;
     private String ip;
-    private String ssidScanned;
     private boolean isProtected;
     private String passwordScanned;
 
@@ -122,7 +121,6 @@ public class ReceiverActivity extends InjectableActivity implements OnItemClickL
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         isQRCodeScanned = false;
-        ssidScanned = null;
         isProtected = false;
         port = -1;
 
@@ -405,14 +403,14 @@ public class ReceiverActivity extends InjectableActivity implements OnItemClickL
                 try {
                     JSONObject obj = new JSONObject(result.getContents());
                     ip = (String) obj.get(IP);
-                    ssidScanned = (String) obj.get(SSID);
+                    wifiNetworkSSID = (String) obj.get(SSID);
                     port = (Integer) obj.get(PORT);
                     isProtected = (boolean) obj.get(PROTECTED);
                     if (isProtected) {
                         passwordScanned = (String) obj.get(PASSWORD);
                     }
 
-                    Timber.d("Scanned results " + ssidScanned + " " + port + " " + isProtected + " " + passwordScanned);
+                    Timber.d("Scanned results " + wifiNetworkSSID + " " + port + " " + isProtected + " " + passwordScanned);
                     isQRCodeScanned = true;
 
                     if (wifiConnector.getAccessPointIpAddress() != null && wifiConnector.getAccessPointIpAddress().equals(ip)) {
@@ -497,12 +495,12 @@ public class ReceiverActivity extends InjectableActivity implements OnItemClickL
         if (isQRCodeScanned) {
             isQRCodeScanned = false;
             for (WifiNetworkInfo info : list) {
-                if (info.getSsid().equals(ssidScanned)) {
+                if (info.getSsid().equals(wifiNetworkSSID)) {
                     if (info.getState() != NetworkInfo.DetailedState.CONNECTED) {
                         Toast.makeText(this, "attempting connection", Toast.LENGTH_SHORT).show();
-                        connectToNetwork(info.getSecurityType(), ssidScanned, passwordScanned);
+                        connectToNetwork(info.getSecurityType(), wifiNetworkSSID, passwordScanned);
                     } else {
-                        Toast.makeText(this, "already connected to " + ssidScanned, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "already connected to " + wifiNetworkSSID, Toast.LENGTH_SHORT).show();
                     }
                     return;
                 }
