@@ -144,11 +144,10 @@ public class ReceiverActivity extends InjectableActivity implements OnItemClickL
         startScan();
     }
 
-    private boolean isPossibleHotspot(String ssid) {
-        return true;
-        /*return ssid.contains(getString(R.string.hotspot_name_suffix)) ||
-                ssid.startsWith(getString(R.string.hotspot_name_prefix_oreo));*/
-    }
+    /*private boolean isPossibleHotspot(String ssid) {
+        return ssid.contains(getString(R.string.hotspot_name_suffix)) ||
+                ssid.startsWith(getString(R.string.hotspot_name_prefix_oreo));
+    }*/
 
     @Override
     protected void onResume() {
@@ -473,13 +472,11 @@ public class ReceiverActivity extends InjectableActivity implements OnItemClickL
         ArrayList<WifiNetworkInfo> list = new ArrayList<>();
 
         for (ScanResult scanResult : scanResults) {
-            if (isPossibleHotspot(scanResult.SSID)) {
-                WifiNetworkInfo wifiNetworkInfo = new WifiNetworkInfo();
-                wifiNetworkInfo.setSsid(scanResult.SSID);
-                wifiNetworkInfo.setRssi(WifiManager.calculateSignalLevel(scanResult.level, 100));
-                wifiNetworkInfo.setSecurityType(wifiConnector.getScanResultSecurity(scanResult));
-                list.add(wifiNetworkInfo);
-            }
+            WifiNetworkInfo wifiNetworkInfo = new WifiNetworkInfo();
+            wifiNetworkInfo.setSsid(scanResult.SSID);
+            wifiNetworkInfo.setRssi(WifiManager.calculateSignalLevel(scanResult.level, 100));
+            wifiNetworkInfo.setSecurityType(wifiConnector.getScanResultSecurity(scanResult));
+            list.add(wifiNetworkInfo);
         }
 
         wifiListAvailable(list);
