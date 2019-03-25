@@ -122,6 +122,12 @@ public class SendActivity extends InjectableActivity {
 
     @Override
     public void onBackPressed() {
+        if (!isHotspotRunning) {
+            stopHotspot();
+            finish();
+            return;
+        }
+
         stopHotspotAlertDialog();
     }
 
@@ -174,7 +180,7 @@ public class SendActivity extends InjectableActivity {
             Intent intent = new Intent(getApplicationContext(), HotspotService.class);
             intent.setAction(HotspotService.ACTION_STATUS);
             startService(intent);
-            
+
             currentConfig = wifiHotspot.getCurrConfig();
             startSending();
         }
@@ -267,7 +273,7 @@ public class SendActivity extends InjectableActivity {
             intent.setAction(HotspotService.ACTION_STATUS);
             startService(intent);
             Timber.d("Started hotspot N");
-            currentConfig = wifiHotspot.getCurrConfig();            
+            currentConfig = wifiHotspot.getCurrConfig();
             startSending();
         }
     }
