@@ -1,15 +1,15 @@
 package org.odk.share.adapters;
 
 import android.content.Context;
-import android.net.wifi.ScanResult;
+import android.net.wifi.WifiConfiguration;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.odk.share.R;
-import org.odk.share.controller.WifiHelper;
 import org.odk.share.listeners.OnItemClickListener;
+import org.odk.share.network.WifiNetworkInfo;
 import org.odk.share.views.WifiView;
 
 import java.util.List;
@@ -26,12 +26,12 @@ import butterknife.ButterKnife;
 public class WifiResultAdapter extends RecyclerView.Adapter<WifiResultAdapter.WifiHolder> {
 
     private final Context context;
-    private final List<ScanResult> wifiScanResult;
+    private final List<WifiNetworkInfo> wifiNetworkInfoList;
     private final OnItemClickListener listener;
 
-    public WifiResultAdapter(Context context, List<ScanResult> wifiScanResult, OnItemClickListener listener) {
+    public WifiResultAdapter(Context context, List<WifiNetworkInfo> wifiNetworkInfoList, OnItemClickListener listener) {
         this.context = context;
-        this.wifiScanResult = wifiScanResult;
+        this.wifiNetworkInfoList = wifiNetworkInfoList;
         this.listener = listener;
     }
 
@@ -44,15 +44,21 @@ public class WifiResultAdapter extends RecyclerView.Adapter<WifiResultAdapter.Wi
 
     @Override
     public void onBindViewHolder(@NonNull final WifiHolder holder, int position) {
-        holder.title.setText(wifiScanResult.get(holder.getAdapterPosition()).SSID);
+        WifiNetworkInfo wifiNetworkInfo = wifiNetworkInfoList.get(holder.getAdapterPosition());
+        holder.title.setText(wifiNetworkInfo.getSsid());
         holder.itemView.setOnClickListener(v -> listener.onItemClick(v, holder.getAdapterPosition()));
-        holder.wifiIcon.updateState(WifiHelper.isClose(wifiScanResult.get(holder.getAdapterPosition())),
-                wifiScanResult.get(holder.getAdapterPosition()).level);
+        holder.wifiIcon.updateState(wifiNetworkInfo.getSecurityType() != WifiConfiguration.KeyMgmt.NONE, wifiNetworkInfo.getRssi());
     }
 
     @Override
     public int getItemCount() {
-        return wifiScanResult.size();
+        return wifiNetworkInfoList.size();
+    }
+
+    public void setList(List<WifiNetworkInfo> list) {
+        wifiNetworkInfoList.clear();
+        wifiNetworkInfoList.addAll(list);
+        notifyDataSetChanged();
     }
 
     static class WifiHolder extends RecyclerView.ViewHolder {

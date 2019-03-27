@@ -50,6 +50,8 @@ public class InstanceManagerTabs extends InjectableActivity implements TabLayout
 
         setSupportActionBar(toolbar);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         String formId = getIntent().getStringExtra(FORM_ID);
 
         if (formId == null) {

@@ -53,7 +53,7 @@ public class WebViewActivity extends AppCompatActivity {
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 super.onPageStarted(view, url, favicon);
-                getSupportActionBar().setTitle(url);
+                getSupportActionBar().setTitle(getString(R.string.open_source_licenses));
                 progressBar.setVisibility(View.VISIBLE);
                 invalidateOptionsMenu();
             }

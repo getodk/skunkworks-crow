@@ -34,8 +34,8 @@ import androidx.core.app.NotificationCompat;
 import org.odk.share.R;
 import org.odk.share.activities.MainActivity;
 import org.odk.share.application.Share;
-import org.odk.share.controller.WifiHotspotHelper;
 import org.odk.share.events.HotspotEvent;
+import org.odk.share.network.WifiHospotConnector;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.rx.schedulers.BaseSchedulerProvider;
 
@@ -63,7 +63,7 @@ public class HotspotService extends Service {
     BaseSchedulerProvider schedulerProvider;
 
     @Inject
-    WifiHotspotHelper wifiHotspotHelper;
+    WifiHospotConnector wifiHospotConnector;
 
     private HotspotState state;
     private BroadcastReceiver stopReceiver;
@@ -125,8 +125,8 @@ public class HotspotService extends Service {
 
     private void stopHotspot() {
 
-        if (wifiHotspotHelper != null) {
-            wifiHotspotHelper.disableHotspot();
+        if (wifiHospotConnector != null) {
+            wifiHospotConnector.disableHotspot();
         }
 
         if (state != null) {
@@ -170,8 +170,8 @@ public class HotspotService extends Service {
         public void handleMessage(Message msg) {
             int id = msg.what;
             if (id == START) {
-                if (service != null && service.wifiHotspotHelper != null) {
-                    if (service.wifiHotspotHelper.isHotspotEnabled()) {
+                if (service != null && service.wifiHospotConnector != null) {
+                    if (service.wifiHospotConnector.isHotspotEnabled()) {
                         updateNotification(getString(R.string.hotspot_running), true);
                         rxEventBus.post(new HotspotEvent(HotspotEvent.Status.ENABLED));
                     } else {
@@ -180,7 +180,7 @@ public class HotspotService extends Service {
                     }
                 }
             } else if (id == STATUS) {
-                if (service.wifiHotspotHelper == null || !service.wifiHotspotHelper.isHotspotEnabled()) {
+                if (service.wifiHospotConnector == null || !service.wifiHospotConnector.isHotspotEnabled()) {
                     stopHotspot();
                 } else {
                     sendEmptyMessageDelayed(STATUS, notify_stop);
