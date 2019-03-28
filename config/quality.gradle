@@ -48,7 +48,7 @@ task findbugs(type: FindBugs, dependsOn: "assembleDebug") {
     reportLevel = 'high'
 
     excludeFilter = new File("$configDir/findbugs-filter.xml")
-    classes = files("${project.rootDir}/skunkworks_crow/build/intermediates/classes")
+    classes = files("${project.rootDir}/skunkworks_crow/build/intermediates/javac")
 
     source 'src'
     include '**/*.java'
@@ -104,4 +104,9 @@ android {
         htmlOutput file("$reportsDir/lint/lint-result.html")
         xmlOutput file("$reportsDir/lint/lint-result.xml")
     }
+}
+
+//------------------------ ALL ------------------------//
+task checkCode(type: GradleBuild) {
+    tasks = ['pmd', 'checkstyle', 'lint', 'findbugs']
 }

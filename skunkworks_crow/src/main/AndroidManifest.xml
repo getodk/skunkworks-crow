@@ -33,11 +33,23 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.WifiActivity" />
+
+        <activity android:name=".activities.WifiActivity"
+                  android:parentActivityName=".activities.MainActivity">
+            <meta-data
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value=".activities.MainActivity"/>
+        </activity>
         <activity android:name=".activities.InstancesList" />
         <activity android:name=".preferences.SettingsPreference" />
         <activity android:name=".activities.WebViewActivity" />
-        <activity android:name=".activities.AboutActivity" />
+
+        <activity android:name=".activities.AboutActivity"
+                  android:parentActivityName=".activities.MainActivity">
+            <meta-data
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value=".activities.MainActivity"/>
+        </activity>
         <activity
             android:name=".activities.SendActivity"
             android:configChanges="orientation|screenSize" />
@@ -49,7 +61,14 @@
             android:screenOrientation="portrait"
             android:stateNotNeeded="true"
             tools:replace="android:screenOrientation" />
-        <activity android:name=".activities.InstanceManagerTabs" />
+
+        <activity android:name=".activities.InstanceManagerTabs"
+                  android:parentActivityName=".activities.MainActivity">
+            <meta-data
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value=".activities.MainActivity"/>
+        </activity>
+
         <activity android:name=".activities.ReviewFormActivity" />
 
         <provider
@@ -59,7 +78,13 @@
             android:name=".provider.InstanceMapProvider"
             android:authorities="org.odk.share.provider.odk.map" />
 
-        <activity android:name=".activities.SendFormsActivity"></activity>
+        <activity android:name=".activities.SendFormsActivity"
+                  android:parentActivityName=".activities.MainActivity">
+            <meta-data
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value=".activities.MainActivity"/>
+        </activity>
+
     </application>
 
 </manifest>
