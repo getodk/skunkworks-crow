@@ -123,12 +123,10 @@ public class SendActivity extends InjectableActivity {
     @Override
     public void onBackPressed() {
         if (!isHotspotRunning) {
-            stopHotspot();
             finish();
-            return;
+        } else {
+            stopHotspotAlertDialog();
         }
-
-        stopHotspotAlertDialog();
     }
 
     /**
