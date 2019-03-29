@@ -25,8 +25,6 @@ import org.odk.share.adapters.InstanceAdapter;
 import org.odk.share.utilities.ApplicationConstants;
 import org.odk.share.utilities.ArrayUtils;
 
-import java.util.LinkedHashSet;
-
 import javax.inject.Inject;
 
 import butterknife.BindView;
@@ -59,9 +57,6 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
     @Inject
     InstancesDao instancesDao;
 
-    private InstanceAdapter instanceAdapter;
-    private LinkedHashSet<Long> selectedInstances;
-
     public FilledFormsFragment() {
     }
 
@@ -71,12 +66,12 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
         setHasOptionsMenu(true);
         View view = inflater.inflate(R.layout.fragment_forms, container, false);
         ButterKnife.bind(this, view);
-
-        selectedInstances = new LinkedHashSet<>();
-
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(llm);
+
+        restoreState(savedInstanceState);
+
         return view;
     }
 
