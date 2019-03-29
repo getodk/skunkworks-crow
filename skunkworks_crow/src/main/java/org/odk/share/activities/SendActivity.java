@@ -130,7 +130,11 @@ public class SendActivity extends InjectableActivity {
 
     @Override
     public void onBackPressed() {
-        stopHotspotAlertDialog();
+        if (!isHotspotRunning) {
+            finish();
+        } else {
+            stopHotspotAlertDialog();
+        }
     }
 
     /**
@@ -290,7 +294,7 @@ public class SendActivity extends InjectableActivity {
         Timber.d("Hotspot Stopped");
         compositeDisposable.dispose();
     }
-
+  
     @Override
     protected void onResume() {
         super.onResume();
