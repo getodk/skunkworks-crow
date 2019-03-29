@@ -81,7 +81,7 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
 
         setTitle(getString(R.string.app_name));
         setSupportActionBar(toolbar);
-        Share.createODKDirs(this);
+        createODKDirs();
 
         sendForms.setEnabled(false);
 
@@ -220,6 +220,17 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
 
         builder.setCancelable(false);
         builder.show();
+    }
+
+    // call createODKDirs() with a permission check.
+    private void createODKDirs() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
+                checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+            Share.createODKDirs(this);
+        } else {
+            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
+                    STORAGE_PERMISSION_REQUEST_CODE);
+        }
     }
 
     private void addListItemDivider() {
