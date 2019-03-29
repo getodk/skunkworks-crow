@@ -1,10 +1,12 @@
 package org.odk.share.activities;
 
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
@@ -45,7 +47,7 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
     public static final String FORM_DISPLAY_NAME = "form_display_name";
     private static final String FORM_CHOOSER_LIST_SORTING_ORDER = "formChooserListSortingOrder";
     private static final String COLLECT_PACKAGE = "org.odk.collect.android";
-
+    private static final int STORAGE_PERMISSION_REQUEST_CODE = 101;
     private static final int FORM_LOADER = 2;
 
     @BindView(R.id.toolbar)
@@ -84,21 +86,13 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
         sendForms.setEnabled(false);
 
         LinearLayoutManager llm = new LinearLayoutManager(this);
-        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        llm.setOrientation(RecyclerView.VERTICAL);
         recyclerView.setLayoutManager(llm);
-        setupAdapter();
-        getSupportLoaderManager().initLoader(FORM_LOADER, null, this);
-        addListItemDivider();
-    }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (isCollectInstalled()) {
-            updateAdapter();
-        } else {
-            showAlertDialog();
-        }
+        //check the storage permission and start the loader
+        setUpLoader();
+
+        addListItemDivider();
     }
 
     private void setupAdapter() {
@@ -237,4 +231,37 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
 
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        switch (requestCode) {
+            case STORAGE_PERMISSION_REQUEST_CODE:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    setUpLoader();
+                } else {
+                    //close the app if the permission is denied
+                    finish();
+                }
+        }
+    }
+
+    private void setUpLoader() {
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
+                checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+
+            setupAdapter();
+            getSupportLoaderManager().initLoader(FORM_LOADER, null, this);
+
+            if (isCollectInstalled()) {
+                updateAdapter();
+            } else {
+                showAlertDialog();
+            }
+        } else {
+            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE , Manifest.permission.READ_EXTERNAL_STORAGE},
+                    STORAGE_PERMISSION_REQUEST_CODE);
+        }
+    }
 }
