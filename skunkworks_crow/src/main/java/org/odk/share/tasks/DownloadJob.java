@@ -158,7 +158,7 @@ public class DownloadJob extends Worker {
     @Override
     public void onStopped() {
         super.onStopped();
-    try {
+        try {
             if (socket != null) {
                 socket.close();
             }
