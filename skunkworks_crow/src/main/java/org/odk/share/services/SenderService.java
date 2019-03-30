@@ -88,12 +88,12 @@ public class SenderService {
 
     public void cancel() {
         if (currentJob != null) {
-                workManager.cancelWorkById(currentJob.getId());
-                rxEventBus.post(new UploadEvent(UploadEvent.Status.CANCELLED));
-            } else {
-                Timber.e("Pending job not found : %s", currentJob);
-            }
-            currentJob = null;
+            workManager.cancelWorkById(currentJob.getId());
+            rxEventBus.post(new UploadEvent(UploadEvent.Status.CANCELLED));
+        } else {
+            Timber.e("Pending job not found : %s", currentJob);
         }
+        currentJob = null;
     }
+}
 
