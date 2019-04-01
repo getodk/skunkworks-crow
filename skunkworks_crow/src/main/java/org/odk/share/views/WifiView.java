@@ -6,11 +6,13 @@ import android.util.AttributeSet;
 
 import org.odk.share.R;
 
+import androidx.appcompat.widget.AppCompatImageView;
+
 /**
  * Created by laksh on 5/25/2018.
  */
 
-public class WifiView extends android.support.v7.widget.AppCompatImageView {
+public class WifiView extends AppCompatImageView {
     public WifiView(Context context) {
         super(context);
     }

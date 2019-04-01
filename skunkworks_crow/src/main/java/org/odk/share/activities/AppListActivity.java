@@ -19,22 +19,24 @@ package org.odk.share.activities;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.BottomSheetDialog;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
+
+import androidx.appcompat.widget.SearchView;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.MenuItemCompat;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import org.odk.share.R;
 import org.odk.share.adapters.SortDialogAdapter;
 
 import java.util.LinkedHashSet;
 
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import timber.log.Timber;
 
 import static org.odk.share.utilities.ApplicationConstants.SortingOrder.BY_NAME_ASC;
@@ -102,7 +104,7 @@ abstract class AppListActivity extends InjectableActivity {
         searchView.setQueryHint(getResources().getString(R.string.search));
         searchView.setMaxWidth(Integer.MAX_VALUE);
         SearchView.SearchAutoComplete searchAutoComplete =
-                (SearchView.SearchAutoComplete) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+                (SearchView.SearchAutoComplete) searchView.findViewById(androidx.appcompat.R.id.search_src_text);
         searchAutoComplete.setCursorVisible(true);
         searchAutoComplete.setHintTextColor(ContextCompat.getColor(this, android.R.color.white));
         searchAutoComplete.setTextColor(ContextCompat.getColor(this, android.R.color.white));
