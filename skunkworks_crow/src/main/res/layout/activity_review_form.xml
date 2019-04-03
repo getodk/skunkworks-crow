@@ -37,7 +37,7 @@
                 android:textSize="21sp"
                 android:textStyle="bold"/>
 
-            <android.support.design.widget.TextInputLayout
+            <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/input_layout_feedback"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -49,8 +49,8 @@
                     android:inputType="text"
                     android:textSize="18sp"
                     android:hint="@string/add_feedback"/>
-
-            </android.support.design.widget.TextInputLayout>
+                
+            </com.google.android.material.textfield.TextInputLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"

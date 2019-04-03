@@ -5,7 +5,7 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "org.odk.share"
-        minSdkVersion 16
+        minSdkVersion 22
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
@@ -31,6 +31,8 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-alpha4'
+    implementation 'com.google.android.material:material:1.0.0'
+
 
     // butterknife
     implementation "com.jakewharton:butterknife:${rootProject.butterknifeVersion}"
