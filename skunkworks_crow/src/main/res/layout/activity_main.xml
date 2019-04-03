@@ -1,6 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    style="@style/MatchParent"
     android:orientation="vertical">
 
     <!-- Toolbar -->
@@ -8,50 +7,44 @@
 
     <RelativeLayout
         android:id="@+id/relativeLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/toolbar"
+        style="@style/MatchParent"
         android:layout_above="@+id/buttonholder"
+        android:layout_below="@id/toolbar"
         android:orientation="vertical">
 
         <TextView
             android:id="@+id/empty_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/WrapContent"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:gravity="center"
-            android:textSize="22sp"
-            android:padding="10dp"/>
+            android:padding="10dp"
+            android:textSize="22sp" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/recyclerview"/>
+            android:id="@+id/recyclerview"
+            style="@style/MatchParent" />
 
     </RelativeLayout>
 
     <LinearLayout
         android:id="@+id/buttonholder"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        style="@style/MatchParentWidth"
         android:layout_alignParentBottom="true"
         android:orientation="horizontal"
         android:weightSum="2">
 
         <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/send_forms"
             android:id="@+id/bSendForms"
-            android:layout_weight="1"/>
+            style="@style/MatchParentWidth"
+            android:layout_weight="1"
+            android:text="@string/send_forms" />
 
         <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/receive_forms"
-            android:id="@+id/bViewWifi"
-            android:layout_weight="1"/>
+            android:id="@+id/bReceiveForms"
+            style="@style/MatchParentWidth"
+            android:layout_weight="1"
+            android:text="@string/receive_forms" />
     </LinearLayout>
 
 </RelativeLayout>
