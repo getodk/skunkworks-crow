@@ -157,7 +157,5 @@ public class SettingsPreference extends PreferenceActivity {
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
-
-
 }
 
