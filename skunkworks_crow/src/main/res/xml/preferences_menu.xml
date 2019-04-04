@@ -10,7 +10,7 @@
             android:key="hotspot_name"
             android:icon="@drawable/ic_wifi_tethering_black_24dp"/>
 
-        <android.preference.EditTextPreference
+        <Preference
             android:defaultValue="@string/default_hotspot_password"
             android:summary="********"
             android:title="@string/title_hotspot_password"

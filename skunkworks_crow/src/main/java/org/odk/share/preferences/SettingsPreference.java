@@ -8,14 +8,16 @@ import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+import android.support.design.widget.TextInputLayout;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
 import org.odk.share.R;
-
-import androidx.appcompat.widget.Toolbar;
 
 
 /**
@@ -25,9 +27,10 @@ import androidx.appcompat.widget.Toolbar;
 public class SettingsPreference extends PreferenceActivity {
 
     EditTextPreference hotspotNamePreference;
-    EditTextPreference hotspotPasswordPreference;
+    Preference hotspotPasswordPreference;
     CheckBoxPreference passwordRequirePreference;
     EditTextPreference odkDestinationDirPreference;
+    private SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,11 +54,11 @@ public class SettingsPreference extends PreferenceActivity {
 
     private void addPreferences() {
         hotspotNamePreference = (EditTextPreference) findPreference(PreferenceKeys.KEY_HOTSPOT_NAME);
-        hotspotPasswordPreference = (EditTextPreference) findPreference(PreferenceKeys.KEY_HOTSPOT_PASSWORD);
+        hotspotPasswordPreference = (Preference) findPreference(PreferenceKeys.KEY_HOTSPOT_PASSWORD);
         passwordRequirePreference = (CheckBoxPreference) findPreference(PreferenceKeys.KEY_HOTSPOT_PWD_REQUIRE);
         odkDestinationDirPreference = (EditTextPreference) findPreference(PreferenceKeys.KEY_ODK_DESTINATION_DIR);
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
         hotspotNamePreference.setSummary(prefs.getString(PreferenceKeys.KEY_HOTSPOT_NAME,
                 getString(R.string.default_hotspot_ssid)));
@@ -70,6 +73,19 @@ public class SettingsPreference extends PreferenceActivity {
         hotspotPasswordPreference.setOnPreferenceChangeListener(preferenceChangeListener());
         passwordRequirePreference.setOnPreferenceChangeListener(preferenceChangeListener());
         odkDestinationDirPreference.setOnPreferenceChangeListener(preferenceChangeListener());
+
+        hotspotPasswordPreference.setOnPreferenceClickListener(preferenceClickListener());
+    }
+
+    private Preference.OnPreferenceClickListener preferenceClickListener() {
+        return preference -> {
+            switch (preference.getKey()) {
+                case PreferenceKeys.KEY_HOTSPOT_PASSWORD:
+                    showPasswordDialog();
+                    break;
+            }
+            return false;
+        };
     }
 
     private Preference.OnPreferenceChangeListener preferenceChangeListener() {
@@ -121,4 +137,24 @@ public class SettingsPreference extends PreferenceActivity {
         }
     }
 
+    private void showPasswordDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater factory = LayoutInflater.from(this);
+
+        View dialogView = factory.inflate(R.layout.dialog_password_til, null);
+        TextInputLayout tlPassword = dialogView.findViewById(R.id.et_password_layout);
+        tlPassword.getEditText().setText(prefs.getString(PreferenceKeys.KEY_HOTSPOT_PASSWORD, getString(R.string.default_hotspot_password)));
+
+        builder.setTitle(getString(R.string.title_hotspot_password));
+        builder.setView(dialogView);
+        builder.setPositiveButton(getString(R.string.ok), (dialog, which) -> {
+            String password = tlPassword.getEditText().getText().toString();
+            prefs.edit().putString(PreferenceKeys.KEY_HOTSPOT_PASSWORD, password).apply();
+        });
+        builder.setNegativeButton(getString(R.string.cancel), (dialog, which) -> dialog.dismiss());
+
+        builder.setCancelable(false);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
 }
