@@ -1,4 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -9,9 +10,9 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/toolbar"
         android:fillViewport="true"
-        android:orientation="vertical"
-        android:layout_below="@id/toolbar">
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -31,13 +32,13 @@
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:lineSpacingMultiplier="1.2"
-                android:paddingBottom="20dp"
                 android:paddingTop="10dp"
+                android:paddingBottom="20dp"
                 android:textColor="@color/colorPrimary"
                 android:textSize="21sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
-            <android.support.design.widget.TextInputLayout
+            <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/input_layout_feedback"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -46,11 +47,12 @@
                     android:id="@+id/save_feedback"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:hint="@string/add_feedback"
                     android:inputType="text"
                     android:textSize="18sp"
-                    android:hint="@string/add_feedback"/>
+                    tools:ignore="Autofill" />
 
-            </android.support.design.widget.TextInputLayout>
+            </com.google.android.material.textfield.TextInputLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -59,18 +61,18 @@
                 android:weightSum="2">
 
                 <Button
+                    android:id="@+id/bApprove"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/approve"
-                    android:id="@+id/bApprove"
-                    android:layout_weight="1" />
+                    android:layout_weight="1"
+                    android:text="@string/approve" />
 
                 <Button
+                    android:id="@+id/bReject"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/Reject"
-                    android:id="@+id/bReject"
-                    android:layout_weight="1"/>
+                    android:layout_weight="1"
+                    android:text="@string/Reject" />
 
             </LinearLayout>
 
@@ -82,10 +84,10 @@
                 android:text="@string/view_form_in_collect" />
 
             <Button
+                android:id="@+id/bReviewLater"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/review_later"
-                android:id="@+id/bReviewLater" />
+                android:text="@string/review_later" />
 
             <View
                 android:layout_width="match_parent"
