@@ -158,4 +158,3 @@ public class SettingsPreference extends PreferenceActivity {
         alertDialog.show();
     }
 }
-

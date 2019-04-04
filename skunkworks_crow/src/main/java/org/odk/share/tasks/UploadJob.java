@@ -2,7 +2,6 @@ package org.odk.share.tasks;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.support.annotation.NonNull;
 
 import com.evernote.android.job.Job;
 
@@ -39,6 +38,7 @@ import java.util.UUID;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
 import timber.log.Timber;
 
 import static org.odk.share.dto.InstanceMap.INSTANCE_UUID;
