@@ -119,6 +119,9 @@ public class SendActivity extends InjectableActivity {
         openSettings = false;
 
         wifiHotspotManager.stopHotspot();
+
+        //location permission is needed for using hotspot
+        checkLocationPermission();
     }
 
     @Override
@@ -257,9 +260,6 @@ public class SendActivity extends InjectableActivity {
         super.onResume();
         compositeDisposable.add(addHotspotEventSubscription());
         compositeDisposable.add(addUploadEventSubscription());
-
-        //location permission is needed for using hotspot
-        checkLocationPermission();
     }
 
     private Disposable addUploadEventSubscription() {
@@ -385,10 +385,8 @@ public class SendActivity extends InjectableActivity {
     }
 
     private void checkLocationPermission() {
-
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
                 checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-
             toggleHotspot();
         } else {
             requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
