@@ -241,7 +241,9 @@ public class SendActivity extends InjectableActivity {
 
     private void stopHotspot() {
         if (isHotspotRunning) {
-            wifiHotspot.disableHotspot();
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                wifiHotspot.disableHotspot();
+            }
         }
 
         senderService.cancel();
