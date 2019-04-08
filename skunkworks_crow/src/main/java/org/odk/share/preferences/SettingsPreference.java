@@ -158,5 +158,6 @@ public class SettingsPreference extends PreferenceActivity {
         builder.setCancelable(false);
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
+        alertDialog.setCancelable(true);
     }
 }
