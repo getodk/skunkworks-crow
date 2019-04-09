@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputLayout;
@@ -159,5 +160,6 @@ public class SettingsPreference extends PreferenceActivity {
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
         alertDialog.setCancelable(true);
+        alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
     }
 }
