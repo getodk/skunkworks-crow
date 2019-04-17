@@ -34,7 +34,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".activities.WifiActivity"
+        <activity android:name=".activities.ReceiverActivity"
                   android:parentActivityName=".activities.MainActivity">
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
@@ -85,6 +85,10 @@
                     android:value=".activities.MainActivity"/>
         </activity>
 
+        <service
+            android:name="com.evernote.android.job.gcm.PlatformGcmService"
+            android:enabled="true"
+            tools:replace="android:enabled"/>
     </application>
 
 </manifest>

@@ -10,7 +10,10 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 
 import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.Collections;
 import java.util.List;
 
 import timber.log.Timber;
@@ -197,5 +200,25 @@ public final class WifiConnector {
                 (byte) (0xff & (hostAddress >> 8)),
                 (byte) (0xff & (hostAddress >> 16)),
                 (byte) (0xff & (hostAddress >> 24))};
+    }
+
+    public String getWifiApIp() {
+        try {
+            List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
+            for (NetworkInterface intf : interfaces) {
+                if (intf.getName().contains("wlan")) {
+                    List<InetAddress> addrs = Collections.list(intf.getInetAddresses());
+                    for (InetAddress addr : addrs) {
+                        if (addr.isSiteLocalAddress()) {
+                            return addr.getHostAddress();
+                        }
+                    }
+                }
+            }
+        } catch (SocketException e) {
+            Timber.e(e);
+        }
+
+        return getAccessPointIpAddress();
     }
 }

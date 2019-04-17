@@ -40,7 +40,6 @@ import org.odk.share.rx.schedulers.BaseSchedulerProvider;
 import org.odk.share.services.ReceiverService;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -58,12 +57,13 @@ import io.reactivex.disposables.Disposable;
 import timber.log.Timber;
 
 import static com.google.zxing.integration.android.IntentIntegrator.QR_CODE_TYPES;
+import static org.odk.share.utilities.QRCodeUtils.IP;
 import static org.odk.share.utilities.QRCodeUtils.PASSWORD;
 import static org.odk.share.utilities.QRCodeUtils.PORT;
 import static org.odk.share.utilities.QRCodeUtils.PROTECTED;
 import static org.odk.share.utilities.QRCodeUtils.SSID;
 
-public class WifiActivity extends InjectableActivity implements OnItemClickListener, WifiStateListener {
+public class ReceiverActivity extends InjectableActivity implements OnItemClickListener, WifiStateListener {
 
     private static final int DIALOG_DOWNLOAD_PROGRESS = 1;
     private static final int DIALOG_CONNECTING = 2;
@@ -101,7 +101,7 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
     private int port;
 
     private boolean isQRCodeScanned;
-    private String ssidScanned;
+    private String ip;
     private boolean isProtected;
     private String passwordScanned;
 
@@ -121,10 +121,7 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         isQRCodeScanned = false;
-        ssidScanned = null;
         isProtected = false;
-        passwordScanned = null;
-        lastConnectedWifiInfo = null;
         port = -1;
 
         scanResultList = new ArrayList<>();
@@ -141,18 +138,19 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
         } else {
             lastConnectedWifiInfo = wifiConnector.getActiveConnection();
         }
+
+        startScan();
     }
 
-    private boolean isPossibleHotspot(String ssid) {
+    /*private boolean isPossibleHotspot(String ssid) {
         return ssid.contains(getString(R.string.hotspot_name_suffix)) ||
-                ssid.contains(getString(R.string.hotspot_name_prefix_oreo));
-    }
+                ssid.startsWith(getString(R.string.hotspot_name_prefix_oreo));
+    }*/
 
     @Override
     protected void onResume() {
         super.onResume();
         wifiStateBroadcastReceiver.register();
-        startScan();
         compositeDisposable.add(addDownloadEventSubscription());
     }
 
@@ -313,8 +311,12 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
 
     private void startReceiveTask() {
         showDialog(DIALOG_DOWNLOAD_PROGRESS);
-        String dstAddress = wifiConnector.getAccessPointIpAddress();
-        receiverService.startDownloading(dstAddress, port);
+
+        if (ip == null || ip.isEmpty()) {
+            ip = wifiConnector.getAccessPointIpAddress();
+        }
+
+        receiverService.startDownloading(ip, port);
     }
 
     @OnClick(R.id.bScan)
@@ -397,19 +399,25 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
                 // request was canceled...
                 Timber.i("QR code scanning cancelled");
             } else {
-                Timber.d("RESULT " + result);
+                Timber.d("Result: %s", result);
                 try {
                     JSONObject obj = new JSONObject(result.getContents());
-                    ssidScanned = (String) obj.get(SSID);
+                    ip = (String) obj.get(IP);
+                    wifiNetworkSSID = (String) obj.get(SSID);
                     port = (Integer) obj.get(PORT);
                     isProtected = (boolean) obj.get(PROTECTED);
                     if (isProtected) {
                         passwordScanned = (String) obj.get(PASSWORD);
                     }
 
-                    Timber.d("Scanned results " + ssidScanned + " " + port + " " + isProtected + " " + passwordScanned);
+                    Timber.d("Scanned results " + wifiNetworkSSID + " " + port + " " + isProtected + " " + passwordScanned);
                     isQRCodeScanned = true;
-                    startScan();
+
+                    if (wifiConnector.getAccessPointIpAddress() != null && wifiConnector.getAccessPointIpAddress().equals(ip)) {
+                        onConnected();
+                    } else {
+                        startScan();
+                    }
                 } catch (JSONException e) {
                     Timber.e(e);
                 }
@@ -419,7 +427,6 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
 
     @Override
     public void onStateUpdate(NetworkInfo.DetailedState detailedState) {
-
         String connectedSsid = wifiConnector.getWifiSSID();
 
         Timber.d(wifiNetworkSSID + " " + connectedSsid + " " + detailedState.toString());
@@ -430,7 +437,6 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
                 wifiResultAdapter.notifyItemChanged(scanResultList.indexOf(wifiNetworkInfo));
 
                 if (!isConnected) {
-                    isConnected = true;
                     onConnected();
                 }
 
@@ -440,6 +446,8 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
     }
 
     private void onConnected() {
+        isConnected = true;
+
         Toast.makeText(getApplicationContext(), "Connected to " + wifiNetworkSSID, Toast.LENGTH_LONG).show();
 
         removeDialog(DIALOG_CONNECTING);
@@ -462,16 +470,12 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
         ArrayList<WifiNetworkInfo> list = new ArrayList<>();
 
         for (ScanResult scanResult : scanResults) {
-            if (isPossibleHotspot(scanResult.SSID)) {
-                WifiNetworkInfo wifiNetworkInfo = new WifiNetworkInfo();
-                wifiNetworkInfo.setSsid(scanResult.SSID);
-                wifiNetworkInfo.setRssi(WifiManager.calculateSignalLevel(scanResult.level, 100));
-                wifiNetworkInfo.setSecurityType(wifiConnector.getScanResultSecurity(scanResult));
-                list.add(wifiNetworkInfo);
-            }
+            WifiNetworkInfo wifiNetworkInfo = new WifiNetworkInfo();
+            wifiNetworkInfo.setSsid(scanResult.SSID);
+            wifiNetworkInfo.setRssi(WifiManager.calculateSignalLevel(scanResult.level, 100));
+            wifiNetworkInfo.setSecurityType(wifiConnector.getScanResultSecurity(scanResult));
+            list.add(wifiNetworkInfo);
         }
-
-        Timber.d(Arrays.toString(list.toArray()));
 
         wifiListAvailable(list);
     }
@@ -491,12 +495,12 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
         if (isQRCodeScanned) {
             isQRCodeScanned = false;
             for (WifiNetworkInfo info : list) {
-                if (info.getSsid().equals(ssidScanned)) {
+                if (info.getSsid().equals(wifiNetworkSSID)) {
                     if (info.getState() != NetworkInfo.DetailedState.CONNECTED) {
                         Toast.makeText(this, "attempting connection", Toast.LENGTH_SHORT).show();
-                        connectToNetwork(info.getSecurityType(), ssidScanned, passwordScanned);
+                        connectToNetwork(info.getSecurityType(), wifiNetworkSSID, passwordScanned);
                     } else {
-                        Toast.makeText(this, "already connected to " + ssidScanned, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "already connected to " + wifiNetworkSSID, Toast.LENGTH_SHORT).show();
                     }
                     return;
                 }

@@ -1,6 +1,7 @@
 package org.odk.share.activities;
 
 import android.Manifest;
+import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -24,6 +25,7 @@ import org.odk.share.adapters.basecursoradapter.ItemClickListener;
 import org.odk.share.application.Share;
 import org.odk.share.dao.TransferDao;
 import org.odk.share.preferences.SettingsPreference;
+import org.odk.share.preferences.SharedPreferencesHelper;
 
 import javax.inject.Inject;
 
@@ -70,6 +72,9 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
     @Inject
     TransferDao transferDao;
 
+    @Inject
+    SharedPreferencesHelper sharedPreferencesHelper;
+
     private FormsAdapter formAdapter;
 
 
@@ -102,14 +107,41 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
 
     @OnClick(R.id.bViewWifi)
     public void viewWifiNetworks() {
-        Intent intent = new Intent(this, WifiActivity.class);
+        Intent intent = new Intent(this, ReceiverActivity.class);
         startActivity(intent);
     }
 
     @OnClick(R.id.bSendForms)
     public void selectForms() {
-        Intent intent = new Intent(this, SendFormsActivity.class);
-        startActivity(intent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (sharedPreferencesHelper.getHotspotName().isEmpty() ||
+                    (sharedPreferencesHelper.isHotspotPasswordProtected() && sharedPreferencesHelper.getHotspotPassword().isEmpty())) {
+                new AlertDialog.Builder(this)
+                        .setTitle("Configuration missing...")
+                        .setMessage("Please set hotspot name and password as declared in setting")
+                        .setPositiveButton("Open Hotspot Settings", (dialog, which) -> {
+                            final Intent intent = new Intent(Intent.ACTION_MAIN, null);
+                            intent.addCategory(Intent.CATEGORY_LAUNCHER);
+                            final ComponentName cn = new ComponentName("com.android.settings", "com.android.settings.TetherSettings");
+                            intent.setComponent(cn);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent);
+                        })
+                        .setNegativeButton("Configure", (dialog, which) -> {
+                            startActivity(new Intent(getApplicationContext(), SettingsPreference.class));
+                            dialog.dismiss();
+                        })
+                        .setNeutralButton("Cancel", (dialog, which) -> dialog.dismiss())
+                        .create()
+                        .show();
+            } else {
+                Intent intent = new Intent(this, SendFormsActivity.class);
+                startActivity(intent);
+            }
+        } else {
+            Intent intent = new Intent(this, SendFormsActivity.class);
+            startActivity(intent);
+        }
     }
 
     @Override

@@ -111,6 +111,7 @@ public class DownloadJob extends Job {
         try {
             socket = new Socket();
             socket.connect(new InetSocketAddress(ip, port), TIMEOUT);
+            socket.setSoTimeout(0);
             Timber.d("Socket connected");
             dis = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
             dos = new DataOutputStream(socket.getOutputStream());
@@ -138,7 +139,7 @@ public class DownloadJob extends Job {
             dos.close();
             dis.close();
 
-        } catch (IOException | IllegalArgumentException e) {
+        } catch (Exception e) {
             Timber.e(e);
             return new DownloadEvent(DownloadEvent.Status.ERROR, e.getMessage());
         }

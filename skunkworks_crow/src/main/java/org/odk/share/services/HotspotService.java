@@ -24,12 +24,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-
-import androidx.annotation.Nullable;
-import androidx.core.app.NotificationCompat;
 
 import org.odk.share.R;
 import org.odk.share.activities.MainActivity;
@@ -41,6 +39,8 @@ import org.odk.share.rx.schedulers.BaseSchedulerProvider;
 
 import javax.inject.Inject;
 
+import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
 import io.reactivex.disposables.CompositeDisposable;
 
 
@@ -91,7 +91,10 @@ public class HotspotService extends Service {
         };
         state = new HotspotState(this);
         registerReceiver(stopReceiver, new IntentFilter(ACTION_STOP));
-        startForeground(HOTSPOT_NOTIFICATION_ID, buildForegroundNotification(getString(R.string.hotspot_start), false));
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            startForeground(HOTSPOT_NOTIFICATION_ID, buildForegroundNotification(getString(R.string.hotspot_start), false));
+        }
     }
 
     @Override
