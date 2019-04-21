@@ -25,6 +25,8 @@ import org.odk.share.adapters.InstanceAdapter;
 import org.odk.share.utilities.ApplicationConstants;
 import org.odk.share.utilities.ArrayUtils;
 
+import java.util.LinkedHashSet;
+
 import javax.inject.Inject;
 
 import butterknife.BindView;
@@ -58,6 +60,8 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
     InstancesDao instancesDao;
 
     private InstanceAdapter instanceAdapter;
+    private LinkedHashSet<Long> selectedInstances;
+    private static final String SELECTED_INSTANCES_KEY = "ROTATION_SELECTED_INSTANCES";
 
     public FilledFormsFragment() {
     }
@@ -68,11 +72,18 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
         setHasOptionsMenu(true);
         View view = inflater.inflate(R.layout.fragment_forms, container, false);
         ButterKnife.bind(this, view);
+        selectedInstances = new LinkedHashSet<>();
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(llm);
 
-        restoreState(savedInstanceState);
+        if (savedInstanceState != null) {
+            long[] previousSelectedInstances = savedInstanceState.getLongArray(SELECTED_INSTANCES_KEY);
+            for (long previousSelectedInstance : previousSelectedInstances) {
+                selectedInstances.add(previousSelectedInstance);
+            }
+            sendButton.setEnabled(selectedInstances.size() > 0);
+        }
 
         return view;
     }
@@ -87,6 +98,14 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         return instancesDao.getSavedInstancesCursorLoader(getFilterText(), getSortingOrder());
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putLongArray(SELECTED_INSTANCES_KEY, ArrayUtils.toPrimitive(
+                selectedInstances.toArray(new Long[selectedInstances.size()])));
+
     }
 
     @Override
