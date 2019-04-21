@@ -68,6 +68,8 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
     @Inject
     TransferDao transferDao;
 
+    private FormsAdapter formAdapter;
+
     public BlankFormsFragment() {
     }
 

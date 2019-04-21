@@ -57,6 +57,8 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
     @Inject
     InstancesDao instancesDao;
 
+    private InstanceAdapter instanceAdapter;
+
     public FilledFormsFragment() {
     }
 
