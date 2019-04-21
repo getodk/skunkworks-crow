@@ -16,7 +16,9 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import org.odk.collect.android.dao.InstancesDao;
 import org.odk.collect.android.provider.InstanceProviderAPI;
 import org.odk.share.R;
@@ -25,13 +27,8 @@ import org.odk.share.adapters.InstanceAdapter;
 import org.odk.share.utilities.ApplicationConstants;
 import org.odk.share.utilities.ArrayUtils;
 
-import java.util.LinkedHashSet;
-
 import javax.inject.Inject;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
+import java.util.LinkedHashSet;
 
 import static org.odk.share.fragments.ReviewedInstancesFragment.MODE;
 
@@ -62,6 +59,7 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
     private InstanceAdapter instanceAdapter;
     private LinkedHashSet<Long> selectedInstances;
     private static final String SELECTED_INSTANCES_KEY = "ROTATION_SELECTED_INSTANCES";
+    private static final String TOTAL_FORMS_KEY = "TOTAL_FORMS";
 
     public FilledFormsFragment() {
     }
@@ -83,6 +81,12 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
                 selectedInstances.add(previousSelectedInstance);
             }
             sendButton.setEnabled(selectedInstances.size() > 0);
+
+            if (selectedInstances.size() == savedInstanceState.getInt(TOTAL_FORMS_KEY)) {
+                toggleButton.setText(getString(R.string.clear_all));
+            } else {
+                toggleButton.setText(getString(R.string.select_all));
+            }
         }
 
         return view;
@@ -105,6 +109,8 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
         super.onSaveInstanceState(outState);
         outState.putLongArray(SELECTED_INSTANCES_KEY, ArrayUtils.toPrimitive(
                 selectedInstances.toArray(new Long[selectedInstances.size()])));
+
+        outState.putInt(TOTAL_FORMS_KEY, instanceAdapter.getItemCount());
 
     }
 

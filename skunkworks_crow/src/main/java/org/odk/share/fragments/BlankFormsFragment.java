@@ -1,5 +1,3 @@
-
-
 package org.odk.share.fragments;
 
 import android.content.Intent;
@@ -11,13 +9,16 @@ import android.support.v4.content.Loader;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import org.odk.collect.android.dao.FormsDao;
 import org.odk.collect.android.dao.InstancesDao;
 import org.odk.collect.android.provider.FormsProviderAPI;
@@ -30,13 +31,8 @@ import org.odk.share.dao.TransferDao;
 import org.odk.share.utilities.ApplicationConstants;
 import org.odk.share.utilities.ArrayUtils;
 
-import java.util.LinkedHashSet;
-
 import javax.inject.Inject;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
+import java.util.LinkedHashSet;
 
 import static org.odk.share.fragments.ReviewedInstancesFragment.MODE;
 
@@ -49,6 +45,7 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
     public static final String FORM_IDS = "form_ids";
     private static final String FORM_CHOOSER_LIST_SORTING_ORDER = "formChooserListSortingOrder";
     private static final String SELECTED_INSTANCES_KEY = "ROTATION_SELECTED_INSTANCES";
+    private static final String TOTAL_FORMS_KEY = "TOTAL_FORMS";
     private static final int FORM_LOADER = 2;
 
     @BindView(R.id.recyclerview)
@@ -96,6 +93,13 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
                 selectedForms.add(previousSelectedInstance);
             }
             sendButton.setEnabled(selectedForms.size() > 0);
+
+            if (selectedForms.size() == savedInstanceState.getInt(TOTAL_FORMS_KEY)) {
+                toggleButton.setText(getString(R.string.clear_all));
+                Log.v("DANG ", toggleButton.getText().toString());
+            } else {
+                toggleButton.setText(getString(R.string.select_all));
+            }
         }
 
         return view;
@@ -118,6 +122,8 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
         super.onSaveInstanceState(outState);
         outState.putLongArray(SELECTED_INSTANCES_KEY, ArrayUtils.toPrimitive(
                 selectedForms.toArray(new Long[selectedForms.size()])));
+
+        outState.putInt(TOTAL_FORMS_KEY, formAdapter.getItemCount());
 
     }
 
