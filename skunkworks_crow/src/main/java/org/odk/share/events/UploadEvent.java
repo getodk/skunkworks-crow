@@ -1,6 +1,6 @@
 package org.odk.share.events;
 
-public class UploadEvent {
+public class UploadEvent extends RxEvent {
 
     private Status status;
     private String result;

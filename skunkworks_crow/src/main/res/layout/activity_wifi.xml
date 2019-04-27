@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    style="@style/MatchParent"
     android:orientation="vertical">
 
     <!-- Toolbar -->
@@ -9,21 +8,18 @@
 
     <RelativeLayout
         android:id="@+id/relativeLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        style="@style/MatchParent"
         android:layout_above="@+id/buttonholder"
         android:layout_below="@id/toolbar">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            style="@style/MatchParent"
             android:visibility="gone" />
 
         <TextView
             android:id="@+id/empty_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/WrapContent"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:gravity="center"
@@ -33,32 +29,28 @@
 
         <ProgressBar
             android:id="@+id/wifi_progress_bar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/WrapContent"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="128dp"/>
+            android:layout_marginTop="128dp" />
 
     </RelativeLayout>
 
     <LinearLayout
         android:id="@+id/buttonholder"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        style="@style/MatchParentWidth"
         android:layout_alignParentBottom="true"
         android:orientation="horizontal"
         android:weightSum="2">
 
         <Button
             android:id="@+id/bScan"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            style="@style/MatchParentWidth"
             android:layout_weight="1"
             android:text="@string/scan" />
 
         <Button
             android:id="@+id/bScanQRCode"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            style="@style/MatchParentWidth"
             android:layout_weight="1"
             android:text="@string/scan_qr_code" />
     </LinearLayout>

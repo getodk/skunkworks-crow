@@ -1,6 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    style="@style/MatchParent"
     android:orientation="vertical">
 
     <!-- Toolbar -->
@@ -8,8 +7,7 @@
 
     <TextView
         android:id="@+id/tvConnectStatus"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        style="@style/MatchParentWidth"
         android:layout_below="@id/toolbar"
         android:layout_margin="10dp"
         android:gravity="center"
@@ -18,16 +16,14 @@
 
     <ImageView
         android:id="@+id/ivQRcode"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        style="@style/MatchParent"
         android:layout_above="@id/tvConnectInfo"
         android:layout_below="@id/tvConnectStatus"
         android:visibility="gone" />
 
     <TextView
         android:id="@+id/tvConnectInfo"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        style="@style/MatchParentWidth"
         android:layout_alignParentBottom="true"
         android:layout_margin="10dp"
         android:gravity="center"

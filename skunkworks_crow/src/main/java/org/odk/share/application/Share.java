@@ -3,6 +3,8 @@ package org.odk.share.application;
 import android.content.Context;
 import android.os.Environment;
 
+import androidx.annotation.IntDef;
+
 import com.evernote.android.job.JobManager;
 import com.evernote.android.job.JobManagerCreateException;
 
@@ -12,6 +14,8 @@ import org.odk.share.injection.config.DaggerAppComponent;
 import org.odk.share.tasks.ShareJobCreator;
 
 import java.io.File;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 import dagger.android.AndroidInjector;
 import dagger.android.DaggerApplication;
@@ -22,6 +26,14 @@ import timber.log.Timber;
  */
 
 public class Share extends DaggerApplication {
+
+    // define the different methods for data transferring.
+    @IntDef({TransferMethod.BLUETOOTH, TransferMethod.HOTSPOT})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface TransferMethod {
+        int BLUETOOTH = 0x101;
+        int HOTSPOT = 0x110;
+    }
 
     public static final String ODK_ROOT = Environment.getExternalStorageDirectory() + File.separator + "share";
     public static final String ODK_COLLECT_ROOT = Environment.getExternalStorageDirectory() + File.separator + "odk";
