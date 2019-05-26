@@ -59,4 +59,7 @@ dependencies {
 
     //MPAndroidChart
     implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
+
+    //Bluetooth framework
+    implementation 'com.clj.fastble:FastBleLib:2.3.4'
 }
