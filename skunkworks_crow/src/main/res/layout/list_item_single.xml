@@ -1,23 +1,19 @@
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/mMatchParentWidth"
     android:padding="10dp">
 
     <TextView
         android:id="@+id/tvTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        style="@style/mMatchParentWidth"
         android:gravity="center_vertical"
-        android:textColor="@android:color/black"
-        android:textAppearance="?android:attr/textAppearanceMedium"/>
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@android:color/black" />
 
     <org.odk.share.views.WifiView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/ivWifi"
+        style="@style/mWrapContent"
         android:layout_alignEnd="@+id/tvTitle"
         android:layout_alignRight="@+id/tvTitle"
-        android:layout_centerVertical="true"
-        android:id="@+id/ivWifi" />
+        android:layout_centerVertical="true" />
 
 </RelativeLayout>
