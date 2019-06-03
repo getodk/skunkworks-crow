@@ -1,17 +1,17 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/mMatchParentWidth"
+    style="@style/MatchParentWidth"
     android:padding="10dp">
 
     <TextView
         android:id="@+id/tvTitle"
-        style="@style/mMatchParentWidth"
+        style="@style/MatchParentWidth"
         android:gravity="center_vertical"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@android:color/black" />
 
     <org.odk.share.views.WifiView
         android:id="@+id/ivWifi"
-        style="@style/mWrapContent"
+        style="@style/WrapContent"
         android:layout_alignEnd="@+id/tvTitle"
         android:layout_alignRight="@+id/tvTitle"
         android:layout_centerVertical="true" />

@@ -1,5 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/mMatchParent"
+    style="@style/MatchParent"
     android:layout_marginLeft="0dp"
     android:layout_marginTop="0dp"
     android:layout_marginRight="0dp"
@@ -9,7 +9,7 @@
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
-        style="@style/mMatchParentWidth" />
+        style="@style/MatchParentWidth" />
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -19,7 +19,7 @@
 
     <WebView
         android:id="@+id/webView"
-        style="@style/mMatchParent"
+        style="@style/MatchParent"
         android:layout_below="@id/progressBar" />
 
 </RelativeLayout>

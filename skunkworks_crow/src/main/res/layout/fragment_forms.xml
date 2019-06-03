@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/mMatchParent"
+    style="@style/MatchParent"
     android:orientation="vertical">
 
     <TextView
         android:id="@+id/empty_view"
-        style="@style/mWrapContent"
+        style="@style/WrapContent"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         android:gravity="center"
@@ -14,12 +14,12 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerview"
-        style="@style/mMatchParent"
+        style="@style/MatchParent"
         android:layout_above="@id/buttonholder" />
 
     <LinearLayout
         android:id="@+id/buttonholder"
-        style="@style/mMatchParentWidth"
+        style="@style/MatchParentWidth"
         android:layout_alignParentBottom="true"
         android:orientation="horizontal"
         android:weightSum="2">

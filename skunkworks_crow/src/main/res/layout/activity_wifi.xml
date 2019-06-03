@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/mMatchParent"
+    style="@style/MatchParent"
     android:orientation="vertical">
 
     <!-- Toolbar -->
@@ -8,18 +8,18 @@
 
     <RelativeLayout
         android:id="@+id/relativeLayout"
-        style="@style/mMatchParent"
+        style="@style/MatchParent"
         android:layout_above="@+id/buttonholder"
         android:layout_below="@id/toolbar">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
-            style="@style/mMatchParent"
+            style="@style/MatchParent"
             android:visibility="gone" />
 
         <TextView
             android:id="@+id/empty_view"
-            style="@style/mWrapContent"
+            style="@style/WrapContent"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:gravity="center"
@@ -29,7 +29,7 @@
 
         <ProgressBar
             android:id="@+id/wifi_progress_bar"
-            style="@style/mWrapContent"
+            style="@style/WrapContent"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="128dp" />
 
@@ -37,20 +37,20 @@
 
     <LinearLayout
         android:id="@+id/buttonholder"
-        style="@style/mMatchParentWidth"
+        style="@style/MatchParentWidth"
         android:layout_alignParentBottom="true"
         android:orientation="horizontal"
         android:weightSum="2">
 
         <Button
             android:id="@+id/bScan"
-            style="@style/mMatchParentWidth"
+            style="@style/MatchParentWidth"
             android:layout_weight="1"
             android:text="@string/scan" />
 
         <Button
             android:id="@+id/bScanQRCode"
-            style="@style/mMatchParentWidth"
+            style="@style/MatchParentWidth"
             android:layout_weight="1"
             android:text="@string/scan_qr_code" />
     </LinearLayout>

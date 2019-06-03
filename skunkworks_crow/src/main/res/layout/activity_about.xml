@@ -1,5 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/mMatchParent"
+    style="@style/MatchParent"
     android:orientation="vertical">
 
     <!-- Toolbar -->
@@ -7,6 +7,6 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerview"
-        style="@style/mMatchParent"
+        style="@style/MatchParent"
         android:layout_below="@id/toolbar" />
 </RelativeLayout>

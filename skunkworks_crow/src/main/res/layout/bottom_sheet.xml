@@ -16,14 +16,14 @@ the License.
 -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    style="@style/mMatchParentWidth"
+    style="@style/MatchParentWidth"
     android:orientation="vertical"
     android:padding="16dp"
     app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
 
     <TextView
         android:id="@+id/label"
-        style="@style/mMatchParentWidth"
+        style="@style/MatchParentWidth"
         android:layout_alignParentTop="true"
         android:layout_marginBottom="8dp"
         android:text="@string/sort_by"
@@ -31,6 +31,6 @@ the License.
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
-        style="@style/mMatchParentWidth"
+        style="@style/MatchParentWidth"
         android:layout_below="@+id/label" />
 </RelativeLayout>

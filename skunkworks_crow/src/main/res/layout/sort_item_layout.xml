@@ -16,7 +16,7 @@ the License.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    style="@style/mMatchParentWidth"
+    style="@style/MatchParentWidth"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?android:attr/selectableItemBackground"
@@ -26,12 +26,12 @@ the License.
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/icon"
-        style="@style/mMatchParentHeight"
+        style="@style/MatchParentHeight"
         tools:src="@drawable/ic_sort" />
 
     <TextView
         android:id="@+id/title"
-        style="@style/mWrapContent"
+        style="@style/WrapContent"
         android:layout_gravity="center"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"

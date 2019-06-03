@@ -2,18 +2,18 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    style="@style/mMatchParent"
+    style="@style/MatchParent"
     tools:context="org.odk.share.activities.InstanceManagerTabs">
 
     <com.google.android.material.appbar.AppBarLayout
-        style="@style/mMatchParentWidth"
+        style="@style/MatchParentWidth"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
         <include layout="@layout/toolbar" />
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabs"
-            style="@style/mMatchParentWidth"
+            style="@style/MatchParentWidth"
             app:tabGravity="fill"
             app:tabIndicatorColor="@android:color/white"
             app:tabMaxWidth="0dp"
@@ -22,7 +22,7 @@
 
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/viewpager"
-        style="@style/mMatchParent"
+        style="@style/MatchParent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/mWrapContent"
+    style="@style/WrapContent"
     android:gravity="center_horizontal"
     android:orientation="vertical">
 
     <ImageView
         android:id="@+id/ivTabIcon"
-        style="@style/mWrapContent"
+        style="@style/WrapContent"
         android:src="@drawable/ic_download" />
 
     <TextView
         android:id="@+id/tvTabTitle"
-        style="@style/mWrapContent"
+        style="@style/WrapContent"
         android:gravity="center_horizontal"
         android:textColor="@android:color/white"
         android:textStyle="bold" />
