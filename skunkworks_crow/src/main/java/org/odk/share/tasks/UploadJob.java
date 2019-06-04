@@ -45,7 +45,7 @@ import static org.odk.share.dto.InstanceMap.INSTANCE_UUID;
 import static org.odk.share.dto.TransferInstance.INSTANCE_ID;
 import static org.odk.share.dto.TransferInstance.STATUS_FORM_SENT;
 import static org.odk.share.dto.TransferInstance.TRANSFER_STATUS;
-import static org.odk.share.fragments.ReviewedInstancesFragment.MODE;
+import static org.odk.share.views.ui.instance.fragment.ReviewedInstancesFragment.MODE;
 import static org.odk.share.utilities.ApplicationConstants.SEND_BLANK_FORM_MODE;
 import static org.odk.share.utilities.ApplicationConstants.SEND_FILL_FORM_MODE;
 

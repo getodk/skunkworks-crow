@@ -32,7 +32,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
 import org.odk.share.R;
-import org.odk.share.activities.MainActivity;
+import org.odk.share.views.ui.main.MainActivity;
 import org.odk.share.application.Share;
 import org.odk.share.events.HotspotEvent;
 import org.odk.share.network.WifiHospotConnector;
