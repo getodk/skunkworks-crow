@@ -18,7 +18,7 @@ import javax.inject.Singleton;
 
 import timber.log.Timber;
 
-import static org.odk.share.fragments.ReviewedInstancesFragment.MODE;
+import static org.odk.share.views.ui.instance.fragment.ReviewedInstancesFragment.MODE;
 
 @Singleton
 public class SenderService {

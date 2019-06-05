@@ -26,7 +26,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.MainActivity">
+        <activity android:name=".views.ui.main.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -34,24 +34,26 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".activities.WifiActivity"
-                  android:parentActivityName=".activities.MainActivity">
+        <activity
+            android:name=".views.ui.receive.WifiActivity"
+            android:parentActivityName=".views.ui.main.MainActivity">
             <meta-data
-                    android:name="android.support.PARENT_ACTIVITY"
-                    android:value=".activities.MainActivity"/>
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".views.ui.main.MainActivity" />
         </activity>
-        <activity android:name=".activities.InstancesList" />
-        <activity android:name=".preferences.SettingsPreference" />
-        <activity android:name=".activities.WebViewActivity" />
+        <activity android:name=".views.ui.instance.InstancesList" />
+        <activity android:name=".views.ui.settings.SettingsActivity" />
+        <activity android:name=".views.ui.about.WebViewActivity" />
 
-        <activity android:name=".activities.AboutActivity"
-                  android:parentActivityName=".activities.MainActivity">
+        <activity
+            android:name=".views.ui.about.AboutActivity"
+            android:parentActivityName=".views.ui.main.MainActivity">
             <meta-data
-                    android:name="android.support.PARENT_ACTIVITY"
-                    android:value=".activities.MainActivity"/>
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".views.ui.main.MainActivity" />
         </activity>
         <activity
-            android:name=".activities.SendActivity"
+            android:name=".views.ui.send.SendActivity"
             android:configChanges="orientation|screenSize" />
 
         <service android:name=".services.HotspotService" />
@@ -62,14 +64,15 @@
             android:stateNotNeeded="true"
             tools:replace="android:screenOrientation" />
 
-        <activity android:name=".activities.InstanceManagerTabs"
-                  android:parentActivityName=".activities.MainActivity">
+        <activity
+            android:name=".views.ui.instance.InstanceManagerTabs"
+            android:parentActivityName=".views.ui.main.MainActivity">
             <meta-data
-                    android:name="android.support.PARENT_ACTIVITY"
-                    android:value=".activities.MainActivity"/>
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".views.ui.main.MainActivity" />
         </activity>
 
-        <activity android:name=".activities.ReviewFormActivity" />
+        <activity android:name=".views.ui.review.ReviewFormActivity" />
 
         <provider
             android:name=".provider.TransferProvider"
@@ -78,11 +81,12 @@
             android:name=".provider.InstanceMapProvider"
             android:authorities="org.odk.share.provider.odk.map" />
 
-        <activity android:name=".activities.SendFormsActivity"
-                  android:parentActivityName=".activities.MainActivity">
+        <activity
+            android:name=".views.ui.send.SendFormsActivity"
+            android:parentActivityName=".views.ui.main.MainActivity">
             <meta-data
-                    android:name="android.support.PARENT_ACTIVITY"
-                    android:value=".activities.MainActivity"/>
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".views.ui.main.MainActivity" />
         </activity>
 
     </application>
