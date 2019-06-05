@@ -9,7 +9,8 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@android:color/black" />
 
-    <org.odk.share.views.WifiView
+
+    <org.odk.share.views.customui.WifiView
         android:id="@+id/ivWifi"
         style="@style/WrapContent"
         android:layout_alignEnd="@+id/tvTitle"
