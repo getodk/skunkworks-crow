@@ -1,12 +1,12 @@
 package org.odk.share.injection;
 
-import org.odk.share.activities.InstanceManagerTabs;
-import org.odk.share.activities.InstancesList;
-import org.odk.share.activities.MainActivity;
-import org.odk.share.activities.ReviewFormActivity;
-import org.odk.share.activities.SendActivity;
-import org.odk.share.activities.SendFormsActivity;
-import org.odk.share.activities.WifiActivity;
+import org.odk.share.views.ui.instance.InstanceManagerTabs;
+import org.odk.share.views.ui.instance.InstancesList;
+import org.odk.share.views.ui.main.MainActivity;
+import org.odk.share.views.ui.review.ReviewFormActivity;
+import org.odk.share.views.ui.send.SendActivity;
+import org.odk.share.views.ui.send.SendFormsActivity;
+import org.odk.share.views.ui.receive.WifiActivity;
 import org.odk.share.injection.config.scopes.PerActivity;
 
 import dagger.Module;
