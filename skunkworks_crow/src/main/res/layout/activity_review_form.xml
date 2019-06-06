@@ -1,34 +1,29 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    style="@style/MatchParent"
     android:orientation="vertical">
 
     <!-- Toolbar -->
     <include layout="@layout/toolbar" />
 
     <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        style="@style/MatchParent"
         android:layout_below="@id/toolbar"
         android:fillViewport="true"
         android:orientation="vertical">
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            style="@style/MatchParentWidth"
             android:orientation="vertical"
             android:padding="10dp">
 
             <View
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/MatchParentWidth"
                 android:layout_weight="1.0" />
 
             <TextView
                 android:id="@+id/description"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                style="@style/WrapContent"
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:lineSpacingMultiplier="1.2"
@@ -40,13 +35,11 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/input_layout_feedback"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                style="@style/MatchParentWidth">
 
                 <EditText
                     android:id="@+id/save_feedback"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    style="@style/MatchParentWidth"
                     android:hint="@string/add_feedback"
                     android:inputType="text"
                     android:textSize="18sp"
@@ -55,22 +48,19 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/MatchParentWidth"
                 android:orientation="horizontal"
                 android:weightSum="2">
 
                 <Button
                     android:id="@+id/bApprove"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    style="@style/MatchParentWidth"
                     android:layout_weight="1"
                     android:text="@string/approve" />
 
                 <Button
                     android:id="@+id/bReject"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    style="@style/MatchParentWidth"
                     android:layout_weight="1"
                     android:text="@string/Reject" />
 
@@ -78,20 +68,17 @@
 
             <Button
                 android:id="@+id/bViewAgain"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/MatchParentWidth"
                 android:layout_gravity="center_horizontal"
                 android:text="@string/view_form_in_collect" />
 
             <Button
                 android:id="@+id/bReviewLater"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/MatchParentWidth"
                 android:text="@string/review_later" />
 
             <View
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/MatchParentWidth"
                 android:layout_weight="1.0" />
         </LinearLayout>
 
