@@ -174,7 +174,7 @@ public class SettingsActivity extends PreferenceActivity {
         builder.setView(input);
         AlertDialog alertDialog = builder.create();
 
-//
+//thanks to StackOverflow Aaron for the solution below
         input.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
