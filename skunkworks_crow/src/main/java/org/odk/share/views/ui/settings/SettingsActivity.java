@@ -1,5 +1,6 @@
 package org.odk.share.views.ui.settings;
 
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -8,11 +9,15 @@ import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+import android.text.Editable;
+import android.text.InputType;
+import android.text.TextWatcher;
+import android.view.WindowManager;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputLayout;
@@ -34,6 +39,10 @@ public class SettingsActivity extends PreferenceActivity {
     CheckBoxPreference passwordRequirePreference;
     EditTextPreference odkDestinationDirPreference;
     private SharedPreferences prefs;
+    //set the minimum password length
+    final private int MIN_PASSWORD_LENGTH = 8;
+    String m_Text = "";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -142,22 +151,65 @@ public class SettingsActivity extends PreferenceActivity {
 
     private void showPasswordDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        //use layout inflater for our own password layout and editText
         LayoutInflater factory = LayoutInflater.from(this);
-
         View dialogView = factory.inflate(R.layout.dialog_password_til, null);
         TextInputLayout tlPassword = dialogView.findViewById(R.id.et_password_layout);
+
+        //set the default password text
         tlPassword.getEditText().setText(prefs.getString(PreferenceKeys.KEY_HOTSPOT_PASSWORD, getString(R.string.default_hotspot_password)));
 
         builder.setTitle(getString(R.string.title_hotspot_password));
-        builder.setView(dialogView);
         builder.setPositiveButton(getString(R.string.ok), (dialog, which) -> {
-            String password = tlPassword.getEditText().getText().toString();
-            prefs.edit().putString(PreferenceKeys.KEY_HOTSPOT_PASSWORD, password).apply();
-        });
+                        String password = tlPassword.getEditText().getText().toString();
+                        prefs.edit().putString(PreferenceKeys.KEY_HOTSPOT_PASSWORD, password).apply();
+                    });
         builder.setNegativeButton(getString(R.string.cancel), (dialog, which) -> dialog.dismiss());
-
         builder.setCancelable(false);
+        final EditText input = new EditText(this);
+
+        // Specify the type of input expected; this, for example, sets the input as a password,
+        // and will mask the text
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        builder.setView(input);
         AlertDialog alertDialog = builder.create();
+
+//
+        input.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
+                //required function for interface
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if (charSequence.length() >= MIN_PASSWORD_LENGTH) {
+                    alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+                    String password = tlPassword.getEditText().getText().toString();
+
+                    prefs.edit().putString(PreferenceKeys.KEY_HOTSPOT_PASSWORD, password).apply();
+
+                }
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                //required function for interface
+            }
+        });
+
+
+
+        alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+
+            @Override
+            public void onShow(DialogInterface dialog) {
+                //set positive OK button to be disabled by default
+                ((AlertDialog)dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+            }
+        });
+
         alertDialog.show();
         alertDialog.setCancelable(true);
         alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
