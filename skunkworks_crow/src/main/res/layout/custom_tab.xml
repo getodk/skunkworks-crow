@@ -1,21 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:gravity="center_horizontal">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/WrapContent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
 
     <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:id="@+id/ivTabIcon"
-        android:src="@drawable/ic_download"/>
+        style="@style/WrapContent"
+        android:src="@drawable/ic_download" />
+
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:id="@+id/tvTabTitle"
-        android:textColor="@android:color/white"
+        style="@style/WrapContent"
         android:gravity="center_horizontal"
-        android:textStyle="bold"/>
+        android:textColor="@android:color/white"
+        android:textStyle="bold" />
 </LinearLayout>
