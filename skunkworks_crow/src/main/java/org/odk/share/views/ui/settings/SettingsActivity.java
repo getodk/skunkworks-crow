@@ -40,7 +40,7 @@ public class SettingsActivity extends PreferenceActivity {
     EditTextPreference odkDestinationDirPreference;
     private SharedPreferences prefs;
     //set the minimum password length
-    final static int MIN_PASSWORD_LENGTH = 8;
+    static final int MIN_PASSWORD_LENGTH = 8;
 
 
     @Override
