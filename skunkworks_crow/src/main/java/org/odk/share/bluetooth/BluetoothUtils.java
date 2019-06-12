@@ -12,9 +12,9 @@ import timber.log.Timber;
  * @author huangyz0918 (huangyz0918@gmail.com)
  * @since 04/06/2019
  */
-public class BtUtils {
+public class BluetoothUtils {
 
-    private static final String TAG = BtUtils.class.getSimpleName();
+    private static final String TAG = BluetoothUtils.class.getSimpleName();
     public static final Executor EXECUTOR = Executors.newCachedThreadPool();
     private static final Handler sHandler = new Handler();
 
@@ -23,7 +23,7 @@ public class BtUtils {
         Timber.d(TAG + "mkdirs: " + mk);
     }
 
-    public static void runUi(Runnable runnable) {
+    public static void runOnUi(Runnable runnable) {
         sHandler.post(runnable);
     }
 }

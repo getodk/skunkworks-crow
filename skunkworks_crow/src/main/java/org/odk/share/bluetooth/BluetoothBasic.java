@@ -60,7 +60,7 @@ public class BluetoothBasic {
                         break;
                     case FLAG_FILE: //Read files.
                         //TODO: create file path.
-                        BtUtils.mkdirs(FILE_PATH);
+                        BluetoothUtils.mkdirs(FILE_PATH);
                         String fileName = in.readUTF(); //file name
                         long fileLen = in.readLong(); //file length
                         // Read file content.
@@ -89,7 +89,9 @@ public class BluetoothBasic {
      * Send short messages.
      */
     public void sendMessage(String msg) {
-        if (isSending()) return;
+        if (isSending()) {
+            return;
+        }
         isSending = true;
         try {
             dataOutputStream.writeInt(FLAG_MSG);
@@ -110,7 +112,7 @@ public class BluetoothBasic {
             return;
         }
         isSending = true;
-        BtUtils.EXECUTOR.execute(() -> {
+        BluetoothUtils.EXECUTOR.execute(() -> {
             try {
                 FileInputStream in = new FileInputStream(filePath);
                 File file = new File(filePath);
@@ -172,7 +174,7 @@ public class BluetoothBasic {
     }
 
     private void notifyUI(final Listener.ConnectStatus status, final Object obj) {
-        BtUtils.runUi(() -> {
+        BluetoothUtils.runOnUi(() -> {
             try {
                 if (listener != null) {
                     listener.socketNotify(status, obj);
