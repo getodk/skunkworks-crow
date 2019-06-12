@@ -40,8 +40,7 @@ public class SettingsActivity extends PreferenceActivity {
     EditTextPreference odkDestinationDirPreference;
     private SharedPreferences prefs;
     //set the minimum password length
-    final static private int MIN_PASSWORD_LENGTH = 8;
-    String m_Text = "";
+    final static int MIN_PASSWORD_LENGTH = 8;
 
 
     @Override
@@ -174,7 +173,7 @@ public class SettingsActivity extends PreferenceActivity {
         builder.setView(input);
         AlertDialog alertDialog = builder.create();
 
-//thanks to StackOverflow Aaron for the solution below
+        //thanks to StackOverflow Aaron for the solution below
         input.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
@@ -206,7 +205,7 @@ public class SettingsActivity extends PreferenceActivity {
             @Override
             public void onShow(DialogInterface dialog) {
                 //set positive OK button to be disabled by default
-                ((AlertDialog)dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+                ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
             }
         });
 
