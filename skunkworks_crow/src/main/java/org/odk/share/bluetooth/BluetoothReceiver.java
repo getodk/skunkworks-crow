@@ -23,15 +23,15 @@ public class BluetoothReceiver extends BroadcastReceiver {
     public BluetoothReceiver(Context cxt, Listener listener) {
         this.listener = listener;
         IntentFilter filter = new IntentFilter();
-        filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);//Bluetooth switch status.
-        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);//Bluetooth starts searching.
-        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);//Bluetooth search ends.
+        filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED); //Bluetooth switch status.
+        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED); //Bluetooth starts searching.
+        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED); //Bluetooth search ends.
 
-        filter.addAction(BluetoothDevice.ACTION_FOUND);//Bluetooth discovers new devices (unpaired devices).
-        filter.addAction(BluetoothDevice.ACTION_PAIRING_REQUEST);//Before the system pops up the match box (confirm / enter the pairing code).
-        filter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED);//Device pairing status change.
-        filter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);//Bottom connection establishment.
-        filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);//The bottommost connection is broken.
+        filter.addAction(BluetoothDevice.ACTION_FOUND); //Bluetooth discovers new devices (unpaired devices).
+        filter.addAction(BluetoothDevice.ACTION_PAIRING_REQUEST); //Before the system pops up the match box (confirm / enter the pairing code).
+        filter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED); //Device pairing status change.
+        filter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED); //Bottom connection establishment.
+        filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED); //The bottommost connection is broken.
 
         filter.addAction(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED); //BluetoothAdapter connection status.
         filter.addAction(BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED); //BluetoothHeadset connection status.

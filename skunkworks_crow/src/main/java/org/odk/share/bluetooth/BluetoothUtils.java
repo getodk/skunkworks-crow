@@ -14,6 +14,10 @@ import timber.log.Timber;
  */
 public class BluetoothUtils {
 
+    private BluetoothUtils() {
+
+    }
+
     private static final String TAG = BluetoothUtils.class.getSimpleName();
     public static final Executor EXECUTOR = Executors.newCachedThreadPool();
     private static final Handler sHandler = new Handler();

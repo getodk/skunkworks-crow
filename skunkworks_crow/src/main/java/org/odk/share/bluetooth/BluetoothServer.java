@@ -12,7 +12,7 @@ import timber.log.Timber;
  */
 public class BluetoothServer extends BluetoothBasic {
     private static final String TAG = BluetoothServer.class.getSimpleName();
-    private BluetoothServerSocket mSSocket;
+    private BluetoothServerSocket serverSocket;
 
     BluetoothServer(Listener listener) {
         super(listener);
@@ -25,12 +25,12 @@ public class BluetoothServer extends BluetoothBasic {
     public void listen() {
         try {
             BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-//            mSSocket = adapter.listenUsingRfcommWithServiceRecord(TAG, SPP_UUID); //Encrypted transmission, Android system forced pairing, pop-up window display pairing code.
-            mSSocket = adapter.listenUsingInsecureRfcommWithServiceRecord(TAG, SPP_UUID); //Clear text transmission (unsafe), no need to pair.
+            //serverSocket = adapter.listenUsingRfcommWithServiceRecord(TAG, SPP_UUID); //Encrypted transmission, Android system forced pairing, pop-up window display pairing code.
+            serverSocket = adapter.listenUsingInsecureRfcommWithServiceRecord(TAG, SPP_UUID); //Clear text transmission (unsafe), no need to pair.
             BluetoothUtils.EXECUTOR.execute(() -> {
                 try {
-                    BluetoothSocket socket = mSSocket.accept();
-                    mSSocket.close();
+                    BluetoothSocket socket = serverSocket.accept();
+                    serverSocket.close();
                     loopRead(socket);
                 } catch (Throwable e) {
                     close();
@@ -45,7 +45,7 @@ public class BluetoothServer extends BluetoothBasic {
     public void close() {
         super.close();
         try {
-            mSSocket.close();
+            serverSocket.close();
         } catch (Throwable e) {
             Timber.e(e);
         }

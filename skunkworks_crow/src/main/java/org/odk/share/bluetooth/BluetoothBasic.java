@@ -114,15 +114,16 @@ public class BluetoothBasic {
         isSending = true;
         BluetoothUtils.EXECUTOR.execute(() -> {
             try {
-                FileInputStream in = new FileInputStream(filePath);
+                FileInputStream fileInputStream;
                 File file = new File(filePath);
+                fileInputStream = new FileInputStream(filePath);
                 dataOutputStream.writeInt(FLAG_FILE);
                 dataOutputStream.writeUTF(file.getName());
                 dataOutputStream.writeLong(file.length());
                 int r;
                 byte[] b = new byte[4 * 1024];
                 notifyUI(Listener.ConnectStatus.MSG, "sending file (" + filePath + "), please wait...");
-                while ((r = in.read(b)) != -1) {
+                while ((r = fileInputStream.read(b)) != -1) {
                     dataOutputStream.write(b, 0, r);
                 }
                 dataOutputStream.flush();

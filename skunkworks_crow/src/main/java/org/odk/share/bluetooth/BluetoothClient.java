@@ -21,7 +21,7 @@ public class BluetoothClient extends BluetoothBasic {
     public void connect(BluetoothDevice dev) {
         close();
         try {
-//             final BluetoothSocket socket = dev.createRfcommSocketToServiceRecord(SPP_UUID); //Encrypted transmission, Android system forced pairing, pop-up window display pairing code.
+            // final BluetoothSocket socket = dev.createRfcommSocketToServiceRecord(SPP_UUID); //Encrypted transmission, Android system forced pairing, pop-up window display pairing code.
             final BluetoothSocket socket = dev.createInsecureRfcommSocketToServiceRecord(SPP_UUID); //Clear text transmission (unsafe), no need to pair.
             BluetoothUtils.EXECUTOR.execute(() -> {
                 loopRead(socket);
