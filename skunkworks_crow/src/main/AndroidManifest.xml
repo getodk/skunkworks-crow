@@ -12,15 +12,11 @@
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
-    <!-- Device with versions >= Oreo need location permission to start/stop the hotspot -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- Device with versions >= Oreo need location permission to start/stop the hotspot -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
-    <!-- Bluetooth Related -->
-    <uses-permission android:name="android.permission.BLUETOOTH"/>
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- Bluetooth Related -->
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
     <application
         android:name=".application.Share"
@@ -30,6 +26,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".views.ui.bluetooth.BluetoothActivity"></activity>
         <activity android:name=".views.ui.main.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -37,7 +34,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".views.ui.receive.WifiActivity"
             android:parentActivityName=".views.ui.main.MainActivity">
@@ -48,7 +44,6 @@
         <activity android:name=".views.ui.instance.InstancesList" />
         <activity android:name=".views.ui.settings.SettingsActivity" />
         <activity android:name=".views.ui.about.WebViewActivity" />
-
         <activity
             android:name=".views.ui.about.AboutActivity"
             android:parentActivityName=".views.ui.main.MainActivity">
@@ -67,7 +62,6 @@
             android:screenOrientation="portrait"
             android:stateNotNeeded="true"
             tools:replace="android:screenOrientation" />
-
         <activity
             android:name=".views.ui.instance.InstanceManagerTabs"
             android:parentActivityName=".views.ui.main.MainActivity">
@@ -75,7 +69,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".views.ui.main.MainActivity" />
         </activity>
-
         <activity android:name=".views.ui.review.ReviewFormActivity" />
 
         <provider
@@ -92,7 +85,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".views.ui.main.MainActivity" />
         </activity>
-
     </application>
 
 </manifest>
