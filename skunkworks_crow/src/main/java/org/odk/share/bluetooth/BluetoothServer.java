@@ -7,6 +7,8 @@ import android.bluetooth.BluetoothSocket;
 import timber.log.Timber;
 
 /**
+ * Server for bluetooth socket.
+ *
  * @author huangyz0918 (huangyz0918@gmail.com)
  * @since 04/06/2019
  */
@@ -14,7 +16,7 @@ public class BluetoothServer extends BluetoothBasic {
     private static final String TAG = BluetoothServer.class.getSimpleName();
     private BluetoothServerSocket serverSocket;
 
-    BluetoothServer(Listener listener) {
+    public BluetoothServer(Listener listener) {
         super(listener);
         listen();
     }

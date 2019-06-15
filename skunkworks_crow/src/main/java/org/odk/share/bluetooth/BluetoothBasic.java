@@ -86,7 +86,7 @@ public class BluetoothBasic {
     }
 
     /**
-     * Send short messages.
+     * Sending short messages.
      */
     public void sendMessage(String msg) {
         if (isSending()) {
@@ -105,7 +105,7 @@ public class BluetoothBasic {
     }
 
     /**
-     * Send files.
+     * Sending files.
      */
     public void sendFile(final String filePath) {
         if (isSending()) {
@@ -166,6 +166,9 @@ public class BluetoothBasic {
         return connected && bluetoothSocket.getRemoteDevice().equals(dev);
     }
 
+    /**
+     * If the device is sending a form instance.
+     */
     private boolean isSending() {
         if (isSending) {
             Timber.i("Sending other data, please send it later...");
@@ -186,6 +189,9 @@ public class BluetoothBasic {
         });
     }
 
+    /**
+     * Listener for bluetooth connection status.
+     */
     public interface Listener {
         enum ConnectStatus {
             DISCONNECTED,

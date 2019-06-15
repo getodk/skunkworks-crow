@@ -2,38 +2,42 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/MatchParentWidth"
+    android:background="?android:attr/selectableItemBackground"
     android:orientation="horizontal">
 
+    <!-- TODO: fix the selected item click not completed bug -->
+
     <ImageView
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:padding="14dp"
-        android:src="@drawable/ic_phone_device" />
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:padding="12dp"
+        android:src="@drawable/ic_smart_phone" />
 
     <LinearLayout
-        style="@style/MatchParent"
+        style="@style/MatchParentWidth"
         android:orientation="vertical">
 
         <TextView
             android:id="@+id/tv_device_name"
             style="@style/MatchParentWidth"
-            android:layout_marginStart="18dp"
-            android:layout_marginLeft="18dp"
-            android:layout_marginTop="18dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginLeft="6dp"
+            android:layout_marginTop="10dp"
             android:layout_marginBottom="4dp"
-            android:textSize="20sp"
-            tools:text="Device Name" />
+            android:gravity="center_vertical"
+            android:text="@string/bluetooth_instance_name_default"
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/tv_device_address"
             style="@style/MatchParent"
-            android:layout_marginStart="18dp"
-            android:layout_marginLeft="18dp"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="4dp"
-            android:textSize="16sp"
-            tools:text="Device Address XXXXXX" />
-
+            android:layout_marginStart="6dp"
+            android:layout_marginLeft="6dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="2dp"
+            android:gravity="center_vertical"
+            android:textSize="12sp"
+            tools:text="default device address" />
 
     </LinearLayout>
 

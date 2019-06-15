@@ -21,16 +21,20 @@ import butterknife.ButterKnife;
 
 
 /**
- * BluetoothDeviceAdapter: {@link RecyclerView.Adapter} for {@link BluetoothDevice}.
+ * BluetoothListAdapter: {@link RecyclerView.Adapter} for {@link BluetoothDevice}.
  *
  * @author huangyz0918 (huangyz0918@gmail.com)
  * @since 12/06/2019
  */
-public class BluetoothDeviceAdapter extends RecyclerView.Adapter<BluetoothDeviceAdapter.ViewHolder> {
+public class BluetoothListAdapter extends RecyclerView.Adapter<BluetoothListAdapter.ViewHolder> {
 
     private List<BluetoothDevice> bluetoothDeviceList;
     private OnDeviceClickListener btDeviceClickListener;
 
+    public BluetoothListAdapter(OnDeviceClickListener btDeviceClickListener) {
+        this.btDeviceClickListener = btDeviceClickListener;
+        this.bluetoothDeviceList = new ArrayList<>();
+    }
 
     /**
      * Methods for updating data.
@@ -43,11 +47,7 @@ public class BluetoothDeviceAdapter extends RecyclerView.Adapter<BluetoothDevice
         if (!bluetoothDeviceList.contains(bluetoothDevice)) {
             this.bluetoothDeviceList.add(bluetoothDevice);
         }
-    }
-
-    public BluetoothDeviceAdapter(OnDeviceClickListener btDeviceClickListener) {
-        this.btDeviceClickListener = btDeviceClickListener;
-        this.bluetoothDeviceList = new ArrayList<>();
+        notifyDataSetChanged();
     }
 
     @Override
@@ -56,7 +56,7 @@ public class BluetoothDeviceAdapter extends RecyclerView.Adapter<BluetoothDevice
         String deviceName = device.getName();
         String deviceAddress = device.getAddress();
         int deviceBondState = device.getBondState();
-        viewHolder.deviceName.setText(deviceName == null ? "" : deviceName);
+        viewHolder.deviceName.setText(deviceName == null ? viewHolder.itemView.getResources().getString(R.string.bluetooth_instance_name_default) : deviceName);
         viewHolder.deviceAddress.setText(String.format("%s (%s)", deviceAddress, deviceBondState == 10 ? "unpaired" : "paired"));
     }
 

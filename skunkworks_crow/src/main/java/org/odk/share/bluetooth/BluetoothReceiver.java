@@ -20,7 +20,7 @@ public class BluetoothReceiver extends BroadcastReceiver {
     private static final String TAG = BluetoothReceiver.class.getSimpleName();
     private final Listener listener;
 
-    public BluetoothReceiver(Context cxt, Listener listener) {
+    public BluetoothReceiver(Context context, Listener listener) {
         this.listener = listener;
         IntentFilter filter = new IntentFilter();
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED); //Bluetooth switch status.
@@ -36,7 +36,7 @@ public class BluetoothReceiver extends BroadcastReceiver {
         filter.addAction(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED); //BluetoothAdapter connection status.
         filter.addAction(BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED); //BluetoothHeadset connection status.
         filter.addAction(BluetoothA2dp.ACTION_CONNECTION_STATE_CHANGED); //BluetoothA2dp connection status.
-        cxt.registerReceiver(this, filter);
+        context.registerReceiver(this, filter);
     }
 
     @Override
@@ -64,7 +64,7 @@ public class BluetoothReceiver extends BroadcastReceiver {
             case BluetoothDevice.ACTION_FOUND:
                 short rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MAX_VALUE);
                 Timber.d(TAG + "EXTRA_RSSI:" + rssi);
-                listener.foundDevices(dev);
+                listener.foundDevice(dev);
                 break;
             case BluetoothDevice.ACTION_PAIRING_REQUEST: //Automatic pairing is cancelled before the system pops up the matching box, and the system matching box is cancelled.
                 /*try {
@@ -94,6 +94,6 @@ public class BluetoothReceiver extends BroadcastReceiver {
     }
 
     public interface Listener {
-        void foundDevices(BluetoothDevice device);
+        void foundDevice(BluetoothDevice device);
     }
 }
