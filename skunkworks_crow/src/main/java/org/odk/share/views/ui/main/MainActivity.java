@@ -14,22 +14,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import org.odk.collect.android.dao.FormsDao;
-import org.odk.collect.android.dao.InstancesDao;
-import org.odk.collect.android.dto.Form;
-import org.odk.share.R;
-import org.odk.share.views.ui.common.basecursor.BaseCursorViewHolder;
-import org.odk.share.views.listeners.ItemClickListener;
-import org.odk.share.application.Share;
-import org.odk.share.dao.TransferDao;
-import org.odk.share.views.ui.settings.SettingsActivity;
-import org.odk.share.views.ui.about.AboutActivity;
-import org.odk.share.views.ui.instance.InstanceManagerTabs;
-import org.odk.share.views.ui.send.SendFormsActivity;
-import org.odk.share.views.ui.receive.WifiActivity;
-
-import javax.inject.Inject;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
@@ -38,6 +22,24 @@ import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import org.odk.collect.android.dao.FormsDao;
+import org.odk.collect.android.dao.InstancesDao;
+import org.odk.collect.android.dto.Form;
+import org.odk.share.R;
+import org.odk.share.application.Share;
+import org.odk.share.dao.TransferDao;
+import org.odk.share.views.listeners.ItemClickListener;
+import org.odk.share.views.ui.about.AboutActivity;
+import org.odk.share.views.ui.bluetooth.BtReceiverActivity;
+import org.odk.share.views.ui.common.basecursor.BaseCursorViewHolder;
+import org.odk.share.views.ui.hotspot.HpReceiverActivity;
+import org.odk.share.views.ui.instance.InstanceManagerTabs;
+import org.odk.share.views.ui.send.SendFormsActivity;
+import org.odk.share.views.ui.settings.SettingsActivity;
+
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -52,12 +54,13 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
     private static final String COLLECT_PACKAGE = "org.odk.collect.android";
     private static final int STORAGE_PERMISSION_REQUEST_CODE = 101;
     private static final int FORM_LOADER = 2;
+    private static final String[] TRANSFER_OPTIONS = {"via bluetooth", "via hotspot"};
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     @BindView(R.id.bSendForms)
     Button sendForms;
-    @BindView(R.id.bViewWifi)
+    @BindView(R.id.bReceiveForms)
     Button viewWifi;
     @BindView(R.id.recyclerview)
     RecyclerView recyclerView;
@@ -103,10 +106,28 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
         recyclerView.setAdapter(formAdapter);
     }
 
-    @OnClick(R.id.bViewWifi)
-    public void viewWifiNetworks() {
-        Intent intent = new Intent(this, WifiActivity.class);
-        startActivity(intent);
+    @OnClick(R.id.bReceiveForms)
+    public void chooseReceivingMethods() {
+        Intent hotspotIntent = new Intent(this, HpReceiverActivity.class);
+        Intent bluetoothIntent = new Intent(this, BtReceiverActivity.class);
+
+        // choose different sending methods, TODO: needs refactor if we have a better UI/UX.
+        android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(this)
+                .setTitle("Receive Options")
+                .setIcon(R.drawable.ic_help_outline)
+                .setItems(TRANSFER_OPTIONS, (DialogInterface dialog, int which) -> {
+                    switch (which) {
+                        case 0:
+                            startActivity(bluetoothIntent);
+                            finish();
+                            break;
+                        case 1:
+                            startActivity(hotspotIntent);
+                            finish();
+                            break;
+                    }
+                }).create();
+        alertDialog.show();
     }
 
     @OnClick(R.id.bSendForms)
@@ -203,22 +224,18 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
     private void showAlertDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.install_collect);
-        builder.setPositiveButton(getString(R.string.install), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                try {
-                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + COLLECT_PACKAGE)));
-                } catch (android.content.ActivityNotFoundException e) {
-                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + COLLECT_PACKAGE)));
-                }
+
+        builder.setPositiveButton(getString(R.string.install), (DialogInterface dialog, int which) -> {
+            try {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + COLLECT_PACKAGE)));
+            } catch (android.content.ActivityNotFoundException e) {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + COLLECT_PACKAGE)));
             }
         });
-        builder.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-                finish();
-            }
+
+        builder.setNegativeButton(getString(R.string.cancel), (DialogInterface dialog, int which) -> {
+            dialog.dismiss();
+            finish();
         });
 
         builder.setCancelable(false);

@@ -16,7 +16,7 @@ import org.odk.share.R;
 import org.odk.share.utilities.ApplicationConstants;
 import org.odk.share.utilities.ArrayUtils;
 import org.odk.share.views.ui.instance.adapter.InstanceAdapter;
-import org.odk.share.views.ui.send.SendActivity;
+import org.odk.share.views.ui.hotspot.HpSenderActivity;
 
 import java.util.LinkedHashSet;
 
@@ -119,7 +119,7 @@ public class InstancesList extends InstanceListActivity implements LoaderManager
 
     @OnClick(R.id.send_button)
     public void send() {
-        Intent intent = new Intent(this, SendActivity.class);
+        Intent intent = new Intent(this, HpSenderActivity.class);
         Long[] arr = selectedInstances.toArray(new Long[selectedInstances.size()]);
         long[] a = ArrayUtils.toPrimitive(arr);
         intent.putExtra(INSTANCE_IDS, a);

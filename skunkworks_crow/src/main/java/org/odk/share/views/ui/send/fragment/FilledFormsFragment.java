@@ -1,5 +1,7 @@
 package org.odk.share.views.ui.send.fragment;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -11,25 +13,27 @@ import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import org.odk.collect.android.dao.InstancesDao;
-import org.odk.collect.android.provider.InstanceProviderAPI;
-import org.odk.share.R;
-import org.odk.share.views.ui.common.InstanceListFragment;
-import org.odk.share.views.ui.send.SendActivity;
-import org.odk.share.views.ui.instance.adapter.InstanceAdapter;
-import org.odk.share.utilities.ApplicationConstants;
-import org.odk.share.utilities.ArrayUtils;
-
-import java.util.LinkedHashSet;
-
-import javax.inject.Inject;
-
 import androidx.annotation.NonNull;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import org.odk.collect.android.dao.InstancesDao;
+import org.odk.collect.android.provider.InstanceProviderAPI;
+import org.odk.share.R;
+import org.odk.share.utilities.ApplicationConstants;
+import org.odk.share.utilities.ArrayUtils;
+import org.odk.share.views.ui.bluetooth.BtSenderActivity;
+import org.odk.share.views.ui.common.InstanceListFragment;
+import org.odk.share.views.ui.hotspot.HpSenderActivity;
+import org.odk.share.views.ui.instance.adapter.InstanceAdapter;
+
+import java.util.LinkedHashSet;
+
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -45,6 +49,7 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
     public static final String INSTANCE_IDS = "instance_ids";
     private static final String INSTANCE_LIST_ACTIVITY_SORTING_ORDER = "instanceListActivitySortingOrder";
     private static final int INSTANCE_LOADER = 1;
+    private static final String[] TRANSFER_OPTIONS = {"via bluetooth", "via hotspot"};
 
     @BindView(R.id.recyclerview)
     RecyclerView recyclerView;
@@ -150,13 +155,40 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
 
     @OnClick(R.id.send_button)
     public void send() {
-        Intent intent = new Intent(getActivity(), SendActivity.class);
+        Intent hotspotIntent = new Intent(getActivity(), HpSenderActivity.class);
+        setupSendingIntent(hotspotIntent);
+        Intent bluetoothIntent = new Intent(getActivity(), BtSenderActivity.class);
+        setupSendingIntent(bluetoothIntent);
+
+        // TODO: note, the code is similar with BlankFormsFragment.java, maybe we can refactor in the future.
+        // choose different sending methods, TODO: needs refactor if we have a better UI/UX.
+        AlertDialog alertDialog = new AlertDialog.Builder(getContext())
+                .setTitle("Send Options")
+                .setIcon(R.drawable.ic_help_outline)
+                .setItems(TRANSFER_OPTIONS, (DialogInterface dialog, int which) -> {
+                    switch (which) {
+                        case 0:
+                            if (getActivity() != null) {
+                                startActivity(bluetoothIntent);
+                                getActivity().finish();
+                            }
+                            break;
+                        case 1:
+                            if (getActivity() != null) {
+                                startActivity(hotspotIntent);
+                                getActivity().finish();
+                            }
+                            break;
+                    }
+                }).create();
+        alertDialog.show();
+    }
+
+    private void setupSendingIntent(Intent intent) {
         Long[] arr = selectedInstances.toArray(new Long[selectedInstances.size()]);
         long[] a = ArrayUtils.toPrimitive(arr);
         intent.putExtra(INSTANCE_IDS, a);
         intent.putExtra(MODE, ApplicationConstants.ASK_REVIEW_MODE);
-        startActivity(intent);
-        getActivity().finish();
     }
 
     @OnClick(R.id.toggle_button)

@@ -30,7 +30,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".views.ui.bluetooth.BluetoothActivity"/>
         <activity android:name=".views.ui.bluetooth.BtReceiverActivity"/>
         <activity android:name=".views.ui.bluetooth.BtSenderActivity"/>
         <activity android:name=".views.ui.main.MainActivity">
@@ -41,7 +40,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".views.ui.receive.WifiActivity"
+            android:name=".views.ui.hotspot.HpReceiverActivity"
             android:parentActivityName=".views.ui.main.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -58,7 +57,7 @@
                 android:value=".views.ui.main.MainActivity" />
         </activity>
         <activity
-            android:name=".views.ui.send.SendActivity"
+            android:name=".views.ui.hotspot.HpSenderActivity"
             android:configChanges="orientation|screenSize" />
 
         <service android:name=".services.HotspotService" />

@@ -2,6 +2,8 @@
 
 package org.odk.share.views.ui.send.fragment;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -12,28 +14,30 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import org.odk.collect.android.dao.FormsDao;
-import org.odk.collect.android.dao.InstancesDao;
-import org.odk.collect.android.provider.FormsProviderAPI;
-import org.odk.share.R;
-import org.odk.share.views.ui.main.FormsAdapter;
-import org.odk.share.views.ui.common.basecursor.BaseCursorViewHolder;
-import org.odk.share.views.listeners.ItemClickListener;
-import org.odk.share.dao.TransferDao;
-import org.odk.share.utilities.ApplicationConstants;
-import org.odk.share.utilities.ArrayUtils;
-import org.odk.share.views.ui.send.SendActivity;
-
-import java.util.LinkedHashSet;
-
-import javax.inject.Inject;
-
 import androidx.annotation.NonNull;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import org.odk.collect.android.dao.FormsDao;
+import org.odk.collect.android.dao.InstancesDao;
+import org.odk.collect.android.provider.FormsProviderAPI;
+import org.odk.share.R;
+import org.odk.share.dao.TransferDao;
+import org.odk.share.utilities.ApplicationConstants;
+import org.odk.share.utilities.ArrayUtils;
+import org.odk.share.views.listeners.ItemClickListener;
+import org.odk.share.views.ui.bluetooth.BtSenderActivity;
+import org.odk.share.views.ui.common.basecursor.BaseCursorViewHolder;
+import org.odk.share.views.ui.hotspot.HpSenderActivity;
+import org.odk.share.views.ui.main.FormsAdapter;
+
+import java.util.LinkedHashSet;
+
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -49,6 +53,7 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
     public static final String FORM_IDS = "form_ids";
     private static final String FORM_CHOOSER_LIST_SORTING_ORDER = "formChooserListSortingOrder";
     private static final int FORM_LOADER = 2;
+    private static final String[] TRANSFER_OPTIONS = {"via bluetooth", "via hotspot"};
 
     @BindView(R.id.recyclerview)
     RecyclerView recyclerView;
@@ -156,13 +161,39 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
 
     @OnClick(R.id.send_button)
     public void send() {
-        Intent intent = new Intent(getActivity(), SendActivity.class);
+        Intent hotspotIntent = new Intent(getActivity(), HpSenderActivity.class);
+        Intent bluetoothIntent = new Intent(getActivity(), BtSenderActivity.class);
+        setupSendingIntent(hotspotIntent);
+        setupSendingIntent(bluetoothIntent);
+
+        // choose different sending methods, TODO: needs refactor if we have a better UI/UX.
+        AlertDialog alertDialog = new AlertDialog.Builder(getContext())
+                .setTitle("Send Options")
+                .setIcon(R.drawable.ic_help_outline)
+                .setItems(TRANSFER_OPTIONS, (DialogInterface dialog, int which) -> {
+                    switch (which) {
+                        case 0:
+                            if (getActivity() != null) {
+                                startActivity(bluetoothIntent);
+                                getActivity().finish();
+                            }
+                            break;
+                        case 1:
+                            if (getActivity() != null) {
+                                startActivity(hotspotIntent);
+                                getActivity().finish();
+                            }
+                            break;
+                    }
+                }).create();
+        alertDialog.show();
+    }
+
+    private void setupSendingIntent(Intent intent) {
         Long[] arr = selectedForms.toArray(new Long[selectedForms.size()]);
         long[] a = ArrayUtils.toPrimitive(arr);
         intent.putExtra(FORM_IDS, a);
         intent.putExtra(MODE, ApplicationConstants.SEND_BLANK_FORM_MODE);
-        startActivity(intent);
-        getActivity().finish();
     }
 
     @OnClick(R.id.toggle_button)

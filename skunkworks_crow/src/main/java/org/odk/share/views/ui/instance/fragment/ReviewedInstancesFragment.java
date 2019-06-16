@@ -16,7 +16,7 @@ import org.odk.collect.android.dto.Instance;
 import org.odk.collect.android.provider.InstanceProviderAPI;
 import org.odk.share.R;
 import org.odk.share.views.ui.common.InstanceListFragment;
-import org.odk.share.views.ui.send.SendActivity;
+import org.odk.share.views.ui.hotspot.HpSenderActivity;
 import org.odk.share.views.ui.instance.adapter.TransferInstanceAdapter;
 import org.odk.share.dao.TransferDao;
 import org.odk.share.dto.TransferInstance;
@@ -224,7 +224,7 @@ public class ReviewedInstancesFragment extends InstanceListFragment implements O
                 instanceIds.add(transferInstance.getInstanceId());
             }
         }
-        Intent intent = new Intent(getContext(), SendActivity.class);
+        Intent intent = new Intent(getContext(), HpSenderActivity.class);
         Long[] arr = instanceIds.toArray(new Long[instanceIds.size()]);
         long[] a = ArrayUtils.toPrimitive(arr);
         intent.putExtra(INSTANCE_IDS, a);
