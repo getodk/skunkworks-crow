@@ -8,7 +8,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -19,6 +18,7 @@ import org.odk.share.bluetooth.BluetoothBasic;
 import org.odk.share.bluetooth.BluetoothClient;
 import org.odk.share.bluetooth.BluetoothReceiver;
 import org.odk.share.bluetooth.BluetoothUtils;
+import org.odk.share.views.ui.common.injectable.InjectableActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -29,7 +29,7 @@ import butterknife.ButterKnife;
  *
  * @author huangyz0918 (huangyz0918@gmail.com)
  */
-public class BtSenderActivity extends AppCompatActivity implements BluetoothBasic.Listener,
+public class BtSenderActivity extends InjectableActivity implements BluetoothBasic.Listener,
         BluetoothReceiver.Listener, BluetoothListAdapter.OnDeviceClickListener {
 
     @BindView(R.id.btn_refresh)

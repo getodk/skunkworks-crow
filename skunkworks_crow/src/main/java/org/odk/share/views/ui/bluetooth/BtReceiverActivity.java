@@ -5,13 +5,13 @@ import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import org.odk.share.R;
 import org.odk.share.bluetooth.BluetoothBasic;
 import org.odk.share.bluetooth.BluetoothServer;
 import org.odk.share.bluetooth.BluetoothUtils;
+import org.odk.share.views.ui.common.injectable.InjectableActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -21,7 +21,7 @@ import butterknife.ButterKnife;
  *
  * @author huangyz0918 (huangyz0918@gmail.com)
  */
-public class BtReceiverActivity extends AppCompatActivity implements BluetoothBasic.Listener {
+public class BtReceiverActivity extends InjectableActivity implements BluetoothBasic.Listener {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
