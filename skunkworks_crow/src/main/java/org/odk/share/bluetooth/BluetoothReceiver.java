@@ -46,7 +46,7 @@ public class BluetoothReceiver extends BroadcastReceiver {
             return;
         }
 
-        Timber.d(TAG + "===>" + action);
+        Timber.d(TAG, action);
         BluetoothDevice dev = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
         if (dev != null) {
             Timber.d(TAG + "BluetoothDevice: " + dev.getName() + ", " + dev.getAddress());
