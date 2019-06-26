@@ -58,18 +58,38 @@ public class SenderService {
                             break;
                     }
                 }).subscribe();
-
     }
 
-    public void startUploading(long[] instancesToSend, int port, int mode) {
+    /**
+     * build a bundle for transfer form data using hotspot.
+     *
+     * @param port            port for sending data via hotspot.
+     * @param instancesToSend instance to send.
+     * @param mode            review form mode or others.
+     */
+    public PersistableBundleCompat setupPersistableBundle(long[] instancesToSend, int port, int mode) {
         PersistableBundleCompat extras = new PersistableBundleCompat();
         extras.putLongArray(UploadJob.INSTANCES, instancesToSend);
-        extras.putInt(UploadJob.PORT, port);
         extras.putInt(MODE, mode);
+        return extras;
+    }
 
-        // Build request
+    /**
+     * build a bundle for transfer form data using bluetooth.
+     *
+     * @param instancesToSend instance to send.
+     * @param mode            review form mode or others.
+     */
+    public PersistableBundleCompat setupPersistableBundle(long[] instancesToSend, int mode) {
+        PersistableBundleCompat extras = new PersistableBundleCompat();
+        extras.putLongArray(UploadJob.INSTANCES, instancesToSend);
+        extras.putInt(MODE, mode);
+        return extras;
+    }
+
+    public void startHpUploading(long[] instancesToSend, int port, int mode) {
         JobRequest request = new JobRequest.Builder(UploadJob.TAG)
-                .addExtras(extras)
+                .addExtras(setupPersistableBundle(instancesToSend, port, mode))
                 .startNow()
                 .build();
 
@@ -80,6 +100,22 @@ public class SenderService {
         }
     }
 
+    public void startBtUploading(long[] instancesToSend, int mode) {
+        JobRequest request = new JobRequest.Builder(UploadJob.TAG)
+                .addExtras(setupPersistableBundle(instancesToSend, mode))
+                .startNow()
+                .build();
+
+        if (currentJob != null) {
+            jobs.add(request);
+        } else {
+            startJob(request);
+        }
+    }
+
+    /**
+     * start the uploading job or canceling the job.
+     */
     private void startJob(JobRequest request) {
         request.schedule();
         Timber.d("Starting upload job %d : ", request.getJobId());

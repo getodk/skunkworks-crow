@@ -8,13 +8,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.LocationManager;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.Settings;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,6 +31,7 @@ import org.odk.share.rx.RxEventBus;
 import org.odk.share.rx.schedulers.BaseSchedulerProvider;
 import org.odk.share.services.HotspotService;
 import org.odk.share.services.SenderService;
+import org.odk.share.utilities.PermissionUtils;
 import org.odk.share.utilities.QRCodeUtils;
 import org.odk.share.utilities.SocketUtils;
 import org.odk.share.views.ui.common.injectable.InjectableActivity;
@@ -169,21 +168,11 @@ public class HpSenderActivity extends InjectableActivity {
         }
     }
 
-    private boolean isGPSEnabled() {
-        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        boolean gpsEnabled = false;
-        if (locationManager != null) {
-            gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        }
-
-        return gpsEnabled;
-    }
-
     private void initiateHotspot() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            if (!isGPSEnabled()) {
+            if (!PermissionUtils.isGPSEnabled(this)) {
                 isHotspotInitiated = false;
-                showLocationAlertDialog();
+                PermissionUtils.showLocationAlertDialog(this);
                 return;
             }
             turnOnHotspot();
@@ -206,24 +195,6 @@ public class HpSenderActivity extends InjectableActivity {
             currentConfig = wifiHotspot.getCurrConfig();
             startSending();
         }
-    }
-
-    private void showLocationAlertDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(R.string.location_settings_dialog);
-
-        builder.setPositiveButton(getString(R.string.settings), (DialogInterface dialog, int which) -> {
-            Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-            startActivity(intent);
-        });
-
-        builder.setNegativeButton(getString(R.string.cancel), (DialogInterface dialog, int which) -> {
-            dialog.dismiss();
-            finish();
-        });
-
-        builder.setCancelable(false);
-        builder.show();
     }
 
     private void showAlertDialog() {
@@ -363,7 +334,7 @@ public class HpSenderActivity extends InjectableActivity {
     }
 
     private void startSending() {
-        senderService.startUploading(formIds, port, mode);
+        senderService.startHpUploading(formIds, port, mode);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)

@@ -56,7 +56,7 @@ public class BluetoothBasic {
                 switch (in.readInt()) {
                     case FLAG_MSG: //read short messages.
                         String msg = in.readUTF();
-                        notifyUI(Listener.ConnectStatus.MSG, "receive short message: " + msg);
+                        notifyUI(Listener.ConnectStatus.DATA, "receive short message: " + msg);
                         break;
                     case FLAG_FILE: //Read files.
                         //TODO: create file path.
@@ -68,7 +68,7 @@ public class BluetoothBasic {
                         int r;
                         byte[] b = new byte[4 * 1024];
                         FileOutputStream out = new FileOutputStream(FILE_PATH + fileName);
-                        notifyUI(Listener.ConnectStatus.MSG, "receiving file (" + fileName + "), please wait...");
+                        notifyUI(Listener.ConnectStatus.DATA, "receiving file (" + fileName + "), please wait...");
                         while ((r = in.read(b)) != -1) {
                             out.write(b, 0, r);
                             len += r;
@@ -76,7 +76,7 @@ public class BluetoothBasic {
                                 break;
                             }
                         }
-                        notifyUI(Listener.ConnectStatus.MSG, "done (put file in: " + FILE_PATH + ")");
+                        notifyUI(Listener.ConnectStatus.DATA, "done (put file in: " + FILE_PATH + ")");
                         break;
                 }
             }
@@ -97,7 +97,24 @@ public class BluetoothBasic {
             dataOutputStream.writeInt(FLAG_MSG);
             dataOutputStream.writeUTF(msg);
             dataOutputStream.flush();
-            notifyUI(Listener.ConnectStatus.MSG, "send short message: " + msg);
+            notifyUI(Listener.ConnectStatus.DATA, "send short message: " + msg);
+        } catch (Throwable e) {
+            close();
+        }
+        isSending = false;
+    }
+
+    /**
+     * Sending data using {@link DataOutputStream}.
+     */
+    public void sendData(DataOutputStream dos) {
+        if (isSending()) {
+            return;
+        }
+        isSending = true;
+        try {
+            dataOutputStream = dos;
+            dataOutputStream.flush();
         } catch (Throwable e) {
             close();
         }
@@ -122,12 +139,12 @@ public class BluetoothBasic {
                 dataOutputStream.writeLong(file.length());
                 int r;
                 byte[] b = new byte[4 * 1024];
-                notifyUI(Listener.ConnectStatus.MSG, "sending file (" + filePath + "), please wait...");
+                notifyUI(Listener.ConnectStatus.DATA, "sending file (" + filePath + "), please wait...");
                 while ((r = fileInputStream.read(b)) != -1) {
                     dataOutputStream.write(b, 0, r);
                 }
                 dataOutputStream.flush();
-                notifyUI(Listener.ConnectStatus.MSG, "done.");
+                notifyUI(Listener.ConnectStatus.DATA, "done.");
             } catch (Throwable e) {
                 close();
             }
@@ -196,7 +213,7 @@ public class BluetoothBasic {
         enum ConnectStatus {
             DISCONNECTED,
             CONNECTED,
-            MSG
+            DATA
         }
 
         void socketNotify(Listener.ConnectStatus status, Object obj);

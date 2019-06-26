@@ -64,7 +64,7 @@ public class BtReceiverActivity extends InjectableActivity implements BluetoothB
                 message = "lost connection, listen again...";
                 Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
                 break;
-            case MSG:
+            case DATA:
                 message = String.format("\n%s", obj);
                 testTextView.append(message);
                 break;

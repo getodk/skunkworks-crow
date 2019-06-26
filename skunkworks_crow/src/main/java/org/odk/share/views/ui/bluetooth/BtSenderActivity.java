@@ -1,6 +1,7 @@
 package org.odk.share.views.ui.bluetooth;
 
 
+import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.os.Bundle;
@@ -18,10 +19,20 @@ import org.odk.share.bluetooth.BluetoothBasic;
 import org.odk.share.bluetooth.BluetoothClient;
 import org.odk.share.bluetooth.BluetoothReceiver;
 import org.odk.share.bluetooth.BluetoothUtils;
+import org.odk.share.rx.RxEventBus;
+import org.odk.share.rx.schedulers.BaseSchedulerProvider;
+import org.odk.share.services.SenderService;
 import org.odk.share.views.ui.common.injectable.InjectableActivity;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static org.odk.share.utilities.ApplicationConstants.ASK_REVIEW_MODE;
+import static org.odk.share.views.ui.instance.InstancesList.INSTANCE_IDS;
+import static org.odk.share.views.ui.instance.fragment.ReviewedInstancesFragment.MODE;
+import static org.odk.share.views.ui.send.fragment.BlankFormsFragment.FORM_IDS;
 
 
 /**
@@ -40,6 +51,19 @@ public class BtSenderActivity extends InjectableActivity implements BluetoothBas
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
+
+    @Inject
+    RxEventBus rxEventBus;
+
+    @Inject
+    BaseSchedulerProvider schedulerProvider;
+
+    @Inject
+    SenderService senderService;
+
+    private long[] formIds;
+    private int mode;
+    private ProgressDialog connectingDialog;
 
     private final BluetoothListAdapter bluetoothListAdapter = new BluetoothListAdapter(this);
     private final BluetoothClient bluetoothClient = new BluetoothClient(this);
@@ -61,6 +85,12 @@ public class BtSenderActivity extends InjectableActivity implements BluetoothBas
         if (!BluetoothUtils.isBluetoothEnabled()) {
             BluetoothUtils.enableBluetooth();
             bluetoothListAdapter.rescan();
+        }
+
+        formIds = getIntent().getLongArrayExtra(INSTANCE_IDS);
+        mode = getIntent().getIntExtra(MODE, ASK_REVIEW_MODE);
+        if (formIds == null) {
+            formIds = getIntent().getLongArrayExtra(FORM_IDS);
         }
     }
 
@@ -98,15 +128,17 @@ public class BtSenderActivity extends InjectableActivity implements BluetoothBas
         String message;
         switch (status) {
             case CONNECTED:
+                connectingDialog.dismiss();
                 BluetoothDevice dev = (BluetoothDevice) obj;
                 message = String.format("connected success with: %s(%s)", dev.getName(), dev.getAddress());
                 Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
                 sendMsg();
                 break;
             case DISCONNECTED:
+                connectingDialog.dismiss();
                 Toast.makeText(this, "Connection lost", Toast.LENGTH_SHORT).show();
                 break;
-            case MSG:
+            case DATA:
                 message = String.format("\n%s", obj);
                 Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
                 break;
@@ -128,7 +160,8 @@ public class BtSenderActivity extends InjectableActivity implements BluetoothBas
             }
 
             bluetoothClient.connect(dev);
-            Toast.makeText(this, "connecting...", Toast.LENGTH_SHORT).show();
+            connectingDialog = ProgressDialog.show(this, "Connecting",
+                    "Connecting to device, please wait...", true);
         } else {
             Toast.makeText(this, "you have disabled bluetooth, turning on...", Toast.LENGTH_SHORT).show();
             BluetoothUtils.enableBluetooth();
@@ -144,6 +177,11 @@ public class BtSenderActivity extends InjectableActivity implements BluetoothBas
         } else {
             Toast.makeText(this, "no connections", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    // TODO: needs private.
+    public void startSending() {
+        senderService.startBtUploading(formIds, mode);
     }
 
     @Override
