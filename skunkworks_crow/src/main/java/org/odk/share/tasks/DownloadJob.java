@@ -1,10 +1,17 @@
 package org.odk.share.tasks;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.ContentValues;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.evernote.android.job.Job;
 
 import org.odk.collect.android.dao.FormsDao;
@@ -18,9 +25,9 @@ import org.odk.share.dao.TransferDao;
 import org.odk.share.database.ShareDatabaseHelper;
 import org.odk.share.dto.TransferInstance;
 import org.odk.share.events.DownloadEvent;
-import org.odk.share.views.ui.settings.PreferenceKeys;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.utilities.ApplicationConstants;
+import org.odk.share.views.ui.settings.PreferenceKeys;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
@@ -36,7 +43,6 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
-import androidx.annotation.NonNull;
 import timber.log.Timber;
 
 import static org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns.CAN_EDIT_WHEN_COMPLETE;
@@ -48,6 +54,7 @@ import static org.odk.collect.android.provider.InstanceProviderAPI.InstanceColum
 import static org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns.SUBMISSION_URI;
 import static org.odk.share.application.Share.FORMS_DIR_NAME;
 import static org.odk.share.application.Share.INSTANCES_DIR_NAME;
+import static org.odk.share.bluetooth.BluetoothBasic.SPP_UUID;
 import static org.odk.share.dto.InstanceMap.INSTANCE_UUID;
 import static org.odk.share.dto.TransferInstance.INSTANCE_ID;
 import static org.odk.share.dto.TransferInstance.INSTRUCTIONS;
@@ -80,9 +87,10 @@ public class DownloadJob extends Job {
 
     private String ip;
     private int port;
+    private Socket socket;
+
     private int total;
     private int progress;
-    private Socket socket;
     private DataInputStream dis;
     private DataOutputStream dos;
 
@@ -94,7 +102,6 @@ public class DownloadJob extends Job {
         ((Share) getContext().getApplicationContext()).getAppComponent().inject(this);
 
         initJob(params);
-        rxEventBus.post(receiveForms());
 
         return null;
     }
@@ -103,17 +110,42 @@ public class DownloadJob extends Job {
         ip = params.getExtras().getString(IP, "");
         port = params.getExtras().getInt(PORT, -1);
         sbResult = new StringBuilder();
+
+        setupDataStreamsAndReceive(true);
+    }
+
+    private void setupDataStreamsAndReceive(boolean isBluetooth) {
+        try {
+            Timber.d("Waiting for receiver");
+            if (isBluetooth) {
+
+                BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+                BluetoothDevice bluetoothDevice = bluetoothAdapter.getRemoteDevice("DC:09:4C:3D:8E:93");
+                BluetoothSocket bluetoothSocket = bluetoothDevice.createRfcommSocketToServiceRecord(SPP_UUID);
+                if (!bluetoothSocket.isConnected()) {
+                    bluetoothSocket.connect();
+                }
+
+                dos = new DataOutputStream(bluetoothSocket.getOutputStream());
+                dis = new DataInputStream(bluetoothSocket.getInputStream());
+            } else {
+                Timber.d("Socket " + ip + " " + port);
+                socket = new Socket();
+                socket.connect(new InetSocketAddress(ip, port), TIMEOUT);
+                Timber.d("Socket connected");
+                dis = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+                dos = new DataOutputStream(socket.getOutputStream());
+            }
+
+            rxEventBus.post(receiveForms());
+        } catch (IOException e) {
+            Timber.e(e);
+        }
+
     }
 
     private DownloadEvent receiveForms() {
-        Timber.d("Socket " + ip + " " + port);
-
         try {
-            socket = new Socket();
-            socket.connect(new InetSocketAddress(ip, port), TIMEOUT);
-            Timber.d("Socket connected");
-            dis = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
-            dos = new DataOutputStream(socket.getOutputStream());
             int mode = dis.readInt();
             if (mode == SEND_FILL_FORM_MODE) {
                 total = dis.readInt();
@@ -134,7 +166,9 @@ public class DownloadJob extends Job {
             }
 
             // close connection
-            socket.close();
+            if (socket != null) {
+                socket.close();
+            }
             dos.close();
             dis.close();
 

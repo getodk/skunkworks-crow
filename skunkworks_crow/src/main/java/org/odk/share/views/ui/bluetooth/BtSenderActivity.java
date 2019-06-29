@@ -19,6 +19,7 @@ import org.odk.share.bluetooth.BluetoothBasic;
 import org.odk.share.bluetooth.BluetoothClient;
 import org.odk.share.bluetooth.BluetoothReceiver;
 import org.odk.share.bluetooth.BluetoothUtils;
+import org.odk.share.events.UploadEvent;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.rx.schedulers.BaseSchedulerProvider;
 import org.odk.share.services.SenderService;
@@ -28,6 +29,9 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import timber.log.Timber;
 
 import static org.odk.share.utilities.ApplicationConstants.ASK_REVIEW_MODE;
 import static org.odk.share.views.ui.instance.InstancesList.INSTANCE_IDS;
@@ -64,6 +68,7 @@ public class BtSenderActivity extends InjectableActivity implements BluetoothBas
     private long[] formIds;
     private int mode;
     private ProgressDialog connectingDialog;
+    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     private final BluetoothListAdapter bluetoothListAdapter = new BluetoothListAdapter(this);
     private final BluetoothClient bluetoothClient = new BluetoothClient(this);
@@ -132,15 +137,10 @@ public class BtSenderActivity extends InjectableActivity implements BluetoothBas
                 BluetoothDevice dev = (BluetoothDevice) obj;
                 message = String.format("connected success with: %s(%s)", dev.getName(), dev.getAddress());
                 Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-                sendMsg();
                 break;
             case DISCONNECTED:
                 connectingDialog.dismiss();
                 Toast.makeText(this, "Connection lost", Toast.LENGTH_SHORT).show();
-                break;
-            case DATA:
-                message = String.format("\n%s", obj);
-                Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
                 break;
         }
 
@@ -159,7 +159,8 @@ public class BtSenderActivity extends InjectableActivity implements BluetoothBas
                 return;
             }
 
-            bluetoothClient.connect(dev);
+//            bluetoothClient.connect(dev);
+            senderService.startBtUploading(formIds, mode);
             connectingDialog = ProgressDialog.show(this, "Connecting",
                     "Connecting to device, please wait...", true);
         } else {
@@ -168,20 +169,53 @@ public class BtSenderActivity extends InjectableActivity implements BluetoothBas
         }
     }
 
+    // TODO: improve the UI/UX according to the callback.
+    private Disposable addUploadEventSubscription() {
+        return rxEventBus.register(UploadEvent.class)
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.androidThread())
+                .subscribe(uploadEvent -> {
+                    switch (uploadEvent.getStatus()) {
+                        case QUEUED:
+                            Toast.makeText(this, R.string.upload_queued, Toast.LENGTH_SHORT).show();
+                            break;
+                        case UPLOADING:
+                            int progress = uploadEvent.getCurrentProgress();
+                            int total = uploadEvent.getTotalSize();
 
-    //TODO: For testing, please remove this after connect to form instance.
-    public void sendMsg() {
-        if (bluetoothClient.isConnected(null)) {
-            String message = "Hello World";
-            bluetoothClient.sendMessage(message);
-        } else {
-            Toast.makeText(this, "no connections", Toast.LENGTH_SHORT).show();
-        }
+                            String alertMsg = getString(R.string.sending_items, String.valueOf(progress), String.valueOf(total));
+                            Toast.makeText(this, alertMsg, Toast.LENGTH_SHORT).show();
+//                            setDialogMessage(PROGRESS_DIALOG, alertMsg);
+                            break;
+                        case FINISHED:
+//                            hideDialog(PROGRESS_DIALOG);
+                            String result = uploadEvent.getResult();
+//                            createAlertDialog(getString(R.string.transfer_result), result);
+                            Toast.makeText(this, getString(R.string.transfer_result) + " : " + result, Toast.LENGTH_SHORT).show();
+                            break;
+                        case ERROR:
+                            Toast.makeText(this, getString(R.string.error_while_uploading, uploadEvent.getResult()), Toast.LENGTH_SHORT).show();
+//                            hideDialog(PROGRESS_DIALOG);
+//                            createAlertDialog(getString(R.string.transfer_result), getString(R.string.error_while_uploading, uploadEvent.getResult()));
+                            break;
+                        case CANCELLED:
+                            Toast.makeText(this, getString(R.string.canceled), Toast.LENGTH_LONG).show();
+//                            hideDialog(PROGRESS_DIALOG);
+                            break;
+                    }
+                }, Timber::e);
     }
 
-    // TODO: needs private.
-    public void startSending() {
-        senderService.startBtUploading(formIds, mode);
+    @Override
+    protected void onResume() {
+        super.onResume();
+        compositeDisposable.add(addUploadEventSubscription());
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        compositeDisposable.clear();
     }
 
     @Override

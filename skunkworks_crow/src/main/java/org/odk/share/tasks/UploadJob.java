@@ -1,7 +1,14 @@
 package org.odk.share.tasks;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothServerSocket;
+import android.bluetooth.BluetoothSocket;
 import android.content.ContentValues;
 import android.database.Cursor;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.evernote.android.job.Job;
 
@@ -38,16 +45,16 @@ import java.util.UUID;
 
 import javax.inject.Inject;
 
-import androidx.annotation.NonNull;
 import timber.log.Timber;
 
+import static org.odk.share.bluetooth.BluetoothBasic.SPP_UUID;
 import static org.odk.share.dto.InstanceMap.INSTANCE_UUID;
 import static org.odk.share.dto.TransferInstance.INSTANCE_ID;
 import static org.odk.share.dto.TransferInstance.STATUS_FORM_SENT;
 import static org.odk.share.dto.TransferInstance.TRANSFER_STATUS;
-import static org.odk.share.views.ui.instance.fragment.ReviewedInstancesFragment.MODE;
 import static org.odk.share.utilities.ApplicationConstants.SEND_BLANK_FORM_MODE;
 import static org.odk.share.utilities.ApplicationConstants.SEND_FILL_FORM_MODE;
+import static org.odk.share.views.ui.instance.fragment.ReviewedInstancesFragment.MODE;
 
 public class UploadJob extends Job {
 
@@ -89,33 +96,53 @@ public class UploadJob extends Job {
 
         initJob(params);
 
-        rxEventBus.post(uploadInstances());
-
         return null;
     }
 
     private void initJob(Params params) {
+        sbResult = new StringBuilder();
         instancesToSend = ArrayUtils.toObject(params.getExtras().getLongArray(INSTANCES));
         port = params.getExtras().getInt(PORT, -1);
         mode = params.getExtras().getInt(MODE, ApplicationConstants.ASK_REVIEW_MODE);
-        sbResult = new StringBuilder();
+
+        setupDataStreamsAndRun(true);
+    }
+
+    private void setupDataStreamsAndRun(boolean isBluetooth) {
+        try {
+            Timber.d("Waiting for receiver");
+            if (isBluetooth) {
+                BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+                BluetoothServerSocket serverSocket = bluetoothAdapter.listenUsingInsecureRfcommWithServiceRecord(TAG, SPP_UUID);
+                BluetoothSocket bluetoothSocket = serverSocket.accept();
+
+                dos = new DataOutputStream(bluetoothSocket.getOutputStream());
+                dis = new DataInputStream(bluetoothSocket.getInputStream());
+            } else {
+                serverSocket = new ServerSocket(port);
+                socket = serverSocket.accept();
+                dos = new DataOutputStream(socket.getOutputStream());
+                dis = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+            }
+
+            rxEventBus.post(uploadInstances());
+        } catch (IOException e) {
+            Timber.e(e);
+        } /*catch (InterruptedException e) {
+            Timber.e(e);
+        }*/
     }
 
     private UploadEvent uploadInstances() {
         try {
-            Timber.d("Waiting for receiver");
-
-            serverSocket = new ServerSocket(port);
-            socket = serverSocket.accept();
-            dos = new DataOutputStream(socket.getOutputStream());
-            dis = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
-
             // show dialog and connected
             Timber.d("Start Sending");
             processSelectedFiles(instancesToSend);
 
             // close connection
-            socket.close();
+            if (socket != null) {
+                socket.close();
+            }
             serverSocket.close();
             dos.close();
             dis.close();

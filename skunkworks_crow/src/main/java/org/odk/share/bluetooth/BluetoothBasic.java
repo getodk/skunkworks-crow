@@ -20,7 +20,7 @@ import timber.log.Timber;
  */
 public class BluetoothBasic {
 
-    static final UUID SPP_UUID = UUID.fromString("724f00a0-795e-4272-a85a-11075e760e58");
+    public static final UUID SPP_UUID = UUID.fromString("724f00a0-795e-4272-a85a-11075e760e58");
     private static final String FILE_PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/bluetooth/";
 
     // TODO: replace with single file instance.

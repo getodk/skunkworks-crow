@@ -55,12 +55,22 @@ public class ReceiverService {
 
     }
 
+    public void startDownloading() {
+        JobRequest request = new JobRequest.Builder(DownloadJob.TAG)
+                .startNow()
+                .build();
+
+       startJob(request);
+    }
+
     public void startDownloading(String ip, int port) {
         PersistableBundleCompat extras = new PersistableBundleCompat();
         extras.putString(DownloadJob.IP, ip);
         extras.putInt(DownloadJob.PORT, port);
+        startJob(extras);
+    }
 
-        // Build request
+    private void startJob(PersistableBundleCompat extras) {
         JobRequest request = new JobRequest.Builder(DownloadJob.TAG)
                 .addExtras(extras)
                 .startNow()

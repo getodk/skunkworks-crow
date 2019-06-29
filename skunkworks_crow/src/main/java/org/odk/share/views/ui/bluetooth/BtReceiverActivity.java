@@ -11,10 +11,19 @@ import org.odk.share.R;
 import org.odk.share.bluetooth.BluetoothBasic;
 import org.odk.share.bluetooth.BluetoothServer;
 import org.odk.share.bluetooth.BluetoothUtils;
+import org.odk.share.events.DownloadEvent;
+import org.odk.share.rx.RxEventBus;
+import org.odk.share.rx.schedulers.BaseSchedulerProvider;
+import org.odk.share.services.ReceiverService;
 import org.odk.share.views.ui.common.injectable.InjectableActivity;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import timber.log.Timber;
 
 /**
  * Receive activity, for testing, needs refactor.
@@ -29,7 +38,17 @@ public class BtReceiverActivity extends InjectableActivity implements BluetoothB
     @BindView(R.id.test_text_view)
     TextView testTextView;
 
+    @Inject
+    ReceiverService receiverService;
+
+    @Inject
+    RxEventBus rxEventBus;
+
+    @Inject
+    BaseSchedulerProvider schedulerProvider;
+
     private BluetoothServer bluetoothServer;
+    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +63,8 @@ public class BtReceiverActivity extends InjectableActivity implements BluetoothB
         if (!BluetoothUtils.isBluetoothEnabled()) {
             BluetoothUtils.enableBluetooth();
         }
+
+        receiverService.startDownloading();
     }
 
     @Override
@@ -64,11 +85,50 @@ public class BtReceiverActivity extends InjectableActivity implements BluetoothB
                 message = "lost connection, listen again...";
                 Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
                 break;
-            case DATA:
-                message = String.format("\n%s", obj);
-                testTextView.append(message);
-                break;
         }
+    }
+
+
+    // TODO: improve the UI/UX progress.
+    private Disposable addDownloadEventSubscription() {
+        return rxEventBus.register(DownloadEvent.class)
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.androidThread())
+                .subscribe(downloadEvent -> {
+                    switch (downloadEvent.getStatus()) {
+                        case QUEUED:
+                            Toast.makeText(this, R.string.download_queued, Toast.LENGTH_SHORT).show();
+                            break;
+                        case DOWNLOADING:
+                            int progress = downloadEvent.getCurrentProgress();
+                            int total = downloadEvent.getTotalSize();
+                            String alertMsg = getString(R.string.receiving_items, String.valueOf(progress), String.valueOf(total));
+//                            progressDialog.setMessage(alertMsg);
+                            Toast.makeText(this, alertMsg, Toast.LENGTH_SHORT).show();
+                            break;
+                        case FINISHED:
+//                            dismissDialog(DIALOG_DOWNLOAD_PROGRESS);
+                            String result = downloadEvent.getResult();
+                            Toast.makeText(this, getString(R.string.transfer_result) + " : " + result, Toast.LENGTH_SHORT).show();
+//                            createAlertDialog(getString(R.string.transfer_result), result);
+                            break;
+                        case ERROR:
+                            Toast.makeText(this, getString(R.string.error_while_downloading, downloadEvent.getResult()), Toast.LENGTH_SHORT).show();
+//                            dismissDialog(DIALOG_DOWNLOAD_PROGRESS);
+//                            createAlertDialog(getString(R.string.transfer_result), getString(R.string.error_while_downloading, downloadEvent.getResult()));
+                            break;
+                        case CANCELLED:
+                            Toast.makeText(this, getString(R.string.canceled), Toast.LENGTH_LONG).show();
+//                            dismissDialog(DIALOG_DOWNLOAD_PROGRESS);
+                            break;
+                    }
+                }, Timber::e);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        compositeDisposable.add(addDownloadEventSubscription());
     }
 
     @Override
