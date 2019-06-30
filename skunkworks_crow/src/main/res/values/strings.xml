@@ -133,8 +133,16 @@
 
     <!-- Bluetooth Related -->
     <string name="btn_refresh">Refresh</string>
-    <string name="connect_bluetooth_title">Device to Send</string>
-    <string name="send_instance_title">Send Data After Connecting</string>
+    <string name="connect_bluetooth_title">Device to Receive</string>
+    <string name="connecting_title">Connecting</string>
+    <string name="receiving_title">Receiving</string>
+    <string name="connecting_message">connecting to bluetooth \n please wait&#8230;</string>
+    <string name="connecting_transfer_message">connected with bluetooth receiver! \n starting transferring&#8230;</string>
+    <string name="turning_on_bluetooth_message">you have disabled bluetooth, turning on now&#8230;</string>
+    <string name="send_instance_title">Send Data</string>
     <string name="bluetooth_instance_name_default">Bluetooth Device</string>
-    <string name="tv_sender_wait_for_connect">Wait for bluetooth connection&#8230;</string>
+    <string name="tv_sender_wait_for_connect">waiting for connection&#8230; \n will start transfer when connected </string>
+    <string name="tv_form_already_exist">form already exists \n please send different form</string>
+    <string name="dev_already_connected">already connected to a device</string>
+    <string name="tv_form_send_success">form sent with success!</string>
 </resources>

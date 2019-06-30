@@ -2,6 +2,7 @@ package org.odk.share.views.ui.bluetooth;
 
 
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,7 +39,7 @@ import static org.odk.share.views.ui.send.fragment.BlankFormsFragment.FORM_IDS;
 public class BtSenderActivity extends InjectableActivity {
 
     @BindView(R.id.test_text_view)
-    TextView testTextView;
+    TextView resultTextView;
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -88,18 +89,14 @@ public class BtSenderActivity extends InjectableActivity {
                 .subscribe(bluetoothEvent -> {
                     switch (bluetoothEvent.getStatus()) {
                         case CONNECTED:
-                            Timber.d("======== SENDER: BLUETOOTH CONNECTED ========");
-                            // TODO: update ui
+                            resultTextView.setText(getString(R.string.connecting_transfer_message));
                             break;
                         case DISCONNECTED:
-                            Timber.d("======== SENDER: BLUETOOTH DISCONNECTED ========");
-                            // TODO: update ui
                             break;
                     }
                 });
     }
 
-    // TODO: improve the UI/UX according to the callback.
     private Disposable addUploadEventSubscription() {
         return rxEventBus.register(UploadEvent.class)
                 .subscribeOn(schedulerProvider.io())
@@ -115,23 +112,22 @@ public class BtSenderActivity extends InjectableActivity {
 
                             String alertMsg = getString(R.string.sending_items, String.valueOf(progress), String.valueOf(total));
                             Toast.makeText(this, alertMsg, Toast.LENGTH_SHORT).show();
-                            //setDialogMessage(PROGRESS_DIALOG, alertMsg);
                             break;
                         case FINISHED:
-                            //hideDialog(PROGRESS_DIALOG);
                             String result = uploadEvent.getResult();
-                            //createAlertDialog(getString(R.string.transfer_result), result);
-                            testTextView.setText(result);
+                            if (TextUtils.isEmpty(result)) {
+                                resultTextView.setText(getString(R.string.tv_form_already_exist));
+                            } else {
+                                resultTextView.setText(getString(R.string.tv_form_send_success));
+                                resultTextView.append(result);
+                            }
                             Toast.makeText(this, getString(R.string.transfer_result) + " : " + result, Toast.LENGTH_SHORT).show();
                             break;
                         case ERROR:
                             Toast.makeText(this, getString(R.string.error_while_uploading, uploadEvent.getResult()), Toast.LENGTH_SHORT).show();
-                            //hideDialog(PROGRESS_DIALOG);
-                            //createAlertDialog(getString(R.string.transfer_result), getString(R.string.error_while_uploading, uploadEvent.getResult()));
                             break;
                         case CANCELLED:
                             Toast.makeText(this, getString(R.string.canceled), Toast.LENGTH_LONG).show();
-                            //hideDialog(PROGRESS_DIALOG);
                             break;
                     }
                 }, Timber::e);

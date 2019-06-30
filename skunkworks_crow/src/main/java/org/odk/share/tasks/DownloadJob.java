@@ -134,6 +134,7 @@ public class DownloadJob extends Job {
 
                 if (bluetoothSocket.isConnected()) {
                     rxEventBus.post(new BluetoothEvent(BluetoothEvent.Status.CONNECTED));
+
                 }
 
                 dos = new DataOutputStream(bluetoothSocket.getOutputStream());
