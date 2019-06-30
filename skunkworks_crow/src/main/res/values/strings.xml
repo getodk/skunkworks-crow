@@ -133,7 +133,8 @@
 
     <!-- Bluetooth Related -->
     <string name="btn_refresh">Refresh</string>
-    <string name="connect_bluetooth_title">Bluetooth Devices</string>
-    <string name="receive_instance_title">Receive Data from Bluetooth</string>
+    <string name="connect_bluetooth_title">Device to Send</string>
+    <string name="send_instance_title">Send Data After Connecting</string>
     <string name="bluetooth_instance_name_default">Bluetooth Device</string>
+    <string name="tv_sender_wait_for_connect">Wait for bluetooth connection&#8230;</string>
 </resources>

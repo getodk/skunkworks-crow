@@ -69,7 +69,7 @@ public class BtReceiverActivity extends InjectableActivity implements
         ButterKnife.bind(this);
         initEvents();
 
-        setTitle(getString(R.string.receive_instance_title));
+        setTitle(getString(R.string.connect_bluetooth_title));
         setSupportActionBar(toolbar);
 
         // checking for if bluetooth enabled
@@ -138,23 +138,23 @@ public class BtReceiverActivity extends InjectableActivity implements
                             int progress = downloadEvent.getCurrentProgress();
                             int total = downloadEvent.getTotalSize();
                             String alertMsg = getString(R.string.receiving_items, String.valueOf(progress), String.valueOf(total));
-//                            progressDialog.setMessage(alertMsg);
+                            // progressDialog.setMessage(alertMsg);
                             Toast.makeText(this, alertMsg, Toast.LENGTH_SHORT).show();
                             break;
                         case FINISHED:
-//                            dismissDialog(DIALOG_DOWNLOAD_PROGRESS);
+                            // dismissDialog(DIALOG_DOWNLOAD_PROGRESS);
                             String result = downloadEvent.getResult();
                             Toast.makeText(this, getString(R.string.transfer_result) + " : " + result, Toast.LENGTH_SHORT).show();
-//                            createAlertDialog(getString(R.string.transfer_result), result);
+                            // createAlertDialog(getString(R.string.transfer_result), result);
                             break;
                         case ERROR:
                             Toast.makeText(this, getString(R.string.error_while_downloading, downloadEvent.getResult()), Toast.LENGTH_SHORT).show();
-//                            dismissDialog(DIALOG_DOWNLOAD_PROGRESS);
-//                            createAlertDialog(getString(R.string.transfer_result), getString(R.string.error_while_downloading, downloadEvent.getResult()));
+                            // dismissDialog(DIALOG_DOWNLOAD_PROGRESS);
+                            // createAlertDialog(getString(R.string.transfer_result), getString(R.string.error_while_downloading, downloadEvent.getResult()));
                             break;
                         case CANCELLED:
                             Toast.makeText(this, getString(R.string.canceled), Toast.LENGTH_LONG).show();
-//                            dismissDialog(DIALOG_DOWNLOAD_PROGRESS);
+                            // dismissDialog(DIALOG_DOWNLOAD_PROGRESS);
                             break;
                     }
                 }, Timber::e);

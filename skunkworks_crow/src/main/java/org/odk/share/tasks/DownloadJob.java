@@ -23,6 +23,7 @@ import org.odk.share.dao.InstanceMapDao;
 import org.odk.share.dao.TransferDao;
 import org.odk.share.database.ShareDatabaseHelper;
 import org.odk.share.dto.TransferInstance;
+import org.odk.share.events.BluetoothEvent;
 import org.odk.share.events.DownloadEvent;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.utilities.ApplicationConstants;
@@ -129,6 +130,10 @@ public class DownloadJob extends Job {
                 BluetoothSocket bluetoothSocket = bluetoothDevice.createRfcommSocketToServiceRecord(SPP_UUID);
                 if (!bluetoothSocket.isConnected()) {
                     bluetoothSocket.connect();
+                }
+
+                if (bluetoothSocket.isConnected()) {
+                    rxEventBus.post(new BluetoothEvent(BluetoothEvent.Status.CONNECTED));
                 }
 
                 dos = new DataOutputStream(bluetoothSocket.getOutputStream());

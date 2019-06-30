@@ -118,8 +118,9 @@ public class UploadJob extends Job {
                 BluetoothServerSocket bluetoothServerSocket = bluetoothAdapter.listenUsingInsecureRfcommWithServiceRecord(TAG, SPP_UUID);
                 BluetoothSocket bluetoothSocket = bluetoothServerSocket.accept();
 
-                // after the blocking accept(), means the connection has been established.
-                rxEventBus.post(new BluetoothEvent(BluetoothEvent.Status.CONNECTED));
+                if (bluetoothSocket.isConnected()) {
+                    rxEventBus.post(new BluetoothEvent(BluetoothEvent.Status.CONNECTED));
+                }
 
                 dos = new DataOutputStream(bluetoothSocket.getOutputStream());
                 dis = new DataInputStream(bluetoothSocket.getInputStream());

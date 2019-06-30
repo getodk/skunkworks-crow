@@ -71,6 +71,7 @@ public class SenderService {
         PersistableBundleCompat extras = new PersistableBundleCompat();
         extras.putLongArray(UploadJob.INSTANCES, instancesToSend);
         extras.putBoolean("isBluetooth", false);
+        extras.putInt(UploadJob.PORT, port);
         extras.putInt(MODE, mode);
         return extras;
     }

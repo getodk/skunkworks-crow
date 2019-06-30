@@ -52,7 +52,6 @@ public class BtSenderActivity extends InjectableActivity {
     @Inject
     SenderService senderService;
 
-    private boolean isConnected = false;
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
 
@@ -62,7 +61,7 @@ public class BtSenderActivity extends InjectableActivity {
         setContentView(R.layout.activity_bt_send);
         ButterKnife.bind(this);
 
-        setTitle(getString(R.string.connect_bluetooth_title));
+        setTitle(getString(R.string.send_instance_title));
         setSupportActionBar(toolbar);
 
         if (!BluetoothUtils.isBluetoothEnabled()) {
@@ -116,23 +115,23 @@ public class BtSenderActivity extends InjectableActivity {
 
                             String alertMsg = getString(R.string.sending_items, String.valueOf(progress), String.valueOf(total));
                             Toast.makeText(this, alertMsg, Toast.LENGTH_SHORT).show();
-//                            setDialogMessage(PROGRESS_DIALOG, alertMsg);
+                            //setDialogMessage(PROGRESS_DIALOG, alertMsg);
                             break;
                         case FINISHED:
-//                            hideDialog(PROGRESS_DIALOG);
+                            //hideDialog(PROGRESS_DIALOG);
                             String result = uploadEvent.getResult();
-//                            createAlertDialog(getString(R.string.transfer_result), result);
-                            testTextView.setText(getString(R.string.transfer_result) + " : " + result);
+                            //createAlertDialog(getString(R.string.transfer_result), result);
+                            testTextView.setText(result);
                             Toast.makeText(this, getString(R.string.transfer_result) + " : " + result, Toast.LENGTH_SHORT).show();
                             break;
                         case ERROR:
                             Toast.makeText(this, getString(R.string.error_while_uploading, uploadEvent.getResult()), Toast.LENGTH_SHORT).show();
-//                            hideDialog(PROGRESS_DIALOG);
-//                            createAlertDialog(getString(R.string.transfer_result), getString(R.string.error_while_uploading, uploadEvent.getResult()));
+                            //hideDialog(PROGRESS_DIALOG);
+                            //createAlertDialog(getString(R.string.transfer_result), getString(R.string.error_while_uploading, uploadEvent.getResult()));
                             break;
                         case CANCELLED:
                             Toast.makeText(this, getString(R.string.canceled), Toast.LENGTH_LONG).show();
-//                            hideDialog(PROGRESS_DIALOG);
+                            //hideDialog(PROGRESS_DIALOG);
                             break;
                     }
                 }, Timber::e);
