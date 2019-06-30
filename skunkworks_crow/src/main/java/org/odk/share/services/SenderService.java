@@ -67,9 +67,10 @@ public class SenderService {
      * @param instancesToSend instance to send.
      * @param mode            review form mode or others.
      */
-    public PersistableBundleCompat setupPersistableBundle(long[] instancesToSend, int port, int mode) {
+    private PersistableBundleCompat setupPersistableBundle(long[] instancesToSend, int port, int mode) {
         PersistableBundleCompat extras = new PersistableBundleCompat();
         extras.putLongArray(UploadJob.INSTANCES, instancesToSend);
+        extras.putBoolean("isBluetooth", false);
         extras.putInt(MODE, mode);
         return extras;
     }
@@ -80,14 +81,15 @@ public class SenderService {
      * @param instancesToSend instance to send.
      * @param mode            review form mode or others.
      */
-    public PersistableBundleCompat setupPersistableBundle(long[] instancesToSend, int mode) {
+    private PersistableBundleCompat setupPersistableBundle(long[] instancesToSend, int mode) {
         PersistableBundleCompat extras = new PersistableBundleCompat();
         extras.putLongArray(UploadJob.INSTANCES, instancesToSend);
+        extras.putBoolean("isBluetooth", true);
         extras.putInt(MODE, mode);
         return extras;
     }
 
-    public void startHpUploading(long[] instancesToSend, int port, int mode) {
+    public void startUploading(long[] instancesToSend, int port, int mode) {
         JobRequest request = new JobRequest.Builder(UploadJob.TAG)
                 .addExtras(setupPersistableBundle(instancesToSend, port, mode))
                 .startNow()
@@ -100,7 +102,7 @@ public class SenderService {
         }
     }
 
-    public void startBtUploading(long[] instancesToSend, int mode) {
+    public void startUploading(long[] instancesToSend, int mode) {
         JobRequest request = new JobRequest.Builder(UploadJob.TAG)
                 .addExtras(setupPersistableBundle(instancesToSend, mode))
                 .startNow()

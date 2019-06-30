@@ -55,8 +55,12 @@ public class ReceiverService {
 
     }
 
-    public void startDownloading() {
+    public void startDownloading(String macAddress) {
+        PersistableBundleCompat extras = new PersistableBundleCompat();
+        extras.putString("mac", macAddress);
+        extras.putBoolean("isBluetooth", true);
         JobRequest request = new JobRequest.Builder(DownloadJob.TAG)
+                .addExtras(extras)
                 .startNow()
                 .build();
 
@@ -66,6 +70,7 @@ public class ReceiverService {
     public void startDownloading(String ip, int port) {
         PersistableBundleCompat extras = new PersistableBundleCompat();
         extras.putString(DownloadJob.IP, ip);
+        extras.putBoolean("isBluetooth", false);
         extras.putInt(DownloadJob.PORT, port);
         startJob(extras);
     }

@@ -10,7 +10,6 @@ import android.net.Uri;
 import android.preference.PreferenceManager;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.evernote.android.job.Job;
 
@@ -88,6 +87,7 @@ public class DownloadJob extends Job {
     private String ip;
     private int port;
     private Socket socket;
+    private String tragetMacAddress;
 
     private int total;
     private int progress;
@@ -107,20 +107,25 @@ public class DownloadJob extends Job {
     }
 
     private void initJob(Params params) {
-        ip = params.getExtras().getString(IP, "");
-        port = params.getExtras().getInt(PORT, -1);
         sbResult = new StringBuilder();
+        boolean isBluetooth = params.getExtras().getBoolean("isBluetooth", true);
+        if (!isBluetooth){
+            ip = params.getExtras().getString(IP, "");
+            port = params.getExtras().getInt(PORT, -1);
+        } else {
+            tragetMacAddress = params.getExtras().getString("mac", null);
+        }
 
-        setupDataStreamsAndReceive(true);
+        setupDataStreamsAndReceive(isBluetooth, tragetMacAddress);
     }
 
-    private void setupDataStreamsAndReceive(boolean isBluetooth) {
+    private void setupDataStreamsAndReceive(boolean isBluetooth, String macAddress) {
         try {
             Timber.d("Waiting for receiver");
             if (isBluetooth) {
 
                 BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-                BluetoothDevice bluetoothDevice = bluetoothAdapter.getRemoteDevice("DC:09:4C:3D:8E:93");
+                BluetoothDevice bluetoothDevice = bluetoothAdapter.getRemoteDevice(macAddress);
                 BluetoothSocket bluetoothSocket = bluetoothDevice.createRfcommSocketToServiceRecord(SPP_UUID);
                 if (!bluetoothSocket.isConnected()) {
                     bluetoothSocket.connect();

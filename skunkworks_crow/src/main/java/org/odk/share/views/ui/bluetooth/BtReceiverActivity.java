@@ -1,15 +1,22 @@
 package org.odk.share.views.ui.bluetooth;
 
+import android.app.ProgressDialog;
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.os.Bundle;
-import android.widget.TextView;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import org.odk.share.R;
 import org.odk.share.bluetooth.BluetoothBasic;
-import org.odk.share.bluetooth.BluetoothServer;
+import org.odk.share.bluetooth.BluetoothClient;
+import org.odk.share.bluetooth.BluetoothReceiver;
 import org.odk.share.bluetooth.BluetoothUtils;
 import org.odk.share.events.DownloadEvent;
 import org.odk.share.rx.RxEventBus;
@@ -30,13 +37,17 @@ import timber.log.Timber;
  *
  * @author huangyz0918 (huangyz0918@gmail.com)
  */
-public class BtReceiverActivity extends InjectableActivity implements BluetoothBasic.Listener {
+public class BtReceiverActivity extends InjectableActivity implements
+        BluetoothReceiver.Listener, BluetoothListAdapter.OnDeviceClickListener {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
-    @BindView(R.id.test_text_view)
-    TextView testTextView;
+    @BindView(R.id.btn_refresh)
+    Button btnRefresh;
+
+    @BindView(R.id.list_bt_device)
+    RecyclerView recyclerView;
 
     @Inject
     ReceiverService receiverService;
@@ -47,7 +58,12 @@ public class BtReceiverActivity extends InjectableActivity implements BluetoothB
     @Inject
     BaseSchedulerProvider schedulerProvider;
 
-    private BluetoothServer bluetoothServer;
+    private BluetoothReceiver bluetoothReceiver;
+//    private ProgressDialog connectingDialog;
+    private final BluetoothListAdapter bluetoothListAdapter = new BluetoothListAdapter(this);
+//    private final BluetoothClient bluetoothClient = new BluetoothClient(this);
+
+
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     @Override
@@ -55,39 +71,38 @@ public class BtReceiverActivity extends InjectableActivity implements BluetoothB
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bt_receive);
         ButterKnife.bind(this);
+        initEvents();
 
         setTitle(getString(R.string.receive_instance_title));
         setSupportActionBar(toolbar);
 
-        bluetoothServer = new BluetoothServer(this);
+        // checking for if bluetooth enabled
         if (!BluetoothUtils.isBluetoothEnabled()) {
             BluetoothUtils.enableBluetooth();
-        }
-
-        receiverService.startDownloading();
-    }
-
-    @Override
-    public void socketNotify(ConnectStatus status, Object obj) {
-        if (BluetoothUtils.isActivityDestroyed(this)) {
-            return;
-        }
-
-        String message;
-        switch (status) {
-            case CONNECTED:
-                BluetoothDevice dev = (BluetoothDevice) obj;
-                message = String.format("connected with device: %s(%s)", dev.getName(), dev.getAddress());
-                Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-                break;
-            case DISCONNECTED:
-                bluetoothServer.listen();
-                message = "lost connection, listen again...";
-                Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-                break;
+            bluetoothListAdapter.rescan();
         }
     }
 
+    private void initEvents() {
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
+                linearLayoutManager.getOrientation());
+        recyclerView.addItemDecoration(dividerItemDecoration);
+        recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerView.setAdapter(bluetoothListAdapter);
+        bluetoothReceiver = new BluetoothReceiver(this, this);
+        BluetoothAdapter.getDefaultAdapter().startDiscovery();
+
+        // click to refresh the devices list.
+        btnRefresh.setOnClickListener((View v) -> {
+            if (BluetoothUtils.isBluetoothEnabled()) {
+                bluetoothListAdapter.rescan();
+            } else {
+                BluetoothUtils.enableBluetooth();
+                Toast.makeText(this, "bluetooth has been disabled, turning on...", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 
     // TODO: improve the UI/UX progress.
     private Disposable addDownloadEventSubscription() {
@@ -126,6 +141,28 @@ public class BtReceiverActivity extends InjectableActivity implements BluetoothB
     }
 
     @Override
+    public void foundDevice(BluetoothDevice device) {
+        bluetoothListAdapter.addDevice(device);
+    }
+
+    @Override
+    public void onItemClick(BluetoothDevice dev) {
+        if (BluetoothUtils.isBluetoothEnabled()) {
+//            if (bluetoothClient.isConnected(dev)) {
+//                Toast.makeText(this, "already connected to this device!", Toast.LENGTH_SHORT).show();
+//                return;
+//            }
+
+            receiverService.startDownloading(dev.getAddress());
+//            connectingDialog = ProgressDialog.show(this, "Connecting",
+//                    "Connecting to device, please wait...", true);
+        } else {
+            Toast.makeText(this, "you have disabled bluetooth, turning on...", Toast.LENGTH_SHORT).show();
+            BluetoothUtils.enableBluetooth();
+        }
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         compositeDisposable.add(addDownloadEventSubscription());
@@ -134,7 +171,6 @@ public class BtReceiverActivity extends InjectableActivity implements BluetoothB
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        bluetoothServer.detachListener();
-        bluetoothServer.close();
+        unregisterReceiver(bluetoothReceiver);
     }
 }

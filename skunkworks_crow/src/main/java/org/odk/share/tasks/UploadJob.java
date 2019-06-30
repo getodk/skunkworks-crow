@@ -1,14 +1,12 @@
 package org.odk.share.tasks;
 
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.ContentValues;
 import android.database.Cursor;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.evernote.android.job.Job;
 
@@ -101,11 +99,14 @@ public class UploadJob extends Job {
 
     private void initJob(Params params) {
         sbResult = new StringBuilder();
-        instancesToSend = ArrayUtils.toObject(params.getExtras().getLongArray(INSTANCES));
-        port = params.getExtras().getInt(PORT, -1);
+        boolean isBluetooth = params.getExtras().getBoolean("isBluetooth", true);
         mode = params.getExtras().getInt(MODE, ApplicationConstants.ASK_REVIEW_MODE);
+        instancesToSend = ArrayUtils.toObject(params.getExtras().getLongArray(INSTANCES));
+        if (!isBluetooth) {
+            port = params.getExtras().getInt(PORT, -1);
+        }
 
-        setupDataStreamsAndRun(true);
+        setupDataStreamsAndRun(isBluetooth);
     }
 
     private void setupDataStreamsAndRun(boolean isBluetooth) {
@@ -128,9 +129,7 @@ public class UploadJob extends Job {
             rxEventBus.post(uploadInstances());
         } catch (IOException e) {
             Timber.e(e);
-        } /*catch (InterruptedException e) {
-            Timber.e(e);
-        }*/
+        }
     }
 
     private UploadEvent uploadInstances() {
@@ -143,7 +142,10 @@ public class UploadJob extends Job {
             if (socket != null) {
                 socket.close();
             }
-            serverSocket.close();
+
+            if (serverSocket != null) {
+                serverSocket.close();
+            }
             dos.close();
             dis.close();
         } catch (IOException e) {

@@ -1,25 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/MatchParent"
     android:orientation="vertical"
-    tools:context=".views.ui.bluetooth.BtSenderActivity">
+    tools:context=".views.ui.bluetooth.BtReceiverActivity">
 
     <!-- Toolbar -->
     <include layout="@layout/toolbar" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/list_bt_device"
+    <TextView
+        android:id="@+id/test_text_view"
         style="@style/MatchParent"
-        android:layout_above="@id/btn_refresh"
-        android:layout_below="@id/toolbar" />
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:textSize="20sp"
+        tools:text="test texts" />
 
-    <Button
-        android:id="@+id/btn_refresh"
-        style="@style/MatchParentWidth"
-        android:layout_alignParentBottom="true"
-        android:layout_margin="4dp"
-        android:text="@string/btn_refresh"
-        android:textSize="15sp" />
-
-</RelativeLayout>
+</LinearLayout>

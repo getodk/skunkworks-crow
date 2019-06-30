@@ -334,7 +334,7 @@ public class HpSenderActivity extends InjectableActivity {
     }
 
     private void startSending() {
-        senderService.startHpUploading(formIds, port, mode);
+        senderService.startUploading(formIds, port, mode);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
