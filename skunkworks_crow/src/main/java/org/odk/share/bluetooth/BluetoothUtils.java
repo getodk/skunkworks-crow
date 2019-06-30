@@ -3,13 +3,8 @@ package org.odk.share.bluetooth;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.os.Build;
-import android.os.Handler;
 
-import java.io.File;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-
-import timber.log.Timber;
+import java.util.UUID;
 
 /**
  * Basic tools for bluetooth features.
@@ -19,28 +14,11 @@ import timber.log.Timber;
  */
 public class BluetoothUtils {
 
+    // UUID for security bluetooth pairing.
+    public static final UUID SPP_UUID = UUID.fromString("724f00a0-795e-4272-a85a-11075e760e58");
+
     private BluetoothUtils() {
 
-    }
-
-    private static final String TAG = BluetoothUtils.class.getSimpleName();
-    public static final Executor EXECUTOR = Executors.newCachedThreadPool();
-    private static final Handler sHandler = new Handler();
-
-
-    /**
-     * TODO: if the odk share has familiar methods, please replace this.
-     */
-    public static void mkdirs(String filePath) {
-        boolean mk = new File(filePath).mkdirs();
-        Timber.d(TAG + "mkdirs: " + mk);
-    }
-
-    /**
-     * Run on main thread.
-     */
-    public static void runOnUi(Runnable runnable) {
-        sHandler.post(runnable);
     }
 
     private static BluetoothAdapter getBluetoothAdapter() {

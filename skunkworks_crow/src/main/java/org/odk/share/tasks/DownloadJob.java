@@ -53,7 +53,7 @@ import static org.odk.collect.android.provider.InstanceProviderAPI.InstanceColum
 import static org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns.SUBMISSION_URI;
 import static org.odk.share.application.Share.FORMS_DIR_NAME;
 import static org.odk.share.application.Share.INSTANCES_DIR_NAME;
-import static org.odk.share.bluetooth.BluetoothBasic.SPP_UUID;
+import static org.odk.share.bluetooth.BluetoothUtils.SPP_UUID;
 import static org.odk.share.dto.InstanceMap.INSTANCE_UUID;
 import static org.odk.share.dto.TransferInstance.INSTANCE_ID;
 import static org.odk.share.dto.TransferInstance.INSTRUCTIONS;
@@ -87,7 +87,7 @@ public class DownloadJob extends Job {
     private String ip;
     private int port;
     private Socket socket;
-    private String tragetMacAddress;
+    private String targetMacAddress;
 
     private int total;
     private int progress;
@@ -109,14 +109,14 @@ public class DownloadJob extends Job {
     private void initJob(Params params) {
         sbResult = new StringBuilder();
         boolean isBluetooth = params.getExtras().getBoolean("isBluetooth", true);
-        if (!isBluetooth){
+        if (!isBluetooth) {
             ip = params.getExtras().getString(IP, "");
             port = params.getExtras().getInt(PORT, -1);
         } else {
-            tragetMacAddress = params.getExtras().getString("mac", null);
+            targetMacAddress = params.getExtras().getString("mac", null);
         }
 
-        setupDataStreamsAndReceive(isBluetooth, tragetMacAddress);
+        setupDataStreamsAndReceive(isBluetooth, targetMacAddress);
     }
 
     private void setupDataStreamsAndReceive(boolean isBluetooth, String macAddress) {

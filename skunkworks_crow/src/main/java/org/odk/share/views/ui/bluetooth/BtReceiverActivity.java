@@ -1,6 +1,5 @@
 package org.odk.share.views.ui.bluetooth;
 
-import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.os.Bundle;
@@ -14,10 +13,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.odk.share.R;
-import org.odk.share.bluetooth.BluetoothBasic;
-import org.odk.share.bluetooth.BluetoothClient;
 import org.odk.share.bluetooth.BluetoothReceiver;
 import org.odk.share.bluetooth.BluetoothUtils;
+import org.odk.share.events.BluetoothEvent;
 import org.odk.share.events.DownloadEvent;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.rx.schedulers.BaseSchedulerProvider;
@@ -59,10 +57,8 @@ public class BtReceiverActivity extends InjectableActivity implements
     BaseSchedulerProvider schedulerProvider;
 
     private BluetoothReceiver bluetoothReceiver;
-//    private ProgressDialog connectingDialog;
     private final BluetoothListAdapter bluetoothListAdapter = new BluetoothListAdapter(this);
-//    private final BluetoothClient bluetoothClient = new BluetoothClient(this);
-
+    private boolean isConnected = false;
 
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
@@ -102,6 +98,30 @@ public class BtReceiverActivity extends InjectableActivity implements
                 Toast.makeText(this, "bluetooth has been disabled, turning on...", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    /**
+     * Creates a subscription for listening to all hotspot events being send through the
+     * application's {@link RxEventBus}
+     */
+    private Disposable addBluetoothEventSubscription() {
+        return rxEventBus.register(BluetoothEvent.class)
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.androidThread())
+                .subscribe(bluetoothEvent -> {
+                    switch (bluetoothEvent.getStatus()) {
+                        case CONNECTED:
+                            // TODO: update ui
+                            Timber.d("======== RECEIVER: BLUETOOTH CONNECTED ========");
+                            isConnected = true;
+                            break;
+                        case DISCONNECTED:
+                            // TODO: update ui
+                            Timber.d("======== RECEIVER: BLUETOOTH DISCONNECTED ========");
+                            isConnected = false;
+                            break;
+                    }
+                });
     }
 
     // TODO: improve the UI/UX progress.
@@ -148,14 +168,13 @@ public class BtReceiverActivity extends InjectableActivity implements
     @Override
     public void onItemClick(BluetoothDevice dev) {
         if (BluetoothUtils.isBluetoothEnabled()) {
-//            if (bluetoothClient.isConnected(dev)) {
-//                Toast.makeText(this, "already connected to this device!", Toast.LENGTH_SHORT).show();
-//                return;
-//            }
+            if (isConnected) {
+                Toast.makeText(this, "bluetooth already connected to another device", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
             receiverService.startDownloading(dev.getAddress());
-//            connectingDialog = ProgressDialog.show(this, "Connecting",
-//                    "Connecting to device, please wait...", true);
+            // TODO: update ui
         } else {
             Toast.makeText(this, "you have disabled bluetooth, turning on...", Toast.LENGTH_SHORT).show();
             BluetoothUtils.enableBluetooth();
@@ -166,6 +185,7 @@ public class BtReceiverActivity extends InjectableActivity implements
     protected void onResume() {
         super.onResume();
         compositeDisposable.add(addDownloadEventSubscription());
+        compositeDisposable.add(addBluetoothEventSubscription());
     }
 
     @Override

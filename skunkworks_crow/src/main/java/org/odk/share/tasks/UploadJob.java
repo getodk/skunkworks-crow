@@ -20,6 +20,7 @@ import org.odk.share.dao.InstanceMapDao;
 import org.odk.share.dao.TransferDao;
 import org.odk.share.database.ShareDatabaseHelper;
 import org.odk.share.dto.TransferInstance;
+import org.odk.share.events.BluetoothEvent;
 import org.odk.share.events.UploadEvent;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.utilities.ApplicationConstants;
@@ -45,7 +46,7 @@ import javax.inject.Inject;
 
 import timber.log.Timber;
 
-import static org.odk.share.bluetooth.BluetoothBasic.SPP_UUID;
+import static org.odk.share.bluetooth.BluetoothUtils.SPP_UUID;
 import static org.odk.share.dto.InstanceMap.INSTANCE_UUID;
 import static org.odk.share.dto.TransferInstance.INSTANCE_ID;
 import static org.odk.share.dto.TransferInstance.STATUS_FORM_SENT;
@@ -114,8 +115,11 @@ public class UploadJob extends Job {
             Timber.d("Waiting for receiver");
             if (isBluetooth) {
                 BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-                BluetoothServerSocket serverSocket = bluetoothAdapter.listenUsingInsecureRfcommWithServiceRecord(TAG, SPP_UUID);
-                BluetoothSocket bluetoothSocket = serverSocket.accept();
+                BluetoothServerSocket bluetoothServerSocket = bluetoothAdapter.listenUsingInsecureRfcommWithServiceRecord(TAG, SPP_UUID);
+                BluetoothSocket bluetoothSocket = bluetoothServerSocket.accept();
+
+                // after the blocking accept(), means the connection has been established.
+                rxEventBus.post(new BluetoothEvent(BluetoothEvent.Status.CONNECTED));
 
                 dos = new DataOutputStream(bluetoothSocket.getOutputStream());
                 dis = new DataInputStream(bluetoothSocket.getInputStream());

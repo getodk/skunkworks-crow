@@ -8,8 +8,8 @@ import android.widget.Toast;
 import androidx.appcompat.widget.Toolbar;
 
 import org.odk.share.R;
-import org.odk.share.bluetooth.BluetoothServer;
 import org.odk.share.bluetooth.BluetoothUtils;
+import org.odk.share.events.BluetoothEvent;
 import org.odk.share.events.UploadEvent;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.rx.schedulers.BaseSchedulerProvider;
@@ -52,8 +52,7 @@ public class BtSenderActivity extends InjectableActivity {
     @Inject
     SenderService senderService;
 
-    private long[] formIds;
-    private int mode;
+    private boolean isConnected = false;
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
 
@@ -70,13 +69,35 @@ public class BtSenderActivity extends InjectableActivity {
             BluetoothUtils.enableBluetooth();
         }
 
-        formIds = getIntent().getLongArrayExtra(INSTANCE_IDS);
-        mode = getIntent().getIntExtra(MODE, ASK_REVIEW_MODE);
+        long[] formIds = getIntent().getLongArrayExtra(INSTANCE_IDS);
+        int mode = getIntent().getIntExtra(MODE, ASK_REVIEW_MODE);
         if (formIds == null) {
             formIds = getIntent().getLongArrayExtra(FORM_IDS);
         }
 
         senderService.startUploading(formIds, mode);
+    }
+
+    /**
+     * Creates a subscription for listening to all hotspot events being send through the
+     * application's {@link RxEventBus}
+     */
+    private Disposable addBluetoothEventSubscription() {
+        return rxEventBus.register(BluetoothEvent.class)
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.androidThread())
+                .subscribe(bluetoothEvent -> {
+                    switch (bluetoothEvent.getStatus()) {
+                        case CONNECTED:
+                            Timber.d("======== SENDER: BLUETOOTH CONNECTED ========");
+                            // TODO: update ui
+                            break;
+                        case DISCONNECTED:
+                            Timber.d("======== SENDER: BLUETOOTH DISCONNECTED ========");
+                            // TODO: update ui
+                            break;
+                    }
+                });
     }
 
     // TODO: improve the UI/UX according to the callback.
@@ -121,6 +142,7 @@ public class BtSenderActivity extends InjectableActivity {
     protected void onResume() {
         super.onResume();
         compositeDisposable.add(addUploadEventSubscription());
+        compositeDisposable.add(addBluetoothEventSubscription());
     }
 
     @Override
