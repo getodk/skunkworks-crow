@@ -67,17 +67,13 @@ public class BluetoothUtils {
      */
     public static void disableBluetooth() {
         if (isBluetoothEnabled()) {
-            new Thread(() -> {
-                getBluetoothAdapter().disable();
-            }).start();
+            getBluetoothAdapter().disable();
         }
     }
 
     public static void enableBluetooth() {
         if (!isBluetoothEnabled()) {
-            new Thread(() -> {
-                getBluetoothAdapter().enable();
-            }).start();
+            getBluetoothAdapter().enable();
         }
     }
 
