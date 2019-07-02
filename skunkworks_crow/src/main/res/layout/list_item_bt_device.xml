@@ -8,10 +8,11 @@
     <!-- TODO: fix the selected item click not completed bug -->
 
     <ImageView
+        android:id="@+id/iv_device"
         android:layout_width="72dp"
         android:layout_height="72dp"
         android:padding="12dp"
-        android:src="@drawable/ic_smart_phone" />
+        android:src="@drawable/ic_smart_phone_black" />
 
     <LinearLayout
         style="@style/MatchParentWidth"

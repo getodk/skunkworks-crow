@@ -2,9 +2,11 @@ package org.odk.share.views.ui.bluetooth;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -18,6 +20,8 @@ import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static android.bluetooth.BluetoothDevice.BOND_BONDED;
 
 
 /**
@@ -52,12 +56,17 @@ public class BluetoothListAdapter extends RecyclerView.Adapter<BluetoothListAdap
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder viewHolder, int position) {
+        Context context = viewHolder.itemView.getContext();
         BluetoothDevice device = bluetoothDeviceList.get(position);
         String deviceName = device.getName();
         String deviceAddress = device.getAddress();
         int deviceBondState = device.getBondState();
         viewHolder.deviceName.setText(deviceName == null ? viewHolder.itemView.getResources().getString(R.string.bluetooth_instance_name_default) : deviceName);
-        viewHolder.deviceAddress.setText(String.format("%s (%s)", deviceAddress, deviceBondState == 10 ? "unpaired" : "paired"));
+        viewHolder.deviceAddress.setText(String.format("%s (%s)", deviceAddress,
+                deviceBondState == 10 ? context.getString(R.string.bluetooth_unpaired) : context.getString(R.string.bluetooth_paired)));
+        if (device.getBondState() == BOND_BONDED) {
+            viewHolder.deviceLogo.setImageResource(R.drawable.ic_smart_phone_yellow);
+        }
     }
 
     @Override
@@ -88,7 +97,7 @@ public class BluetoothListAdapter extends RecyclerView.Adapter<BluetoothListAdap
     /**
      * Add the bounded bluetooth devices.
      */
-    private void addPairedDevices() {
+    public void addPairedDevices() {
         Set<BluetoothDevice> bondedDevices = BluetoothAdapter.getDefaultAdapter().getBondedDevices();
         if (bondedDevices != null) {
             bluetoothDeviceList.addAll(bondedDevices);
@@ -105,6 +114,9 @@ public class BluetoothListAdapter extends RecyclerView.Adapter<BluetoothListAdap
 
         @BindView(R.id.tv_device_address)
         TextView deviceAddress;
+
+        @BindView(R.id.iv_device)
+        ImageView deviceLogo;
 
         ViewHolder(View view) {
             super(view);
