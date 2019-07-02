@@ -89,6 +89,8 @@ public class DownloadJob extends Job {
     private int port;
     private Socket socket;
     private String targetMacAddress;
+    private BluetoothDevice bluetoothDevice;
+    private BluetoothSocket bluetoothSocket;
 
     private int total;
     private int progress;
@@ -124,23 +126,22 @@ public class DownloadJob extends Job {
         try {
             Timber.d("Waiting for receiver");
             if (isBluetooth) {
-
                 BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-                BluetoothDevice bluetoothDevice = bluetoothAdapter.getRemoteDevice(macAddress);
-                BluetoothSocket bluetoothSocket = bluetoothDevice.createRfcommSocketToServiceRecord(SPP_UUID);
+                bluetoothDevice = bluetoothAdapter.getRemoteDevice(macAddress);
+                bluetoothSocket = bluetoothDevice.createRfcommSocketToServiceRecord(SPP_UUID);
+
                 if (!bluetoothSocket.isConnected()) {
                     bluetoothSocket.connect();
                 }
 
                 if (bluetoothSocket.isConnected()) {
                     rxEventBus.post(new BluetoothEvent(BluetoothEvent.Status.CONNECTED));
-
                 }
 
                 dos = new DataOutputStream(bluetoothSocket.getOutputStream());
                 dis = new DataInputStream(bluetoothSocket.getInputStream());
             } else {
-                Timber.d("Socket " + ip + " " + port);
+                Timber.d("Socket %s, %s", ip, port);
                 socket = new Socket();
                 socket.connect(new InetSocketAddress(ip, port), TIMEOUT);
                 Timber.d("Socket connected");
@@ -152,7 +153,6 @@ public class DownloadJob extends Job {
         } catch (IOException e) {
             Timber.e(e);
         }
-
     }
 
     private DownloadEvent receiveForms() {

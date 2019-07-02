@@ -1,31 +1,34 @@
 package org.odk.share.views.ui.instance;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.Toolbar;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.Loader;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import org.odk.collect.android.dao.InstancesDao;
 import org.odk.collect.android.provider.InstanceProviderAPI;
 import org.odk.share.R;
 import org.odk.share.utilities.ApplicationConstants;
 import org.odk.share.utilities.ArrayUtils;
-import org.odk.share.views.ui.instance.adapter.InstanceAdapter;
+import org.odk.share.views.ui.bluetooth.BtSenderActivity;
 import org.odk.share.views.ui.hotspot.HpSenderActivity;
+import org.odk.share.views.ui.instance.adapter.InstanceAdapter;
 
 import java.util.LinkedHashSet;
 
 import javax.inject.Inject;
 
-import androidx.loader.app.LoaderManager;
-import androidx.loader.content.Loader;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -38,8 +41,10 @@ public class InstancesList extends InstanceListActivity implements LoaderManager
     RecyclerView recyclerView;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
-    @BindView(R.id.send_button) Button sendButton;
-    @BindView(R.id.toggle_button) Button toggleButton;
+    @BindView(R.id.send_button)
+    Button sendButton;
+    @BindView(R.id.toggle_button)
+    Button toggleButton;
 
     private static final String INSTANCE_LIST_ACTIVITY_SORTING_ORDER = "instanceListActivitySortingOrder";
 
@@ -85,8 +90,8 @@ public class InstancesList extends InstanceListActivity implements LoaderManager
         instanceAdapter = new InstanceAdapter(this, cursor, this::onListItemClick, selectedInstances);
         recyclerView.setAdapter(instanceAdapter);
         if (instanceAdapter.getItemCount() > 0) {
-           toggleButton.setText(getString(R.string.select_all));
-           toggleButton.setEnabled(true);
+            toggleButton.setText(getString(R.string.select_all));
+            toggleButton.setEnabled(true);
         } else {
             toggleButton.setEnabled(false);
         }
@@ -119,13 +124,29 @@ public class InstancesList extends InstanceListActivity implements LoaderManager
 
     @OnClick(R.id.send_button)
     public void send() {
-        Intent intent = new Intent(this, HpSenderActivity.class);
+        Intent intent = new Intent();
         Long[] arr = selectedInstances.toArray(new Long[selectedInstances.size()]);
         long[] a = ArrayUtils.toPrimitive(arr);
         intent.putExtra(INSTANCE_IDS, a);
         intent.putExtra(MODE, ApplicationConstants.ASK_REVIEW_MODE);
-        startActivity(intent);
-        finish();
+
+        String[] options = {getString(R.string.method_bluetooth), getString(R.string.method_hotspot)};
+        AlertDialog alertDialog = new AlertDialog.Builder(this)
+                .setTitle("Send Options")
+                .setIcon(R.drawable.ic_help_outline)
+                .setItems(options, (DialogInterface dialog, int which) -> {
+                    switch (which) {
+                        case 0:
+                            intent.setClass(this, BtSenderActivity.class);
+                            break;
+                        case 1:
+                            intent.setClass(this, HpSenderActivity.class);
+                            break;
+                    }
+                    startActivity(intent);
+                    finish();
+                }).create();
+        alertDialog.show();
     }
 
     @OnClick(R.id.toggle_button)
