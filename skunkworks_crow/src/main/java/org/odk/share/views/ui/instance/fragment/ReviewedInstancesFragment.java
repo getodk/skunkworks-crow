@@ -1,5 +1,7 @@
 package org.odk.share.views.ui.instance.fragment;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -11,18 +13,23 @@ import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import org.odk.collect.android.dao.InstancesDao;
 import org.odk.collect.android.dto.Instance;
 import org.odk.collect.android.provider.InstanceProviderAPI;
 import org.odk.share.R;
+import org.odk.share.dao.TransferDao;
+import org.odk.share.dto.TransferInstance;
+import org.odk.share.utilities.ApplicationConstants;
+import org.odk.share.utilities.ArrayUtils;
+import org.odk.share.views.listeners.OnItemClickListener;
+import org.odk.share.views.ui.bluetooth.BtSenderActivity;
 import org.odk.share.views.ui.common.InstanceListFragment;
 import org.odk.share.views.ui.hotspot.HpSenderActivity;
 import org.odk.share.views.ui.instance.adapter.TransferInstanceAdapter;
-import org.odk.share.dao.TransferDao;
-import org.odk.share.dto.TransferInstance;
-import org.odk.share.views.listeners.OnItemClickListener;
-import org.odk.share.utilities.ApplicationConstants;
-import org.odk.share.utilities.ArrayUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,9 +38,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -224,11 +228,30 @@ public class ReviewedInstancesFragment extends InstanceListFragment implements O
                 instanceIds.add(transferInstance.getInstanceId());
             }
         }
-        Intent intent = new Intent(getContext(), HpSenderActivity.class);
+
+        Intent intent = new Intent();
         Long[] arr = instanceIds.toArray(new Long[instanceIds.size()]);
         long[] a = ArrayUtils.toPrimitive(arr);
         intent.putExtra(INSTANCE_IDS, a);
         intent.putExtra(MODE, ApplicationConstants.SEND_REVIEW_MODE);
-        startActivity(intent);
+
+        String[] options = {getString(R.string.method_bluetooth), getString(R.string.method_hotspot)};
+        AlertDialog alertDialog = new AlertDialog.Builder(getContext())
+                .setTitle("Send Options")
+                .setIcon(R.drawable.ic_help_outline)
+                .setItems(options, (DialogInterface dialog, int which) -> {
+                    if (getActivity() != null) {
+                        switch (which) {
+                            case 0:
+                                intent.setClass(getActivity(), BtSenderActivity.class);
+                                break;
+                            case 1:
+                                intent.setClass(getActivity(), HpSenderActivity.class);
+                                break;
+                        }
+                        startActivity(intent);
+                    }
+                }).create();
+        alertDialog.show();
     }
 }
