@@ -82,6 +82,8 @@ public class UploadJob extends Job {
     private ServerSocket serverSocket;
     private DataOutputStream dos;
     private DataInputStream dis;
+    private BluetoothServerSocket bluetoothServerSocket;
+    private BluetoothSocket bluetoothSocket;
     private int progress;
     private int total;
     private int mode;
@@ -115,8 +117,8 @@ public class UploadJob extends Job {
             Timber.d("Waiting for receiver");
             if (isBluetooth) {
                 BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-                BluetoothServerSocket bluetoothServerSocket = bluetoothAdapter.listenUsingInsecureRfcommWithServiceRecord(TAG, SPP_UUID);
-                BluetoothSocket bluetoothSocket = bluetoothServerSocket.accept();
+                bluetoothServerSocket = bluetoothAdapter.listenUsingInsecureRfcommWithServiceRecord(TAG, SPP_UUID);
+                bluetoothSocket = bluetoothServerSocket.accept();
 
                 if (bluetoothSocket.isConnected()) {
                     rxEventBus.post(new BluetoothEvent(BluetoothEvent.Status.CONNECTED));
@@ -137,22 +139,30 @@ public class UploadJob extends Job {
         }
     }
 
+    private void closeConnections() throws IOException {
+        if (socket != null) {
+            socket.close();
+        }
+        if (dos != null) {
+            dos.close();
+        }
+        if (dis != null) {
+            dis.close();
+        }
+        if (bluetoothSocket != null) {
+            bluetoothSocket.close();
+        }
+        if (bluetoothServerSocket != null) {
+            bluetoothServerSocket.close();
+        }
+    }
+
     private UploadEvent uploadInstances() {
         try {
             // show dialog and connected
             Timber.d("Start Sending");
             processSelectedFiles(instancesToSend);
-
-            // close connection
-            if (socket != null) {
-                socket.close();
-            }
-
-            if (serverSocket != null) {
-                serverSocket.close();
-            }
-            dos.close();
-            dis.close();
+            closeConnections();
         } catch (IOException e) {
             Timber.e(e);
             return new UploadEvent(UploadEvent.Status.ERROR, e.getMessage());
@@ -164,18 +174,7 @@ public class UploadJob extends Job {
     @Override
     protected void onCancel() {
         try {
-            if (socket != null) {
-                socket.close();
-            }
-            if (serverSocket != null) {
-                serverSocket.close();
-            }
-            if (dos != null) {
-                dos.close();
-            }
-            if (dis != null) {
-                dis.close();
-            }
+            closeConnections();
         } catch (IOException e) {
             Timber.e(e);
         }

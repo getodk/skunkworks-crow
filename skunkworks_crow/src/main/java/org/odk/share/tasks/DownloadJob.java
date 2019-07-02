@@ -89,7 +89,6 @@ public class DownloadJob extends Job {
     private int port;
     private Socket socket;
     private String targetMacAddress;
-    private BluetoothDevice bluetoothDevice;
     private BluetoothSocket bluetoothSocket;
 
     private int total;
@@ -127,7 +126,7 @@ public class DownloadJob extends Job {
             Timber.d("Waiting for sender");
             if (isBluetooth && macAddress != null) {
                 BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-                bluetoothDevice = bluetoothAdapter.getRemoteDevice(macAddress);
+                BluetoothDevice bluetoothDevice = bluetoothAdapter.getRemoteDevice(macAddress);
                 bluetoothSocket = bluetoothDevice.createRfcommSocketToServiceRecord(SPP_UUID);
 
                 if (!bluetoothSocket.isConnected()) {
@@ -176,12 +175,7 @@ public class DownloadJob extends Job {
                 }
             }
 
-            // close connection
-            if (socket != null) {
-                socket.close();
-            }
-            dos.close();
-            dis.close();
+            closeConnections();
 
         } catch (IOException | IllegalArgumentException e) {
             Timber.e(e);
@@ -191,18 +185,28 @@ public class DownloadJob extends Job {
         return new DownloadEvent(DownloadEvent.Status.FINISHED, sbResult.toString());
     }
 
+    /**
+     * Close all the connections.
+     */
+    private void closeConnections() throws IOException {
+        if (socket != null) {
+            socket.close();
+        }
+        if (dos != null) {
+            dos.close();
+        }
+        if (dis != null) {
+            dis.close();
+        }
+        if (bluetoothSocket != null) {
+            bluetoothSocket.close();
+        }
+    }
+
     @Override
     protected void onCancel() {
         try {
-            if (socket != null) {
-                socket.close();
-            }
-            if (dos != null) {
-                dos.close();
-            }
-            if (dis != null) {
-                dis.close();
-            }
+            closeConnections();
         } catch (IOException e) {
             Timber.e(e);
         }
