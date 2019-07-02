@@ -169,7 +169,7 @@ public class BtReceiverActivity extends InjectableActivity implements
                 return;
             }
 
-            receiverService.startDownloading(device.getAddress());
+            receiverService.startBtDownloading(device.getAddress());
             progressDialog = ProgressDialog.show(this, getString(R.string.connecting_title),
                     getString(R.string.connecting_message), true);
         } else {

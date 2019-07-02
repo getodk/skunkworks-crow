@@ -314,7 +314,7 @@ public class HpReceiverActivity extends InjectableActivity implements OnItemClic
     private void startReceiveTask() {
         showDialog(DIALOG_DOWNLOAD_PROGRESS);
         String dstAddress = wifiConnector.getAccessPointIpAddress();
-        receiverService.startDownloading(dstAddress, port);
+        receiverService.startHpDownloading(dstAddress, port);
     }
 
     @OnClick(R.id.bScan)

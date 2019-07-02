@@ -110,21 +110,24 @@ public class DownloadJob extends Job {
 
     private void initJob(Params params) {
         sbResult = new StringBuilder();
-        boolean isBluetooth = params.getExtras().getBoolean("isBluetooth", true);
-        if (!isBluetooth) {
-            ip = params.getExtras().getString(IP, "");
-            port = params.getExtras().getInt(PORT, -1);
-        } else {
-            targetMacAddress = params.getExtras().getString("mac", null);
+        int method = params.getExtras().getInt("MODE_OF_TRANSFER", -1);
+        switch (method) {
+            case Share.TransferMethod.HOTSPOT:
+                ip = params.getExtras().getString(IP, "");
+                port = params.getExtras().getInt(PORT, -1);
+                break;
+            case Share.TransferMethod.BLUETOOTH:
+                targetMacAddress = params.getExtras().getString("mac", null);
+                break;
         }
 
-        setupDataStreamsAndReceive(isBluetooth, targetMacAddress);
+        setupDataStreamsAndReceive(method, targetMacAddress);
     }
 
-    private void setupDataStreamsAndReceive(boolean isBluetooth, String macAddress) {
+    private void setupDataStreamsAndReceive(@Share.TransferMethod int method, String macAddress) {
         try {
             Timber.d("Waiting for sender");
-            if (isBluetooth && macAddress != null) {
+            if (method == Share.TransferMethod.BLUETOOTH && macAddress != null) {
                 BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
                 BluetoothDevice bluetoothDevice = bluetoothAdapter.getRemoteDevice(macAddress);
                 bluetoothSocket = bluetoothDevice.createRfcommSocketToServiceRecord(SPP_UUID);

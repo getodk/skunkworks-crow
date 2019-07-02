@@ -5,6 +5,7 @@ import com.evernote.android.job.JobManager;
 import com.evernote.android.job.JobRequest;
 import com.evernote.android.job.util.support.PersistableBundleCompat;
 
+import org.odk.share.application.Share;
 import org.odk.share.events.UploadEvent;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.rx.schedulers.BaseSchedulerProvider;
@@ -70,7 +71,7 @@ public class SenderService {
     private PersistableBundleCompat setupPersistableBundle(long[] instancesToSend, int port, int mode) {
         PersistableBundleCompat extras = new PersistableBundleCompat();
         extras.putLongArray(UploadJob.INSTANCES, instancesToSend);
-        extras.putBoolean("isBluetooth", false);
+        extras.putInt("MODE_OF_TRANSFER", Share.TransferMethod.HOTSPOT);
         extras.putInt(UploadJob.PORT, port);
         extras.putInt(MODE, mode);
         return extras;
@@ -85,7 +86,7 @@ public class SenderService {
     private PersistableBundleCompat setupPersistableBundle(long[] instancesToSend, int mode) {
         PersistableBundleCompat extras = new PersistableBundleCompat();
         extras.putLongArray(UploadJob.INSTANCES, instancesToSend);
-        extras.putBoolean("isBluetooth", true);
+        extras.putInt("MODE_OF_TRANSFER", Share.TransferMethod.BLUETOOTH);
         extras.putInt(MODE, mode);
         return extras;
     }

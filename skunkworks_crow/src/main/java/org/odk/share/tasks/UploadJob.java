@@ -102,35 +102,38 @@ public class UploadJob extends Job {
 
     private void initJob(Params params) {
         sbResult = new StringBuilder();
-        boolean isBluetooth = params.getExtras().getBoolean("isBluetooth", true);
+        int method = params.getExtras().getInt("MODE_OF_TRANSFER", -1);
         mode = params.getExtras().getInt(MODE, ApplicationConstants.ASK_REVIEW_MODE);
         instancesToSend = ArrayUtils.toObject(params.getExtras().getLongArray(INSTANCES));
-        if (!isBluetooth) {
+        if (method == Share.TransferMethod.HOTSPOT) {
             port = params.getExtras().getInt(PORT, -1);
         }
 
-        setupDataStreamsAndRun(isBluetooth);
+        setupDataStreamsAndRun(method);
     }
 
-    private void setupDataStreamsAndRun(boolean isBluetooth) {
+    private void setupDataStreamsAndRun(@Share.TransferMethod int method) {
         try {
             Timber.d("Waiting for receiver");
-            if (isBluetooth) {
-                BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-                bluetoothServerSocket = bluetoothAdapter.listenUsingInsecureRfcommWithServiceRecord(TAG, SPP_UUID);
-                bluetoothSocket = bluetoothServerSocket.accept();
+            switch (method) {
+                case Share.TransferMethod.BLUETOOTH:
+                    BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+                    bluetoothServerSocket = bluetoothAdapter.listenUsingInsecureRfcommWithServiceRecord(TAG, SPP_UUID);
+                    bluetoothSocket = bluetoothServerSocket.accept();
 
-                if (bluetoothSocket.isConnected()) {
-                    rxEventBus.post(new BluetoothEvent(BluetoothEvent.Status.CONNECTED));
-                }
+                    if (bluetoothSocket.isConnected()) {
+                        rxEventBus.post(new BluetoothEvent(BluetoothEvent.Status.CONNECTED));
+                    }
 
-                dos = new DataOutputStream(bluetoothSocket.getOutputStream());
-                dis = new DataInputStream(bluetoothSocket.getInputStream());
-            } else {
-                serverSocket = new ServerSocket(port);
-                socket = serverSocket.accept();
-                dos = new DataOutputStream(socket.getOutputStream());
-                dis = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+                    dos = new DataOutputStream(bluetoothSocket.getOutputStream());
+                    dis = new DataInputStream(bluetoothSocket.getInputStream());
+                    break;
+                case Share.TransferMethod.HOTSPOT:
+                    serverSocket = new ServerSocket(port);
+                    socket = serverSocket.accept();
+                    dos = new DataOutputStream(socket.getOutputStream());
+                    dis = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+                    break;
             }
 
             rxEventBus.post(uploadInstances());

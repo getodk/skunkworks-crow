@@ -5,6 +5,7 @@ import com.evernote.android.job.JobManager;
 import com.evernote.android.job.JobRequest;
 import com.evernote.android.job.util.support.PersistableBundleCompat;
 
+import org.odk.share.application.Share;
 import org.odk.share.events.DownloadEvent;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.rx.schedulers.BaseSchedulerProvider;
@@ -36,7 +37,6 @@ public class ReceiverService {
                 .observeOn(schedulerProvider.androidThread())
                 .doOnNext(downloadEvent -> {
                     switch (downloadEvent.getStatus()) {
-
                         case CANCELLED:
                         case ERROR:
                             jobs.clear();
@@ -52,13 +52,12 @@ public class ReceiverService {
                             break;
                     }
                 }).subscribe();
-
     }
 
-    public void startDownloading(String macAddress) {
+    public void startBtDownloading(String macAddress) {
         PersistableBundleCompat extras = new PersistableBundleCompat();
         extras.putString("mac", macAddress);
-        extras.putBoolean("isBluetooth", true);
+        extras.putInt("MODE_OF_TRANSFER", Share.TransferMethod.BLUETOOTH);
         JobRequest request = new JobRequest.Builder(DownloadJob.TAG)
                 .addExtras(extras)
                 .startNow()
@@ -67,10 +66,10 @@ public class ReceiverService {
        startJob(request);
     }
 
-    public void startDownloading(String ip, int port) {
+    public void startHpDownloading(String ip, int port) {
         PersistableBundleCompat extras = new PersistableBundleCompat();
         extras.putString(DownloadJob.IP, ip);
-        extras.putBoolean("isBluetooth", false);
+        extras.putInt("MODE_OF_TRANSFER", Share.TransferMethod.HOTSPOT);
         extras.putInt(DownloadJob.PORT, port);
         startJob(extras);
     }
