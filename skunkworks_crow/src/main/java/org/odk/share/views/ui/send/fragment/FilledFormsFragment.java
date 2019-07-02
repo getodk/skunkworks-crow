@@ -155,30 +155,23 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
 
     @OnClick(R.id.send_button)
     public void send() {
-        Intent hotspotIntent = new Intent(getActivity(), HpSenderActivity.class);
-        setupSendingIntent(hotspotIntent);
-        Intent bluetoothIntent = new Intent(getActivity(), BtSenderActivity.class);
-        setupSendingIntent(bluetoothIntent);
-
-        // TODO: note, the code is similar with BlankFormsFragment.java, maybe we can refactor in the future.
-        // choose different sending methods, TODO: needs refactor if we have a better UI/UX.
+        Intent intent = new Intent();
+        setupSendingIntent(intent);
         AlertDialog alertDialog = new AlertDialog.Builder(getContext())
                 .setTitle("Send Options")
                 .setIcon(R.drawable.ic_help_outline)
                 .setItems(TRANSFER_OPTIONS, (DialogInterface dialog, int which) -> {
-                    switch (which) {
-                        case 0:
-                            if (getActivity() != null) {
-                                startActivity(bluetoothIntent);
-                                getActivity().finish();
-                            }
-                            break;
-                        case 1:
-                            if (getActivity() != null) {
-                                startActivity(hotspotIntent);
-                                getActivity().finish();
-                            }
-                            break;
+                    if (getActivity() != null) {
+                        switch (which) {
+                            case 0:
+                                intent.setClass(getActivity(), BtSenderActivity.class);
+                                break;
+                            case 1:
+                                intent.setClass(getActivity(), HpSenderActivity.class);
+                                break;
+                        }
+                        startActivity(intent);
+                        getActivity().finish();
                     }
                 }).create();
         alertDialog.show();
