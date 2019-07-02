@@ -54,7 +54,6 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
     private static final String COLLECT_PACKAGE = "org.odk.collect.android";
     private static final int STORAGE_PERMISSION_REQUEST_CODE = 101;
     private static final int FORM_LOADER = 2;
-    private static final String[] TRANSFER_OPTIONS = {"via bluetooth", "via hotspot"};
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -108,24 +107,22 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
 
     @OnClick(R.id.bReceiveForms)
     public void chooseReceivingMethods() {
-        Intent hotspotIntent = new Intent(this, HpReceiverActivity.class);
-        Intent bluetoothIntent = new Intent(this, BtReceiverActivity.class);
-
-        // choose different sending methods, TODO: needs refactor if we have a better UI/UX.
+        String[] options = {getString(R.string.method_bluetooth), getString(R.string.method_hotspot)};
+        Intent intent = new Intent();
         android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(this)
                 .setTitle("Receive Options")
                 .setIcon(R.drawable.ic_help_outline)
-                .setItems(TRANSFER_OPTIONS, (DialogInterface dialog, int which) -> {
+                .setItems(options, (DialogInterface dialog, int which) -> {
                     switch (which) {
                         case 0:
-                            startActivity(bluetoothIntent);
-                            finish();
+                            intent.setClass(this, BtReceiverActivity.class);
                             break;
                         case 1:
-                            startActivity(hotspotIntent);
-                            finish();
+                            intent.setClass(this, HpReceiverActivity.class);
                             break;
                     }
+                    startActivity(intent);
+                    finish();
                 }).create();
         alertDialog.show();
     }

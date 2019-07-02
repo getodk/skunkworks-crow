@@ -49,7 +49,6 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
     public static final String INSTANCE_IDS = "instance_ids";
     private static final String INSTANCE_LIST_ACTIVITY_SORTING_ORDER = "instanceListActivitySortingOrder";
     private static final int INSTANCE_LOADER = 1;
-    private static final String[] TRANSFER_OPTIONS = {"via bluetooth", "via hotspot"};
 
     @BindView(R.id.recyclerview)
     RecyclerView recyclerView;
@@ -157,10 +156,11 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
     public void send() {
         Intent intent = new Intent();
         setupSendingIntent(intent);
+        String[] options = {getString(R.string.method_bluetooth), getString(R.string.method_hotspot)};
         AlertDialog alertDialog = new AlertDialog.Builder(getContext())
                 .setTitle("Send Options")
                 .setIcon(R.drawable.ic_help_outline)
-                .setItems(TRANSFER_OPTIONS, (DialogInterface dialog, int which) -> {
+                .setItems(options, (DialogInterface dialog, int which) -> {
                     if (getActivity() != null) {
                         switch (which) {
                             case 0:

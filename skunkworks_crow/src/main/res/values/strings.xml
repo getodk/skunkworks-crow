@@ -133,6 +133,8 @@
 
     <!-- Bluetooth Related -->
     <string name="btn_refresh">Refresh</string>
+    <string name="method_bluetooth">Bluetooth</string>
+    <string name="method_hotspot">Hotspot</string>
     <string name="connect_bluetooth_title">Device to Receive</string>
     <string name="connecting_title">Connecting</string>
     <string name="receiving_title">Receiving</string>

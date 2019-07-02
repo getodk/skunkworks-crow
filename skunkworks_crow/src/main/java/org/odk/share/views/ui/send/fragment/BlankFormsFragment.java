@@ -53,7 +53,6 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
     public static final String FORM_IDS = "form_ids";
     private static final String FORM_CHOOSER_LIST_SORTING_ORDER = "formChooserListSortingOrder";
     private static final int FORM_LOADER = 2;
-    private static final String[] TRANSFER_OPTIONS = {"via bluetooth", "via hotspot"};
 
     @BindView(R.id.recyclerview)
     RecyclerView recyclerView;
@@ -163,10 +162,11 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
     public void send() {
         Intent intent = new Intent();
         setupSendingIntent(intent);
+        String[] options = {getString(R.string.method_bluetooth), getString(R.string.method_hotspot)};
         AlertDialog alertDialog = new AlertDialog.Builder(getContext())
                 .setTitle("Send Options")
                 .setIcon(R.drawable.ic_help_outline)
-                .setItems(TRANSFER_OPTIONS, (DialogInterface dialog, int which) -> {
+                .setItems(options, (DialogInterface dialog, int which) -> {
                     if (getActivity() != null) {
                         switch (which) {
                             case 0:
