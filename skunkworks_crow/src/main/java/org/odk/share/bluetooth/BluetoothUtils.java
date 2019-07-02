@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.os.Build;
 
+import java.util.Random;
 import java.util.UUID;
 
 /**
@@ -15,10 +16,28 @@ import java.util.UUID;
 public class BluetoothUtils {
 
     // UUID for security bluetooth pairing.
-    public static final UUID SPP_UUID = UUID.randomUUID();
+    public static final UUID SPP_UUID = getRandomUUID();
+    public static final int UUID_SEED = 0x110;
+    public static final int RANDOM_BOUND = 5;
 
     private BluetoothUtils() {
 
+    }
+
+    private static UUID getRandomUUID() {
+        return UUID.nameUUIDFromBytes(random().getBytes());
+    }
+
+    private static String random() {
+        Random generator = new Random(UUID_SEED);
+        StringBuilder randomStringBuilder = new StringBuilder();
+        int randomLength = generator.nextInt(RANDOM_BOUND);
+        char tempChar;
+        for (int i = 0; i < randomLength; i++) {
+            tempChar = (char) (generator.nextInt(96) + 32);
+            randomStringBuilder.append(tempChar);
+        }
+        return randomStringBuilder.toString();
     }
 
     private static BluetoothAdapter getBluetoothAdapter() {
