@@ -1,6 +1,7 @@
 package org.odk.share.views.ui.main;
 
 import android.Manifest;
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -225,7 +226,7 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
         builder.setPositiveButton(getString(R.string.install), (DialogInterface dialog, int which) -> {
             try {
                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + COLLECT_PACKAGE)));
-            } catch (android.content.ActivityNotFoundException e) {
+            } catch (ActivityNotFoundException e) {
                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + COLLECT_PACKAGE)));
             }
         });

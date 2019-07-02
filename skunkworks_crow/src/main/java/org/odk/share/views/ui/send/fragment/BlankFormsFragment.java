@@ -161,7 +161,6 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
     @OnClick(R.id.send_button)
     public void send() {
         Intent intent = new Intent();
-        setupSendingIntent(intent);
         String[] options = {getString(R.string.method_bluetooth), getString(R.string.method_hotspot)};
         AlertDialog alertDialog = new AlertDialog.Builder(getContext())
                 .setTitle("Send Options")
@@ -176,6 +175,7 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
                                 intent.setClass(getActivity(), HpSenderActivity.class);
                                 break;
                         }
+                        setupSendingIntent(intent);
                         startActivity(intent);
                         getActivity().finish();
                     }

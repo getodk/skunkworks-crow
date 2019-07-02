@@ -72,13 +72,12 @@ public class BluetoothListAdapter extends RecyclerView.Adapter<BluetoothListAdap
         return new ViewHolder(view);
     }
 
-
     /**
-     * rescan the bluetooth devices and update the list.
+     * Rescan the bluetooth devices and update the list.
      */
-    public void rescan() {
+    public void updateDeviceList() {
         bluetoothDeviceList.clear();
-        addBoundedDevices();
+        addPairedDevices();
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (!bluetoothAdapter.isDiscovering()) {
             bluetoothAdapter.startDiscovery();
@@ -86,17 +85,15 @@ public class BluetoothListAdapter extends RecyclerView.Adapter<BluetoothListAdap
         notifyDataSetChanged();
     }
 
-
     /**
      * Add the bounded bluetooth devices.
      */
-    private void addBoundedDevices() {
+    private void addPairedDevices() {
         Set<BluetoothDevice> bondedDevices = BluetoothAdapter.getDefaultAdapter().getBondedDevices();
         if (bondedDevices != null) {
             bluetoothDeviceList.addAll(bondedDevices);
         }
     }
-
 
     /**
      * View holder for the bluetooth devices.
@@ -123,7 +120,6 @@ public class BluetoothListAdapter extends RecyclerView.Adapter<BluetoothListAdap
             }
         }
     }
-
 
     /**
      * listener for bluetooth devices clicked.

@@ -124,8 +124,8 @@ public class DownloadJob extends Job {
 
     private void setupDataStreamsAndReceive(boolean isBluetooth, String macAddress) {
         try {
-            Timber.d("Waiting for receiver");
-            if (isBluetooth) {
+            Timber.d("Waiting for sender");
+            if (isBluetooth && macAddress != null) {
                 BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
                 bluetoothDevice = bluetoothAdapter.getRemoteDevice(macAddress);
                 bluetoothSocket = bluetoothDevice.createRfcommSocketToServiceRecord(SPP_UUID);

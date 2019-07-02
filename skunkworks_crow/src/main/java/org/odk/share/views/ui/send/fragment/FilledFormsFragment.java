@@ -155,7 +155,6 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
     @OnClick(R.id.send_button)
     public void send() {
         Intent intent = new Intent();
-        setupSendingIntent(intent);
         String[] options = {getString(R.string.method_bluetooth), getString(R.string.method_hotspot)};
         AlertDialog alertDialog = new AlertDialog.Builder(getContext())
                 .setTitle("Send Options")
@@ -170,6 +169,7 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
                                 intent.setClass(getActivity(), HpSenderActivity.class);
                                 break;
                         }
+                        setupSendingIntent(intent);
                         startActivity(intent);
                         getActivity().finish();
                     }

@@ -37,7 +37,7 @@ import timber.log.Timber;
  * @author huangyz0918 (huangyz0918@gmail.com)
  */
 public class BtReceiverActivity extends InjectableActivity implements
-        BluetoothReceiver.Listener, BluetoothListAdapter.OnDeviceClickListener {
+        BluetoothReceiver.BluetoothReceiverListener, BluetoothListAdapter.OnDeviceClickListener {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -77,7 +77,7 @@ public class BtReceiverActivity extends InjectableActivity implements
         // checking for if bluetooth enabled
         if (!BluetoothUtils.isBluetoothEnabled()) {
             BluetoothUtils.enableBluetooth();
-            bluetoothListAdapter.rescan();
+            bluetoothListAdapter.updateDeviceList();
         }
     }
 
@@ -94,7 +94,7 @@ public class BtReceiverActivity extends InjectableActivity implements
         // click to refresh the devices list.
         btnRefresh.setOnClickListener((View v) -> {
             if (BluetoothUtils.isBluetoothEnabled()) {
-                bluetoothListAdapter.rescan();
+                bluetoothListAdapter.updateDeviceList();
             } else {
                 BluetoothUtils.enableBluetooth();
                 Toast.makeText(this, "bluetooth has been disabled, turning on...", Toast.LENGTH_SHORT).show();
@@ -113,7 +113,7 @@ public class BtReceiverActivity extends InjectableActivity implements
                 .subscribe(bluetoothEvent -> {
                     switch (bluetoothEvent.getStatus()) {
                         case CONNECTED:
-                            progressDialog.setMessage("Connected, start downloading...");
+                            progressDialog.setMessage(getString(R.string.connected_bluetooth_downloading));
                             isConnected = true;
                             break;
                         case DISCONNECTED:
@@ -156,19 +156,19 @@ public class BtReceiverActivity extends InjectableActivity implements
     }
 
     @Override
-    public void foundDevice(BluetoothDevice device) {
+    public void onDeviceFound(BluetoothDevice device) {
         bluetoothListAdapter.addDevice(device);
     }
 
     @Override
-    public void onItemClick(BluetoothDevice dev) {
+    public void onItemClick(BluetoothDevice device) {
         if (BluetoothUtils.isBluetoothEnabled()) {
             if (isConnected) {
                 Toast.makeText(this, getString(R.string.dev_already_connected), Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            receiverService.startDownloading(dev.getAddress());
+            receiverService.startDownloading(device.getAddress());
             progressDialog = ProgressDialog.show(this, getString(R.string.connecting_title),
                     getString(R.string.connecting_message), true);
         } else {

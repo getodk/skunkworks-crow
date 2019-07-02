@@ -46,8 +46,10 @@ public class BluetoothUtils {
 
     /**
      * Checking if current device supports bluetooth.
+     *
+     * @return true if the device supports Bluetooth otherwise throws an {@link IllegalStateException}.
      */
-    public static boolean isSupportBluetooth() {
+    public static boolean isBluetoothSupported() {
         if (getBluetoothAdapter() != null) {
             return true;
         } else {
@@ -57,13 +59,15 @@ public class BluetoothUtils {
 
     /**
      * Checking if bluetooth is enabled.
+     *
+     * @return true if the bluetooth enabled.
      */
     public static boolean isBluetoothEnabled() {
-        return isSupportBluetooth() && getBluetoothAdapter().isEnabled();
+        return isBluetoothSupported() && getBluetoothAdapter().isEnabled();
     }
 
     /**
-     * Disable and enable the bluetooth.
+     * Disable the bluetooth.
      */
     public static void disableBluetooth() {
         if (isBluetoothEnabled()) {
@@ -71,6 +75,9 @@ public class BluetoothUtils {
         }
     }
 
+    /**
+     * Enable the bluetooth.
+     */
     public static void enableBluetooth() {
         if (!isBluetoothEnabled()) {
             getBluetoothAdapter().enable();
@@ -78,7 +85,7 @@ public class BluetoothUtils {
     }
 
     /**
-     * Checking if the current {@link android.app.Activity} is destroyed.
+     * Checking if the current {@link android.app.Activity} is finished or about to be finished.
      */
     public static boolean isActivityDestroyed(Activity activity) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {

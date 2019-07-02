@@ -146,5 +146,3 @@ public class BtSenderActivity extends InjectableActivity {
         compositeDisposable.clear();
     }
 }
-
-

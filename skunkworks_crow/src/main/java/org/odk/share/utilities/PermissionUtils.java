@@ -35,7 +35,6 @@ public class PermissionUtils {
         return gpsEnabled;
     }
 
-
     /**
      * Showing an alert dialog for user to enable the location permission from system settings.
      */
@@ -56,8 +55,6 @@ public class PermissionUtils {
         builder.setCancelable(false);
         builder.show();
     }
-
-
 }
 
 

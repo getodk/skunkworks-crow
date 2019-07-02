@@ -16,10 +16,10 @@ import timber.log.Timber;
 public class BluetoothReceiver extends BroadcastReceiver {
 
     private static final String TAG = BluetoothReceiver.class.getSimpleName();
-    private final Listener listener;
+    private final BluetoothReceiverListener bluetoothReceiverListener;
 
-    public BluetoothReceiver(Context context, Listener listener) {
-        this.listener = listener;
+    public BluetoothReceiver(Context context, BluetoothReceiverListener bluetoothReceiverListener) {
+        this.bluetoothReceiverListener = bluetoothReceiverListener;
         IntentFilter filter = new IntentFilter();
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED); //Bluetooth switch status.
         filter.addAction(BluetoothDevice.ACTION_FOUND); //Bluetooth discovers new devices (unpaired devices).
@@ -46,12 +46,15 @@ public class BluetoothReceiver extends BroadcastReceiver {
             case BluetoothDevice.ACTION_FOUND:
                 short rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MAX_VALUE);
                 Timber.d("EXTRA_RSSI: %s", rssi);
-                listener.foundDevice(dev);
+                bluetoothReceiverListener.onDeviceFound(dev);
                 break;
         }
     }
 
-    public interface Listener {
-        void foundDevice(BluetoothDevice device);
+    /**
+     * Listener for bluetooth devices when we found a new {@link BluetoothDevice}.
+     */
+    public interface BluetoothReceiverListener {
+        void onDeviceFound(BluetoothDevice device);
     }
 }

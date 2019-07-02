@@ -136,6 +136,7 @@
     <string name="method_bluetooth">Bluetooth</string>
     <string name="method_hotspot">Hotspot</string>
     <string name="connect_bluetooth_title">Device to Receive</string>
+    <string name="connected_bluetooth_downloading">Connected, start downloading&#8230;</string>
     <string name="connecting_title">Connecting</string>
     <string name="receiving_title">Receiving</string>
     <string name="connecting_message">connecting to bluetooth \n please wait&#8230;</string>
