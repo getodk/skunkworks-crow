@@ -50,11 +50,7 @@ public class BluetoothUtils {
      * @return true if the device supports Bluetooth otherwise throws an {@link IllegalStateException}.
      */
     public static boolean isBluetoothSupported() {
-        if (getBluetoothAdapter() != null) {
-            return true;
-        } else {
-            throw new IllegalStateException("Your device does not support bluetooth!");
-        }
+        return getBluetoothAdapter() != null;
     }
 
     /**

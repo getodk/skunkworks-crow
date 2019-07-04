@@ -115,7 +115,7 @@ public class BtReceiverActivity extends InjectableActivity implements
         recyclerView.setAdapter(bluetoothListAdapter);
         bluetoothReceiver = new BluetoothReceiver(this, this);
         addPairedDevices();
-        BluetoothAdapter.getDefaultAdapter().startDiscovery();
+        bluetoothAdapter.startDiscovery();
 
         // click to refresh the devices list.
         btnRefresh.setOnClickListener((View v) -> {
