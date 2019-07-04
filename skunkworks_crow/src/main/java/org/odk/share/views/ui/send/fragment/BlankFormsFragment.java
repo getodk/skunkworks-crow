@@ -177,7 +177,6 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
                         }
                         setupSendingIntent(intent);
                         startActivity(intent);
-                        getActivity().finish();
                     }
                 }).create();
         alertDialog.show();

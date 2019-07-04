@@ -56,20 +56,15 @@ public class ReceiverService {
 
     public void startBtDownloading(String macAddress) {
         PersistableBundleCompat extras = new PersistableBundleCompat();
-        extras.putString("mac", macAddress);
         extras.putInt("MODE_OF_TRANSFER", Share.TransferMethod.BLUETOOTH);
-        JobRequest request = new JobRequest.Builder(DownloadJob.TAG)
-                .addExtras(extras)
-                .startNow()
-                .build();
-
-       startJob(request);
+        extras.putString("mac", macAddress);
+        startJob(extras);
     }
 
     public void startHpDownloading(String ip, int port) {
         PersistableBundleCompat extras = new PersistableBundleCompat();
-        extras.putString(DownloadJob.IP, ip);
         extras.putInt("MODE_OF_TRANSFER", Share.TransferMethod.HOTSPOT);
+        extras.putString(DownloadJob.IP, ip);
         extras.putInt(DownloadJob.PORT, port);
         startJob(extras);
     }

@@ -61,60 +61,21 @@ public class SenderService {
                 }).subscribe();
     }
 
-    /**
-     * build a bundle for transfer form data using hotspot.
-     *
-     * @param port            port for sending data via hotspot.
-     * @param instancesToSend instance to send.
-     * @param mode            review form mode or others.
-     */
-    private PersistableBundleCompat setupPersistableBundle(long[] instancesToSend, int port, int mode) {
+    public void startUploading(long[] instancesToSend, int port, int mode) {
         PersistableBundleCompat extras = new PersistableBundleCompat();
-        extras.putLongArray(UploadJob.INSTANCES, instancesToSend);
         extras.putInt("MODE_OF_TRANSFER", Share.TransferMethod.HOTSPOT);
+        extras.putLongArray(UploadJob.INSTANCES, instancesToSend);
         extras.putInt(UploadJob.PORT, port);
         extras.putInt(MODE, mode);
-        return extras;
-    }
-
-    /**
-     * build a bundle for transfer form data using bluetooth.
-     *
-     * @param instancesToSend instance to send.
-     * @param mode            review form mode or others.
-     */
-    private PersistableBundleCompat setupPersistableBundle(long[] instancesToSend, int mode) {
-        PersistableBundleCompat extras = new PersistableBundleCompat();
-        extras.putLongArray(UploadJob.INSTANCES, instancesToSend);
-        extras.putInt("MODE_OF_TRANSFER", Share.TransferMethod.BLUETOOTH);
-        extras.putInt(MODE, mode);
-        return extras;
-    }
-
-    public void startUploading(long[] instancesToSend, int port, int mode) {
-        JobRequest request = new JobRequest.Builder(UploadJob.TAG)
-                .addExtras(setupPersistableBundle(instancesToSend, port, mode))
-                .startNow()
-                .build();
-
-        if (currentJob != null) {
-            jobs.add(request);
-        } else {
-            startJob(request);
-        }
+        startJob(extras);
     }
 
     public void startUploading(long[] instancesToSend, int mode) {
-        JobRequest request = new JobRequest.Builder(UploadJob.TAG)
-                .addExtras(setupPersistableBundle(instancesToSend, mode))
-                .startNow()
-                .build();
-
-        if (currentJob != null) {
-            jobs.add(request);
-        } else {
-            startJob(request);
-        }
+        PersistableBundleCompat extras = new PersistableBundleCompat();
+        extras.putInt("MODE_OF_TRANSFER", Share.TransferMethod.BLUETOOTH);
+        extras.putLongArray(UploadJob.INSTANCES, instancesToSend);
+        extras.putInt(MODE, mode);
+        startJob(extras);
     }
 
     /**
@@ -124,6 +85,19 @@ public class SenderService {
         request.schedule();
         Timber.d("Starting upload job %d : ", request.getJobId());
         currentJob = request;
+    }
+
+    private void startJob(PersistableBundleCompat extras) {
+        JobRequest request = new JobRequest.Builder(UploadJob.TAG)
+                .addExtras(extras)
+                .startNow()
+                .build();
+
+        if (currentJob != null) {
+            jobs.add(request);
+        } else {
+            startJob(request);
+        }
     }
 
     public void cancel() {

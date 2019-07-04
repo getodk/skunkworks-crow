@@ -143,14 +143,17 @@ public class UploadJob extends Job {
     }
 
     private void closeConnections() throws IOException {
-        if (socket != null) {
-            socket.close();
-        }
         if (dos != null) {
             dos.close();
         }
         if (dis != null) {
             dis.close();
+        }
+        if (socket != null) {
+            socket.close();
+        }
+        if (serverSocket != null) {
+            serverSocket.close();
         }
         if (bluetoothSocket != null) {
             bluetoothSocket.close();

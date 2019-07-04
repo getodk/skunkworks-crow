@@ -121,27 +121,29 @@ public class DownloadJob extends Job {
                 break;
         }
 
-        setupDataStreamsAndReceive(method, targetMacAddress);
+        setupDataStreamsAndReceive(method);
     }
 
-    private void setupDataStreamsAndReceive(@Share.TransferMethod int method, String macAddress) {
+    private void setupDataStreamsAndReceive(@Share.TransferMethod int method) {
         try {
             Timber.d("Waiting for sender");
-            if (method == Share.TransferMethod.BLUETOOTH && macAddress != null) {
+            if (method == Share.TransferMethod.BLUETOOTH && targetMacAddress != null) {
                 BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-                BluetoothDevice bluetoothDevice = bluetoothAdapter.getRemoteDevice(macAddress);
-                bluetoothSocket = bluetoothDevice.createRfcommSocketToServiceRecord(SPP_UUID);
+                BluetoothDevice bluetoothDevice = bluetoothAdapter.getRemoteDevice(targetMacAddress);
+                if (bluetoothDevice != null) {
+                    bluetoothSocket = bluetoothDevice.createRfcommSocketToServiceRecord(SPP_UUID);
 
-                if (!bluetoothSocket.isConnected()) {
-                    bluetoothSocket.connect();
+                    if (!bluetoothSocket.isConnected()) {
+                        bluetoothSocket.connect();
+                    }
+
+                    if (bluetoothSocket.isConnected()) {
+                        rxEventBus.post(new BluetoothEvent(BluetoothEvent.Status.CONNECTED));
+                    }
+
+                    dos = new DataOutputStream(bluetoothSocket.getOutputStream());
+                    dis = new DataInputStream(bluetoothSocket.getInputStream());
                 }
-
-                if (bluetoothSocket.isConnected()) {
-                    rxEventBus.post(new BluetoothEvent(BluetoothEvent.Status.CONNECTED));
-                }
-
-                dos = new DataOutputStream(bluetoothSocket.getOutputStream());
-                dis = new DataInputStream(bluetoothSocket.getInputStream());
             } else {
                 Timber.d("Socket %s, %s", ip, port);
                 socket = new Socket();
@@ -154,6 +156,7 @@ public class DownloadJob extends Job {
             rxEventBus.post(receiveForms());
         } catch (IOException e) {
             Timber.e(e);
+            cancel();
         }
     }
 
@@ -192,14 +195,14 @@ public class DownloadJob extends Job {
      * Close all the connections.
      */
     private void closeConnections() throws IOException {
-        if (socket != null) {
-            socket.close();
-        }
         if (dos != null) {
             dos.close();
         }
         if (dis != null) {
             dis.close();
+        }
+        if (socket != null) {
+            socket.close();
         }
         if (bluetoothSocket != null) {
             bluetoothSocket.close();

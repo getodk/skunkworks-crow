@@ -1,6 +1,5 @@
 package org.odk.share.views.ui.bluetooth;
 
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -54,6 +53,13 @@ public class BluetoothListAdapter extends RecyclerView.Adapter<BluetoothListAdap
         notifyDataSetChanged();
     }
 
+    public void addDevices(Set<BluetoothDevice> devices) {
+        if (!bluetoothDeviceList.containsAll(devices)) {
+            this.bluetoothDeviceList.addAll(devices);
+        }
+        notifyDataSetChanged();
+    }
+
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder viewHolder, int position) {
         Context context = viewHolder.itemView.getContext();
@@ -79,29 +85,6 @@ public class BluetoothListAdapter extends RecyclerView.Adapter<BluetoothListAdap
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_bt_device, null);
         return new ViewHolder(view);
-    }
-
-    /**
-     * Rescan the bluetooth devices and update the list.
-     */
-    public void updateDeviceList() {
-        bluetoothDeviceList.clear();
-        addPairedDevices();
-        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (!bluetoothAdapter.isDiscovering()) {
-            bluetoothAdapter.startDiscovery();
-        }
-        notifyDataSetChanged();
-    }
-
-    /**
-     * Add the bounded bluetooth devices.
-     */
-    public void addPairedDevices() {
-        Set<BluetoothDevice> bondedDevices = BluetoothAdapter.getDefaultAdapter().getBondedDevices();
-        if (bondedDevices != null) {
-            bluetoothDeviceList.addAll(bondedDevices);
-        }
     }
 
     /**
@@ -131,6 +114,13 @@ public class BluetoothListAdapter extends RecyclerView.Adapter<BluetoothListAdap
                 btDeviceClickListener.onItemClick(bluetoothDeviceList.get(position));
             }
         }
+    }
+
+    /**
+     * clear all the data in the list.
+     */
+    public void clearBluetoothDeviceList() {
+        bluetoothDeviceList.clear();
     }
 
     /**

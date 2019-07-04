@@ -123,7 +123,6 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
                             break;
                     }
                     startActivity(intent);
-                    finish();
                 }).create();
         alertDialog.show();
     }

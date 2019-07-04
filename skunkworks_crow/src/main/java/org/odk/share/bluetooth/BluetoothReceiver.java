@@ -15,12 +15,13 @@ import timber.log.Timber;
  */
 public class BluetoothReceiver extends BroadcastReceiver {
 
-    private static final String TAG = BluetoothReceiver.class.getSimpleName();
     private final BluetoothReceiverListener bluetoothReceiverListener;
 
     public BluetoothReceiver(Context context, BluetoothReceiverListener bluetoothReceiverListener) {
         this.bluetoothReceiverListener = bluetoothReceiverListener;
         IntentFilter filter = new IntentFilter();
+        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED); //Bluetooth starts searching.
+        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED); //Bluetooth search ends.
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED); //Bluetooth switch status.
         filter.addAction(BluetoothDevice.ACTION_FOUND); //Bluetooth discovers new devices (unpaired devices).
         context.registerReceiver(this, filter);
@@ -33,21 +34,28 @@ public class BluetoothReceiver extends BroadcastReceiver {
             return;
         }
 
-        Timber.d(TAG, action);
-        BluetoothDevice dev = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-        if (dev != null) {
-            Timber.d("%s BluetoothDevice: %s, Address: %s", TAG, dev.getName(), dev.getAddress());
-        }
-        switch (action) {
-            case BluetoothAdapter.ACTION_STATE_CHANGED:
-                int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0);
-                Timber.d("%s STATE: %s", TAG, state);
-                break;
-            case BluetoothDevice.ACTION_FOUND:
-                short rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MAX_VALUE);
-                Timber.d("EXTRA_RSSI: %s", rssi);
-                bluetoothReceiverListener.onDeviceFound(dev);
-                break;
+        BluetoothDevice bluetoothDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+        if (bluetoothDevice != null) {
+            Timber.d("BluetoothDevice: %s, Address: %s", bluetoothDevice.getName(), bluetoothDevice.getAddress());
+            switch (action) {
+                case BluetoothAdapter.ACTION_STATE_CHANGED:
+                    int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0);
+                    Timber.d("STATE: %s", state);
+                    break;
+                case BluetoothDevice.ACTION_FOUND:
+                    short rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MAX_VALUE);
+                    Timber.d("EXTRA_RSSI: %s", rssi);
+                    bluetoothReceiverListener.onDeviceFound(bluetoothDevice);
+                    break;
+                case BluetoothAdapter.ACTION_DISCOVERY_STARTED:
+                    Timber.d("bluetooth devices discovery started...");
+                    bluetoothReceiverListener.onDiscoveryStarted();
+                    break;
+                case BluetoothAdapter.ACTION_DISCOVERY_FINISHED:
+                    Timber.d("bluetooth devices discovery finished...");
+                    bluetoothReceiverListener.onDiscoveryFinished();
+                    break;
+            }
         }
     }
 
@@ -56,5 +64,9 @@ public class BluetoothReceiver extends BroadcastReceiver {
      */
     public interface BluetoothReceiverListener {
         void onDeviceFound(BluetoothDevice device);
+
+        void onDiscoveryStarted();
+
+        void onDiscoveryFinished();
     }
 }

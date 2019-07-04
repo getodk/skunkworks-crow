@@ -171,7 +171,6 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
                         }
                         setupSendingIntent(intent);
                         startActivity(intent);
-                        getActivity().finish();
                     }
                 }).create();
         alertDialog.show();

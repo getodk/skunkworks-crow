@@ -144,7 +144,6 @@ public class InstancesList extends InstanceListActivity implements LoaderManager
                             break;
                     }
                     startActivity(intent);
-                    finish();
                 }).create();
         alertDialog.show();
     }

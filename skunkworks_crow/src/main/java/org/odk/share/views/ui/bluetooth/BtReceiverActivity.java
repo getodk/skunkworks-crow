@@ -23,6 +23,8 @@ import org.odk.share.rx.schedulers.BaseSchedulerProvider;
 import org.odk.share.services.ReceiverService;
 import org.odk.share.views.ui.common.injectable.InjectableActivity;
 
+import java.util.Set;
+
 import javax.inject.Inject;
 
 import butterknife.BindView;
@@ -57,6 +59,7 @@ public class BtReceiverActivity extends InjectableActivity implements
     @Inject
     BaseSchedulerProvider schedulerProvider;
 
+    private BluetoothAdapter bluetoothAdapter;
     private BluetoothReceiver bluetoothReceiver;
     private final BluetoothListAdapter bluetoothListAdapter = new BluetoothListAdapter(this);
     private boolean isConnected = false;
@@ -77,11 +80,33 @@ public class BtReceiverActivity extends InjectableActivity implements
         // checking for if bluetooth enabled
         if (!BluetoothUtils.isBluetoothEnabled()) {
             BluetoothUtils.enableBluetooth();
-            bluetoothListAdapter.updateDeviceList();
+            updateDeviceList();
         }
     }
 
+    /**
+     * Add the bounded bluetooth devices.
+     */
+    public void addPairedDevices() {
+        Set<BluetoothDevice> bondedDevices = bluetoothAdapter.getBondedDevices();
+        if (bondedDevices != null) {
+            bluetoothListAdapter.addDevices(bondedDevices);
+        }
+    }
+
+    /**
+     * Rescan the bluetooth devices and update the list.
+     */
+    public void updateDeviceList() {
+        addPairedDevices();
+        if (!bluetoothAdapter.isDiscovering()) {
+            bluetoothAdapter.startDiscovery();
+        }
+        bluetoothListAdapter.notifyDataSetChanged();
+    }
+
     private void initEvents() {
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
                 linearLayoutManager.getOrientation());
@@ -89,13 +114,13 @@ public class BtReceiverActivity extends InjectableActivity implements
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(bluetoothListAdapter);
         bluetoothReceiver = new BluetoothReceiver(this, this);
-        bluetoothListAdapter.addPairedDevices();
+        addPairedDevices();
         BluetoothAdapter.getDefaultAdapter().startDiscovery();
 
         // click to refresh the devices list.
         btnRefresh.setOnClickListener((View v) -> {
             if (BluetoothUtils.isBluetoothEnabled()) {
-                bluetoothListAdapter.updateDeviceList();
+                updateDeviceList();
             } else {
                 BluetoothUtils.enableBluetooth();
                 Toast.makeText(this, "bluetooth has been disabled, turning on...", Toast.LENGTH_SHORT).show();
@@ -159,6 +184,16 @@ public class BtReceiverActivity extends InjectableActivity implements
     @Override
     public void onDeviceFound(BluetoothDevice device) {
         bluetoothListAdapter.addDevice(device);
+    }
+
+    @Override
+    public void onDiscoveryStarted() {
+
+    }
+
+    @Override
+    public void onDiscoveryFinished() {
+
     }
 
     @Override

@@ -131,7 +131,6 @@
     <string name="location_permission_needed">Location Permission Needed</string>
     <string name="location_settings_dialog">Enable location from the settings.</string>
 
-    <!-- Bluetooth Related -->
     <string name="btn_refresh">Refresh</string>
     <string name="method_bluetooth">Bluetooth</string>
     <string name="method_hotspot">Hotspot</string>
@@ -149,5 +148,5 @@
     <string name="tv_sender_wait_for_connect">waiting for connection&#8230; \n will start transfer when connected </string>
     <string name="tv_form_already_exist">form already exists \n please send different form</string>
     <string name="dev_already_connected">already connected to a device</string>
-    <string name="tv_form_send_success">form sent with success!</string>
+    <string name="tv_form_send_success">form sent with success! \n</string>
 </resources>
