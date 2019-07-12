@@ -1,4 +1,4 @@
-package org.odk.share.bluetooth;
+package org.odk.share.utilities;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
