@@ -51,7 +51,6 @@
     <string name="canceled">Canceled</string>
     <string name="stop_sending">Stop Sending</string>
 
-
     <string name="sending_items">Sending %1$s of %2$s form(s)</string>
     <string name="receiving_items">Receiving %1$s of %2$s form(s)</string>
     <string name="transfer_result">Transfer result</string>
@@ -75,6 +74,7 @@
     <string name="search_list">Search the list</string>
     <string name="search">Search</string>
 
+    <string name="review_form">Review Form</string>
     <string name="sort_by_name_asc">Name, A-Z</string>
     <string name="sort_by_name_desc">Name, Z-A</string>
     <string name="sort_by_date_asc">Date, newest first</string>
