@@ -30,11 +30,11 @@ import org.odk.collect.android.dto.Form;
 import org.odk.share.R;
 import org.odk.share.application.Share;
 import org.odk.share.dao.TransferDao;
+import org.odk.share.utilities.ActivityUtils;
+import org.odk.share.utilities.DialogUtils;
 import org.odk.share.views.listeners.ItemClickListener;
 import org.odk.share.views.ui.about.AboutActivity;
-import org.odk.share.views.ui.bluetooth.BtReceiverActivity;
 import org.odk.share.views.ui.common.basecursor.BaseCursorViewHolder;
-import org.odk.share.views.ui.hotspot.HpReceiverActivity;
 import org.odk.share.views.ui.instance.InstanceManagerTabs;
 import org.odk.share.views.ui.send.SendFormsActivity;
 import org.odk.share.views.ui.settings.SettingsActivity;
@@ -108,29 +108,12 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
 
     @OnClick(R.id.bReceiveForms)
     public void chooseReceivingMethods() {
-        String[] options = {getString(R.string.method_bluetooth), getString(R.string.method_hotspot)};
-        Intent intent = new Intent();
-        android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(this)
-                .setTitle("Receive Options")
-                .setIcon(R.drawable.ic_help_outline)
-                .setItems(options, (DialogInterface dialog, int which) -> {
-                    switch (which) {
-                        case 0:
-                            intent.setClass(this, BtReceiverActivity.class);
-                            break;
-                        case 1:
-                            intent.setClass(this, HpReceiverActivity.class);
-                            break;
-                    }
-                    startActivity(intent);
-                }).create();
-        alertDialog.show();
+        DialogUtils.showReceiverMethodsDialog(this, new Intent(), getString(R.string.title_receive_options)).show();
     }
 
     @OnClick(R.id.bSendForms)
     public void selectForms() {
-        Intent intent = new Intent(this, SendFormsActivity.class);
-        startActivity(intent);
+        ActivityUtils.launchActivity(this, SendFormsActivity.class, false);
     }
 
     @Override
@@ -143,10 +126,10 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_settings:
-                startActivity(new Intent(this, SettingsActivity.class));
+                ActivityUtils.launchActivity(this, SettingsActivity.class, false);
                 return true;
             case R.id.menu_about:
-                startActivity(new Intent(this, AboutActivity.class));
+                ActivityUtils.launchActivity(this, AboutActivity.class, false);
         }
         return super.onOptionsItemSelected(item);
     }

@@ -1,7 +1,5 @@
 package org.odk.share.views.ui.send.fragment;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -25,9 +23,8 @@ import org.odk.collect.android.provider.InstanceProviderAPI;
 import org.odk.share.R;
 import org.odk.share.utilities.ApplicationConstants;
 import org.odk.share.utilities.ArrayUtils;
-import org.odk.share.views.ui.bluetooth.BtSenderActivity;
+import org.odk.share.utilities.DialogUtils;
 import org.odk.share.views.ui.common.InstanceListFragment;
-import org.odk.share.views.ui.hotspot.HpSenderActivity;
 import org.odk.share.views.ui.instance.adapter.InstanceAdapter;
 
 import java.util.LinkedHashSet;
@@ -154,26 +151,11 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
 
     @OnClick(R.id.send_button)
     public void send() {
-        Intent intent = new Intent();
-        String[] options = {getString(R.string.method_bluetooth), getString(R.string.method_hotspot)};
-        AlertDialog alertDialog = new AlertDialog.Builder(getContext())
-                .setTitle("Send Options")
-                .setIcon(R.drawable.ic_help_outline)
-                .setItems(options, (DialogInterface dialog, int which) -> {
-                    if (getActivity() != null) {
-                        switch (which) {
-                            case 0:
-                                intent.setClass(getActivity(), BtSenderActivity.class);
-                                break;
-                            case 1:
-                                intent.setClass(getActivity(), HpSenderActivity.class);
-                                break;
-                        }
-                        setupSendingIntent(intent);
-                        startActivity(intent);
-                    }
-                }).create();
-        alertDialog.show();
+        if (getContext() != null) {
+            Intent intent = new Intent();
+            setupSendingIntent(intent);
+            DialogUtils.showSenderMethodsDialog(getContext(), intent, getString(R.string.title_send_options)).show();
+        }
     }
 
     private void setupSendingIntent(Intent intent) {

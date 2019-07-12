@@ -1,6 +1,6 @@
 package org.odk.share.events;
 
-public class BluetoothEvent {
+public class BluetoothEvent extends RxEvent {
 
     private Status status;
 

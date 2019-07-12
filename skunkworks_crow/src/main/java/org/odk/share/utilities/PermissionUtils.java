@@ -2,6 +2,7 @@ package org.odk.share.utilities;
 
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.LocationManager;
@@ -25,7 +26,7 @@ public class PermissionUtils {
     /**
      * Checking if the location permission has been enabled.
      */
-    public static boolean isGPSEnabled(Activity targetActivity) {
+    public static boolean isGPSEnabled(Context targetActivity) {
         LocationManager locationManager = (LocationManager) targetActivity.getSystemService(LOCATION_SERVICE);
         boolean gpsEnabled = false;
         if (locationManager != null) {
