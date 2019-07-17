@@ -1,4 +1,4 @@
-package org.odk.share.views.ui.send;
+package org.odk.share.views.ui.hotspot;
 
 import android.Manifest;
 import android.app.Dialog;
@@ -7,18 +7,20 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-
 import android.content.pm.PackageManager;
-import android.location.LocationManager;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.Settings;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
 
 import org.odk.share.R;
 import org.odk.share.events.HotspotEvent;
@@ -29,16 +31,13 @@ import org.odk.share.rx.RxEventBus;
 import org.odk.share.rx.schedulers.BaseSchedulerProvider;
 import org.odk.share.services.HotspotService;
 import org.odk.share.services.SenderService;
+import org.odk.share.utilities.PermissionUtils;
 import org.odk.share.utilities.QRCodeUtils;
 import org.odk.share.utilities.SocketUtils;
 import org.odk.share.views.ui.common.injectable.InjectableActivity;
 
 import javax.inject.Inject;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.Toolbar;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.disposables.CompositeDisposable;
@@ -46,16 +45,16 @@ import io.reactivex.disposables.Disposable;
 import timber.log.Timber;
 
 import static android.view.View.VISIBLE;
-import static org.odk.share.views.ui.instance.InstancesList.INSTANCE_IDS;
-import static org.odk.share.views.ui.send.fragment.BlankFormsFragment.FORM_IDS;
-import static org.odk.share.views.ui.instance.fragment.ReviewedInstancesFragment.MODE;
 import static org.odk.share.utilities.ApplicationConstants.ASK_REVIEW_MODE;
+import static org.odk.share.views.ui.instance.InstancesList.INSTANCE_IDS;
+import static org.odk.share.views.ui.instance.fragment.ReviewedInstancesFragment.MODE;
+import static org.odk.share.views.ui.send.fragment.BlankFormsFragment.FORM_IDS;
 
 /**
  * Created by laksh on 6/9/2018.
  */
 
-public class SendActivity extends InjectableActivity {
+public class HpSenderActivity extends InjectableActivity {
 
     public static final String DEFAULT_SSID = "ODK-SKUNKWORKS";
     private static final int PROGRESS_DIALOG = 1;
@@ -169,21 +168,11 @@ public class SendActivity extends InjectableActivity {
         }
     }
 
-    private boolean isGPSEnabled() {
-        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        boolean gpsEnabled = false;
-        if (locationManager != null) {
-            gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        }
-
-        return gpsEnabled;
-    }
-
     private void initiateHotspot() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            if (!isGPSEnabled()) {
+            if (!PermissionUtils.isGPSEnabled(this)) {
                 isHotspotInitiated = false;
-                showLocationAlertDialog();
+                PermissionUtils.showLocationAlertDialog(this);
                 return;
             }
             turnOnHotspot();
@@ -208,53 +197,26 @@ public class SendActivity extends InjectableActivity {
         }
     }
 
-    private void showLocationAlertDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(R.string.location_settings_dialog);
-        builder.setPositiveButton(getString(R.string.settings), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                startActivity(intent);
-            }
-        });
-
-        builder.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-                finish();
-            }
-        });
-        builder.setCancelable(false);
-        builder.show();
-    }
-
     private void showAlertDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.hotspot_settings_dialog);
-        builder.setPositiveButton(getString(R.string.settings), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                wifiHotspot.saveLastConfig();
-                WifiConfiguration newWifiConfig = wifiHotspot.createNewConfig(DEFAULT_SSID + getString(R.string.hotspot_name_suffix));
-                wifiHotspot.setCurrConfig(newWifiConfig);
-                wifiHotspot.setWifiConfig(newWifiConfig);
-                final Intent intent = new Intent(Intent.ACTION_MAIN, null);
-                intent.addCategory(Intent.CATEGORY_LAUNCHER);
-                final ComponentName cn = new ComponentName("com.android.settings", "com.android.settings.TetherSettings");
-                intent.setComponent(cn);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                openSettings = true;
-            }
+        builder.setPositiveButton(getString(R.string.settings), (DialogInterface dialog, int which) -> {
+            wifiHotspot.saveLastConfig();
+            WifiConfiguration newWifiConfig = wifiHotspot.createNewConfig(DEFAULT_SSID + getString(R.string.hotspot_name_suffix));
+            wifiHotspot.setCurrConfig(newWifiConfig);
+            wifiHotspot.setWifiConfig(newWifiConfig);
+            final Intent intent = new Intent(Intent.ACTION_MAIN, null);
+            intent.addCategory(Intent.CATEGORY_LAUNCHER);
+            final ComponentName cn = new ComponentName("com.android.settings", "com.android.settings.TetherSettings");
+            intent.setComponent(cn);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            openSettings = true;
         });
-        builder.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-                finish();
-            }
+
+        builder.setNegativeButton(getString(R.string.cancel), (DialogInterface dialog, int which) -> {
+            dialog.dismiss();
+            finish();
         });
 
         builder.setCancelable(false);
@@ -264,18 +226,13 @@ public class SendActivity extends InjectableActivity {
     private void stopHotspotAlertDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.stop_sending);
-        builder.setPositiveButton(getString(R.string.stop), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                stopHotspot();
-                finish();
-            }
+        builder.setPositiveButton(getString(R.string.stop), (DialogInterface dialog, int which) -> {
+            stopHotspot();
+            finish();
         });
-        builder.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
+
+        builder.setNegativeButton(getString(R.string.cancel), (DialogInterface dialog, int which) -> {
+            dialog.dismiss();
         });
 
         builder.setCancelable(false);
@@ -295,7 +252,7 @@ public class SendActivity extends InjectableActivity {
         Timber.d("Hotspot Stopped");
         compositeDisposable.dispose();
     }
-  
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -425,13 +382,10 @@ public class SendActivity extends InjectableActivity {
                 progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                 progressDialog.setCancelable(false);
                 progressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.cancel),
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                senderService.cancel();
-                                dialog.dismiss();
-                                finish();
-                            }
+                        (DialogInterface dialog, int which) -> {
+                            senderService.cancel();
+                            dialog.dismiss();
+                            finish();
                         });
                 return progressDialog;
         }
@@ -443,17 +397,15 @@ public class SendActivity extends InjectableActivity {
         AlertDialog alertDialog = new AlertDialog.Builder(this).create();
         alertDialog.setTitle(title);
         alertDialog.setMessage(message);
-        DialogInterface.OnClickListener quitListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int i) {
-                switch (i) {
-                    case DialogInterface.BUTTON_POSITIVE:
-                        stopHotspot();
-                        finish();
-                        break;
-                }
+        DialogInterface.OnClickListener quitListener = (DialogInterface dialog, int i) -> {
+            switch (i) {
+                case DialogInterface.BUTTON_POSITIVE:
+                    stopHotspot();
+                    finish();
+                    break;
             }
         };
+
         alertDialog.setCancelable(false);
         alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.ok), quitListener);
         alertDialog.show();
@@ -466,7 +418,7 @@ public class SendActivity extends InjectableActivity {
 
             toggleHotspot();
         } else {
-            requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION} , LOCATION_PERMISSION_REQUEST_CODE);
+            requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
         }
     }
 

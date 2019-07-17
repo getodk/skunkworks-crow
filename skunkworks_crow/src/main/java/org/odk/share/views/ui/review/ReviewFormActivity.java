@@ -10,6 +10,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.widget.Toolbar;
+
 import org.odk.collect.android.dao.InstancesDao;
 import org.odk.collect.android.provider.InstanceProviderAPI;
 import org.odk.share.R;
@@ -39,6 +41,8 @@ public class ReviewFormActivity extends InjectableActivity {
     TextView description;
     @BindView(R.id.save_feedback)
     EditText feedback;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
 
     @Inject
     InstancesDao instancesDao;
@@ -58,6 +62,9 @@ public class ReviewFormActivity extends InjectableActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_review_form);
         ButterKnife.bind(this);
+
+        setTitle(getString(R.string.review_form));
+        setSupportActionBar(toolbar);
 
         transferID = getIntent().getLongExtra(TRANSFER_ID, -1);
         instanceID = getIntent().getLongExtra(INSTANCE_ID, -1);

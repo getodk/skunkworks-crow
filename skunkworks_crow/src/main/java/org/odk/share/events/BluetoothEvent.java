@@ -1,10 +1,10 @@
 package org.odk.share.events;
 
-public class HotspotEvent extends RxEvent {
+public class BluetoothEvent extends RxEvent {
 
     private Status status;
 
-    public HotspotEvent(Status status) {
+    public BluetoothEvent(Status status) {
         this.status = status;
     }
 
@@ -13,7 +13,7 @@ public class HotspotEvent extends RxEvent {
     }
 
     public enum Status {
-        ENABLED, DISABLED
+        CONNECTED, DISCONNECTED
     }
 
     @Override

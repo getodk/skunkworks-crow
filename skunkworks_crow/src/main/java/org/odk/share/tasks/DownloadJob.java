@@ -1,10 +1,16 @@
 package org.odk.share.tasks;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.ContentValues;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+
+import androidx.annotation.NonNull;
+
 import com.evernote.android.job.Job;
 
 import org.odk.collect.android.dao.FormsDao;
@@ -17,10 +23,11 @@ import org.odk.share.dao.InstanceMapDao;
 import org.odk.share.dao.TransferDao;
 import org.odk.share.database.ShareDatabaseHelper;
 import org.odk.share.dto.TransferInstance;
+import org.odk.share.events.BluetoothEvent;
 import org.odk.share.events.DownloadEvent;
-import org.odk.share.views.ui.settings.PreferenceKeys;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.utilities.ApplicationConstants;
+import org.odk.share.views.ui.settings.PreferenceKeys;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
@@ -36,7 +43,6 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
-import androidx.annotation.NonNull;
 import timber.log.Timber;
 
 import static org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns.CAN_EDIT_WHEN_COMPLETE;
@@ -48,6 +54,7 @@ import static org.odk.collect.android.provider.InstanceProviderAPI.InstanceColum
 import static org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns.SUBMISSION_URI;
 import static org.odk.share.application.Share.FORMS_DIR_NAME;
 import static org.odk.share.application.Share.INSTANCES_DIR_NAME;
+import static org.odk.share.bluetooth.BluetoothUtils.SPP_UUID;
 import static org.odk.share.dto.InstanceMap.INSTANCE_UUID;
 import static org.odk.share.dto.TransferInstance.INSTANCE_ID;
 import static org.odk.share.dto.TransferInstance.INSTRUCTIONS;
@@ -80,9 +87,12 @@ public class DownloadJob extends Job {
 
     private String ip;
     private int port;
+    private Socket socket;
+    private String targetMacAddress;
+    private BluetoothSocket bluetoothSocket;
+
     private int total;
     private int progress;
-    private Socket socket;
     private DataInputStream dis;
     private DataOutputStream dos;
 
@@ -94,26 +104,62 @@ public class DownloadJob extends Job {
         ((Share) getContext().getApplicationContext()).getAppComponent().inject(this);
 
         initJob(params);
-        rxEventBus.post(receiveForms());
 
         return null;
     }
 
     private void initJob(Params params) {
-        ip = params.getExtras().getString(IP, "");
-        port = params.getExtras().getInt(PORT, -1);
         sbResult = new StringBuilder();
+        int method = params.getExtras().getInt("MODE_OF_TRANSFER", -1);
+        switch (method) {
+            case Share.TransferMethod.HOTSPOT:
+                ip = params.getExtras().getString(IP, "");
+                port = params.getExtras().getInt(PORT, -1);
+                break;
+            case Share.TransferMethod.BLUETOOTH:
+                targetMacAddress = params.getExtras().getString("mac", null);
+                break;
+        }
+
+        setupDataStreamsAndReceive(method);
+    }
+
+    private void setupDataStreamsAndReceive(@Share.TransferMethod int method) {
+        try {
+            Timber.d("Waiting for sender");
+            if (method == Share.TransferMethod.BLUETOOTH && targetMacAddress != null) {
+                BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+                BluetoothDevice bluetoothDevice = bluetoothAdapter.getRemoteDevice(targetMacAddress);
+                if (bluetoothDevice != null) {
+                    bluetoothSocket = bluetoothDevice.createRfcommSocketToServiceRecord(SPP_UUID);
+
+                    if (!bluetoothSocket.isConnected()) {
+                        bluetoothSocket.connect();
+                    }
+
+                    rxEventBus.post(new BluetoothEvent(BluetoothEvent.Status.CONNECTED));
+
+                    dos = new DataOutputStream(bluetoothSocket.getOutputStream());
+                    dis = new DataInputStream(bluetoothSocket.getInputStream());
+                }
+            } else {
+                Timber.d("Socket %s, %s", ip, port);
+                socket = new Socket();
+                socket.connect(new InetSocketAddress(ip, port), TIMEOUT);
+                Timber.d("Socket connected");
+                dis = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+                dos = new DataOutputStream(socket.getOutputStream());
+            }
+
+            rxEventBus.post(receiveForms());
+        } catch (IOException e) {
+            Timber.e(e);
+            cancel();
+        }
     }
 
     private DownloadEvent receiveForms() {
-        Timber.d("Socket " + ip + " " + port);
-
         try {
-            socket = new Socket();
-            socket.connect(new InetSocketAddress(ip, port), TIMEOUT);
-            Timber.d("Socket connected");
-            dis = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
-            dos = new DataOutputStream(socket.getOutputStream());
             int mode = dis.readInt();
             if (mode == SEND_FILL_FORM_MODE) {
                 total = dis.readInt();
@@ -133,10 +179,7 @@ public class DownloadJob extends Job {
                 }
             }
 
-            // close connection
-            socket.close();
-            dos.close();
-            dis.close();
+            closeConnections();
 
         } catch (IOException | IllegalArgumentException e) {
             Timber.e(e);
@@ -146,18 +189,28 @@ public class DownloadJob extends Job {
         return new DownloadEvent(DownloadEvent.Status.FINISHED, sbResult.toString());
     }
 
+    /**
+     * Close all the connections.
+     */
+    private void closeConnections() throws IOException {
+        if (dos != null) {
+            dos.close();
+        }
+        if (dis != null) {
+            dis.close();
+        }
+        if (socket != null) {
+            socket.close();
+        }
+        if (bluetoothSocket != null) {
+            bluetoothSocket.close();
+        }
+    }
+
     @Override
     protected void onCancel() {
         try {
-            if (socket != null) {
-                socket.close();
-            }
-            if (dos != null) {
-                dos.close();
-            }
-            if (dis != null) {
-                dis.close();
-            }
+            closeConnections();
         } catch (IOException e) {
             Timber.e(e);
         }

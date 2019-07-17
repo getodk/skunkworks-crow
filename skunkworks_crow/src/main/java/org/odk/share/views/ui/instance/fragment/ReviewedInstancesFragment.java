@@ -11,18 +11,22 @@ import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import org.odk.collect.android.dao.InstancesDao;
 import org.odk.collect.android.dto.Instance;
 import org.odk.collect.android.provider.InstanceProviderAPI;
 import org.odk.share.R;
-import org.odk.share.views.ui.common.InstanceListFragment;
-import org.odk.share.views.ui.send.SendActivity;
-import org.odk.share.views.ui.instance.adapter.TransferInstanceAdapter;
 import org.odk.share.dao.TransferDao;
 import org.odk.share.dto.TransferInstance;
-import org.odk.share.views.listeners.OnItemClickListener;
 import org.odk.share.utilities.ApplicationConstants;
 import org.odk.share.utilities.ArrayUtils;
+import org.odk.share.utilities.DialogUtils;
+import org.odk.share.views.listeners.OnItemClickListener;
+import org.odk.share.views.ui.common.InstanceListFragment;
+import org.odk.share.views.ui.instance.adapter.TransferInstanceAdapter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,9 +35,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -224,11 +225,15 @@ public class ReviewedInstancesFragment extends InstanceListFragment implements O
                 instanceIds.add(transferInstance.getInstanceId());
             }
         }
-        Intent intent = new Intent(getContext(), SendActivity.class);
+
+        Intent intent = new Intent();
         Long[] arr = instanceIds.toArray(new Long[instanceIds.size()]);
         long[] a = ArrayUtils.toPrimitive(arr);
         intent.putExtra(INSTANCE_IDS, a);
         intent.putExtra(MODE, ApplicationConstants.SEND_REVIEW_MODE);
-        startActivity(intent);
+
+        if (getContext() != null) {
+            DialogUtils.showSenderMethodsDialog(getContext(), intent, getString(R.string.title_send_options)).show();
+        }
     }
 }

@@ -1,4 +1,4 @@
-package org.odk.share.views.ui.receive;
+package org.odk.share.views.ui.hotspot;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -63,7 +63,7 @@ import static org.odk.share.utilities.QRCodeUtils.PORT;
 import static org.odk.share.utilities.QRCodeUtils.PROTECTED;
 import static org.odk.share.utilities.QRCodeUtils.SSID;
 
-public class WifiActivity extends InjectableActivity implements OnItemClickListener, WifiStateListener {
+public class HpReceiverActivity extends InjectableActivity implements OnItemClickListener, WifiStateListener {
 
     private static final int DIALOG_DOWNLOAD_PROGRESS = 1;
     private static final int DIALOG_CONNECTING = 2;
@@ -314,7 +314,7 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
     private void startReceiveTask() {
         showDialog(DIALOG_DOWNLOAD_PROGRESS);
         String dstAddress = wifiConnector.getAccessPointIpAddress();
-        receiverService.startDownloading(dstAddress, port);
+        receiverService.startHpDownloading(dstAddress, port);
     }
 
     @OnClick(R.id.bScan)

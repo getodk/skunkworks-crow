@@ -11,25 +11,26 @@ import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import org.odk.collect.android.dao.InstancesDao;
-import org.odk.collect.android.provider.InstanceProviderAPI;
-import org.odk.share.R;
-import org.odk.share.views.ui.common.InstanceListFragment;
-import org.odk.share.views.ui.send.SendActivity;
-import org.odk.share.views.ui.instance.adapter.InstanceAdapter;
-import org.odk.share.utilities.ApplicationConstants;
-import org.odk.share.utilities.ArrayUtils;
-
-import java.util.LinkedHashSet;
-
-import javax.inject.Inject;
-
 import androidx.annotation.NonNull;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import org.odk.collect.android.dao.InstancesDao;
+import org.odk.collect.android.provider.InstanceProviderAPI;
+import org.odk.share.R;
+import org.odk.share.utilities.ApplicationConstants;
+import org.odk.share.utilities.ArrayUtils;
+import org.odk.share.utilities.DialogUtils;
+import org.odk.share.views.ui.common.InstanceListFragment;
+import org.odk.share.views.ui.instance.adapter.InstanceAdapter;
+
+import java.util.LinkedHashSet;
+
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -150,13 +151,18 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
 
     @OnClick(R.id.send_button)
     public void send() {
-        Intent intent = new Intent(getActivity(), SendActivity.class);
+        if (getContext() != null) {
+            Intent intent = new Intent();
+            setupSendingIntent(intent);
+            DialogUtils.showSenderMethodsDialog(getContext(), intent, getString(R.string.title_send_options)).show();
+        }
+    }
+
+    private void setupSendingIntent(Intent intent) {
         Long[] arr = selectedInstances.toArray(new Long[selectedInstances.size()]);
         long[] a = ArrayUtils.toPrimitive(arr);
         intent.putExtra(INSTANCE_IDS, a);
         intent.putExtra(MODE, ApplicationConstants.ASK_REVIEW_MODE);
-        startActivity(intent);
-        getActivity().finish();
     }
 
     @OnClick(R.id.toggle_button)

@@ -51,7 +51,6 @@
     <string name="canceled">Canceled</string>
     <string name="stop_sending">Stop Sending</string>
 
-
     <string name="sending_items">Sending %1$s of %2$s form(s)</string>
     <string name="receiving_items">Receiving %1$s of %2$s form(s)</string>
     <string name="transfer_result">Transfer result</string>
@@ -75,6 +74,7 @@
     <string name="search_list">Search the list</string>
     <string name="search">Search</string>
 
+    <string name="review_form">Review Form</string>
     <string name="sort_by_name_asc">Name, A-Z</string>
     <string name="sort_by_name_desc">Name, Z-A</string>
     <string name="sort_by_date_asc">Date, newest first</string>
@@ -130,4 +130,25 @@
     <string name="odk_destination_dir_error">The destination should not be empty</string>
     <string name="location_permission_needed">Location Permission Needed</string>
     <string name="location_settings_dialog">Enable location from the settings.</string>
+
+    <string name="btn_refresh">Refresh</string>
+    <string name="method_bluetooth">Bluetooth</string>
+    <string name="method_wifi_hotspot">Hotspot</string>
+    <string name="title_send_options">Send Options</string>
+    <string name="title_receive_options">Receive Options</string>
+    <string name="connect_bluetooth_title">Device to Receive</string>
+    <string name="connected_bluetooth_downloading">Connected, start downloading&#8230;</string>
+    <string name="connecting_title">Connecting</string>
+    <string name="bluetooth_paired">paired, may unreachable</string>
+    <string name="bluetooth_unpaired">unpaired, reachable</string>
+    <string name="receiving_title">Receiving</string>
+    <string name="connecting_message">connecting to bluetooth \n please wait&#8230;</string>
+    <string name="connecting_transfer_message">connected with bluetooth receiver! \n starting transferring&#8230;</string>
+    <string name="turning_on_bluetooth_message">you have disabled bluetooth, turning on now&#8230;</string>
+    <string name="send_instance_title">Send Data</string>
+    <string name="bluetooth_instance_name_default">Bluetooth Device</string>
+    <string name="tv_sender_wait_for_connect">waiting for connection&#8230; \n will start transfer when connected </string>
+    <string name="tv_form_already_exist">form already exists \n please send different form</string>
+    <string name="dev_already_connected">already connected to a device</string>
+    <string name="tv_form_send_success">form sent with success! \n</string>
 </resources>

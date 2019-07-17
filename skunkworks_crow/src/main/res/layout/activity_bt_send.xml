@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/MatchParent"
+    android:orientation="vertical"
+    tools:context=".views.ui.bluetooth.BtReceiverActivity">
+
+    <!-- Toolbar -->
+    <include layout="@layout/toolbar" />
+
+    <TextView
+        android:id="@+id/test_text_view"
+        style="@style/MatchParent"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:textSize="20sp"
+        android:text="@string/tv_sender_wait_for_connect" />
+
+</LinearLayout>
