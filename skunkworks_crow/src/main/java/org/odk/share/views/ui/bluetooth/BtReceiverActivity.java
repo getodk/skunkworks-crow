@@ -1,8 +1,10 @@
 package org.odk.share.views.ui.bluetooth;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -76,6 +78,12 @@ public class BtReceiverActivity extends InjectableActivity implements
 
         setTitle(getString(R.string.connect_bluetooth_title));
         setSupportActionBar(toolbar);
+
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.cancel), (DialogInterface dialog, int which) -> {
+            dialog.dismiss();
+            receiverService.cancel();
+        });
 
         // checking for if bluetooth enabled
         if (!BluetoothUtils.isBluetoothEnabled()) {
@@ -205,8 +213,9 @@ public class BtReceiverActivity extends InjectableActivity implements
             }
 
             receiverService.startBtDownloading(device.getAddress());
-            progressDialog = ProgressDialog.show(this, getString(R.string.connecting_title),
-                    getString(R.string.connecting_message), true);
+            progressDialog.setTitle(getString(R.string.connecting_title));
+            progressDialog.setMessage(getString(R.string.connecting_message));
+            progressDialog.show();
         } else {
             Toast.makeText(this, getString(R.string.turning_on_bluetooth_message), Toast.LENGTH_SHORT).show();
             BluetoothUtils.enableBluetooth();
@@ -224,5 +233,23 @@ public class BtReceiverActivity extends InjectableActivity implements
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(bluetoothReceiver);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (BluetoothUtils.isBluetoothEnabled()) {
+            new AlertDialog.Builder(this)
+                    .setTitle(getString(R.string.disable_bluetooth))
+                    .setPositiveButton(android.R.string.yes, (DialogInterface dialog, int which) -> {
+                        BluetoothUtils.disableBluetooth();
+                        super.onBackPressed();
+                    })
+                    .setNegativeButton(android.R.string.no, (DialogInterface dialog, int which) -> {
+                        dialog.dismiss();
+                        super.onBackPressed();
+                    })
+                    .create()
+                    .show();
+        }
     }
 }

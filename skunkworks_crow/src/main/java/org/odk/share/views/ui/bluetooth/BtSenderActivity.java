@@ -1,6 +1,8 @@
 package org.odk.share.views.ui.bluetooth;
 
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.TextView;
@@ -144,5 +146,25 @@ public class BtSenderActivity extends InjectableActivity {
     protected void onPause() {
         super.onPause();
         compositeDisposable.clear();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (BluetoothUtils.isBluetoothEnabled()) {
+            new AlertDialog.Builder(this)
+                    .setTitle(getString(R.string.stop_sending))
+                    .setPositiveButton(R.string.stop, (DialogInterface dialog, int which) -> {
+                        senderService.cancel();
+                        BluetoothUtils.disableBluetooth();
+                        super.onBackPressed();
+                    })
+                    .setNegativeButton(R.string.cancel, (DialogInterface dialog, int which) -> {
+                        dialog.dismiss();
+                    })
+                    .create()
+                    .show();
+        } else {
+            super.onBackPressed();
+        }
     }
 }
