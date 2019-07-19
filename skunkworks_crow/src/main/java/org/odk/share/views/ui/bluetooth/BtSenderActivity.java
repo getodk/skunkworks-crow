@@ -56,7 +56,9 @@ public class BtSenderActivity extends InjectableActivity {
     SenderService senderService;
 
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
-
+    private boolean isFinished = false;
+    int mode;
+    long[] formIds;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,13 +73,11 @@ public class BtSenderActivity extends InjectableActivity {
             BluetoothUtils.enableBluetooth();
         }
 
-        long[] formIds = getIntent().getLongArrayExtra(INSTANCE_IDS);
-        int mode = getIntent().getIntExtra(MODE, ASK_REVIEW_MODE);
+        formIds = getIntent().getLongArrayExtra(INSTANCE_IDS);
+        mode = getIntent().getIntExtra(MODE, ASK_REVIEW_MODE);
         if (formIds == null) {
             formIds = getIntent().getLongArrayExtra(FORM_IDS);
         }
-
-        senderService.startUploading(formIds, mode);
     }
 
     /**
@@ -106,6 +106,7 @@ public class BtSenderActivity extends InjectableActivity {
                 .subscribe(uploadEvent -> {
                     switch (uploadEvent.getStatus()) {
                         case QUEUED:
+                            isFinished = false;
                             Toast.makeText(this, R.string.upload_queued, Toast.LENGTH_SHORT).show();
                             break;
                         case UPLOADING:
@@ -116,6 +117,7 @@ public class BtSenderActivity extends InjectableActivity {
                             Toast.makeText(this, alertMsg, Toast.LENGTH_SHORT).show();
                             break;
                         case FINISHED:
+                            isFinished = true;
                             String result = uploadEvent.getResult();
                             if (TextUtils.isEmpty(result)) {
                                 resultTextView.setText(getString(R.string.tv_form_already_exist));
@@ -138,6 +140,7 @@ public class BtSenderActivity extends InjectableActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        senderService.startUploading(formIds, mode);
         compositeDisposable.add(addUploadEventSubscription());
         compositeDisposable.add(addBluetoothEventSubscription());
     }
@@ -150,12 +153,12 @@ public class BtSenderActivity extends InjectableActivity {
 
     @Override
     public void onBackPressed() {
-        if (BluetoothUtils.isBluetoothEnabled()) {
+        if (!isFinished) {
             new AlertDialog.Builder(this)
                     .setTitle(getString(R.string.stop_sending))
+                    .setMessage(getString(R.string.stop_sending_msg))
                     .setPositiveButton(R.string.stop, (DialogInterface dialog, int which) -> {
                         senderService.cancel();
-                        BluetoothUtils.disableBluetooth();
                         super.onBackPressed();
                     })
                     .setNegativeButton(R.string.cancel, (DialogInterface dialog, int which) -> {

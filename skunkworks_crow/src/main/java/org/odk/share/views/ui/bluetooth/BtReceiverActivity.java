@@ -80,6 +80,7 @@ public class BtReceiverActivity extends InjectableActivity implements
         setSupportActionBar(toolbar);
 
         progressDialog = new ProgressDialog(this);
+        progressDialog.setCancelable(false);
         progressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.cancel), (DialogInterface dialog, int which) -> {
             dialog.dismiss();
             receiverService.cancel();
@@ -240,12 +241,14 @@ public class BtReceiverActivity extends InjectableActivity implements
         if (BluetoothUtils.isBluetoothEnabled()) {
             new AlertDialog.Builder(this)
                     .setTitle(getString(R.string.disable_bluetooth))
+                    .setMessage(getString(R.string.disable_bluetooth_msg))
                     .setPositiveButton(android.R.string.yes, (DialogInterface dialog, int which) -> {
+                        receiverService.cancel();
                         BluetoothUtils.disableBluetooth();
                         super.onBackPressed();
                     })
                     .setNegativeButton(android.R.string.no, (DialogInterface dialog, int which) -> {
-                        dialog.dismiss();
+                        receiverService.cancel();
                         super.onBackPressed();
                     })
                     .create()
