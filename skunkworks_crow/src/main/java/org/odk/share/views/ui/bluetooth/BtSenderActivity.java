@@ -1,6 +1,8 @@
 package org.odk.share.views.ui.bluetooth;
 
 
+import android.bluetooth.BluetoothAdapter;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.TextView;
@@ -75,6 +77,7 @@ public class BtSenderActivity extends InjectableActivity {
             formIds = getIntent().getLongArrayExtra(FORM_IDS);
         }
 
+        enableDiscovery();
         senderService.startUploading(formIds, mode);
     }
 
@@ -131,6 +134,16 @@ public class BtSenderActivity extends InjectableActivity {
                             break;
                     }
                 }, Timber::e);
+    }
+
+    /**
+     * Enable the bluetooth discovery for other devices. The timeout is 60 seconds.
+     */
+    private void enableDiscovery() {
+        Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+        // set the discovery timeout for 60s.
+        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 60);
+        startActivity(discoverableIntent);
     }
 
     @Override

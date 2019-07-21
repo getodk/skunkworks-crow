@@ -3,6 +3,7 @@ package org.odk.share.views.ui.bluetooth;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -64,6 +65,7 @@ public class BtReceiverActivity extends InjectableActivity implements
     private final BluetoothListAdapter bluetoothListAdapter = new BluetoothListAdapter(this);
     private boolean isConnected = false;
     private ProgressDialog progressDialog;
+    private ProgressDialog scanningDialog;
 
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
@@ -82,6 +84,22 @@ public class BtReceiverActivity extends InjectableActivity implements
             BluetoothUtils.enableBluetooth();
             updateDeviceList();
         }
+
+        setupScanningDialog();
+    }
+
+    /**
+     * build a new progress dialog waiting for the scanning progress.
+     */
+    private void setupScanningDialog() {
+        scanningDialog = new ProgressDialog(this);
+        scanningDialog.setCancelable(false);
+        scanningDialog.setTitle(getString(R.string.scanning_title));
+        scanningDialog.setMessage(getString(R.string.scanning_msg));
+        scanningDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.stop), (DialogInterface dialog, int which) -> {
+            dialog.dismiss();
+            bluetoothAdapter.cancelDiscovery();
+        });
     }
 
     /**
@@ -188,12 +206,12 @@ public class BtReceiverActivity extends InjectableActivity implements
 
     @Override
     public void onDiscoveryStarted() {
-
+        scanningDialog.show();
     }
 
     @Override
     public void onDiscoveryFinished() {
-
+        scanningDialog.dismiss();
     }
 
     @Override
