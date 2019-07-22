@@ -141,8 +141,8 @@
     <string name="connecting_title">Connecting</string>
     <string name="scanning_title">Scanning</string>
     <string name="scanning_msg">Scanning bluetooth devices, please wait&#8230;</string>
-    <string name="bluetooth_paired">paired</string>
-    <string name="bluetooth_unpaired">unpaired</string>
+    <string name="bluetooth_paired">device paired</string>
+    <string name="bluetooth_unpaired">device unpaired</string>
     <string name="receiving_title">Receiving</string>
     <string name="connecting_message">connecting to bluetooth \n please wait&#8230;</string>
     <string name="connecting_transfer_message">connected with bluetooth receiver! \n starting transferring&#8230;</string>
