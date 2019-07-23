@@ -21,6 +21,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static android.bluetooth.BluetoothDevice.BOND_BONDED;
+import static android.bluetooth.BluetoothDevice.BOND_NONE;
 
 
 /**
@@ -69,7 +70,7 @@ public class BluetoothListAdapter extends RecyclerView.Adapter<BluetoothListAdap
         int deviceBondState = device.getBondState();
         viewHolder.deviceName.setText(deviceName == null ? viewHolder.itemView.getResources().getString(R.string.bluetooth_instance_name_default) : deviceName);
         viewHolder.deviceAddress.setText(String.format("%s (%s)", deviceAddress,
-                deviceBondState == 10 ? context.getString(R.string.bluetooth_unpaired) : context.getString(R.string.bluetooth_paired)));
+                deviceBondState == BOND_NONE ? context.getString(R.string.bluetooth_unpaired) : context.getString(R.string.bluetooth_paired)));
         if (device.getBondState() == BOND_BONDED) {
             viewHolder.deviceLogo.setImageResource(R.drawable.ic_smart_phone_yellow);
         }
