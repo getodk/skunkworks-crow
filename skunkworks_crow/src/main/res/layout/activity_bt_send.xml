@@ -14,6 +14,6 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:textSize="20sp"
-        android:text="@string/tv_sender_wait_for_connect" />
+        tools:text="@string/tv_sender_wait_for_connect" />
 
 </LinearLayout>

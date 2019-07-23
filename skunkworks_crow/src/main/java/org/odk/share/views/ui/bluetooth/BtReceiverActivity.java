@@ -219,7 +219,6 @@ public class BtReceiverActivity extends InjectableActivity implements
         if (BluetoothUtils.isBluetoothEnabled()) {
             if (isConnected) {
                 Toast.makeText(this, getString(R.string.dev_already_connected), Toast.LENGTH_SHORT).show();
-                return;
             }
 
             receiverService.startBtDownloading(device.getAddress());
