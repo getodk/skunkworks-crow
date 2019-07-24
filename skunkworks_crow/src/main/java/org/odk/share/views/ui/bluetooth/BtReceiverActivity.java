@@ -23,8 +23,6 @@ import org.odk.share.rx.schedulers.BaseSchedulerProvider;
 import org.odk.share.services.ReceiverService;
 import org.odk.share.views.ui.common.injectable.InjectableActivity;
 
-import java.util.Set;
-
 import javax.inject.Inject;
 
 import butterknife.BindView;
@@ -85,20 +83,9 @@ public class BtReceiverActivity extends InjectableActivity implements
     }
 
     /**
-     * Add the bounded bluetooth devices.
-     */
-    public void addPairedDevices() {
-        Set<BluetoothDevice> bondedDevices = bluetoothAdapter.getBondedDevices();
-        if (bondedDevices != null) {
-            bluetoothListAdapter.addDevices(bondedDevices);
-        }
-    }
-
-    /**
      * Rescan the bluetooth devices and update the list.
      */
     public void updateDeviceList() {
-        addPairedDevices();
         if (!bluetoothAdapter.isDiscovering()) {
             bluetoothAdapter.startDiscovery();
         }
@@ -114,7 +101,6 @@ public class BtReceiverActivity extends InjectableActivity implements
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(bluetoothListAdapter);
         bluetoothReceiver = new BluetoothReceiver(this, this);
-        addPairedDevices();
         bluetoothAdapter.startDiscovery();
 
         // click to refresh the devices list.
