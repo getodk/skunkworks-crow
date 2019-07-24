@@ -8,6 +8,29 @@
     <!-- Toolbar -->
     <include layout="@layout/toolbar" />
 
+    <LinearLayout
+        android:id="@+id/no_devices_view"
+        style="@style/MatchParent"
+        android:layout_above="@+id/btn_refresh"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="144dp"
+            android:layout_height="144dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_no_devices_found" />
+
+        <TextView
+            style="@style/MatchParentWidth"
+            android:layout_marginTop="24dp"
+            android:gravity="center"
+            android:text="@string/bluetooth_no_device_scanned"
+            android:textSize="22sp" />
+
+    </LinearLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/list_bt_device"
         style="@style/MatchParent"

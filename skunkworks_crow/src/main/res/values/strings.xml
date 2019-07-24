@@ -151,4 +151,5 @@
     <string name="tv_form_already_exist">form already exists \n please send different form</string>
     <string name="dev_already_connected">already connected to a device</string>
     <string name="tv_form_send_success">form sent with success! \n</string>
+    <string name="bluetooth_no_device_scanned">No devices are available. \n Tap refresh to search again.</string>
 </resources>
