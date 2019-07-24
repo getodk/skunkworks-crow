@@ -172,12 +172,6 @@ public class UploadJob extends Job {
         } catch (IOException e) {
             Timber.e(e);
             return new UploadEvent(UploadEvent.Status.ERROR, e.getMessage());
-        } finally {
-            try {
-                closeConnections();
-            } catch (IOException e) {
-                Timber.e(e);
-            }
         }
 
         return new UploadEvent(UploadEvent.Status.FINISHED, sbResult.toString());
