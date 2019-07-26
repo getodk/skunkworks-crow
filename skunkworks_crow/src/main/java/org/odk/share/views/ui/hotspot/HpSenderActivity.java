@@ -13,7 +13,6 @@ import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.TextUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -283,9 +282,6 @@ public class HpSenderActivity extends InjectableActivity {
                         case FINISHED:
                             hideDialog(PROGRESS_DIALOG);
                             String result = uploadEvent.getResult();
-                            if (TextUtils.isEmpty(result)) {
-                                result = getString(R.string.tv_form_already_exist);
-                            }
                             createAlertDialog(getString(R.string.transfer_result), result);
                             break;
                         case ERROR:

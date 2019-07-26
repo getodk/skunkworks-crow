@@ -350,6 +350,11 @@ public class UploadJob extends Job {
             boolean formExistAtReceiver = dis.readBoolean();
             Timber.d("Form exists %b ", formExistAtReceiver);
 
+            sbResult.append(displayName + " ");
+            if (formVersion != null) {
+                sbResult.append(getContext().getString(R.string.version, formVersion));
+            }
+
             if (!formExistAtReceiver) {
                 Timber.d("Form sent to the receiver");
 
@@ -384,13 +389,12 @@ public class UploadJob extends Job {
                     dos.writeInt(0);
                 }
 
-                sbResult.append(displayName + " ");
-                if (formVersion != null) {
-                    sbResult.append(getContext().getString(R.string.version, formVersion));
-                }
                 sbResult.append(getContext().getString(R.string.id, formId) + " " +
                         getContext().getString(R.string.success, getContext().getString(R.string.blank_form_count,
                                 getContext().getString(R.string.sent))));
+            } else {
+                sbResult.append(getContext().getString(R.string.id, formId) + " " +
+                        getContext().getString(R.string.msg_form_already_exist));
             }
         } catch (IOException e) {
             Timber.e(e);

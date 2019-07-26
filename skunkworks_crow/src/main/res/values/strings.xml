@@ -97,17 +97,18 @@
     <string name="sent_on">Sent on %s</string>
     <string name="date_at_time">EEE, MMM dd, yyyy \'at\' HH:mm</string> <!-- http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html -->
 
-    <string name="blank_form_count">(Blank form %s)</string>
+    <string name="blank_form_count">(Blank form %s) \n</string>
     <string name="success">-Success %s\n</string>
     <string name="failed">-Failed %s\n</string>
-    <string name="review_not_asked">(Review not asked by the receiver)</string>
-    <string name="not_sent_for_review">(Form not sent for review)</string>
-    <string name="review_sent">(Review sent)</string>
-    <string name="review_received">(Review received)</string>
-    <string name="sent_for_review">(Sent for review)</string>
-    <string name="received_for_review">(Received for review)</string>
-    <string name="updated">(Updated)</string>
-    <string name="sent_again">(Sent again)</string>
+    <string name="review_not_asked">(Review not asked by the receiver) \n</string>
+    <string name="not_sent_for_review">(Form not sent for review) \n</string>
+    <string name="review_sent">(Review sent) \n</string>
+    <string name="review_received">(Review received) \n</string>
+    <string name="sent_for_review">(Sent for review) \n</string>
+    <string name="received_for_review">(Received for review) \n</string>
+    <string name="updated">(Updated) \n</string>
+    <string name="sent_again">(Sent again) \n</string>
+    <string name="msg_form_already_exist">(Already exists) \n</string>
     <string name="form_received_by_reviewer">%s by reviewer</string>
     <string name="accepted">Accepted</string>
     <string name="rejected">Rejected</string>
@@ -148,7 +149,6 @@
     <string name="send_instance_title">Send Data</string>
     <string name="bluetooth_instance_name_default">Bluetooth Device</string>
     <string name="tv_sender_wait_for_connect">waiting for connection&#8230; \n will start transfer when connected </string>
-    <string name="tv_form_already_exist">form already exist \n please send different form</string>
     <string name="dev_already_connected">already connected to a device</string>
     <string name="tv_form_send_success">form sent with success! \n</string>
 </resources>

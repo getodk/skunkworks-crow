@@ -2,7 +2,6 @@ package org.odk.share.views.ui.bluetooth;
 
 
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -109,18 +108,13 @@ public class BtSenderActivity extends InjectableActivity {
                         case UPLOADING:
                             int progress = uploadEvent.getCurrentProgress();
                             int total = uploadEvent.getTotalSize();
-
                             String alertMsg = getString(R.string.sending_items, String.valueOf(progress), String.valueOf(total));
                             Toast.makeText(this, alertMsg, Toast.LENGTH_SHORT).show();
                             break;
                         case FINISHED:
                             String result = uploadEvent.getResult();
-                            if (TextUtils.isEmpty(result)) {
-                                resultTextView.setText(getString(R.string.tv_form_already_exist));
-                            } else {
-                                resultTextView.setText(getString(R.string.tv_form_send_success));
-                                resultTextView.append(result);
-                            }
+                            resultTextView.setText(getString(R.string.tv_form_send_success));
+                            resultTextView.append(result);
                             Toast.makeText(this, getString(R.string.transfer_result) + " : " + result, Toast.LENGTH_SHORT).show();
                             break;
                         case ERROR:

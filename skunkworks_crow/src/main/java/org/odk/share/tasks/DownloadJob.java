@@ -234,6 +234,9 @@ public class DownloadJob extends Job {
             if (!formExists) {
                 // read form
                 readForm();
+            } else {
+                sbResult.append(getContext().getString(R.string.id, formId) + " " +
+                        getContext().getString(R.string.msg_form_already_exist));
             }
 
             // readInstances
@@ -264,6 +267,9 @@ public class DownloadJob extends Job {
             if (!formExists) {
                 // read form
                 readForm();
+            } else {
+                sbResult.append(getContext().getString(R.string.id, formId) + " " +
+                        getContext().getString(R.string.msg_form_already_exist));
             }
         } catch (IOException e) {
             Timber.e(e);

@@ -11,7 +11,6 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.text.InputType;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
@@ -22,6 +21,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.journeyapps.barcodescanner.CaptureActivity;
@@ -30,7 +35,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.odk.share.R;
 import org.odk.share.events.DownloadEvent;
-import org.odk.share.views.listeners.OnItemClickListener;
 import org.odk.share.network.WifiConnector;
 import org.odk.share.network.WifiNetworkInfo;
 import org.odk.share.network.listeners.WifiStateListener;
@@ -38,6 +42,7 @@ import org.odk.share.network.receivers.WifiStateBroadcastReceiver;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.rx.schedulers.BaseSchedulerProvider;
 import org.odk.share.services.ReceiverService;
+import org.odk.share.views.listeners.OnItemClickListener;
 import org.odk.share.views.ui.common.injectable.InjectableActivity;
 
 import java.util.ArrayList;
@@ -46,11 +51,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -182,9 +182,6 @@ public class HpReceiverActivity extends InjectableActivity implements OnItemClic
                         case FINISHED:
                             dismissDialog(DIALOG_DOWNLOAD_PROGRESS);
                             String result = downloadEvent.getResult();
-                            if (TextUtils.isEmpty(result)) {
-                                result = getString(R.string.tv_form_already_exist);
-                            }
                             createAlertDialog(getString(R.string.transfer_result), result);
                             break;
                         case ERROR:
