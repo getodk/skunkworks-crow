@@ -148,7 +148,7 @@
     <string name="send_instance_title">Send Data</string>
     <string name="bluetooth_instance_name_default">Bluetooth Device</string>
     <string name="tv_sender_wait_for_connect">waiting for connection&#8230; \n will start transfer when connected </string>
-    <string name="tv_form_already_exist">form already exists \n please send different form</string>
+    <string name="tv_form_already_exist">form already exist \n please send different form</string>
     <string name="dev_already_connected">already connected to a device</string>
     <string name="tv_form_send_success">form sent with success! \n</string>
 </resources>

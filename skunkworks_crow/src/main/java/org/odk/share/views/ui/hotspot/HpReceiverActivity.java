@@ -11,6 +11,7 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
@@ -181,6 +182,9 @@ public class HpReceiverActivity extends InjectableActivity implements OnItemClic
                         case FINISHED:
                             dismissDialog(DIALOG_DOWNLOAD_PROGRESS);
                             String result = downloadEvent.getResult();
+                            if (TextUtils.isEmpty(result)) {
+                                result = getString(R.string.tv_form_already_exist);
+                            }
                             createAlertDialog(getString(R.string.transfer_result), result);
                             break;
                         case ERROR:
