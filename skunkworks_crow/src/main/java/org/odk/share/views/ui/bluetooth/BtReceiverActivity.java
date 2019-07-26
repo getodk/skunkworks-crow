@@ -222,8 +222,15 @@ public class BtReceiverActivity extends InjectableActivity implements
             }
 
             receiverService.startBtDownloading(device.getAddress());
-            progressDialog = ProgressDialog.show(this, getString(R.string.connecting_title),
-                    getString(R.string.connecting_message), true);
+            progressDialog = new ProgressDialog(this);
+            progressDialog.setTitle(getString(R.string.connecting_title));
+            progressDialog.setMessage(getString(R.string.connecting_message));
+            progressDialog.setIndeterminate(true);
+            progressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.stop), (DialogInterface dialog, int which) -> {
+                receiverService.cancel();
+                dialog.dismiss();
+            });
+            progressDialog.show();
         } else {
             Toast.makeText(this, getString(R.string.turning_on_bluetooth_message), Toast.LENGTH_SHORT).show();
             BluetoothUtils.enableBluetooth();
