@@ -48,6 +48,9 @@ public class BtReceiverActivity extends InjectableActivity implements
     @BindView(R.id.list_bt_device)
     RecyclerView recyclerView;
 
+    @BindView(R.id.no_devices_view)
+    View emptyDevicesView;
+
     @Inject
     ReceiverService receiverService;
 
@@ -167,19 +170,31 @@ public class BtReceiverActivity extends InjectableActivity implements
                 }, Timber::e);
     }
 
+    /**
+     * To check if the bluetooth devices list is empty, and present an empty view for users.
+     */
+    private void checkEmptyList() {
+        if (bluetoothListAdapter.getItemCount() == 0) {
+            emptyDevicesView.setVisibility(View.VISIBLE);
+        } else {
+            emptyDevicesView.setVisibility(View.GONE);
+        }
+    }
+
     @Override
     public void onDeviceFound(BluetoothDevice device) {
         bluetoothListAdapter.addDevice(device);
+        checkEmptyList();
     }
 
     @Override
     public void onDiscoveryStarted() {
-
+        checkEmptyList();
     }
 
     @Override
     public void onDiscoveryFinished() {
-
+        checkEmptyList();
     }
 
     @Override
