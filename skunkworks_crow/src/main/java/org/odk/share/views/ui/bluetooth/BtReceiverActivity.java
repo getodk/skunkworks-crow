@@ -21,6 +21,7 @@ import org.odk.share.events.DownloadEvent;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.rx.schedulers.BaseSchedulerProvider;
 import org.odk.share.services.ReceiverService;
+import org.odk.share.utilities.PermissionUtils;
 import org.odk.share.views.ui.common.injectable.InjectableActivity;
 
 import javax.inject.Inject;
@@ -77,6 +78,9 @@ public class BtReceiverActivity extends InjectableActivity implements
 
         setTitle(getString(R.string.connect_bluetooth_title));
         setSupportActionBar(toolbar);
+
+        //checking the location permission for bluetooth for android 9.
+        PermissionUtils.requestLocationPermission(this);
 
         // checking for if bluetooth enabled
         if (!BluetoothUtils.isBluetoothEnabled()) {

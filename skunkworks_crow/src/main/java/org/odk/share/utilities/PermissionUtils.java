@@ -1,14 +1,18 @@
 package org.odk.share.utilities;
 
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.provider.Settings;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import org.odk.share.R;
 
@@ -19,6 +23,9 @@ import static android.content.Context.LOCATION_SERVICE;
  * For putting utils for permission checks.
  */
 public class PermissionUtils {
+
+    private static final int PERMISSIONS_REQUEST_FINE_LOCATION = 0x110;
+    private static final int PERMISSIONS_REQUEST_COARSE_LOCATION = 0x111;
 
     private PermissionUtils() {
     }
@@ -55,6 +62,31 @@ public class PermissionUtils {
 
         builder.setCancelable(false);
         builder.show();
+    }
+
+    /**
+     * Request for the location permission.
+     */
+    public static void requestLocationPermission(Activity activity) {
+        // ACCESS_FINE_LOCATION
+        if (ContextCompat.checkSelfPermission(activity.getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(activity,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    PERMISSIONS_REQUEST_FINE_LOCATION);
+            ActivityCompat.shouldShowRequestPermissionRationale(activity,
+                    Manifest.permission.ACCESS_FINE_LOCATION);
+        }
+
+        // ACCESS_COARSE_LOCATION
+        if (ContextCompat.checkSelfPermission(activity.getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(activity,
+                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                    PERMISSIONS_REQUEST_COARSE_LOCATION);
+            ActivityCompat.shouldShowRequestPermissionRationale(activity,
+                    Manifest.permission.ACCESS_COARSE_LOCATION);
+        }
     }
 }
 
