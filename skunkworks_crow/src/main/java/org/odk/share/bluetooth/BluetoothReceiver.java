@@ -33,24 +33,26 @@ public class BluetoothReceiver extends BroadcastReceiver {
             return;
         }
 
-        BluetoothDevice bluetoothDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-        if (bluetoothDevice != null) {
-            Timber.d("BluetoothDevice: %s, Address: %s", bluetoothDevice.getName(), bluetoothDevice.getAddress());
-            switch (action) {
-                case BluetoothDevice.ACTION_FOUND:
+        switch (action) {
+            case BluetoothAdapter.ACTION_DISCOVERY_STARTED:
+                // if the discovery started, update the ui in activity.
+                Timber.d("bluetooth devices discovery started...");
+                bluetoothReceiverListener.onDiscoveryStarted();
+                break;
+            case BluetoothDevice.ACTION_FOUND:
+                // once the bluetooth device was found, update the ui.
+                BluetoothDevice bluetoothDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                if (bluetoothDevice != null) {
                     short rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MAX_VALUE);
                     Timber.d("EXTRA_RSSI: %s", rssi);
                     bluetoothReceiverListener.onDeviceFound(bluetoothDevice);
-                    break;
-                case BluetoothAdapter.ACTION_DISCOVERY_STARTED:
-                    Timber.d("bluetooth devices discovery started...");
-                    bluetoothReceiverListener.onDiscoveryStarted();
-                    break;
-                case BluetoothAdapter.ACTION_DISCOVERY_FINISHED:
-                    Timber.d("bluetooth devices discovery finished...");
-                    bluetoothReceiverListener.onDiscoveryFinished();
-                    break;
-            }
+                }
+                break;
+            case BluetoothAdapter.ACTION_DISCOVERY_FINISHED:
+                // if the discovery finished, update the ui in activity.
+                Timber.d("bluetooth devices discovery finished...");
+                bluetoothReceiverListener.onDiscoveryFinished();
+                break;
         }
     }
 

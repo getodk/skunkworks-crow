@@ -25,8 +25,6 @@ import org.odk.share.rx.schedulers.BaseSchedulerProvider;
 import org.odk.share.services.ReceiverService;
 import org.odk.share.views.ui.common.injectable.InjectableActivity;
 
-import java.util.Set;
-
 import javax.inject.Inject;
 
 import butterknife.BindView;
@@ -52,6 +50,9 @@ public class BtReceiverActivity extends InjectableActivity implements
     @BindView(R.id.list_bt_device)
     RecyclerView recyclerView;
 
+    @BindView(R.id.no_devices_view)
+    View emptyDevicesView;
+
     @Inject
     ReceiverService receiverService;
 
@@ -66,6 +67,7 @@ public class BtReceiverActivity extends InjectableActivity implements
     private final BluetoothListAdapter bluetoothListAdapter = new BluetoothListAdapter(this);
     private boolean isConnected = false;
     private ProgressDialog progressDialog;
+    private ProgressDialog scanningDialog;
 
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
@@ -91,23 +93,28 @@ public class BtReceiverActivity extends InjectableActivity implements
             BluetoothUtils.enableBluetooth();
             updateDeviceList();
         }
+
+        setupScanningDialog();
     }
 
     /**
-     * Add the bounded bluetooth devices.
+     * build a new progress dialog waiting for the scanning progress.
      */
-    public void addPairedDevices() {
-        Set<BluetoothDevice> bondedDevices = bluetoothAdapter.getBondedDevices();
-        if (bondedDevices != null) {
-            bluetoothListAdapter.addDevices(bondedDevices);
-        }
+    private void setupScanningDialog() {
+        scanningDialog = new ProgressDialog(this);
+        scanningDialog.setCancelable(false);
+        scanningDialog.setTitle(getString(R.string.scanning_title));
+        scanningDialog.setMessage(getString(R.string.scanning_msg));
+        scanningDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.stop), (DialogInterface dialog, int which) -> {
+            dialog.dismiss();
+            bluetoothAdapter.cancelDiscovery();
+        });
     }
 
     /**
      * Rescan the bluetooth devices and update the list.
      */
     public void updateDeviceList() {
-        addPairedDevices();
         if (!bluetoothAdapter.isDiscovering()) {
             bluetoothAdapter.startDiscovery();
         }
@@ -123,7 +130,6 @@ public class BtReceiverActivity extends InjectableActivity implements
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(bluetoothListAdapter);
         bluetoothReceiver = new BluetoothReceiver(this, this);
-        addPairedDevices();
         bluetoothAdapter.startDiscovery();
 
         // click to refresh the devices list.
@@ -190,19 +196,33 @@ public class BtReceiverActivity extends InjectableActivity implements
                 }, Timber::e);
     }
 
+    /**
+     * To check if the bluetooth devices list is empty, and present an empty view for users.
+     */
+    private void checkEmptyList() {
+        if (bluetoothListAdapter.getItemCount() == 0) {
+            emptyDevicesView.setVisibility(View.VISIBLE);
+        } else {
+            emptyDevicesView.setVisibility(View.GONE);
+        }
+    }
+
     @Override
     public void onDeviceFound(BluetoothDevice device) {
         bluetoothListAdapter.addDevice(device);
+        checkEmptyList();
     }
 
     @Override
     public void onDiscoveryStarted() {
-
+        scanningDialog.show();
+        checkEmptyList();
     }
 
     @Override
     public void onDiscoveryFinished() {
-
+        scanningDialog.dismiss();
+        checkEmptyList();
     }
 
     @Override
@@ -210,12 +230,17 @@ public class BtReceiverActivity extends InjectableActivity implements
         if (BluetoothUtils.isBluetoothEnabled()) {
             if (isConnected) {
                 Toast.makeText(this, getString(R.string.dev_already_connected), Toast.LENGTH_SHORT).show();
-                return;
             }
 
             receiverService.startBtDownloading(device.getAddress());
+            progressDialog = new ProgressDialog(this);
             progressDialog.setTitle(getString(R.string.connecting_title));
             progressDialog.setMessage(getString(R.string.connecting_message));
+            progressDialog.setIndeterminate(true);
+            progressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.stop), (DialogInterface dialog, int which) -> {
+                receiverService.cancel();
+                dialog.dismiss();
+            });
             progressDialog.show();
         } else {
             Toast.makeText(this, getString(R.string.turning_on_bluetooth_message), Toast.LENGTH_SHORT).show();
