@@ -209,6 +209,7 @@ public class BtReceiverActivity extends InjectableActivity implements
     public void onDiscoveryStarted() {
         scanningDialog.show();
         checkEmptyList();
+        bluetoothListAdapter.clearBluetoothDeviceList();
     }
 
     @Override

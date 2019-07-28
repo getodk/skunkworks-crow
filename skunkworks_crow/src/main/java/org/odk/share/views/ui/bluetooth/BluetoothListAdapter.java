@@ -122,6 +122,7 @@ public class BluetoothListAdapter extends RecyclerView.Adapter<BluetoothListAdap
      */
     public void clearBluetoothDeviceList() {
         bluetoothDeviceList.clear();
+        notifyDataSetChanged();
     }
 
     /**
