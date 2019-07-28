@@ -32,6 +32,7 @@ import org.odk.share.application.Share;
 import org.odk.share.dao.TransferDao;
 import org.odk.share.utilities.ActivityUtils;
 import org.odk.share.utilities.DialogUtils;
+import org.odk.share.utilities.PermissionUtils;
 import org.odk.share.views.listeners.ItemClickListener;
 import org.odk.share.views.ui.about.AboutActivity;
 import org.odk.share.views.ui.common.basecursor.BaseCursorViewHolder;
@@ -97,6 +98,11 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
 
         //check the storage permission and start the loader
         setUpLoader();
+
+        //checking the location permission for bluetooth for android 9.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            PermissionUtils.requestLocationPermission(this);
+        }
 
         addListItemDivider();
     }
