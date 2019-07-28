@@ -1,7 +1,12 @@
 package org.odk.share.views.ui.bluetooth;
 
 
+import android.app.AlertDialog;
+import android.bluetooth.BluetoothAdapter;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.text.TextUtils;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -55,6 +60,9 @@ public class BtSenderActivity extends InjectableActivity {
     SenderService senderService;
 
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private CountDownTimer countDownTimer;
+    private static final int CONNECT_TIMEOUT = 120;
+    private static final int COUNT_DOWN_INTERVAL = 1000;
 
 
     @Override
@@ -73,12 +81,15 @@ public class BtSenderActivity extends InjectableActivity {
             BluetoothUtils.enableBluetooth();
         }
 
+        checkDiscoverableDuration();
+
         long[] formIds = getIntent().getLongArrayExtra(INSTANCE_IDS);
         int mode = getIntent().getIntExtra(MODE, ASK_REVIEW_MODE);
         if (formIds == null) {
             formIds = getIntent().getLongArrayExtra(FORM_IDS);
         }
 
+        enableDiscovery();
         senderService.startUploading(formIds, mode);
     }
 
@@ -93,6 +104,7 @@ public class BtSenderActivity extends InjectableActivity {
                 .subscribe(bluetoothEvent -> {
                     switch (bluetoothEvent.getStatus()) {
                         case CONNECTED:
+                            countDownTimer.cancel();
                             resultTextView.setText(getString(R.string.connecting_transfer_message));
                             break;
                         case DISCONNECTED:
@@ -135,6 +147,45 @@ public class BtSenderActivity extends InjectableActivity {
                             break;
                     }
                 }, Timber::e);
+    }
+
+    /**
+     * Enable the bluetooth discovery for other devices. The timeout is specific seconds.
+     */
+    private void enableDiscovery() {
+        Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+        // set the discovery timeout for 120s.
+        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, CONNECT_TIMEOUT);
+        startActivity(discoverableIntent);
+    }
+
+    /**
+     * Checking the discoverable time, if the device is no longer discoverable, we should show
+     * an {@link AlertDialog} to notice our users.
+     */
+    private void checkDiscoverableDuration() {
+        AlertDialog alertDialog = new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.timeout))
+                .setMessage(getString(R.string.bluetooth_send_time_up))
+                .setCancelable(false)
+                .setNegativeButton(R.string.quit, (DialogInterface dialog, int which) -> {
+                    finish();
+                })
+                .create();
+
+        resultTextView.setText(getString(R.string.tv_sender_wait_for_connect));
+        countDownTimer = new CountDownTimer(CONNECT_TIMEOUT * COUNT_DOWN_INTERVAL, COUNT_DOWN_INTERVAL) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                resultTextView.setText(String.format(getString(R.string.tv_sender_wait_for_connect),
+                        String.valueOf(millisUntilFinished / COUNT_DOWN_INTERVAL)));
+            }
+
+            @Override
+            public void onFinish() {
+                alertDialog.show();
+            }
+        }.start();
     }
 
     @Override
