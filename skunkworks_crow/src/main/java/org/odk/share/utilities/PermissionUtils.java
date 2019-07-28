@@ -67,7 +67,7 @@ public class PermissionUtils {
     /**
      * Request for the location permission.
      */
-    public static void requestLocationPermission(Activity activity) {
+    public static void requestLocationPermission(Activity activity) { 
         // ACCESS_FINE_LOCATION
         if (ContextCompat.checkSelfPermission(activity.getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
