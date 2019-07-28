@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.DialogInterface;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -82,7 +83,9 @@ public class BtReceiverActivity extends InjectableActivity implements
         setSupportActionBar(toolbar);
 
         //checking the location permission for bluetooth for android 9.
-        PermissionUtils.requestLocationPermission(this);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            PermissionUtils.requestLocationPermission(this);
+        }
 
         // checking for if bluetooth enabled
         if (!BluetoothUtils.isBluetoothEnabled()) {

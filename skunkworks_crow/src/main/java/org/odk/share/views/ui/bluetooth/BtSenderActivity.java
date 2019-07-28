@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.text.TextUtils;
@@ -75,7 +76,9 @@ public class BtSenderActivity extends InjectableActivity {
         setSupportActionBar(toolbar);
 
         //checking the location permission for bluetooth for android 9.
-        PermissionUtils.requestLocationPermission(this);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            PermissionUtils.requestLocationPermission(this);
+        }
 
         if (!BluetoothUtils.isBluetoothEnabled()) {
             BluetoothUtils.enableBluetooth();
