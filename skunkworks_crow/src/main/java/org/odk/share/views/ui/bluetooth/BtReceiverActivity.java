@@ -3,6 +3,7 @@ package org.odk.share.views.ui.bluetooth;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -48,6 +49,9 @@ public class BtReceiverActivity extends InjectableActivity implements
     @BindView(R.id.list_bt_device)
     RecyclerView recyclerView;
 
+    @BindView(R.id.no_devices_view)
+    View emptyDevicesView;
+
     @Inject
     ReceiverService receiverService;
 
@@ -62,6 +66,7 @@ public class BtReceiverActivity extends InjectableActivity implements
     private final BluetoothListAdapter bluetoothListAdapter = new BluetoothListAdapter(this);
     private boolean isConnected = false;
     private ProgressDialog progressDialog;
+    private ProgressDialog scanningDialog;
 
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
@@ -80,6 +85,22 @@ public class BtReceiverActivity extends InjectableActivity implements
             BluetoothUtils.enableBluetooth();
             updateDeviceList();
         }
+
+        setupScanningDialog();
+    }
+
+    /**
+     * build a new progress dialog waiting for the scanning progress.
+     */
+    private void setupScanningDialog() {
+        scanningDialog = new ProgressDialog(this);
+        scanningDialog.setCancelable(false);
+        scanningDialog.setTitle(getString(R.string.scanning_title));
+        scanningDialog.setMessage(getString(R.string.scanning_msg));
+        scanningDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.stop), (DialogInterface dialog, int which) -> {
+            dialog.dismiss();
+            bluetoothAdapter.cancelDiscovery();
+        });
     }
 
     /**
@@ -167,19 +188,33 @@ public class BtReceiverActivity extends InjectableActivity implements
                 }, Timber::e);
     }
 
+    /**
+     * To check if the bluetooth devices list is empty, and present an empty view for users.
+     */
+    private void checkEmptyList() {
+        if (bluetoothListAdapter.getItemCount() == 0) {
+            emptyDevicesView.setVisibility(View.VISIBLE);
+        } else {
+            emptyDevicesView.setVisibility(View.GONE);
+        }
+    }
+
     @Override
     public void onDeviceFound(BluetoothDevice device) {
         bluetoothListAdapter.addDevice(device);
+        checkEmptyList();
     }
 
     @Override
     public void onDiscoveryStarted() {
-
+        scanningDialog.show();
+        checkEmptyList();
     }
 
     @Override
     public void onDiscoveryFinished() {
-
+        scanningDialog.dismiss();
+        checkEmptyList();
     }
 
     @Override
@@ -187,12 +222,18 @@ public class BtReceiverActivity extends InjectableActivity implements
         if (BluetoothUtils.isBluetoothEnabled()) {
             if (isConnected) {
                 Toast.makeText(this, getString(R.string.dev_already_connected), Toast.LENGTH_SHORT).show();
-                return;
             }
 
             receiverService.startBtDownloading(device.getAddress());
-            progressDialog = ProgressDialog.show(this, getString(R.string.connecting_title),
-                    getString(R.string.connecting_message), true);
+            progressDialog = new ProgressDialog(this);
+            progressDialog.setTitle(getString(R.string.connecting_title));
+            progressDialog.setMessage(getString(R.string.connecting_message));
+            progressDialog.setIndeterminate(true);
+            progressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.stop), (DialogInterface dialog, int which) -> {
+                receiverService.cancel();
+                dialog.dismiss();
+            });
+            progressDialog.show();
         } else {
             Toast.makeText(this, getString(R.string.turning_on_bluetooth_message), Toast.LENGTH_SHORT).show();
             BluetoothUtils.enableBluetooth();
