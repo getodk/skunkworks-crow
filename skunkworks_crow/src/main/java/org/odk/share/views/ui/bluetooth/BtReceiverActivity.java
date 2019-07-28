@@ -24,8 +24,6 @@ import org.odk.share.rx.schedulers.BaseSchedulerProvider;
 import org.odk.share.services.ReceiverService;
 import org.odk.share.views.ui.common.injectable.InjectableActivity;
 
-import java.util.Set;
-
 import javax.inject.Inject;
 
 import butterknife.BindView;
@@ -50,6 +48,9 @@ public class BtReceiverActivity extends InjectableActivity implements
 
     @BindView(R.id.list_bt_device)
     RecyclerView recyclerView;
+
+    @BindView(R.id.no_devices_view)
+    View emptyDevicesView;
 
     @Inject
     ReceiverService receiverService;
@@ -103,20 +104,9 @@ public class BtReceiverActivity extends InjectableActivity implements
     }
 
     /**
-     * Add the bounded bluetooth devices.
-     */
-    public void addPairedDevices() {
-        Set<BluetoothDevice> bondedDevices = bluetoothAdapter.getBondedDevices();
-        if (bondedDevices != null) {
-            bluetoothListAdapter.addDevices(bondedDevices);
-        }
-    }
-
-    /**
      * Rescan the bluetooth devices and update the list.
      */
     public void updateDeviceList() {
-        addPairedDevices();
         if (!bluetoothAdapter.isDiscovering()) {
             bluetoothAdapter.startDiscovery();
         }
@@ -132,7 +122,6 @@ public class BtReceiverActivity extends InjectableActivity implements
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(bluetoothListAdapter);
         bluetoothReceiver = new BluetoothReceiver(this, this);
-        addPairedDevices();
         bluetoothAdapter.startDiscovery();
 
         // click to refresh the devices list.
@@ -199,19 +188,33 @@ public class BtReceiverActivity extends InjectableActivity implements
                 }, Timber::e);
     }
 
+    /**
+     * To check if the bluetooth devices list is empty, and present an empty view for users.
+     */
+    private void checkEmptyList() {
+        if (bluetoothListAdapter.getItemCount() == 0) {
+            emptyDevicesView.setVisibility(View.VISIBLE);
+        } else {
+            emptyDevicesView.setVisibility(View.GONE);
+        }
+    }
+
     @Override
     public void onDeviceFound(BluetoothDevice device) {
         bluetoothListAdapter.addDevice(device);
+        checkEmptyList();
     }
 
     @Override
     public void onDiscoveryStarted() {
         scanningDialog.show();
+        checkEmptyList();
     }
 
     @Override
     public void onDiscoveryFinished() {
         scanningDialog.dismiss();
+        checkEmptyList();
     }
 
     @Override
