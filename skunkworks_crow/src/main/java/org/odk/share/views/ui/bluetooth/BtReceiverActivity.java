@@ -144,6 +144,7 @@ public class BtReceiverActivity extends InjectableActivity implements
         bluetoothListAdapter.notifyDataSetChanged();
     }
 
+    @SuppressWarnings("CallNeedsPermission")
     private void updateDeviceListWithPermissionCheck() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             BtReceiverActivityPermissionsDispatcher.updateDeviceListWithPermissionCheck(this);
