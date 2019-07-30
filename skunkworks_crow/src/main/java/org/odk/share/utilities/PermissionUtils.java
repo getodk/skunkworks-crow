@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.provider.Settings;
 
 import androidx.appcompat.app.AlertDialog;
@@ -19,6 +20,8 @@ import static android.content.Context.LOCATION_SERVICE;
  * For putting utils for permission checks.
  */
 public class PermissionUtils {
+
+    private static final String SCHEME = "package";
 
     private PermissionUtils() {
     }
@@ -45,6 +48,30 @@ public class PermissionUtils {
 
         builder.setPositiveButton(targetActivity.getString(R.string.settings), (DialogInterface dialog, int which) -> {
             Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+            targetActivity.startActivity(intent);
+        });
+
+        builder.setNegativeButton(targetActivity.getString(R.string.cancel), (DialogInterface dialog, int which) -> {
+            dialog.dismiss();
+            targetActivity.finish();
+        });
+
+        builder.setCancelable(false);
+        builder.show();
+    }
+
+    /**
+     * Showing an alert dialog and send users to app info page.
+     */
+    public static void showAppInfo(Activity targetActivity, String packageName) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(targetActivity);
+        builder.setMessage(R.string.permission_open_info);
+
+        builder.setPositiveButton(targetActivity.getString(R.string.permission_open_info_button), (DialogInterface dialog, int which) -> {
+            Intent intent = new Intent();
+            intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+            Uri uri = Uri.fromParts(SCHEME, packageName, null);
+            intent.setData(uri);
             targetActivity.startActivity(intent);
         });
 

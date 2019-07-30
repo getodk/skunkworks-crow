@@ -157,8 +157,7 @@
     <string name="dev_already_connected">already connected to the device, start transferring now&#8230;</string>
     <string name="tv_form_send_success">form sent with success! \n</string>
     <string name="bluetooth_no_device_scanned">No devices are available. \n Tap refresh to search again.</string>
-    <string name="button_allow">Allow</string>
-    <string name="button_deny">Deny</string>
-    <string name="permission_location_rationale">In Android 9, we need the location permission to make the bluetooth work, please give us the location permission and move forward.</string>
-    <string name="permission_location_never_ask">You need to get location permission to enable bluetooth feature!</string>
+    <string name="permission_location_denied">You need to get location permission to enable bluetooth feature!</string>
+    <string name="permission_open_info">Please get location permissions on the APP details page.</string>
+    <string name="permission_open_info_button">Details</string>
 </resources>

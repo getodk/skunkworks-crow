@@ -12,7 +12,6 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -26,6 +25,7 @@ import org.odk.share.events.DownloadEvent;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.rx.schedulers.BaseSchedulerProvider;
 import org.odk.share.services.ReceiverService;
+import org.odk.share.utilities.PermissionUtils;
 import org.odk.share.views.ui.common.injectable.InjectableActivity;
 
 import javax.inject.Inject;
@@ -38,8 +38,6 @@ import io.reactivex.disposables.Disposable;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.OnNeverAskAgain;
 import permissions.dispatcher.OnPermissionDenied;
-import permissions.dispatcher.OnShowRationale;
-import permissions.dispatcher.PermissionRequest;
 import permissions.dispatcher.RuntimePermissions;
 import timber.log.Timber;
 
@@ -154,27 +152,12 @@ public class BtReceiverActivity extends InjectableActivity implements
     }
 
     /**
-     * Show the rationale dialog for location permission, only if the permission was granted,
-     * we can start using the bluetooth.
-     */
-    @OnShowRationale({Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION})
-    void showLocationPermissionDialog(final PermissionRequest request) {
-        new AlertDialog.Builder(this)
-                .setCancelable(false)
-                .setMessage(R.string.permission_location_rationale)
-                .setPositiveButton(R.string.button_allow, (dialog, button) -> request.proceed())
-                .setNegativeButton(R.string.button_deny, (dialog, button) -> request.cancel())
-                .show();
-    }
-
-    /**
      * If the permission was denied, finishing this activity.
      */
     @OnPermissionDenied({Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION})
     void showDeniedForLocation() {
-        Toast.makeText(this, R.string.permission_location_never_ask, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, R.string.permission_location_denied, Toast.LENGTH_SHORT).show();
         finish();
     }
 
@@ -183,8 +166,8 @@ public class BtReceiverActivity extends InjectableActivity implements
      */
     @OnNeverAskAgain({Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION})
-    void showNeverAskForCamera() {
-        Toast.makeText(this, R.string.permission_location_never_ask, Toast.LENGTH_SHORT).show();
+    void showNeverAskForLocation() {
+        PermissionUtils.showAppInfo(this, getPackageName());
     }
 
     @Override
