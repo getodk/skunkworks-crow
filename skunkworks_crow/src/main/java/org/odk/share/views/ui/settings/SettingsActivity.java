@@ -5,9 +5,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,12 +17,12 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+
 import com.google.android.material.textfield.TextInputLayout;
 
 import org.odk.share.R;
-
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.Toolbar;
 
 
 /**
@@ -33,6 +35,7 @@ public class SettingsActivity extends PreferenceActivity {
     Preference hotspotPasswordPreference;
     CheckBoxPreference passwordRequirePreference;
     EditTextPreference odkDestinationDirPreference;
+    ListPreference defaultMethodPreference;
     private SharedPreferences prefs;
 
     @Override
@@ -56,6 +59,7 @@ public class SettingsActivity extends PreferenceActivity {
     }
 
     private void addPreferences() {
+        defaultMethodPreference = (ListPreference) findPreference(PreferenceKeys.KEY_DEFAULT_TRANSFER_METHOD);
         hotspotNamePreference = (EditTextPreference) findPreference(PreferenceKeys.KEY_HOTSPOT_NAME);
         hotspotPasswordPreference = findPreference(PreferenceKeys.KEY_HOTSPOT_PASSWORD);
         passwordRequirePreference = (CheckBoxPreference) findPreference(PreferenceKeys.KEY_HOTSPOT_PWD_REQUIRE);
@@ -63,6 +67,8 @@ public class SettingsActivity extends PreferenceActivity {
 
         prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
+        defaultMethodPreference.setSummary(prefs.getString(PreferenceKeys.KEY_DEFAULT_TRANSFER_METHOD,
+                getString(R.string.hotspot)));
         hotspotNamePreference.setSummary(prefs.getString(PreferenceKeys.KEY_HOTSPOT_NAME,
                 getString(R.string.default_hotspot_ssid)));
         boolean isPasswordSet = prefs.getBoolean(PreferenceKeys.KEY_HOTSPOT_PWD_REQUIRE, false);
@@ -76,6 +82,7 @@ public class SettingsActivity extends PreferenceActivity {
         hotspotPasswordPreference.setOnPreferenceChangeListener(preferenceChangeListener());
         passwordRequirePreference.setOnPreferenceChangeListener(preferenceChangeListener());
         odkDestinationDirPreference.setOnPreferenceChangeListener(preferenceChangeListener());
+        defaultMethodPreference.setOnPreferenceChangeListener(preferenceChangeListener());
 
         hotspotPasswordPreference.setOnPreferenceClickListener(preferenceClickListener());
     }
@@ -125,6 +132,12 @@ public class SettingsActivity extends PreferenceActivity {
                         return false;
                     } else {
                         odkDestinationDirPreference.setSummary(dir);
+                    }
+                    break;
+                case PreferenceKeys.KEY_DEFAULT_TRANSFER_METHOD:
+                    String method = newValue.toString();
+                    if (!TextUtils.isEmpty(method)) {
+                        defaultMethodPreference.setSummary(method);
                     }
                     break;
             }

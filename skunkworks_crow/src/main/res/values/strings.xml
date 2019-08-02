@@ -141,6 +141,8 @@
     <string name="connected_bluetooth_downloading">Connected, start downloading&#8230;</string>
     <string name="connecting_title">Connecting</string>
     <string name="scanning_title">Scanning</string>
+    <string name="bluetooth">bluetooth</string>
+    <string name="hotspot">@string/default_hotspot_ssid</string>
     <string name="scanning_msg">Scanning bluetooth devices, please wait&#8230;</string>
     <string name="bluetooth_paired">device paired</string>
     <string name="bluetooth_unpaired">device unpaired</string>
@@ -157,4 +159,6 @@
     <string name="dev_already_connected">already connected to the device, start transferring now&#8230;</string>
     <string name="tv_form_send_success">form sent with success! \n</string>
     <string name="bluetooth_no_device_scanned">No devices are available. \n Tap refresh to search again.</string>
+    <string name="preference_default_method">Default Transfer Method</string>
+    <string name="preference_default_method_summary">Bluetooth</string>
 </resources>
