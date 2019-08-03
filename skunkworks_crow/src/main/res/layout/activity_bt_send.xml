@@ -12,14 +12,10 @@
         android:gravity="center"
         android:orientation="vertical">
 
-        <!--TODO: Add this into Open Source License after PR#286 was merged-->
-        <com.github.ybq.android.spinkit.SpinKitView xmlns:app="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/spin_kit"
-            style="@style/SpinKitView.Large.DoubleBounce"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            app:SpinKit_Color="@color/colorAccent" />
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="@style/MatchParentWidth"
+            android:indeterminate="true" />
 
         <TextView
             android:id="@+id/test_text_view"
