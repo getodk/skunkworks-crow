@@ -1,15 +1,16 @@
 package org.odk.share.utilities;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import org.odk.share.R;
 import org.odk.share.views.ui.bluetooth.BtReceiverActivity;
 import org.odk.share.views.ui.bluetooth.BtSenderActivity;
 import org.odk.share.views.ui.hotspot.HpReceiverActivity;
 import org.odk.share.views.ui.hotspot.HpSenderActivity;
+import org.odk.share.views.ui.settings.PreferenceKeys;
 
 /**
  * @author huangyz0918 (huangyz0918@gmail.com)
@@ -21,48 +22,36 @@ public class DialogUtils {
     }
 
     /**
-     * Show a {@link AlertDialog} for choosing a sender methods.
+     * Detecting the default set by user, and using that as main sending method.
      */
-    public static AlertDialog showSenderMethodsDialog(Context context, Intent intent, String title) {
-        String[] options = {context.getString(R.string.method_bluetooth), context.getString(R.string.method_wifi_hotspot)};
-        return new AlertDialog.Builder(context)
-                .setTitle(title)
-                .setIcon(R.drawable.ic_help_outline)
-                .setItems(options, (DialogInterface dialog, int which) -> {
-                    if (ActivityUtils.getActivity(context) != null) {
-                        switch (which) {
-                            case 0:
-                                intent.setClass(ActivityUtils.getActivity(context), BtSenderActivity.class);
-                                break;
-                            case 1:
-                                intent.setClass(ActivityUtils.getActivity(context), HpSenderActivity.class);
-                                break;
-                        }
-                        context.startActivity(intent);
-                    }
-                }).create();
+    public static void switchToDefaultSendingMethod(Context context, Intent intent) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+        String defaultMethod = prefs.getString(PreferenceKeys.KEY_DEFAULT_TRANSFER_METHOD, context.getString(R.string.hotspot));
+        if (context.getString(R.string.hotspot).equals(defaultMethod)) {
+            intent.setClass(ActivityUtils.getActivity(context), HpSenderActivity.class);
+        } else if (context.getString(R.string.bluetooth).equals(defaultMethod)) {
+            intent.setClass(ActivityUtils.getActivity(context), BtSenderActivity.class);
+        } else {
+            throw new IllegalArgumentException("No such default sending method!");
+        }
+
+        context.startActivity(intent);
     }
 
     /**
-     * Show a {@link AlertDialog} for choosing a sender methods.
+     * Detecting the default set by user, and using that as main receiving method.
      */
-    public static AlertDialog showReceiverMethodsDialog(Context context, Intent intent, String title) {
-        String[] options = {context.getString(R.string.method_bluetooth), context.getString(R.string.method_wifi_hotspot)};
-        return new AlertDialog.Builder(context)
-                .setTitle(title)
-                .setIcon(R.drawable.ic_help_outline)
-                .setItems(options, (DialogInterface dialog, int which) -> {
-                    if (ActivityUtils.getActivity(context) != null) {
-                        switch (which) {
-                            case 0:
-                                intent.setClass(ActivityUtils.getActivity(context), BtReceiverActivity.class);
-                                break;
-                            case 1:
-                                intent.setClass(ActivityUtils.getActivity(context), HpReceiverActivity.class);
-                                break;
-                        }
-                        context.startActivity(intent);
-                    }
-                }).create();
+    public static void switchToDefaultReceivingMethod(Context context, Intent intent) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+        String defaultMethod = prefs.getString(PreferenceKeys.KEY_DEFAULT_TRANSFER_METHOD, context.getString(R.string.hotspot));
+        if (context.getString(R.string.hotspot).equals(defaultMethod)) {
+            intent.setClass(ActivityUtils.getActivity(context), HpReceiverActivity.class);
+        } else if (context.getString(R.string.bluetooth).equals(defaultMethod)) {
+            intent.setClass(ActivityUtils.getActivity(context), BtReceiverActivity.class);
+        } else {
+            throw new IllegalArgumentException("No such default receiving method!");
+        }
+
+        context.startActivity(intent);
     }
 }

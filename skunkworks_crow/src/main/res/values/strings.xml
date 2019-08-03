@@ -133,10 +133,6 @@
     <string name="location_settings_dialog">Enable location from the settings.</string>
 
     <string name="btn_refresh">Refresh</string>
-    <string name="method_bluetooth">Bluetooth</string>
-    <string name="method_wifi_hotspot">Hotspot</string>
-    <string name="title_send_options">Send Options</string>
-    <string name="title_receive_options">Receive Options</string>
     <string name="connect_bluetooth_title">Device to Receive</string>
     <string name="connected_bluetooth_downloading">Connected, start downloading&#8230;</string>
     <string name="connecting_title">Connecting</string>
