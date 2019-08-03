@@ -1,19 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/MatchParent"
-    android:orientation="vertical"
     tools:context=".views.ui.bluetooth.BtReceiverActivity">
 
     <!-- Toolbar -->
     <include layout="@layout/toolbar" />
 
-    <TextView
-        android:id="@+id/test_text_view"
+    <LinearLayout
         style="@style/MatchParent"
-        android:layout_gravity="center"
         android:gravity="center"
-        android:textSize="20sp"
-        tools:text="@string/tv_sender_wait_for_connect" />
+        android:orientation="vertical">
 
-</LinearLayout>
+        <!--TODO: Add this into Open Source License after PR#286 was merged-->
+        <com.github.ybq.android.spinkit.SpinKitView xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/spin_kit"
+            style="@style/SpinKitView.Large.DoubleBounce"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            app:SpinKit_Color="@color/colorAccent" />
+
+        <TextView
+            android:id="@+id/test_text_view"
+            style="@style/MatchParentWidth"
+            android:layout_gravity="center"
+            android:layout_marginTop="28dp"
+            android:gravity="center"
+            android:textSize="20sp"
+            tools:text="@string/tv_sender_wait_for_connect" />
+    </LinearLayout>
+
+</RelativeLayout>

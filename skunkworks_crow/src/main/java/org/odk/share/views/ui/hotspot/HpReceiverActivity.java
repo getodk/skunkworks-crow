@@ -21,6 +21,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.journeyapps.barcodescanner.CaptureActivity;
@@ -29,7 +35,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.odk.share.R;
 import org.odk.share.events.DownloadEvent;
-import org.odk.share.views.listeners.OnItemClickListener;
 import org.odk.share.network.WifiConnector;
 import org.odk.share.network.WifiNetworkInfo;
 import org.odk.share.network.listeners.WifiStateListener;
@@ -37,6 +42,8 @@ import org.odk.share.network.receivers.WifiStateBroadcastReceiver;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.rx.schedulers.BaseSchedulerProvider;
 import org.odk.share.services.ReceiverService;
+import org.odk.share.utilities.DialogUtils;
+import org.odk.share.views.listeners.OnItemClickListener;
 import org.odk.share.views.ui.common.injectable.InjectableActivity;
 
 import java.util.ArrayList;
@@ -45,11 +52,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -378,11 +380,7 @@ public class HpReceiverActivity extends InjectableActivity implements OnItemClic
     }
 
     private void createAlertDialog(String title, String message) {
-        alertDialog = new AlertDialog.Builder(this).create();
-        alertDialog.setTitle(title);
-        alertDialog.setMessage(message);
-        alertDialog.setCancelable(false);
-        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.ok), (dialog, i) -> finish());
+        alertDialog = DialogUtils.createSimpleDialog(this, title, message);
         alertDialog.show();
     }
 
