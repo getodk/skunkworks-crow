@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -16,6 +17,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 
 import org.odk.share.R;
 import org.odk.share.bluetooth.BluetoothUtils;
@@ -40,6 +42,7 @@ import permissions.dispatcher.RuntimePermissions;
 import timber.log.Timber;
 
 import static org.odk.share.utilities.ApplicationConstants.ASK_REVIEW_MODE;
+import static org.odk.share.utilities.PermissionUtils.APP_SETTING_REQUEST_CODE;
 import static org.odk.share.views.ui.instance.InstancesList.INSTANCE_IDS;
 import static org.odk.share.views.ui.instance.fragment.ReviewedInstancesFragment.MODE;
 import static org.odk.share.views.ui.send.fragment.BlankFormsFragment.FORM_IDS;
@@ -72,7 +75,7 @@ public class BtSenderActivity extends InjectableActivity {
     private CountDownTimer countDownTimer;
     private static final int CONNECT_TIMEOUT = 120;
     private static final int COUNT_DOWN_INTERVAL = 1000;
-    private static final int DISCOVERABLE_CODE = 0x120;
+    private static final int DISCOVERABLE_CODE = 0x121;
     private static final int SUCCESS_CODE = 120;
 
     @Override
@@ -203,12 +206,23 @@ public class BtSenderActivity extends InjectableActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == DISCOVERABLE_CODE) {
-            if (resultCode == SUCCESS_CODE) {
-                startCheckingDiscoverableDuration();
-            } else {
-                finish();
-            }
+        switch (requestCode) {
+            case DISCOVERABLE_CODE:
+                if (resultCode == SUCCESS_CODE) {
+                    startCheckingDiscoverableDuration();
+                } else {
+                    finish();
+                }
+                break;
+            case APP_SETTING_REQUEST_CODE:
+                //only android 9 would enter this case.
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    PermissionUtils.showAppInfo(this, getPackageName());
+                } else {
+                    enableDiscoveryWithPermissionCheck();
+                }
+                break;
         }
     }
 

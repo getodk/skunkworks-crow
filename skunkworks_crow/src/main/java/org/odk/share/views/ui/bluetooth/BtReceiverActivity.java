@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -12,6 +13,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -40,6 +42,8 @@ import permissions.dispatcher.OnNeverAskAgain;
 import permissions.dispatcher.OnPermissionDenied;
 import permissions.dispatcher.RuntimePermissions;
 import timber.log.Timber;
+
+import static org.odk.share.utilities.PermissionUtils.APP_SETTING_REQUEST_CODE;
 
 /**
  * Receive activity, for testing, needs refactor.
@@ -293,6 +297,14 @@ public class BtReceiverActivity extends InjectableActivity implements
         } else {
             Toast.makeText(this, getString(R.string.turning_on_bluetooth_message), Toast.LENGTH_SHORT).show();
             BluetoothUtils.enableBluetooth();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == APP_SETTING_REQUEST_CODE) {
+            updateDeviceListWithPermissionCheck();
         }
     }
 

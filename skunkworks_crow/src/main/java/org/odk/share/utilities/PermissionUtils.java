@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.provider.Settings;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 
@@ -22,6 +23,7 @@ import static android.content.Context.LOCATION_SERVICE;
 public class PermissionUtils {
 
     private static final String SCHEME = "package";
+    public static final int APP_SETTING_REQUEST_CODE = 0x120;
 
     private PermissionUtils() {
     }
@@ -72,11 +74,12 @@ public class PermissionUtils {
             intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
             Uri uri = Uri.fromParts(SCHEME, packageName, null);
             intent.setData(uri);
-            targetActivity.startActivity(intent);
+            targetActivity.startActivityForResult(intent, APP_SETTING_REQUEST_CODE);
         });
 
         builder.setNegativeButton(targetActivity.getString(R.string.cancel), (DialogInterface dialog, int which) -> {
             dialog.dismiss();
+            Toast.makeText(targetActivity, R.string.permission_location_denied, Toast.LENGTH_SHORT).show();
             targetActivity.finish();
         });
 
