@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.text.TextUtils;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,6 +51,9 @@ public class BtSenderActivity extends InjectableActivity {
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
+    @BindView(R.id.progressBar)
+    ProgressBar progressBar;
+
     @Inject
     RxEventBus rxEventBus;
 
@@ -62,6 +67,7 @@ public class BtSenderActivity extends InjectableActivity {
     private CountDownTimer countDownTimer;
     private static final int CONNECT_TIMEOUT = 120;
     private static final int COUNT_DOWN_INTERVAL = 1000;
+    private BtSenderActivity thisActivity = this;
 
 
     @Override
@@ -126,6 +132,7 @@ public class BtSenderActivity extends InjectableActivity {
                             Toast.makeText(this, alertMsg, Toast.LENGTH_SHORT).show();
                             break;
                         case FINISHED:
+                            progressBar.setVisibility(View.GONE);
                             String result = uploadEvent.getResult();
                             if (TextUtils.isEmpty(result)) {
                                 resultTextView.setText(getString(R.string.tv_form_already_exist));
@@ -136,9 +143,11 @@ public class BtSenderActivity extends InjectableActivity {
                             Toast.makeText(this, getString(R.string.transfer_result) + " : " + result, Toast.LENGTH_SHORT).show();
                             break;
                         case ERROR:
+                            progressBar.setVisibility(View.GONE);
                             Toast.makeText(this, getString(R.string.error_while_uploading, uploadEvent.getResult()), Toast.LENGTH_SHORT).show();
                             break;
                         case CANCELLED:
+                            progressBar.setVisibility(View.GONE);
                             Toast.makeText(this, getString(R.string.canceled), Toast.LENGTH_LONG).show();
                             break;
                     }
@@ -179,7 +188,9 @@ public class BtSenderActivity extends InjectableActivity {
 
             @Override
             public void onFinish() {
-                alertDialog.show();
+                if (!BluetoothUtils.isActivityDestroyed(thisActivity)) {
+                    alertDialog.show();
+                }
             }
         }.start();
     }

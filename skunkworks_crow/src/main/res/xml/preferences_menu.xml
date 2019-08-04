@@ -45,4 +45,20 @@
             android:title="@string/set_password" />
 
     </PreferenceCategory>
+
+    <PreferenceCategory android:title="Bluetooth Settings">
+
+        <EditTextPreference
+            android:icon="@drawable/ic_bluetooth_black_24dp"
+            android:key="bluetooth_name"
+            android:title="@string/title_bluetooth_name" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:icon="@drawable/ic_security_black_24dp"
+            android:key="bluetooth_secure_mode"
+            android:summary="@string/summary_security_bluetooth"
+            android:title="@string/secure_mode" />
+
+    </PreferenceCategory>
 </PreferenceScreen>
