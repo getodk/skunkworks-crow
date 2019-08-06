@@ -13,6 +13,8 @@ import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,6 +36,7 @@ import org.odk.share.services.SenderService;
 import org.odk.share.utilities.PermissionUtils;
 import org.odk.share.utilities.QRCodeUtils;
 import org.odk.share.utilities.SocketUtils;
+import org.odk.share.views.ui.bluetooth.BtSenderActivity;
 import org.odk.share.views.ui.common.injectable.InjectableActivity;
 
 import javax.inject.Inject;
@@ -87,6 +90,8 @@ public class HpSenderActivity extends InjectableActivity {
     private int port;
     private long[] formIds;
     private int mode;
+    private HpSenderActivity thisActivity = this;
+    private Intent receivedIntent;
 
     private WifiManager.LocalOnlyHotspotReservation hotspotReservation;
     private WifiConfiguration currentConfig;
@@ -100,8 +105,9 @@ public class HpSenderActivity extends InjectableActivity {
         setTitle(getString(R.string.send_forms));
         setSupportActionBar(toolbar);
 
-        formIds = getIntent().getLongArrayExtra(INSTANCE_IDS);
-        mode = getIntent().getIntExtra(MODE, ASK_REVIEW_MODE);
+        receivedIntent = getIntent();
+        formIds = receivedIntent.getLongArrayExtra(INSTANCE_IDS);
+        mode = receivedIntent.getIntExtra(MODE, ASK_REVIEW_MODE);
         if (formIds == null) {
             formIds = getIntent().getLongArrayExtra(FORM_IDS);
         }
@@ -135,6 +141,48 @@ public class HpSenderActivity extends InjectableActivity {
         } else {
             stopHotspotAlertDialog();
         }
+    }
+
+    /**
+     * Create the switch method button in the menu.
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.switch_method_menu, menu);
+        final MenuItem switchItem = menu.findItem(R.id.menu_switch);
+
+        switchItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                AlertDialog alertDialog = new AlertDialog.Builder(thisActivity).create();
+                alertDialog.setTitle(getString(R.string.switch_method_title));
+                alertDialog.setCancelable(false);
+                alertDialog.setMessage(getString(R.string.bluetooth_switch_method));
+
+                alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.cancel),
+                        (dialog, i) -> {
+                            dialog.dismiss();
+                        });
+
+                alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.switch_method),
+                        (dialog, i) -> {
+                            Intent intent = receivedIntent;
+                            intent.setClass(thisActivity, BtSenderActivity.class);
+
+                            if (isHotspotRunning) {
+                                stopHotspot();
+                            }
+
+                            startActivity(intent);
+                            finish();
+                        });
+
+                alertDialog.show();
+                return true;
+            }
+        });
+
+        return super.onCreateOptionsMenu(menu);
     }
 
     /**

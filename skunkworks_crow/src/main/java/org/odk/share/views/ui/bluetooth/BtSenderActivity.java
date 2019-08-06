@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -23,6 +25,7 @@ import org.odk.share.rx.RxEventBus;
 import org.odk.share.rx.schedulers.BaseSchedulerProvider;
 import org.odk.share.services.SenderService;
 import org.odk.share.views.ui.common.injectable.InjectableActivity;
+import org.odk.share.views.ui.hotspot.HpSenderActivity;
 
 import javax.inject.Inject;
 
@@ -68,6 +71,7 @@ public class BtSenderActivity extends InjectableActivity {
     private static final int CONNECT_TIMEOUT = 120;
     private static final int COUNT_DOWN_INTERVAL = 1000;
     private BtSenderActivity thisActivity = this;
+    private Intent receivedIntent;
 
 
     @Override
@@ -85,14 +89,52 @@ public class BtSenderActivity extends InjectableActivity {
 
         checkDiscoverableDuration();
 
-        long[] formIds = getIntent().getLongArrayExtra(INSTANCE_IDS);
-        int mode = getIntent().getIntExtra(MODE, ASK_REVIEW_MODE);
+        receivedIntent = getIntent();
+        long[] formIds = receivedIntent.getLongArrayExtra(INSTANCE_IDS);
+        int mode = receivedIntent.getIntExtra(MODE, ASK_REVIEW_MODE);
         if (formIds == null) {
-            formIds = getIntent().getLongArrayExtra(FORM_IDS);
+            formIds = receivedIntent.getLongArrayExtra(FORM_IDS);
         }
 
         enableDiscovery();
         senderService.startUploading(formIds, mode);
+    }
+
+    /**
+     * Create the switch method button in the menu.
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.switch_method_menu, menu);
+        final MenuItem switchItem = menu.findItem(R.id.menu_switch);
+
+        switchItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                androidx.appcompat.app.AlertDialog alertDialog = new androidx.appcompat.app.AlertDialog.Builder(thisActivity).create();
+                alertDialog.setTitle(getString(R.string.switch_method_title));
+                alertDialog.setCancelable(false);
+                alertDialog.setMessage(getString(R.string.hotspot_switch_method));
+
+                alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.cancel),
+                        (dialog, i) -> {
+                            dialog.dismiss();
+                        });
+
+                alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.switch_method),
+                        (dialog, i) -> {
+                            Intent intent = receivedIntent;
+                            intent.setClass(thisActivity, HpSenderActivity.class);
+                            senderService.cancel();
+                            startActivity(intent);
+                            finish();
+                        });
+                alertDialog.show();
+                return true;
+            }
+        });
+
+        return super.onCreateOptionsMenu(menu);
     }
 
     /**

@@ -77,6 +77,7 @@
     <string name="no_forms_reviewed">No finalized %s forms reviewed</string>
     <string name="sort_list">Sort the list</string>
     <string name="search_list">Search the list</string>
+    <string name="switch_list">Switch the transfer method</string>
     <string name="search">Search</string>
 
     <string name="review_form">Review Form</string>
@@ -136,6 +137,7 @@
     <string name="location_permission_needed">Location Permission Needed</string>
     <string name="location_settings_dialog">Enable location from the settings.</string>
 
+    <string name="switch_method">Switch</string>
     <string name="btn_refresh">Refresh</string>
     <string name="connect_bluetooth_title">Device to Receive</string>
     <string name="connected_bluetooth_downloading">Connected, start downloading&#8230;</string>
@@ -161,4 +163,7 @@
     <string name="bluetooth_no_device_scanned">No devices are available. \n Tap refresh to search again.</string>
     <string name="preference_default_method">Default Transfer Method</string>
     <string name="preference_default_method_summary">Bluetooth</string>
+    <string name="bluetooth_switch_method">Are you sure to stop and switch to bluetooth method?</string>
+    <string name="hotspot_switch_method">Are you sure to stop and switch to hotspot method?</string>
+    <string name="switch_method_title">Switch Method</string>
 </resources>
