@@ -174,7 +174,7 @@ public class BtSenderActivity extends InjectableActivity {
     @OnPermissionDenied({Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION})
     void showDeniedForLocation() {
-        Toast.makeText(this, R.string.permission_location_denied, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, R.string.permission_location_denied, Toast.LENGTH_LONG).show();
         finish();
     }
 
