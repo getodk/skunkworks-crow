@@ -24,6 +24,7 @@ import org.odk.share.events.UploadEvent;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.rx.schedulers.BaseSchedulerProvider;
 import org.odk.share.services.SenderService;
+import org.odk.share.utilities.DialogUtils;
 import org.odk.share.views.ui.common.injectable.InjectableActivity;
 import org.odk.share.views.ui.hotspot.HpSenderActivity;
 
@@ -111,25 +112,13 @@ public class BtSenderActivity extends InjectableActivity {
         switchItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                androidx.appcompat.app.AlertDialog alertDialog = new androidx.appcompat.app.AlertDialog.Builder(thisActivity).create();
-                alertDialog.setTitle(getString(R.string.switch_method_title));
-                alertDialog.setCancelable(false);
-                alertDialog.setMessage(getString(R.string.hotspot_switch_method));
-
-                alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.cancel),
-                        (dialog, i) -> {
-                            dialog.dismiss();
-                        });
-
-                alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.switch_method),
-                        (dialog, i) -> {
-                            Intent intent = receivedIntent;
-                            intent.setClass(thisActivity, HpSenderActivity.class);
-                            senderService.cancel();
-                            startActivity(intent);
-                            finish();
-                        });
-                alertDialog.show();
+                DialogUtils.createMethodSwitchDialog(thisActivity, (DialogInterface dialog, int which) -> {
+                    Intent intent = receivedIntent;
+                    intent.setClass(thisActivity, HpSenderActivity.class);
+                    senderService.cancel();
+                    startActivity(intent);
+                    finish();
+                }).show();
                 return true;
             }
         });

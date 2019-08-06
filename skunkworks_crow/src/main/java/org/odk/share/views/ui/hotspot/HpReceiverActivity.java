@@ -12,6 +12,8 @@ import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -42,8 +44,10 @@ import org.odk.share.network.receivers.WifiStateBroadcastReceiver;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.rx.schedulers.BaseSchedulerProvider;
 import org.odk.share.services.ReceiverService;
+import org.odk.share.utilities.ActivityUtils;
 import org.odk.share.utilities.DialogUtils;
 import org.odk.share.views.listeners.OnItemClickListener;
+import org.odk.share.views.ui.bluetooth.BtReceiverActivity;
 import org.odk.share.views.ui.common.injectable.InjectableActivity;
 
 import java.util.ArrayList;
@@ -110,6 +114,7 @@ public class HpReceiverActivity extends InjectableActivity implements OnItemClic
     private WifiConnector wifiConnector;
     private WifiStateBroadcastReceiver wifiStateBroadcastReceiver;
     private boolean isConnected = false;
+    private HpReceiverActivity thisActivity = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -195,6 +200,27 @@ public class HpReceiverActivity extends InjectableActivity implements OnItemClic
                             break;
                     }
                 }, Timber::e);
+    }
+
+    /**
+     * Create the switch method button in the menu.
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.switch_method_menu, menu);
+        final MenuItem switchItem = menu.findItem(R.id.menu_switch);
+
+        switchItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                DialogUtils.createMethodSwitchDialog(thisActivity, (DialogInterface dialog, int which) -> {
+                    receiverService.cancel();
+                    ActivityUtils.launchActivity(thisActivity, BtReceiverActivity.class, true);
+                }).show();
+                return true;
+            }
+        });
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override

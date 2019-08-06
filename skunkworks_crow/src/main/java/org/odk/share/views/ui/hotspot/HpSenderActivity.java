@@ -33,6 +33,7 @@ import org.odk.share.rx.RxEventBus;
 import org.odk.share.rx.schedulers.BaseSchedulerProvider;
 import org.odk.share.services.HotspotService;
 import org.odk.share.services.SenderService;
+import org.odk.share.utilities.DialogUtils;
 import org.odk.share.utilities.PermissionUtils;
 import org.odk.share.utilities.QRCodeUtils;
 import org.odk.share.utilities.SocketUtils;
@@ -154,30 +155,17 @@ public class HpSenderActivity extends InjectableActivity {
         switchItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                AlertDialog alertDialog = new AlertDialog.Builder(thisActivity).create();
-                alertDialog.setTitle(getString(R.string.switch_method_title));
-                alertDialog.setCancelable(false);
-                alertDialog.setMessage(getString(R.string.bluetooth_switch_method));
+                DialogUtils.createMethodSwitchDialog(thisActivity, (DialogInterface dialog, int which) -> {
+                    Intent intent = receivedIntent;
+                    intent.setClass(thisActivity, BtSenderActivity.class);
 
-                alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.cancel),
-                        (dialog, i) -> {
-                            dialog.dismiss();
-                        });
+                    if (isHotspotRunning) {
+                        stopHotspot();
+                    }
 
-                alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.switch_method),
-                        (dialog, i) -> {
-                            Intent intent = receivedIntent;
-                            intent.setClass(thisActivity, BtSenderActivity.class);
-
-                            if (isHotspotRunning) {
-                                stopHotspot();
-                            }
-
-                            startActivity(intent);
-                            finish();
-                        });
-
-                alertDialog.show();
+                    startActivity(intent);
+                    finish();
+                }).show();
                 return true;
             }
         });

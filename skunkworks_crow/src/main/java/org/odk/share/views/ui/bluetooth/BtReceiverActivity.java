@@ -5,6 +5,8 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -22,7 +24,10 @@ import org.odk.share.events.DownloadEvent;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.rx.schedulers.BaseSchedulerProvider;
 import org.odk.share.services.ReceiverService;
+import org.odk.share.utilities.ActivityUtils;
+import org.odk.share.utilities.DialogUtils;
 import org.odk.share.views.ui.common.injectable.InjectableActivity;
+import org.odk.share.views.ui.hotspot.HpReceiverActivity;
 
 import javax.inject.Inject;
 
@@ -67,6 +72,7 @@ public class BtReceiverActivity extends InjectableActivity implements
     private boolean isConnected = false;
     private ProgressDialog progressDialog;
     private ProgressDialog scanningDialog;
+    private BtReceiverActivity thisActivity = this;
 
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
@@ -239,6 +245,27 @@ public class BtReceiverActivity extends InjectableActivity implements
             Toast.makeText(this, getString(R.string.turning_on_bluetooth_message), Toast.LENGTH_SHORT).show();
             BluetoothUtils.enableBluetooth();
         }
+    }
+
+    /**
+     * Create the switch method button in the menu.
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.switch_method_menu, menu);
+        final MenuItem switchItem = menu.findItem(R.id.menu_switch);
+
+        switchItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                DialogUtils.createMethodSwitchDialog(thisActivity, (DialogInterface dialog, int which) -> {
+                    receiverService.cancel();
+                    ActivityUtils.launchActivity(thisActivity, HpReceiverActivity.class, true);
+                }).show();
+                return true;
+            }
+        });
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override

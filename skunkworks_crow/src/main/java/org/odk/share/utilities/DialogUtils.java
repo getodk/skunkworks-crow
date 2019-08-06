@@ -38,6 +38,31 @@ public class DialogUtils {
     }
 
     /**
+     * Create an {@link AlertDialog} for switching receive method.
+     */
+    public static AlertDialog createMethodSwitchDialog(Activity targetActivity, DialogInterface.OnClickListener listener) {
+        AlertDialog alertDialog = new AlertDialog.Builder(targetActivity).create();
+        alertDialog.setTitle(targetActivity.getString(R.string.switch_method_title));
+        alertDialog.setCancelable(false);
+        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, targetActivity.getString(R.string.cancel),
+                (dialog, i) -> {
+                    dialog.dismiss();
+                });
+
+        alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, targetActivity.getString(R.string.switch_method), listener);
+
+        if (targetActivity instanceof BtReceiverActivity || targetActivity instanceof BtSenderActivity) {
+            alertDialog.setMessage(targetActivity.getString(R.string.hotspot_switch_method));
+        } else if (targetActivity instanceof HpReceiverActivity || targetActivity instanceof HpSenderActivity) {
+            alertDialog.setMessage(targetActivity.getString(R.string.bluetooth_switch_method));
+        } else {
+            throw new IllegalArgumentException("Not a valid activity parameter");
+        }
+
+        return alertDialog;
+    }
+
+    /**
      * Detecting the default set by user, and using that as main sending method.
      */
     public static void switchToDefaultSendingMethod(Context context, Intent intent) {
@@ -57,7 +82,8 @@ public class DialogUtils {
     /**
      * Detecting the default set by user, and using that as main receiving method.
      */
-    public static void switchToDefaultReceivingMethod(Context context, Intent intent) {
+    public static void switchToDefaultReceivingMethod(Context context) {
+        Intent intent = new Intent();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
         String defaultMethod = prefs.getString(PreferenceKeys.KEY_DEFAULT_TRANSFER_METHOD, context.getString(R.string.hotspot));
         if (context.getString(R.string.hotspot).equals(defaultMethod)) {
