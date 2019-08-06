@@ -7,7 +7,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.text.TextUtils;
@@ -97,7 +96,7 @@ public class BtSenderActivity extends InjectableActivity {
             formIds = getIntent().getLongArrayExtra(FORM_IDS);
         }
 
-        enableDiscoveryWithPermissionCheck();
+        BtSenderActivityPermissionsDispatcher.enableDiscoveryWithPermissionCheck(this);
         senderService.startUploading(formIds, mode);
     }
 
@@ -169,15 +168,6 @@ public class BtSenderActivity extends InjectableActivity {
         startActivityForResult(discoverableIntent, DISCOVERABLE_CODE);
     }
 
-    @SuppressWarnings("CallNeedsPermission")
-    private void enableDiscoveryWithPermissionCheck() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            BtSenderActivityPermissionsDispatcher.enableDiscoveryWithPermissionCheck(this);
-        } else {
-            enableDiscovery();
-        }
-    }
-
     /**
      * If the permission was denied, finishing this activity.
      */
@@ -220,7 +210,7 @@ public class BtSenderActivity extends InjectableActivity {
                         != PackageManager.PERMISSION_GRANTED) {
                     PermissionUtils.showAppInfo(this, getPackageName());
                 } else {
-                    enableDiscoveryWithPermissionCheck();
+                    BtSenderActivityPermissionsDispatcher.enableDiscoveryWithPermissionCheck(this);
                 }
                 break;
         }

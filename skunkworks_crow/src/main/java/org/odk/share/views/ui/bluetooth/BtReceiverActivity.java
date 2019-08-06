@@ -6,7 +6,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -97,7 +96,7 @@ public class BtReceiverActivity extends InjectableActivity implements
         // checking for if bluetooth enabled
         if (!BluetoothUtils.isBluetoothEnabled()) {
             BluetoothUtils.enableBluetooth();
-            updateDeviceListWithPermissionCheck();
+            BtReceiverActivityPermissionsDispatcher.updateDeviceListWithPermissionCheck(this);
         }
 
         setupScanningDialog();
@@ -117,7 +116,7 @@ public class BtReceiverActivity extends InjectableActivity implements
         recyclerView.setAdapter(bluetoothListAdapter);
         bluetoothReceiver = new BluetoothReceiver(this, this);
 
-        updateDeviceListWithPermissionCheck();
+        BtReceiverActivityPermissionsDispatcher.updateDeviceListWithPermissionCheck(this);
     }
 
     /**
@@ -144,15 +143,6 @@ public class BtReceiverActivity extends InjectableActivity implements
             bluetoothAdapter.startDiscovery();
         }
         bluetoothListAdapter.notifyDataSetChanged();
-    }
-
-    @SuppressWarnings("CallNeedsPermission")
-    private void updateDeviceListWithPermissionCheck() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            BtReceiverActivityPermissionsDispatcher.updateDeviceListWithPermissionCheck(this);
-        } else {
-            updateDeviceList();
-        }
     }
 
     /**
@@ -186,7 +176,7 @@ public class BtReceiverActivity extends InjectableActivity implements
     @OnClick(R.id.btn_refresh)
     public void refresh() {
         if (BluetoothUtils.isBluetoothEnabled()) {
-            updateDeviceListWithPermissionCheck();
+            BtReceiverActivityPermissionsDispatcher.updateDeviceListWithPermissionCheck(this);
         } else {
             BluetoothUtils.enableBluetooth();
             Toast.makeText(this, "bluetooth has been disabled, turning on...", Toast.LENGTH_SHORT).show();
@@ -304,7 +294,7 @@ public class BtReceiverActivity extends InjectableActivity implements
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == APP_SETTING_REQUEST_CODE) {
-            updateDeviceListWithPermissionCheck();
+            BtReceiverActivityPermissionsDispatcher.updateDeviceListWithPermissionCheck(this);
         }
     }
 
