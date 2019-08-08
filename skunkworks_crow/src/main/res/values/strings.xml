@@ -148,13 +148,13 @@
     <string name="bluetooth_send_time_up">You have not connected a device for more than 60 seconds, the device is not discoverable. If you want to continue, please restart the sending page.</string>
     <string name="timeout">Timeout</string>
     <string name="receiving_title">Receiving</string>
+    <string name="sending_title">Sending</string>
     <string name="connecting_message">connecting to bluetooth \n please wait&#8230;</string>
-    <string name="connecting_transfer_message">connected with bluetooth receiver! \n starting transferring&#8230;</string>
+    <string name="connecting_transfer_message">connected with bluetooth receiver! \nstarting transferring&#8230;</string>
     <string name="turning_on_bluetooth_message">you have disabled bluetooth, turning on now&#8230;</string>
     <string name="send_instance_title">Send Data</string>
     <string name="bluetooth_instance_name_default">Bluetooth Device</string>
-    <string name="tv_sender_wait_for_connect">waiting for connection (%ss left)&#8230; \n will start transfer when connected </string>
+    <string name="tv_sender_wait_for_connect">waiting for connection (%ss left)&#8230; \nwill start transfer when connected </string>
     <string name="dev_already_connected">already connected to the device, start transferring now&#8230;</string>
-    <string name="tv_form_send_success">form sent with success! \n</string>
     <string name="bluetooth_no_device_scanned">No devices are available. \n Tap refresh to search again.</string>
 </resources>

@@ -1,5 +1,6 @@
 package org.odk.share.views.ui.bluetooth;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -67,6 +68,7 @@ public class BtReceiverActivity extends InjectableActivity implements
     private boolean isConnected = false;
     private ProgressDialog progressDialog;
     private ProgressDialog scanningDialog;
+    private AlertDialog resultDialog;
 
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
@@ -86,13 +88,14 @@ public class BtReceiverActivity extends InjectableActivity implements
             updateDeviceList();
         }
 
-        setupScanningDialog();
+        setupDialogs();
     }
 
     /**
      * build a new progress dialog waiting for the scanning progress.
      */
-    private void setupScanningDialog() {
+    private void setupDialogs() {
+        //scanning dialog
         scanningDialog = new ProgressDialog(this);
         scanningDialog.setCancelable(false);
         scanningDialog.setTitle(getString(R.string.scanning_title));
@@ -101,6 +104,31 @@ public class BtReceiverActivity extends InjectableActivity implements
             dialog.dismiss();
             bluetoothAdapter.cancelDiscovery();
         });
+
+        //result dialog
+        resultDialog = new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.transfer_result))
+                .setCancelable(false)
+                .setNegativeButton(getString(R.string.ok), (DialogInterface dialog, int which) -> {
+                    dialog.dismiss();
+                    receiverService.cancel();
+                    finish();
+                })
+                .create();
+    }
+
+    private void dismissAllDialogs() {
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
+
+        if (resultDialog != null && resultDialog.isShowing()) {
+            resultDialog.dismiss();
+        }
+
+        if (scanningDialog != null && scanningDialog.isShowing()) {
+            scanningDialog.dismiss();
+        }
     }
 
     /**
@@ -162,9 +190,6 @@ public class BtReceiverActivity extends InjectableActivity implements
                 .observeOn(schedulerProvider.androidThread())
                 .subscribe(downloadEvent -> {
                     switch (downloadEvent.getStatus()) {
-                        case QUEUED:
-                            Toast.makeText(this, R.string.download_queued, Toast.LENGTH_SHORT).show();
-                            break;
                         case DOWNLOADING:
                             int progress = downloadEvent.getCurrentProgress();
                             int total = downloadEvent.getTotalSize();
@@ -174,14 +199,16 @@ public class BtReceiverActivity extends InjectableActivity implements
                             break;
                         case FINISHED:
                             progressDialog.dismiss();
-                            Toast.makeText(this, getString(R.string.tv_form_send_success), Toast.LENGTH_SHORT).show();
+                            String result = downloadEvent.getResult();
+                            resultDialog.setMessage(result);
+                            resultDialog.show();
                             break;
                         case ERROR:
-                            progressDialog.dismiss();
+                            dismissAllDialogs();
                             Toast.makeText(this, getString(R.string.error_while_downloading, downloadEvent.getResult()), Toast.LENGTH_SHORT).show();
                             break;
                         case CANCELLED:
-                            progressDialog.dismiss();
+                            dismissAllDialogs();
                             Toast.makeText(this, getString(R.string.canceled), Toast.LENGTH_LONG).show();
                             break;
                     }
@@ -238,6 +265,12 @@ public class BtReceiverActivity extends InjectableActivity implements
             Toast.makeText(this, getString(R.string.turning_on_bluetooth_message), Toast.LENGTH_SHORT).show();
             BluetoothUtils.enableBluetooth();
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        dismissAllDialogs();
     }
 
     @Override
