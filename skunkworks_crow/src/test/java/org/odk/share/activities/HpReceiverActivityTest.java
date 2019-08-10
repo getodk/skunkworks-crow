@@ -47,6 +47,6 @@ public class HpReceiverActivityTest {
     @Test
     public void titleTest() throws Exception {
         Toolbar toolbar = hpReceiverActivity.findViewById(R.id.toolbar);
-        assertEquals(hpReceiverActivity.getString(R.string.connect_wifi), toolbar.getTitle());
+        assertEquals(" " + hpReceiverActivity.getString(R.string.connect_wifi), toolbar.getTitle());
     }
 }
