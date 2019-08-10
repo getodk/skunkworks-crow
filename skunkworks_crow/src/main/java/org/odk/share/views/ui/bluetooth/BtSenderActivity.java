@@ -81,8 +81,11 @@ public class BtSenderActivity extends InjectableActivity {
         setContentView(R.layout.activity_bt_send);
         ButterKnife.bind(this);
 
-        setTitle(getString(R.string.send_instance_title));
+        setTitle(" " + getString(R.string.send_instance_title));
         setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setIcon(R.drawable.ic_bluetooth_white_24dp);
+        }
 
         if (!BluetoothUtils.isBluetoothEnabled()) {
             BluetoothUtils.enableBluetooth();

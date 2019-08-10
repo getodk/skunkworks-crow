@@ -83,8 +83,11 @@ public class BtReceiverActivity extends InjectableActivity implements
         ButterKnife.bind(this);
         initEvents();
 
-        setTitle(getString(R.string.connect_bluetooth_title));
+        setTitle(" " + getString(R.string.connect_bluetooth_title));
         setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setIcon(R.drawable.ic_bluetooth_white_24dp);
+        }
 
         // checking for if bluetooth enabled
         if (!BluetoothUtils.isBluetoothEnabled()) {

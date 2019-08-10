@@ -103,8 +103,11 @@ public class HpSenderActivity extends InjectableActivity {
         setContentView(R.layout.activity_send);
         ButterKnife.bind(this);
 
-        setTitle(getString(R.string.send_forms));
+        setTitle(" " + getString(R.string.send_forms));
         setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setIcon(R.drawable.ic_wifi_tethering_white_24dp);
+        }
 
         receivedIntent = getIntent();
         formIds = receivedIntent.getLongArrayExtra(INSTANCE_IDS);
