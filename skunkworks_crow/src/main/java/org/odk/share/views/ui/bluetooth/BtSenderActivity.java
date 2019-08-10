@@ -205,7 +205,6 @@ public class BtSenderActivity extends InjectableActivity {
                 }
                 break;
             case APP_SETTING_REQUEST_CODE:
-                //only android 9 would enter this case.
                 if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                         != PackageManager.PERMISSION_GRANTED) {
                     PermissionUtils.showAppInfo(this, getPackageName());
