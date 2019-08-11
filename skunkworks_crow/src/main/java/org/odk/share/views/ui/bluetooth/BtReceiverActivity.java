@@ -45,7 +45,7 @@ import timber.log.Timber;
 import static org.odk.share.utilities.PermissionUtils.APP_SETTING_REQUEST_CODE;
 
 /**
- * Receive activity, for testing, needs refactor.
+ * Bluetooth receiver activity.
  *
  * @author huangyz0918 (huangyz0918@gmail.com)
  */
@@ -161,7 +161,7 @@ public class BtReceiverActivity extends InjectableActivity implements
     @OnNeverAskAgain({Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION})
     void showNeverAskForLocation() {
-        PermissionUtils.showAppInfo(this, getPackageName());
+        PermissionUtils.showAppInfo(this, getPackageName(), getString(R.string.permission_open_location_info), getString(R.string.permission_location_denied));
     }
 
     @Override

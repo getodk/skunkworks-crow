@@ -65,9 +65,10 @@ public class PermissionUtils {
     /**
      * Showing an alert dialog and send users to app info page.
      */
-    public static void showAppInfo(Activity targetActivity, String packageName) {
+    public static void showAppInfo(Activity targetActivity, String packageName,
+                                   String msg, String deniedMsg) {
         AlertDialog.Builder builder = new AlertDialog.Builder(targetActivity);
-        builder.setMessage(R.string.permission_open_info);
+        builder.setMessage(msg);
 
         builder.setPositiveButton(targetActivity.getString(R.string.permission_open_info_button), (DialogInterface dialog, int which) -> {
             Intent intent = new Intent();
@@ -79,7 +80,7 @@ public class PermissionUtils {
 
         builder.setNegativeButton(targetActivity.getString(R.string.cancel), (DialogInterface dialog, int which) -> {
             dialog.dismiss();
-            Toast.makeText(targetActivity, R.string.permission_location_denied, Toast.LENGTH_SHORT).show();
+            Toast.makeText(targetActivity, deniedMsg, Toast.LENGTH_SHORT).show();
             targetActivity.finish();
         });
 
