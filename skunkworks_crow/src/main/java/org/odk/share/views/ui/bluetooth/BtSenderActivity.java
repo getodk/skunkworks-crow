@@ -72,8 +72,7 @@ public class BtSenderActivity extends InjectableActivity {
 
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
     private boolean isFinished = false;
-    private int mode;
-    private long[] formIds;
+
     private CountDownTimer countDownTimer;
     private static final int CONNECT_TIMEOUT = 120;
     private static final int COUNT_DOWN_INTERVAL = 1000;
@@ -95,8 +94,8 @@ public class BtSenderActivity extends InjectableActivity {
             BluetoothUtils.enableBluetooth();
         }
 
-        formIds = getIntent().getLongArrayExtra(INSTANCE_IDS);
-        mode = getIntent().getIntExtra(MODE, ASK_REVIEW_MODE);
+        long[] formIds = getIntent().getLongArrayExtra(INSTANCE_IDS);
+        int mode = getIntent().getIntExtra(MODE, ASK_REVIEW_MODE);
         if (formIds == null) {
             formIds = getIntent().getLongArrayExtra(FORM_IDS);
         }
@@ -256,7 +255,6 @@ public class BtSenderActivity extends InjectableActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        senderService.startUploading(formIds, mode);
         compositeDisposable.add(addUploadEventSubscription());
         compositeDisposable.add(addBluetoothEventSubscription());
     }
