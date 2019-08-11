@@ -338,6 +338,8 @@ public class BtReceiverActivity extends InjectableActivity implements
                     })
                     .create()
                     .show();
+        } else {
+            super.onBackPressed();
         }
     }
 }
