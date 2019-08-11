@@ -1,17 +1,22 @@
 package org.odk.share.views.ui.bluetooth;
 
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.text.TextUtils;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 
 import org.odk.share.R;
 import org.odk.share.bluetooth.BluetoothUtils;
@@ -20,6 +25,7 @@ import org.odk.share.events.UploadEvent;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.rx.schedulers.BaseSchedulerProvider;
 import org.odk.share.services.SenderService;
+import org.odk.share.utilities.PermissionUtils;
 import org.odk.share.views.ui.common.injectable.InjectableActivity;
 
 import javax.inject.Inject;
@@ -28,9 +34,14 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import permissions.dispatcher.NeedsPermission;
+import permissions.dispatcher.OnNeverAskAgain;
+import permissions.dispatcher.OnPermissionDenied;
+import permissions.dispatcher.RuntimePermissions;
 import timber.log.Timber;
 
 import static org.odk.share.utilities.ApplicationConstants.ASK_REVIEW_MODE;
+import static org.odk.share.utilities.PermissionUtils.APP_SETTING_REQUEST_CODE;
 import static org.odk.share.views.ui.instance.InstancesList.INSTANCE_IDS;
 import static org.odk.share.views.ui.instance.fragment.ReviewedInstancesFragment.MODE;
 import static org.odk.share.views.ui.send.fragment.BlankFormsFragment.FORM_IDS;
@@ -41,6 +52,7 @@ import static org.odk.share.views.ui.send.fragment.BlankFormsFragment.FORM_IDS;
  *
  * @author huangyz0918 (huangyz0918@gmail.com)
  */
+@RuntimePermissions
 public class BtSenderActivity extends InjectableActivity {
 
     @BindView(R.id.test_text_view)
@@ -65,7 +77,8 @@ public class BtSenderActivity extends InjectableActivity {
     private CountDownTimer countDownTimer;
     private static final int CONNECT_TIMEOUT = 120;
     private static final int COUNT_DOWN_INTERVAL = 1000;
-
+    private static final int DISCOVERABLE_CODE = 0x121;
+    private static final int SUCCESS_CODE = 120;
 
     @Override
 
@@ -81,15 +94,14 @@ public class BtSenderActivity extends InjectableActivity {
             BluetoothUtils.enableBluetooth();
         }
 
-        checkDiscoverableDuration();
-
         formIds = getIntent().getLongArrayExtra(INSTANCE_IDS);
         mode = getIntent().getIntExtra(MODE, ASK_REVIEW_MODE);
         if (formIds == null) {
             formIds = getIntent().getLongArrayExtra(FORM_IDS);
         }
 
-        enableDiscovery();
+        BtSenderActivityPermissionsDispatcher.enableDiscoveryWithPermissionCheck(this);
+        senderService.startUploading(formIds, mode);
     }
 
     /**
@@ -153,18 +165,67 @@ public class BtSenderActivity extends InjectableActivity {
     /**
      * Enable the bluetooth discovery for other devices. The timeout is specific seconds.
      */
-    private void enableDiscovery() {
+    @NeedsPermission({Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION})
+    void enableDiscovery() {
         Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
         // set the discovery timeout for 120s.
         discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, CONNECT_TIMEOUT);
-        startActivity(discoverableIntent);
+        startActivityForResult(discoverableIntent, DISCOVERABLE_CODE);
+    }
+
+    /**
+     * If the permission was denied, finishing this activity.
+     */
+    @OnPermissionDenied({Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION})
+    void showDeniedForLocation() {
+        Toast.makeText(this, R.string.permission_location_denied, Toast.LENGTH_LONG).show();
+        finish();
+    }
+
+    /**
+     * If clicked the "never ask", we should show a toast to guide user.
+     */
+    @OnNeverAskAgain({Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION})
+    void showNeverAskForLocation() {
+        PermissionUtils.showAppInfo(this, getPackageName());
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        BtSenderActivityPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case DISCOVERABLE_CODE:
+                if (resultCode == SUCCESS_CODE) {
+                    startCheckingDiscoverableDuration();
+                } else {
+                    finish();
+                }
+                break;
+            case APP_SETTING_REQUEST_CODE:
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    PermissionUtils.showAppInfo(this, getPackageName());
+                } else {
+                    BtSenderActivityPermissionsDispatcher.enableDiscoveryWithPermissionCheck(this);
+                }
+                break;
+        }
     }
 
     /**
      * Checking the discoverable time, if the device is no longer discoverable, we should show
      * an {@link AlertDialog} to notice our users.
      */
-    private void checkDiscoverableDuration() {
+    private void startCheckingDiscoverableDuration() {
         AlertDialog alertDialog = new AlertDialog.Builder(this)
                 .setTitle(getString(R.string.timeout))
                 .setMessage(getString(R.string.bluetooth_send_time_up))
