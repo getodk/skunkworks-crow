@@ -157,4 +157,7 @@
     <string name="tv_sender_wait_for_connect">waiting for connection (%ss left)&#8230; \nwill start transfer when connected </string>
     <string name="dev_already_connected">already connected to the device, start transferring now&#8230;</string>
     <string name="bluetooth_no_device_scanned">No devices are available. \n Tap refresh to search again.</string>
+    <string name="permission_location_denied">Location permission is required to send the forms using Bluetooth. Please allow it in the app settings.</string>
+    <string name="permission_open_info">Skunkworks-crow app requires location permission to access your Bluetooth. Please allow location permission from your app settings.</string>
+    <string name="permission_open_info_button">Open Settings</string>
 </resources>
