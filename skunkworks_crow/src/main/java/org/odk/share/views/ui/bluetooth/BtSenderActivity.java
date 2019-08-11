@@ -72,13 +72,14 @@ public class BtSenderActivity extends InjectableActivity {
 
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
     private boolean isFinished = false;
-    int mode;
-    long[] formIds;
+    private int mode;
+    private long[] formIds;
     private CountDownTimer countDownTimer;
     private static final int CONNECT_TIMEOUT = 120;
     private static final int COUNT_DOWN_INTERVAL = 1000;
     private static final int DISCOVERABLE_CODE = 0x121;
     private static final int SUCCESS_CODE = 120;
+    private BtSenderActivity thisActivity = this;
 
     @Override
 
@@ -245,7 +246,9 @@ public class BtSenderActivity extends InjectableActivity {
 
             @Override
             public void onFinish() {
-                alertDialog.show();
+                if (!(thisActivity).isFinishing()) {
+                    alertDialog.show();
+                }
             }
         }.start();
     }

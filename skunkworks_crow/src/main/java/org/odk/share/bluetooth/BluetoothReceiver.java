@@ -22,6 +22,7 @@ public class BluetoothReceiver extends BroadcastReceiver {
         IntentFilter filter = new IntentFilter();
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED); //Bluetooth starts searching.
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED); //Bluetooth search ends.
+        filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED); //Bluetooth state changed.
         filter.addAction(BluetoothDevice.ACTION_FOUND); //Bluetooth discovers new devices (unpaired devices).
         context.registerReceiver(this, filter);
     }
@@ -34,6 +35,10 @@ public class BluetoothReceiver extends BroadcastReceiver {
         }
 
         switch (action) {
+            case BluetoothAdapter.ACTION_STATE_CHANGED:
+                final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR);
+                bluetoothReceiverListener.onStateChanged(state);
+                break;
             case BluetoothAdapter.ACTION_DISCOVERY_STARTED:
                 // if the discovery started, update the ui in activity.
                 Timber.d("bluetooth devices discovery started...");
@@ -65,5 +70,7 @@ public class BluetoothReceiver extends BroadcastReceiver {
         void onDiscoveryStarted();
 
         void onDiscoveryFinished();
+
+        void onStateChanged(int state);
     }
 }

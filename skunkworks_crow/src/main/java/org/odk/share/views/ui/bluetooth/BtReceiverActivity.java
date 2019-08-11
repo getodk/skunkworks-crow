@@ -95,16 +95,10 @@ public class BtReceiverActivity extends InjectableActivity implements
         setTitle(getString(R.string.connect_bluetooth_title));
         setSupportActionBar(toolbar);
 
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setCancelable(false);
-        progressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.cancel), (DialogInterface dialog, int which) -> {
-            dialog.dismiss();
-            receiverService.cancel();
-        });
-
         // checking for if bluetooth enabled
         if (!BluetoothUtils.isBluetoothEnabled()) {
             BluetoothUtils.enableBluetooth();
+            Toast.makeText(this, getString(R.string.turning_on_bluetooth_message), Toast.LENGTH_SHORT).show();
             BtReceiverActivityPermissionsDispatcher.updateDeviceListWithPermissionCheck(this);
         }
 
@@ -115,7 +109,6 @@ public class BtReceiverActivity extends InjectableActivity implements
      * Init the basic events for our views.
      */
     private void initEvents() {
-        progressDialog = new ProgressDialog(this);
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
@@ -188,7 +181,7 @@ public class BtReceiverActivity extends InjectableActivity implements
             BtReceiverActivityPermissionsDispatcher.updateDeviceListWithPermissionCheck(this);
         } else {
             BluetoothUtils.enableBluetooth();
-            Toast.makeText(this, "bluetooth has been disabled, turning on...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.turning_on_bluetooth_message), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -275,6 +268,13 @@ public class BtReceiverActivity extends InjectableActivity implements
         checkEmptyList();
     }
 
+    @Override
+    public void onStateChanged(int state) {
+        if (state == BluetoothAdapter.STATE_ON) {
+            BtReceiverActivityPermissionsDispatcher.updateDeviceListWithPermissionCheck(this);
+        }
+    }
+
     /**
      * Clicking the item to connect.
      */
@@ -286,6 +286,7 @@ public class BtReceiverActivity extends InjectableActivity implements
             }
 
             receiverService.startBtDownloading(device.getAddress());
+            progressDialog = new ProgressDialog(this);
             progressDialog.setTitle(getString(R.string.connecting_title));
             progressDialog.setMessage(getString(R.string.connecting_message));
             progressDialog.setIndeterminate(true);
