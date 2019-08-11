@@ -1,9 +1,11 @@
 package org.odk.share.views.ui.bluetooth;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,6 +13,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -26,6 +30,7 @@ import org.odk.share.rx.schedulers.BaseSchedulerProvider;
 import org.odk.share.services.ReceiverService;
 import org.odk.share.utilities.ActivityUtils;
 import org.odk.share.utilities.DialogUtils;
+import org.odk.share.utilities.PermissionUtils;
 import org.odk.share.views.ui.common.injectable.InjectableActivity;
 import org.odk.share.views.ui.hotspot.HpReceiverActivity;
 
@@ -33,15 +38,23 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import permissions.dispatcher.NeedsPermission;
+import permissions.dispatcher.OnNeverAskAgain;
+import permissions.dispatcher.OnPermissionDenied;
+import permissions.dispatcher.RuntimePermissions;
 import timber.log.Timber;
+
+import static org.odk.share.utilities.PermissionUtils.APP_SETTING_REQUEST_CODE;
 
 /**
  * Receive activity, for testing, needs refactor.
  *
  * @author huangyz0918 (huangyz0918@gmail.com)
  */
+@RuntimePermissions
 public class BtReceiverActivity extends InjectableActivity implements
         BluetoothReceiver.BluetoothReceiverListener, BluetoothListAdapter.OnDeviceClickListener {
 
@@ -92,10 +105,27 @@ public class BtReceiverActivity extends InjectableActivity implements
         // checking for if bluetooth enabled
         if (!BluetoothUtils.isBluetoothEnabled()) {
             BluetoothUtils.enableBluetooth();
-            updateDeviceList();
+            BtReceiverActivityPermissionsDispatcher.updateDeviceListWithPermissionCheck(this);
         }
 
         setupScanningDialog();
+    }
+
+    /**
+     * Init the basic events for our views.
+     */
+    private void initEvents() {
+        progressDialog = new ProgressDialog(this);
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
+                linearLayoutManager.getOrientation());
+        recyclerView.addItemDecoration(dividerItemDecoration);
+        recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerView.setAdapter(bluetoothListAdapter);
+        bluetoothReceiver = new BluetoothReceiver(this, this);
+
+        BtReceiverActivityPermissionsDispatcher.updateDeviceListWithPermissionCheck(this);
     }
 
     /**
@@ -115,33 +145,51 @@ public class BtReceiverActivity extends InjectableActivity implements
     /**
      * Rescan the bluetooth devices and update the list.
      */
-    public void updateDeviceList() {
+    @NeedsPermission({Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION})
+    void updateDeviceList() {
         if (!bluetoothAdapter.isDiscovering()) {
             bluetoothAdapter.startDiscovery();
         }
         bluetoothListAdapter.notifyDataSetChanged();
     }
 
-    private void initEvents() {
-        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
-                linearLayoutManager.getOrientation());
-        recyclerView.addItemDecoration(dividerItemDecoration);
-        recyclerView.setLayoutManager(linearLayoutManager);
-        recyclerView.setAdapter(bluetoothListAdapter);
-        bluetoothReceiver = new BluetoothReceiver(this, this);
-        bluetoothAdapter.startDiscovery();
+    /**
+     * If the permission was denied, finishing this activity.
+     */
+    @OnPermissionDenied({Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION})
+    void showDeniedForLocation() {
+        Toast.makeText(this, R.string.permission_location_denied, Toast.LENGTH_LONG).show();
+        finish();
+    }
 
-        // click to refresh the devices list.
-        btnRefresh.setOnClickListener((View v) -> {
-            if (BluetoothUtils.isBluetoothEnabled()) {
-                updateDeviceList();
-            } else {
-                BluetoothUtils.enableBluetooth();
-                Toast.makeText(this, "bluetooth has been disabled, turning on...", Toast.LENGTH_SHORT).show();
-            }
-        });
+    /**
+     * If clicked the "never ask", we should show a toast to guide user.
+     */
+    @OnNeverAskAgain({Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION})
+    void showNeverAskForLocation() {
+        PermissionUtils.showAppInfo(this, getPackageName());
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        BtReceiverActivityPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
+    }
+
+    /**
+     * Clicking to refresh the devices list.
+     */
+    @OnClick(R.id.btn_refresh)
+    public void refresh() {
+        if (BluetoothUtils.isBluetoothEnabled()) {
+            BtReceiverActivityPermissionsDispatcher.updateDeviceListWithPermissionCheck(this);
+        } else {
+            BluetoothUtils.enableBluetooth();
+            Toast.makeText(this, "bluetooth has been disabled, turning on...", Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**
@@ -227,6 +275,9 @@ public class BtReceiverActivity extends InjectableActivity implements
         checkEmptyList();
     }
 
+    /**
+     * Clicking the item to connect.
+     */
     @Override
     public void onItemClick(BluetoothDevice device) {
         if (BluetoothUtils.isBluetoothEnabled()) {
@@ -235,7 +286,6 @@ public class BtReceiverActivity extends InjectableActivity implements
             }
 
             receiverService.startBtDownloading(device.getAddress());
-            progressDialog = new ProgressDialog(this);
             progressDialog.setTitle(getString(R.string.connecting_title));
             progressDialog.setMessage(getString(R.string.connecting_message));
             progressDialog.setIndeterminate(true);
@@ -269,6 +319,14 @@ public class BtReceiverActivity extends InjectableActivity implements
             }
         });
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == APP_SETTING_REQUEST_CODE) {
+            BtReceiverActivityPermissionsDispatcher.updateDeviceListWithPermissionCheck(this);
+        }
     }
 
     @Override
