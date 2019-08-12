@@ -165,7 +165,8 @@
     <string name="preference_default_method_summary">Bluetooth</string>
     <string name="bluetooth_switch_method">Are you sure to stop and switch to bluetooth method?</string>
     <string name="hotspot_switch_method">Are you sure to stop and switch to hotspot method?</string>
-    <string name="switch_method_title">Switch Method</string>
+    <string name="switch_to_bluetooth_title">Switch to Bluetooth Method</string>
+    <string name="switch_to_hotspot_title">Switch to Hotspot Method</string>
     <string name="permission_location_denied">Location permission is required to send the forms using Bluetooth. Please allow it in the app settings.</string>
     <string name="permission_open_info">Skunkworks-crow app requires location permission to access your Bluetooth. Please allow location permission from your app settings.</string>
     <string name="permission_open_info_button">Open Settings</string>

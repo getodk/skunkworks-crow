@@ -42,7 +42,6 @@ public class DialogUtils {
      */
     public static AlertDialog createMethodSwitchDialog(Activity targetActivity, DialogInterface.OnClickListener listener) {
         AlertDialog alertDialog = new AlertDialog.Builder(targetActivity).create();
-        alertDialog.setTitle(targetActivity.getString(R.string.switch_method_title));
         alertDialog.setCancelable(false);
         alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, targetActivity.getString(R.string.cancel),
                 (dialog, i) -> {
@@ -52,8 +51,12 @@ public class DialogUtils {
         alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, targetActivity.getString(R.string.switch_method), listener);
 
         if (targetActivity instanceof BtReceiverActivity || targetActivity instanceof BtSenderActivity) {
+            alertDialog.setIcon(R.drawable.ic_wifi_tethering_black_24dp);
+            alertDialog.setTitle(targetActivity.getString(R.string.switch_to_hotspot_title));
             alertDialog.setMessage(targetActivity.getString(R.string.hotspot_switch_method));
         } else if (targetActivity instanceof HpReceiverActivity || targetActivity instanceof HpSenderActivity) {
+            alertDialog.setIcon(R.drawable.ic_bluetooth_black_24dp);
+            alertDialog.setTitle(targetActivity.getString(R.string.switch_to_bluetooth_title));
             alertDialog.setMessage(targetActivity.getString(R.string.bluetooth_switch_method));
         } else {
             throw new IllegalArgumentException("Not a valid activity parameter");
