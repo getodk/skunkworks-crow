@@ -219,6 +219,7 @@ public class DownloadJob extends Job {
     private boolean readFormAndInstances() {
         try {
             Timber.d("readFormAndInstances");
+            String displayName = dis.readUTF();
             String formId = dis.readUTF();
             String formVersion = dis.readUTF();
             Timber.d(formId + " " + formVersion);
@@ -235,6 +236,7 @@ public class DownloadJob extends Job {
                 // read form
                 readForm();
             } else {
+                setupResultFormInfo(displayName, formVersion);
                 sbResult.append(getContext().getString(R.string.id, formId) + " " +
                         getContext().getString(R.string.msg_form_already_exist));
             }
@@ -252,6 +254,7 @@ public class DownloadJob extends Job {
         String formId = null;
         try {
             Timber.d("Reading blank form");
+            String displayName = dis.readUTF();
             formId = dis.readUTF();
             String formVersion = dis.readUTF();
             Timber.d(formId + " " + formVersion);
@@ -268,6 +271,7 @@ public class DownloadJob extends Job {
                 // read form
                 readForm();
             } else {
+                setupResultFormInfo(displayName, formVersion);
                 sbResult.append(getContext().getString(R.string.id, formId) + " " +
                         getContext().getString(R.string.msg_form_already_exist));
             }
@@ -328,15 +332,19 @@ public class DownloadJob extends Job {
             values.put(FormsProviderAPI.FormsColumns.FORM_MEDIA_PATH, formMediaPath);
             formsDao.saveForm(values);
 
-            sbResult.append(displayName + " ");
-            if (formVersion != null) {
-                sbResult.append(getContext().getString(R.string.version, formVersion));
-            }
+            setupResultFormInfo(displayName, formVersion);
             sbResult.append(getContext().getString(R.string.id, formId) + " " +
                     getContext().getString(R.string.success, getContext().getString(R.string.blank_form_count,
                             getContext().getString(R.string.received))));
         } catch (IOException e) {
             Timber.e(e);
+        }
+    }
+
+    private void setupResultFormInfo(String displayName, String formVersion) {
+        sbResult.append(displayName + " ");
+        if (formVersion != null) {
+            sbResult.append(getContext().getString(R.string.version, formVersion));
         }
     }
 

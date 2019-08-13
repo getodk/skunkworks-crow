@@ -333,6 +333,7 @@ public class UploadJob extends Job {
         String formVersion = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.JR_VERSION));
 
         try {
+            dos.writeUTF(displayName);
             dos.writeUTF(formId);
             if (formVersion == null) {
                 dos.writeUTF("-1");

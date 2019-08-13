@@ -109,7 +109,7 @@
     <string name="received_for_review">(Received for review) \n</string>
     <string name="updated">(Updated) \n</string>
     <string name="sent_again">(Sent again) \n</string>
-    <string name="msg_form_already_exist">(Already exists) \n</string>
+    <string name="msg_form_already_exist">(Already exists) \n\n</string>
     <string name="form_received_by_reviewer">%s by reviewer</string>
     <string name="accepted">Accepted</string>
     <string name="rejected">Rejected</string>
