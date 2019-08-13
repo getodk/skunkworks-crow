@@ -51,6 +51,7 @@ import static org.odk.share.dto.InstanceMap.INSTANCE_UUID;
 import static org.odk.share.dto.TransferInstance.INSTANCE_ID;
 import static org.odk.share.dto.TransferInstance.STATUS_FORM_SENT;
 import static org.odk.share.dto.TransferInstance.TRANSFER_STATUS;
+import static org.odk.share.tasks.DownloadJob.RESULT_DIVIDER;
 import static org.odk.share.utilities.ApplicationConstants.SEND_BLANK_FORM_MODE;
 import static org.odk.share.utilities.ApplicationConstants.SEND_FILL_FORM_MODE;
 import static org.odk.share.views.ui.instance.fragment.ReviewedInstancesFragment.MODE;
@@ -351,10 +352,11 @@ public class UploadJob extends Job {
             boolean formExistAtReceiver = dis.readBoolean();
             Timber.d("Form exists %b ", formExistAtReceiver);
 
-            sbResult.append(displayName + " ");
+            sbResult.append(getContext().getString(R.string.form_name, displayName) + "\n");
             if (formVersion != null) {
-                sbResult.append(getContext().getString(R.string.version, formVersion));
+                sbResult.append(getContext().getString(R.string.version, formVersion) + "\n");
             }
+            sbResult.append(getContext().getString(R.string.id, formId) + "\n");
 
             if (!formExistAtReceiver) {
                 Timber.d("Form sent to the receiver");
@@ -390,13 +392,14 @@ public class UploadJob extends Job {
                     dos.writeInt(0);
                 }
 
-                sbResult.append(getContext().getString(R.string.id, formId) + " " +
-                        getContext().getString(R.string.success, getContext().getString(R.string.blank_form_count,
-                                getContext().getString(R.string.sent))));
+                sbResult.append(getContext().getString(R.string.form_transfer_result,
+                        getContext().getString(R.string.success, ", " +
+                                getContext().getString(R.string.blank_form_count,
+                                        getContext().getString(R.string.received)))));
             } else {
-                sbResult.append(getContext().getString(R.string.id, formId) + " " +
-                        getContext().getString(R.string.msg_form_already_exist));
+                sbResult.append(getContext().getString(R.string.form_transfer_result, getContext().getString(R.string.msg_form_already_exist)));
             }
+            sbResult.append(RESULT_DIVIDER);
         } catch (IOException e) {
             Timber.e(e);
         }
@@ -459,7 +462,7 @@ public class UploadJob extends Job {
                         boolean isFormSentForReview = dis.readBoolean();
                         Timber.d("isFormSentForReview " + isFormSentForReview);
                         if (!isFormSentForReview) {
-                            sbResult.append(displayName + getContext().getString(R.string.failed,
+                            setupResultTest(displayName, getContext().getString(R.string.failed,
                                     getContext().getString(R.string.review_not_asked)));
                             continue;
                         } else {
@@ -482,7 +485,7 @@ public class UploadJob extends Job {
 
                     if (mode == ApplicationConstants.SEND_REVIEW_MODE) {
                         // sent the review with the updated files
-                        sbResult.append(displayName + getContext().getString(R.string.success,
+                        setupResultTest(displayName, getContext().getString(R.string.success,
                                 getContext().getString(R.string.review_sent)));
                     } else {
                         // sent for review and update in transfer.db
@@ -495,7 +498,7 @@ public class UploadJob extends Job {
                         boolean isFormAlreadySentForReview = dis.readBoolean();
                         Timber.d("isFormAlreadySentForReview " + isFormAlreadySentForReview);
                         if (isFormAlreadySentForReview) {
-                            sbResult.append(displayName + getContext().getString(R.string.success,
+                            setupResultTest(displayName, getContext().getString(R.string.success,
                                     getContext().getString(R.string.sent_again)));
                         } else {
                             ContentValues values = new ContentValues();
@@ -503,7 +506,7 @@ public class UploadJob extends Job {
                                     c.getLong(c.getColumnIndex(InstanceProviderAPI.InstanceColumns._ID)));
                             values.put(TRANSFER_STATUS, STATUS_FORM_SENT);
                             new ShareDatabaseHelper(getContext()).insertInstance(values);
-                            sbResult.append(displayName + getContext().getString(R.string.success,
+                            setupResultTest(displayName, getContext().getString(R.string.success,
                                     getContext().getString(R.string.sent_for_review)));
                         }
                     }
@@ -516,6 +519,12 @@ public class UploadJob extends Job {
                 c.close();
             }
         }
+    }
+
+    private void setupResultTest(String formName, String status) {
+        sbResult.append(getContext().getString(R.string.form_name, formName) + "\n");
+        sbResult.append(getContext().getString(R.string.form_transfer_result, ", " + status));
+        sbResult.append(RESULT_DIVIDER);
     }
 
     private void sendFile(String filePath) {
