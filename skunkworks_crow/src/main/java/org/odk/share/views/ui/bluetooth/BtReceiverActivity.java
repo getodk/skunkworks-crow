@@ -255,11 +255,11 @@ public class BtReceiverActivity extends InjectableActivity implements
                             resultDialog.show();
                             break;
                         case ERROR:
-                            dismissAllDialogs();
+                            progressDialog.dismiss();
                             Toast.makeText(this, getString(R.string.error_while_downloading, downloadEvent.getResult()), Toast.LENGTH_SHORT).show();
                             break;
                         case CANCELLED:
-                            dismissAllDialogs();
+                            progressDialog.dismiss();
                             Toast.makeText(this, getString(R.string.canceled), Toast.LENGTH_LONG).show();
                             break;
                     }
