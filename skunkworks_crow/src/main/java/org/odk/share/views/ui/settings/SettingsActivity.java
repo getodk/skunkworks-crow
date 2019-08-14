@@ -1,5 +1,6 @@
 package org.odk.share.views.ui.settings;
 
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,12 +16,12 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+
 import com.google.android.material.textfield.TextInputLayout;
 
 import org.odk.share.R;
-
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.Toolbar;
 
 
 /**
@@ -31,6 +32,7 @@ public class SettingsActivity extends PreferenceActivity {
 
     EditTextPreference hotspotNamePreference;
     Preference hotspotPasswordPreference;
+    Preference resetPreference;
     CheckBoxPreference passwordRequirePreference;
     EditTextPreference odkDestinationDirPreference;
     private SharedPreferences prefs;
@@ -56,6 +58,7 @@ public class SettingsActivity extends PreferenceActivity {
     }
 
     private void addPreferences() {
+        resetPreference = findPreference(PreferenceKeys.KEY_RESET_SETTINGS);
         hotspotNamePreference = (EditTextPreference) findPreference(PreferenceKeys.KEY_HOTSPOT_NAME);
         hotspotPasswordPreference = findPreference(PreferenceKeys.KEY_HOTSPOT_PASSWORD);
         passwordRequirePreference = (CheckBoxPreference) findPreference(PreferenceKeys.KEY_HOTSPOT_PWD_REQUIRE);
@@ -77,6 +80,7 @@ public class SettingsActivity extends PreferenceActivity {
         passwordRequirePreference.setOnPreferenceChangeListener(preferenceChangeListener());
         odkDestinationDirPreference.setOnPreferenceChangeListener(preferenceChangeListener());
 
+        resetPreference.setOnPreferenceClickListener(preferenceClickListener());
         hotspotPasswordPreference.setOnPreferenceClickListener(preferenceClickListener());
     }
 
@@ -85,6 +89,9 @@ public class SettingsActivity extends PreferenceActivity {
             switch (preference.getKey()) {
                 case PreferenceKeys.KEY_HOTSPOT_PASSWORD:
                     showPasswordDialog();
+                    break;
+                case PreferenceKeys.KEY_RESET_SETTINGS:
+                    resetSettings();
                     break;
             }
             return false;
@@ -161,5 +168,21 @@ public class SettingsActivity extends PreferenceActivity {
         alertDialog.show();
         alertDialog.setCancelable(true);
         alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+    }
+
+    private void resetSettings() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.title_reset_settings))
+                .setMessage(getString(R.string.message_reset_settings))
+                .setPositiveButton(getString(R.string.ok), (DialogInterface dialog, int which) -> {
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.clear();
+                    editor.apply();
+                    Toast.makeText(this, getString(R.string.success_reset_settings), Toast.LENGTH_LONG).show();
+                    finish();
+                })
+                .setNegativeButton(getString(R.string.cancel), (DialogInterface dialog, int which) -> {
+                    dialog.dismiss();
+                }).create().show();
     }
 }

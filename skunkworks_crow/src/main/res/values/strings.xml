@@ -131,6 +131,10 @@
     <string name="odk_destination_dir_error">The destination should not be empty</string>
     <string name="location_permission_needed">Location Permission Needed</string>
     <string name="location_settings_dialog">Enable location from the settings.</string>
+    <string name="reset_settings">Click to reset all preferences</string>
+    <string name="title_reset_settings">Reset Settings</string>
+    <string name="message_reset_settings">Are you sure to reset all the settings?</string>
+    <string name="success_reset_settings">Reset success, open settings to see changes</string>
 
     <string name="btn_refresh">Refresh</string>
     <string name="method_bluetooth">Bluetooth</string>
