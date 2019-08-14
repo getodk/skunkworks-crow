@@ -147,20 +147,6 @@ public class BtReceiverActivity extends InjectableActivity implements
                 .create();
     }
 
-    private void dismissAllDialogs() {
-        if (progressDialog != null && progressDialog.isShowing()) {
-            progressDialog.dismiss();
-        }
-
-        if (resultDialog != null && resultDialog.isShowing()) {
-            resultDialog.dismiss();
-        }
-
-        if (scanningDialog != null && scanningDialog.isShowing()) {
-            scanningDialog.dismiss();
-        }
-    }
-
     /**
      * Rescan the bluetooth devices and update the list.
      */
@@ -327,12 +313,6 @@ public class BtReceiverActivity extends InjectableActivity implements
         if (requestCode == APP_SETTING_REQUEST_CODE) {
             BtReceiverActivityPermissionsDispatcher.updateDeviceListWithPermissionCheck(this);
         }
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        dismissAllDialogs();
     }
 
     @Override
