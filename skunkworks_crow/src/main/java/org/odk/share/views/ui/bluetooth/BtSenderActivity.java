@@ -48,7 +48,7 @@ import static org.odk.share.views.ui.send.fragment.BlankFormsFragment.FORM_IDS;
 
 
 /**
- * Send activity, for testing, needs refactor.
+ * Bluetooth sender activity.
  *
  * @author huangyz0918 (huangyz0918@gmail.com)
  */
@@ -184,7 +184,7 @@ public class BtSenderActivity extends InjectableActivity {
     @OnNeverAskAgain({Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION})
     void showNeverAskForLocation() {
-        PermissionUtils.showAppInfo(this, getPackageName());
+        PermissionUtils.showAppInfo(this, getPackageName(), getString(R.string.permission_open_location_info), getString(R.string.permission_location_denied));
     }
 
     @Override
@@ -207,7 +207,7 @@ public class BtSenderActivity extends InjectableActivity {
             case APP_SETTING_REQUEST_CODE:
                 if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                         != PackageManager.PERMISSION_GRANTED) {
-                    PermissionUtils.showAppInfo(this, getPackageName());
+                    PermissionUtils.showAppInfo(this, getPackageName(), getString(R.string.permission_open_location_info), getString(R.string.permission_location_denied));
                 } else {
                     BtSenderActivityPermissionsDispatcher.enableDiscoveryWithPermissionCheck(this);
                 }
