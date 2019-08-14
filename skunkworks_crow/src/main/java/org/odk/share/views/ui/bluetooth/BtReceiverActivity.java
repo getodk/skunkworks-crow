@@ -90,18 +90,10 @@ public class BtReceiverActivity extends InjectableActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bt_receive);
         ButterKnife.bind(this);
-        initEvents();
-
         setTitle(getString(R.string.connect_bluetooth_title));
         setSupportActionBar(toolbar);
 
-        // checking for if bluetooth enabled
-        if (!BluetoothUtils.isBluetoothEnabled()) {
-            BluetoothUtils.enableBluetooth();
-            Toast.makeText(this, getString(R.string.turning_on_bluetooth_message), Toast.LENGTH_SHORT).show();
-            BtReceiverActivityPermissionsDispatcher.updateDeviceListWithPermissionCheck(this);
-        }
-
+        initEvents();
         setupScanningDialog();
     }
 
@@ -141,6 +133,10 @@ public class BtReceiverActivity extends InjectableActivity implements
     @NeedsPermission({Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION})
     void updateDeviceList() {
+        if (!BluetoothUtils.isBluetoothEnabled()) {
+            Toast.makeText(this, getString(R.string.turning_on_bluetooth_message), Toast.LENGTH_SHORT).show();
+            BluetoothUtils.enableBluetooth();
+        }
         if (!bluetoothAdapter.isDiscovering()) {
             bluetoothAdapter.startDiscovery();
         }
