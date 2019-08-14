@@ -238,6 +238,9 @@ public class BtReceiverActivity extends InjectableActivity implements
                 .observeOn(schedulerProvider.androidThread())
                 .subscribe(downloadEvent -> {
                     switch (downloadEvent.getStatus()) {
+                        case QUEUED:
+                            Timber.d(getString(R.string.download_queued));
+                            break;
                         case DOWNLOADING:
                             int progress = downloadEvent.getCurrentProgress();
                             int total = downloadEvent.getTotalSize();

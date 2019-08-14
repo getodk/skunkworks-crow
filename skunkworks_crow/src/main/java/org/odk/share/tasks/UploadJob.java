@@ -395,7 +395,7 @@ public class UploadJob extends Job {
                 sbResult.append(getContext().getString(R.string.form_transfer_result,
                         getContext().getString(R.string.success, ", " +
                                 getContext().getString(R.string.blank_form_count,
-                                        getContext().getString(R.string.received)))));
+                                        getContext().getString(R.string.sent)))));
             } else {
                 sbResult.append(getContext().getString(R.string.form_transfer_result, getContext().getString(R.string.msg_form_already_exist)));
             }
