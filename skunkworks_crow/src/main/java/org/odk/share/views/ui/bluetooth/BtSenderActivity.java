@@ -4,8 +4,11 @@ package org.odk.share.views.ui.bluetooth;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -72,6 +75,7 @@ public class BtSenderActivity extends InjectableActivity {
 
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
     private boolean isFinished = false;
+    private boolean isDiscoverying = false;
 
     private CountDownTimer countDownTimer;
     private static final int CONNECT_TIMEOUT = 120;
@@ -79,6 +83,10 @@ public class BtSenderActivity extends InjectableActivity {
     private static final int DISCOVERABLE_CODE = 0x121;
     private static final int SUCCESS_CODE = 120;
     private BtSenderActivity thisActivity = this;
+
+    private long[] formIds;
+    private int mode;
+
 
     @Override
 
@@ -94,14 +102,17 @@ public class BtSenderActivity extends InjectableActivity {
             BluetoothUtils.enableBluetooth();
         }
 
-        long[] formIds = getIntent().getLongArrayExtra(INSTANCE_IDS);
-        int mode = getIntent().getIntExtra(MODE, ASK_REVIEW_MODE);
+        registerReceiver(bluetoothReceiver, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
+
+        formIds = getIntent().getLongArrayExtra(INSTANCE_IDS);
+        mode = getIntent().getIntExtra(MODE, ASK_REVIEW_MODE);
         if (formIds == null) {
             formIds = getIntent().getLongArrayExtra(FORM_IDS);
         }
 
-        BtSenderActivityPermissionsDispatcher.enableDiscoveryWithPermissionCheck(this);
-        senderService.startUploading(formIds, mode);
+        if (BluetoothUtils.isBluetoothEnabled()) {
+            BtSenderActivityPermissionsDispatcher.enableDiscoveryWithPermissionCheck(this);
+        }
     }
 
     /**
@@ -168,11 +179,25 @@ public class BtSenderActivity extends InjectableActivity {
     @NeedsPermission({Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION})
     void enableDiscovery() {
-        Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-        // set the discovery timeout for 120s.
-        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, CONNECT_TIMEOUT);
-        startActivityForResult(discoverableIntent, DISCOVERABLE_CODE);
+        if (BluetoothUtils.isBluetoothEnabled()) {
+            Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+            // set the discovery timeout for 120s.
+            discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, CONNECT_TIMEOUT);
+            startActivityForResult(discoverableIntent, DISCOVERABLE_CODE);
+        }
     }
+
+    private final BroadcastReceiver bluetoothReceiver = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
+                if (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1)
+                        == BluetoothAdapter.STATE_ON && !isDiscoverying) {
+                    BtSenderActivityPermissionsDispatcher.enableDiscoveryWithPermissionCheck(thisActivity);
+                }
+            }
+        }
+    };
 
     /**
      * If the permission was denied, finishing this activity.
@@ -205,8 +230,10 @@ public class BtSenderActivity extends InjectableActivity {
         switch (requestCode) {
             case DISCOVERABLE_CODE:
                 if (resultCode == SUCCESS_CODE) {
+                    isDiscoverying = true;
                     startCheckingDiscoverableDuration();
                 } else {
+                    isDiscoverying = false;
                     finish();
                 }
                 break;
@@ -226,6 +253,7 @@ public class BtSenderActivity extends InjectableActivity {
      * an {@link AlertDialog} to notice our users.
      */
     private void startCheckingDiscoverableDuration() {
+        senderService.startUploading(formIds, mode);
         AlertDialog alertDialog = new AlertDialog.Builder(this)
                 .setTitle(getString(R.string.timeout))
                 .setMessage(getString(R.string.bluetooth_send_time_up))
@@ -245,6 +273,7 @@ public class BtSenderActivity extends InjectableActivity {
 
             @Override
             public void onFinish() {
+                isDiscoverying = false;
                 if (!(thisActivity).isFinishing()) {
                     alertDialog.show();
                 }
@@ -266,6 +295,12 @@ public class BtSenderActivity extends InjectableActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(bluetoothReceiver);
+    }
+
+    @Override
     public void onBackPressed() {
         if (!isFinished) {
             new AlertDialog.Builder(this)
@@ -273,6 +308,7 @@ public class BtSenderActivity extends InjectableActivity {
                     .setMessage(getString(R.string.stop_sending_msg))
                     .setPositiveButton(R.string.stop, (DialogInterface dialog, int which) -> {
                         senderService.cancel();
+                        BluetoothUtils.disableBluetooth();
                         super.onBackPressed();
                     })
                     .setNegativeButton(R.string.cancel, (DialogInterface dialog, int which) -> {
@@ -281,7 +317,19 @@ public class BtSenderActivity extends InjectableActivity {
                     .create()
                     .show();
         } else {
-            super.onBackPressed();
+            new AlertDialog.Builder(this)
+                    .setTitle(getString(R.string.disable_bluetooth))
+                    .setMessage(getString(R.string.disable_bluetooth_sender_msg))
+                    .setPositiveButton(R.string.quit, (DialogInterface dialog, int which) -> {
+                        senderService.cancel();
+                        BluetoothUtils.disableBluetooth();
+                        super.onBackPressed();
+                    })
+                    .setNegativeButton(android.R.string.no, (DialogInterface dialog, int which) -> {
+                        dialog.dismiss();
+                    })
+                    .create()
+                    .show();
         }
     }
 }

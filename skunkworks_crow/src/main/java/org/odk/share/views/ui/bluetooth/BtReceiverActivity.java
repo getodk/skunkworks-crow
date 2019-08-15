@@ -192,7 +192,9 @@ public class BtReceiverActivity extends InjectableActivity implements
                 .subscribe(bluetoothEvent -> {
                     switch (bluetoothEvent.getStatus()) {
                         case CONNECTED:
-                            progressDialog.setMessage(getString(R.string.connected_bluetooth_downloading));
+                            if (progressDialog != null) {
+                                progressDialog.setMessage(getString(R.string.connected_bluetooth_downloading));
+                            }
                             isConnected = true;
                             break;
                         case DISCONNECTED:
@@ -323,7 +325,7 @@ public class BtReceiverActivity extends InjectableActivity implements
         if (BluetoothUtils.isBluetoothEnabled()) {
             new AlertDialog.Builder(this)
                     .setTitle(getString(R.string.disable_bluetooth))
-                    .setMessage(getString(R.string.disable_bluetooth_msg))
+                    .setMessage(getString(R.string.disable_bluetooth_receiver_msg))
                     .setPositiveButton(R.string.quit, (DialogInterface dialog, int which) -> {
                         receiverService.cancel();
                         BluetoothUtils.disableBluetooth();
