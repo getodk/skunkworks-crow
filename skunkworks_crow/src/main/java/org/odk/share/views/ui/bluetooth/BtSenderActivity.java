@@ -137,6 +137,9 @@ public class BtSenderActivity extends InjectableActivity {
                 .setNegativeButton(getString(R.string.ok), (DialogInterface dialog, int which) -> {
                     dialog.dismiss();
                     senderService.cancel();
+                    if (BluetoothUtils.isBluetoothEnabled()) {
+                        BluetoothUtils.disableBluetooth();
+                    }
                     finish();
                 })
                 .create();
