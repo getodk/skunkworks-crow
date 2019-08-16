@@ -14,10 +14,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -32,6 +35,7 @@ import org.odk.share.application.Share;
 import org.odk.share.dao.TransferDao;
 import org.odk.share.utilities.ActivityUtils;
 import org.odk.share.utilities.DialogUtils;
+import org.odk.share.utilities.PermissionUtils;
 import org.odk.share.views.listeners.ItemClickListener;
 import org.odk.share.views.ui.about.AboutActivity;
 import org.odk.share.views.ui.common.basecursor.BaseCursorViewHolder;
@@ -45,6 +49,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import timber.log.Timber;
+
+import static org.odk.share.utilities.PermissionUtils.APP_SETTING_REQUEST_CODE;
 
 public class MainActivity extends FormListActivity implements LoaderManager.LoaderCallbacks<Cursor>, ItemClickListener {
 
@@ -245,20 +251,35 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        switch (requestCode) {
-            case STORAGE_PERMISSION_REQUEST_CODE:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    setUpLoader();
+        if (requestCode == STORAGE_PERMISSION_REQUEST_CODE) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                setUpLoader();
+            } else {
+                if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                        !shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE))) {
+                    PermissionUtils.showAppInfo(this, getPackageName(), getString(R.string.permission_open_storage_info), getString(R.string.permission_storage_denied));
                 } else {
-                    //close the app if the permission is denied
+                    Toast.makeText(this, getString(R.string.permission_storage_denied), Toast.LENGTH_SHORT).show();
                     finish();
                 }
+            }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == APP_SETTING_REQUEST_CODE) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED) {
+                PermissionUtils.showAppInfo(this, getPackageName(), getString(R.string.permission_open_storage_info), getString(R.string.permission_storage_denied));
+            } else {
+                setUpLoader();
+            }
         }
     }
 
     private void setUpLoader() {
-
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
                 checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
 
