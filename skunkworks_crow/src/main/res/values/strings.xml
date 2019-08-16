@@ -55,6 +55,10 @@
     <string name="ok">OK</string>
     <string name="canceled">Canceled</string>
     <string name="stop_sending">Stop Sending</string>
+    <string name="stop_sending_msg">Do you want to stop sending?</string>
+    <string name="disable_bluetooth">Disable bluetooth</string>
+    <string name="disable_bluetooth_receiver_msg">Do you want to disable the bluetooth and stop receiving of forms?</string>
+    <string name="disable_bluetooth_sender_msg">Do you want to disable the bluetooth and quit?</string>
 
     <string name="sending_items">Sending %1$s of %2$s form(s)</string>
     <string name="receiving_items">Receiving %1$s of %2$s form(s)</string>
@@ -168,6 +172,8 @@
     <string name="switch_to_bluetooth_title">Switch to Bluetooth Method</string>
     <string name="switch_to_hotspot_title">Switch to Hotspot Method</string>
     <string name="permission_location_denied">Location permission is required to send the forms using Bluetooth. Please allow it in the app settings.</string>
-    <string name="permission_open_info">Skunkworks-crow app requires location permission to access your Bluetooth. Please allow location permission from your app settings.</string>
+    <string name="permission_storage_denied">Storage permission is required. Please allow it in the app settings.</string>
+    <string name="permission_open_location_info">Skunkworks-crow app requires location permission to access your Bluetooth. Please allow location permission from your app settings.</string>
+    <string name="permission_open_storage_info">Skunkworks-crow app requires storage permission to access ODK database. Please allow that from your app settings.</string>
     <string name="permission_open_info_button">Open Settings</string>
 </resources>
