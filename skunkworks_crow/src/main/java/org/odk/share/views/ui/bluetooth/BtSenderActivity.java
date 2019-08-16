@@ -3,6 +3,7 @@ package org.odk.share.views.ui.bluetooth;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -12,7 +13,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.text.TextUtils;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -59,7 +60,7 @@ import static org.odk.share.views.ui.send.fragment.BlankFormsFragment.FORM_IDS;
 public class BtSenderActivity extends InjectableActivity {
 
     @BindView(R.id.test_text_view)
-    TextView resultTextView;
+    TextView activityTextView;
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -75,9 +76,11 @@ public class BtSenderActivity extends InjectableActivity {
 
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
     private boolean isFinished = false;
-    private boolean isDiscoverying = false;
+    private boolean isDiscovering = false;
 
     private CountDownTimer countDownTimer;
+    private ProgressDialog progressDialog;
+    private AlertDialog resultDialog;
     private static final int CONNECT_TIMEOUT = 120;
     private static final int COUNT_DOWN_INTERVAL = 1000;
     private static final int DISCOVERABLE_CODE = 0x121;
@@ -89,7 +92,6 @@ public class BtSenderActivity extends InjectableActivity {
 
 
     @Override
-
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bt_send);
@@ -102,6 +104,7 @@ public class BtSenderActivity extends InjectableActivity {
             BluetoothUtils.enableBluetooth();
         }
 
+        setupDialog();
         registerReceiver(bluetoothReceiver, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
 
         formIds = getIntent().getLongArrayExtra(INSTANCE_IDS);
@@ -112,6 +115,43 @@ public class BtSenderActivity extends InjectableActivity {
 
         if (BluetoothUtils.isBluetoothEnabled()) {
             BtSenderActivityPermissionsDispatcher.enableDiscoveryWithPermissionCheck(this);
+        }
+    }
+
+    private void setupDialog() {
+        //ProgressDialog
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setTitle(getString(R.string.sending_title));
+        progressDialog.setIndeterminate(true);
+        progressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.stop),
+                (DialogInterface dialog, int which) -> {
+                    dialog.dismiss();
+                    senderService.cancel();
+                    finish();
+                });
+
+        //AlertDialog
+        resultDialog = new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.transfer_result))
+                .setCancelable(false)
+                .setNegativeButton(getString(R.string.ok), (DialogInterface dialog, int which) -> {
+                    dialog.dismiss();
+                    senderService.cancel();
+                    if (BluetoothUtils.isBluetoothEnabled()) {
+                        BluetoothUtils.disableBluetooth();
+                    }
+                    finish();
+                })
+                .create();
+    }
+
+    private void dismissAllDialogs() {
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
+
+        if (resultDialog != null && resultDialog.isShowing()) {
+            resultDialog.dismiss();
         }
     }
 
@@ -127,9 +167,12 @@ public class BtSenderActivity extends InjectableActivity {
                     switch (bluetoothEvent.getStatus()) {
                         case CONNECTED:
                             countDownTimer.cancel();
-                            resultTextView.setText(getString(R.string.connecting_transfer_message));
+                            progressDialog.setMessage(getString(R.string.connecting_transfer_message));
+                            progressDialog.show();
+                            activityTextView.setVisibility(View.GONE);
                             break;
                         case DISCONNECTED:
+                            progressDialog.dismiss();
                             break;
                     }
                 });
@@ -148,25 +191,22 @@ public class BtSenderActivity extends InjectableActivity {
                         case UPLOADING:
                             int progress = uploadEvent.getCurrentProgress();
                             int total = uploadEvent.getTotalSize();
-
                             String alertMsg = getString(R.string.sending_items, String.valueOf(progress), String.valueOf(total));
-                            Toast.makeText(this, alertMsg, Toast.LENGTH_SHORT).show();
+                            progressDialog.setMessage(alertMsg);
                             break;
                         case FINISHED:
+                            progressDialog.dismiss();
                             isFinished = true;
                             String result = uploadEvent.getResult();
-                            if (TextUtils.isEmpty(result)) {
-                                resultTextView.setText(getString(R.string.tv_form_already_exist));
-                            } else {
-                                resultTextView.setText(getString(R.string.tv_form_send_success));
-                                resultTextView.append(result);
-                            }
-                            Toast.makeText(this, getString(R.string.transfer_result) + " : " + result, Toast.LENGTH_SHORT).show();
+                            resultDialog.setMessage(result);
+                            resultDialog.show();
                             break;
                         case ERROR:
+                            dismissAllDialogs();
                             Toast.makeText(this, getString(R.string.error_while_uploading, uploadEvent.getResult()), Toast.LENGTH_SHORT).show();
                             break;
                         case CANCELLED:
+                            dismissAllDialogs();
                             Toast.makeText(this, getString(R.string.canceled), Toast.LENGTH_LONG).show();
                             break;
                     }
@@ -192,7 +232,7 @@ public class BtSenderActivity extends InjectableActivity {
             String action = intent.getAction();
             if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
                 if (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1)
-                        == BluetoothAdapter.STATE_ON && !isDiscoverying) {
+                        == BluetoothAdapter.STATE_ON && !isDiscovering) {
                     BtSenderActivityPermissionsDispatcher.enableDiscoveryWithPermissionCheck(thisActivity);
                 }
             }
@@ -230,10 +270,10 @@ public class BtSenderActivity extends InjectableActivity {
         switch (requestCode) {
             case DISCOVERABLE_CODE:
                 if (resultCode == SUCCESS_CODE) {
-                    isDiscoverying = true;
+                    isDiscovering = true;
                     startCheckingDiscoverableDuration();
                 } else {
-                    isDiscoverying = false;
+                    isDiscovering = false;
                     finish();
                 }
                 break;
@@ -263,22 +303,28 @@ public class BtSenderActivity extends InjectableActivity {
                 })
                 .create();
 
-        resultTextView.setText(getString(R.string.tv_sender_wait_for_connect));
+        activityTextView.setText(getString(R.string.tv_sender_wait_for_connect));
         countDownTimer = new CountDownTimer(CONNECT_TIMEOUT * COUNT_DOWN_INTERVAL, COUNT_DOWN_INTERVAL) {
             @Override
             public void onTick(long millisUntilFinished) {
-                resultTextView.setText(String.format(getString(R.string.tv_sender_wait_for_connect),
+                activityTextView.setText(String.format(getString(R.string.tv_sender_wait_for_connect),
                         String.valueOf(millisUntilFinished / COUNT_DOWN_INTERVAL)));
             }
 
             @Override
             public void onFinish() {
-                isDiscoverying = false;
+                isDiscovering = false;
                 if (!(thisActivity).isFinishing()) {
                     alertDialog.show();
                 }
             }
         }.start();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        dismissAllDialogs();
     }
 
     @Override

@@ -82,6 +82,7 @@ public class BtReceiverActivity extends InjectableActivity implements
     private boolean isConnected = false;
     private ProgressDialog progressDialog;
     private ProgressDialog scanningDialog;
+    private AlertDialog resultDialog;
 
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
@@ -94,7 +95,7 @@ public class BtReceiverActivity extends InjectableActivity implements
         setSupportActionBar(toolbar);
 
         initEvents();
-        setupScanningDialog();
+        setupDialogs();
     }
 
     /**
@@ -116,7 +117,8 @@ public class BtReceiverActivity extends InjectableActivity implements
     /**
      * build a new progress dialog waiting for the scanning progress.
      */
-    private void setupScanningDialog() {
+    private void setupDialogs() {
+        //scanning dialog
         scanningDialog = new ProgressDialog(this);
         scanningDialog.setCancelable(false);
         scanningDialog.setTitle(getString(R.string.scanning_title));
@@ -125,6 +127,20 @@ public class BtReceiverActivity extends InjectableActivity implements
             dialog.dismiss();
             bluetoothAdapter.cancelDiscovery();
         });
+
+        //result dialog
+        resultDialog = new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.transfer_result))
+                .setCancelable(false)
+                .setNegativeButton(getString(R.string.ok), (DialogInterface dialog, int which) -> {
+                    dialog.dismiss();
+                    receiverService.cancel();
+                    if (BluetoothUtils.isBluetoothEnabled()) {
+                        BluetoothUtils.disableBluetooth();
+                    }
+                    finish();
+                })
+                .create();
     }
 
     /**
@@ -211,7 +227,7 @@ public class BtReceiverActivity extends InjectableActivity implements
                 .subscribe(downloadEvent -> {
                     switch (downloadEvent.getStatus()) {
                         case QUEUED:
-                            Toast.makeText(this, R.string.download_queued, Toast.LENGTH_SHORT).show();
+                            Timber.d(getString(R.string.download_queued));
                             break;
                         case DOWNLOADING:
                             int progress = downloadEvent.getCurrentProgress();
@@ -222,7 +238,9 @@ public class BtReceiverActivity extends InjectableActivity implements
                             break;
                         case FINISHED:
                             progressDialog.dismiss();
-                            Toast.makeText(this, getString(R.string.tv_form_send_success), Toast.LENGTH_SHORT).show();
+                            String result = downloadEvent.getResult();
+                            resultDialog.setMessage(result);
+                            resultDialog.show();
                             break;
                         case ERROR:
                             progressDialog.dismiss();
