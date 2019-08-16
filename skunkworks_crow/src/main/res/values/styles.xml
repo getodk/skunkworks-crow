@@ -45,11 +45,4 @@
         <item name="android:layout_width">match_parent</item>
     </style>
 
-    <!-- Styles for Bluetooth -->
-    <style name="BluetoothTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="colorPrimary">@color/DeepSkyBlue3</item>
-        <item name="colorPrimaryDark">@color/DeepSkyBlue4</item>
-        <item name="colorAccent">@color/DeepSkyBlue3</item>
-    </style>
-
 </resources>
