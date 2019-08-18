@@ -76,8 +76,10 @@ public class SettingsActivity extends PreferenceActivity {
                 getString(R.string.hotspot)));
         hotspotNamePreference.setSummary(prefs.getString(PreferenceKeys.KEY_HOTSPOT_NAME,
                 getString(R.string.default_hotspot_ssid)));
-        bluetoothNamePreference.setSummary(prefs.getString(PreferenceKeys.KEY_BLUETOOTH_NAME,
-                BluetoothAdapter.getDefaultAdapter().getName()));
+        String defaultBluetoothName = BluetoothAdapter.getDefaultAdapter().getName();
+        bluetoothNamePreference.setText(defaultBluetoothName);
+        bluetoothNamePreference.setDefaultValue(defaultBluetoothName);
+        bluetoothNamePreference.setSummary(prefs.getString(PreferenceKeys.KEY_BLUETOOTH_NAME, defaultBluetoothName));
         boolean isPasswordSet = prefs.getBoolean(PreferenceKeys.KEY_HOTSPOT_PWD_REQUIRE, false);
         odkDestinationDirPreference.setSummary(prefs.getString(PreferenceKeys.KEY_ODK_DESTINATION_DIR,
                 getString(R.string.default_odk_destination_dir)));
