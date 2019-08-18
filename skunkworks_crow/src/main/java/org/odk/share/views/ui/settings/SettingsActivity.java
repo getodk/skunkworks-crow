@@ -200,7 +200,7 @@ public class SettingsActivity extends PreferenceActivity {
                         progressDialog.dismiss();
                         Toast.makeText(this, getString(R.string.reset_select_nothing), Toast.LENGTH_LONG).show();
                     } else {
-                        startRest(cbResetPref, cbResetData);
+                        startReset(cbResetPref, cbResetData);
                     }
                 })
                 .setNegativeButton(getString(R.string.cancel), (DialogInterface dialog, int which) -> {
@@ -213,7 +213,7 @@ public class SettingsActivity extends PreferenceActivity {
     /**
      * Start resetting the application and presenting the reset result in an {@link AlertDialog}.
      */
-    private void startRest(CheckBox cbResetPref, CheckBox cbResetData) {
+    private void startReset(CheckBox cbResetPref, CheckBox cbResetData) {
         StringBuilder stringBuilder = new StringBuilder();
         if (cbResetData.isChecked()) {
             stringBuilder.append(getString(R.string.reset_result_data,
