@@ -1,5 +1,6 @@
 package org.odk.share.views.ui.settings;
 
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -14,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.CheckBox;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -22,6 +24,8 @@ import androidx.appcompat.widget.Toolbar;
 import com.google.android.material.textfield.TextInputLayout;
 
 import org.odk.share.R;
+import org.odk.share.application.Share;
+import org.odk.share.utilities.FileUtils;
 
 
 /**
@@ -36,6 +40,7 @@ public class SettingsActivity extends PreferenceActivity {
     CheckBoxPreference passwordRequirePreference;
     EditTextPreference odkDestinationDirPreference;
     private SharedPreferences prefs;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,7 +96,7 @@ public class SettingsActivity extends PreferenceActivity {
                     showPasswordDialog();
                     break;
                 case PreferenceKeys.KEY_RESET_SETTINGS:
-                    resetSettings();
+                    resetApplication();
                     break;
             }
             return false;
@@ -170,19 +175,81 @@ public class SettingsActivity extends PreferenceActivity {
         alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
     }
 
-    private void resetSettings() {
+    /**
+     * Reset the application settings and the application data.
+     */
+    private void resetApplication() {
+        View checkBoxView = View.inflate(this, R.layout.pref_reset_dialog, null);
+        CheckBox cbResetPref = checkBoxView.findViewById(R.id.cb_reset_pref);
+        CheckBox cbResetData = checkBoxView.findViewById(R.id.cb_clear_db);
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(getString(R.string.title_reset_settings))
+        AlertDialog resetDialog = builder.setTitle(getString(R.string.title_reset_settings))
                 .setMessage(getString(R.string.message_reset_settings))
+                .setView(checkBoxView)
+                .setCancelable(false)
                 .setPositiveButton(getString(R.string.ok), (DialogInterface dialog, int which) -> {
-                    SharedPreferences.Editor editor = prefs.edit();
-                    editor.clear();
-                    editor.apply();
-                    Toast.makeText(this, getString(R.string.success_reset_settings), Toast.LENGTH_LONG).show();
-                    finish();
+                    progressDialog = new ProgressDialog(this);
+                    progressDialog.setTitle(getString(R.string.resetting));
+                    progressDialog.setMessage(getString(R.string.resetting_msg));
+                    progressDialog.setIndeterminate(true);
+                    progressDialog.setCancelable(false);
+                    progressDialog.show();
+
+                    dialog.dismiss();
+                    if (!cbResetData.isChecked() && !cbResetPref.isChecked()) {
+                        progressDialog.dismiss();
+                        Toast.makeText(this, getString(R.string.reset_select_nothing), Toast.LENGTH_LONG).show();
+                    } else {
+                        startRest(cbResetPref, cbResetData);
+                    }
                 })
                 .setNegativeButton(getString(R.string.cancel), (DialogInterface dialog, int which) -> {
                     dialog.dismiss();
-                }).create().show();
+                })
+                .create();
+        resetDialog.show();
+    }
+
+    private void startRest(CheckBox cbResetPref, CheckBox cbResetData) {
+        StringBuilder stringBuilder = new StringBuilder();
+        if (cbResetData.isChecked()) {
+            stringBuilder.append(getString(R.string.reset_result_data, resetData() ? "Success" : "Failed"));
+        }
+
+        if (cbResetPref.isChecked()) {
+            stringBuilder.append(getString(R.string.reset_result_pref, resetPreference() ? "Success" : "Failed"));
+        }
+
+        progressDialog.dismiss();
+        new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.reset_result))
+                .setMessage(stringBuilder.toString())
+                .setCancelable(false)
+                .setPositiveButton(getString(R.string.ok), (DialogInterface dialog, int which) -> {
+                    dialog.dismiss();
+                    finish();
+                })
+                .create()
+                .show();
+    }
+
+    /**
+     * Reset the preference by resetting the {@link SharedPreferences}.
+     */
+    private boolean resetPreference() {
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.clear();
+        return editor.commit();
+    }
+
+    /**
+     * Removing the cache and database table by deleting the share
+     * folder and create a new one.
+     */
+    private boolean resetData() {
+        boolean result = FileUtils.deleteFolderContents(Share.ODK_ROOT);
+        Share.createODKDirs(this);
+        return result;
     }
 }

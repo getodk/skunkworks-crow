@@ -12,7 +12,6 @@
         <Preference
             android:icon="@drawable/ic_refresh_black_24dp"
             android:key="reset_settings"
-            android:summary="@string/reset_settings"
             android:title="@string/title_reset_settings" />
     </PreferenceCategory>
 
