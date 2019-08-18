@@ -54,7 +54,7 @@ public class BtReceiverActivityTest {
     @Test
     public void titleTest() throws Exception {
         Toolbar toolbar = btReceiverActivity.findViewById(R.id.toolbar);
-        assertEquals(btReceiverActivity.getString(R.string.connect_bluetooth_title), toolbar.getTitle());
+        assertEquals(" " + btReceiverActivity.getString(R.string.connect_bluetooth_title), toolbar.getTitle());
     }
 
     /**

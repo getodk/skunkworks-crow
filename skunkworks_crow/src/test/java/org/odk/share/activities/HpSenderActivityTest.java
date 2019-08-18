@@ -47,6 +47,6 @@ public class HpSenderActivityTest {
     @Test
     public void titleTest() throws Exception {
         Toolbar toolbar = hpSenderActivity.findViewById(R.id.toolbar);
-        assertEquals(hpSenderActivity.getString(R.string.send_forms), toolbar.getTitle());
+        assertEquals(" " + hpSenderActivity.getString(R.string.send_forms), toolbar.getTitle());
     }
 }

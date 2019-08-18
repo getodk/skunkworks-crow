@@ -2,6 +2,8 @@ package org.odk.share.activities;
 
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
@@ -17,12 +19,12 @@ import org.odk.share.views.ui.bluetooth.BtReceiverActivity;
 import org.odk.share.views.ui.hotspot.HpReceiverActivity;
 import org.odk.share.views.ui.main.MainActivity;
 import org.odk.share.views.ui.send.SendFormsActivity;
+import org.odk.share.views.ui.settings.PreferenceKeys;
 import org.odk.share.views.ui.settings.SettingsActivity;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.shadows.ShadowActivity;
-import org.robolectric.shadows.ShadowAlertDialog;
 import org.robolectric.shadows.ShadowIntent;
 
 import static junit.framework.TestCase.assertEquals;
@@ -68,22 +70,18 @@ public class MainActivityTest {
         assertEquals(mainActivity.getString(R.string.receive_forms), receiveButton.getText());
 
         receiveButton.performClick();
-        android.app.AlertDialog alertDialog = (android.app.AlertDialog) ShadowAlertDialog.getLatestDialog();
-        ShadowAlertDialog shadowAlertDialog = shadowOf(alertDialog);
-        assertEquals(shadowAlertDialog.getTitle(), "Receive Options");
-        assertEquals(shadowAlertDialog.getItems().length, 2);
-        assertEquals(shadowAlertDialog.getItems()[0], "Bluetooth");
-        assertEquals(shadowAlertDialog.getItems()[1], "Hotspot");
 
-        shadowAlertDialog.clickOnItem(0);
-        Intent expectedBluetoothIntent = new Intent(mainActivity, BtReceiverActivity.class);
-        Intent bluetoothActual = shadowOf(RuntimeEnvironment.application).getNextStartedActivity();
-        assertEquals(expectedBluetoothIntent.getComponent(), bluetoothActual.getComponent());
-
-        shadowAlertDialog.clickOnItem(1);
-        Intent expectedHotspotIntent = new Intent(mainActivity, HpReceiverActivity.class);
-        Intent hotspotActual = shadowOf(RuntimeEnvironment.application).getNextStartedActivity();
-        assertEquals(expectedHotspotIntent.getComponent(), hotspotActual.getComponent());
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mainActivity.getApplicationContext());
+        String defaultMethod = prefs.getString(PreferenceKeys.KEY_DEFAULT_TRANSFER_METHOD, mainActivity.getString(R.string.default_hotspot_ssid));
+        if (mainActivity.getString(R.string.default_hotspot_ssid).equals(defaultMethod)) {
+            Intent expectedHotspotIntent = new Intent(mainActivity, HpReceiverActivity.class);
+            Intent hotspotActual = shadowOf(RuntimeEnvironment.application).getNextStartedActivity();
+            assertEquals(expectedHotspotIntent.getComponent(), hotspotActual.getComponent());
+        } else {
+            Intent expectedBluetoothIntent = new Intent(mainActivity, BtReceiverActivity.class);
+            Intent bluetoothActual = shadowOf(RuntimeEnvironment.application).getNextStartedActivity();
+            assertEquals(expectedBluetoothIntent.getComponent(), bluetoothActual.getComponent());
+        }
     }
 
     /**

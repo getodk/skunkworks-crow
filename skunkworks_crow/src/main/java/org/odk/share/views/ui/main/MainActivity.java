@@ -114,7 +114,7 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
 
     @OnClick(R.id.bReceiveForms)
     public void chooseReceivingMethods() {
-        DialogUtils.showReceiverMethodsDialog(this, new Intent(), getString(R.string.title_receive_options)).show();
+        DialogUtils.switchToDefaultReceivingMethod(this);
     }
 
     @OnClick(R.id.bSendForms)

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="methods_array">
+        <item>@string/default_hotspot_ssid</item>
+        <item>@string/bluetooth</item>
+    </string-array>
+</resources>

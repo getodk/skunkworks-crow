@@ -1,12 +1,16 @@
 package org.odk.share.views.ui.bluetooth;
 
+
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -26,8 +30,11 @@ import org.odk.share.events.DownloadEvent;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.rx.schedulers.BaseSchedulerProvider;
 import org.odk.share.services.ReceiverService;
+import org.odk.share.utilities.ActivityUtils;
+import org.odk.share.utilities.DialogUtils;
 import org.odk.share.utilities.PermissionUtils;
 import org.odk.share.views.ui.common.injectable.InjectableActivity;
+import org.odk.share.views.ui.hotspot.HpReceiverActivity;
 
 import javax.inject.Inject;
 
@@ -80,6 +87,7 @@ public class BtReceiverActivity extends InjectableActivity implements
     private boolean isConnected = false;
     private ProgressDialog progressDialog;
     private ProgressDialog scanningDialog;
+    private AlertDialog resultDialog;
 
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
@@ -88,25 +96,21 @@ public class BtReceiverActivity extends InjectableActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bt_receive);
         ButterKnife.bind(this);
-        initEvents();
 
-        setTitle(getString(R.string.connect_bluetooth_title));
+        setTitle(" " + getString(R.string.connect_bluetooth_title));
         setSupportActionBar(toolbar);
-
-        // checking for if bluetooth enabled
-        if (!BluetoothUtils.isBluetoothEnabled()) {
-            BluetoothUtils.enableBluetooth();
-            BtReceiverActivityPermissionsDispatcher.updateDeviceListWithPermissionCheck(this);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setIcon(R.drawable.ic_bluetooth_white_24dp);
         }
 
-        setupScanningDialog();
+        initEvents();
+        setupDialogs();
     }
 
     /**
      * Init the basic events for our views.
      */
     private void initEvents() {
-        progressDialog = new ProgressDialog(this);
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
@@ -122,7 +126,8 @@ public class BtReceiverActivity extends InjectableActivity implements
     /**
      * build a new progress dialog waiting for the scanning progress.
      */
-    private void setupScanningDialog() {
+    private void setupDialogs() {
+        //scanning dialog
         scanningDialog = new ProgressDialog(this);
         scanningDialog.setCancelable(false);
         scanningDialog.setTitle(getString(R.string.scanning_title));
@@ -131,6 +136,20 @@ public class BtReceiverActivity extends InjectableActivity implements
             dialog.dismiss();
             bluetoothAdapter.cancelDiscovery();
         });
+
+        //result dialog
+        resultDialog = new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.transfer_result))
+                .setCancelable(false)
+                .setNegativeButton(getString(R.string.ok), (DialogInterface dialog, int which) -> {
+                    dialog.dismiss();
+                    receiverService.cancel();
+                    if (BluetoothUtils.isBluetoothEnabled()) {
+                        BluetoothUtils.disableBluetooth();
+                    }
+                    finish();
+                })
+                .create();
     }
 
     /**
@@ -139,6 +158,10 @@ public class BtReceiverActivity extends InjectableActivity implements
     @NeedsPermission({Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION})
     void updateDeviceList() {
+        if (!BluetoothUtils.isBluetoothEnabled()) {
+            Toast.makeText(this, getString(R.string.turning_on_bluetooth_message), Toast.LENGTH_SHORT).show();
+            BluetoothUtils.enableBluetooth();
+        }
         if (!bluetoothAdapter.isDiscovering()) {
             bluetoothAdapter.startDiscovery();
         }
@@ -179,7 +202,7 @@ public class BtReceiverActivity extends InjectableActivity implements
             BtReceiverActivityPermissionsDispatcher.updateDeviceListWithPermissionCheck(this);
         } else {
             BluetoothUtils.enableBluetooth();
-            Toast.makeText(this, "bluetooth has been disabled, turning on...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.turning_on_bluetooth_message), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -194,7 +217,9 @@ public class BtReceiverActivity extends InjectableActivity implements
                 .subscribe(bluetoothEvent -> {
                     switch (bluetoothEvent.getStatus()) {
                         case CONNECTED:
-                            progressDialog.setMessage(getString(R.string.connected_bluetooth_downloading));
+                            if (progressDialog != null) {
+                                progressDialog.setMessage(getString(R.string.connected_bluetooth_downloading));
+                            }
                             isConnected = true;
                             break;
                         case DISCONNECTED:
@@ -211,7 +236,7 @@ public class BtReceiverActivity extends InjectableActivity implements
                 .subscribe(downloadEvent -> {
                     switch (downloadEvent.getStatus()) {
                         case QUEUED:
-                            Toast.makeText(this, R.string.download_queued, Toast.LENGTH_SHORT).show();
+                            Timber.d(getString(R.string.download_queued));
                             break;
                         case DOWNLOADING:
                             int progress = downloadEvent.getCurrentProgress();
@@ -222,7 +247,9 @@ public class BtReceiverActivity extends InjectableActivity implements
                             break;
                         case FINISHED:
                             progressDialog.dismiss();
-                            Toast.makeText(this, getString(R.string.tv_form_send_success), Toast.LENGTH_SHORT).show();
+                            String result = downloadEvent.getResult();
+                            resultDialog.setMessage(result);
+                            resultDialog.show();
                             break;
                         case ERROR:
                             progressDialog.dismiss();
@@ -266,6 +293,13 @@ public class BtReceiverActivity extends InjectableActivity implements
         checkEmptyList();
     }
 
+    @Override
+    public void onStateChanged(int state) {
+        if (state == BluetoothAdapter.STATE_ON) {
+            BtReceiverActivityPermissionsDispatcher.updateDeviceListWithPermissionCheck(this);
+        }
+    }
+
     /**
      * Clicking the item to connect.
      */
@@ -277,6 +311,7 @@ public class BtReceiverActivity extends InjectableActivity implements
             }
 
             receiverService.startBtDownloading(device.getAddress());
+            progressDialog = new ProgressDialog(this);
             progressDialog.setTitle(getString(R.string.connecting_title));
             progressDialog.setMessage(getString(R.string.connecting_message));
             progressDialog.setIndeterminate(true);
@@ -289,6 +324,26 @@ public class BtReceiverActivity extends InjectableActivity implements
             Toast.makeText(this, getString(R.string.turning_on_bluetooth_message), Toast.LENGTH_SHORT).show();
             BluetoothUtils.enableBluetooth();
         }
+    }
+
+    /**
+     * Create the switch method button in the menu.
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.switch_method_menu, menu);
+        final MenuItem switchItem = menu.findItem(R.id.menu_switch);
+        switchItem.setOnMenuItemClickListener((MenuItem item) -> {
+            DialogUtils.createMethodSwitchDialog(this, (DialogInterface dialog, int which) -> {
+                receiverService.cancel();
+                if (BluetoothUtils.isBluetoothEnabled()) {
+                    BluetoothUtils.disableBluetooth();
+                }
+                ActivityUtils.launchActivity(this, HpReceiverActivity.class, true);
+            }).show();
+            return true;
+        });
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -310,5 +365,26 @@ public class BtReceiverActivity extends InjectableActivity implements
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(bluetoothReceiver);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (BluetoothUtils.isBluetoothEnabled()) {
+            new AlertDialog.Builder(this)
+                    .setTitle(getString(R.string.disable_bluetooth))
+                    .setMessage(getString(R.string.disable_bluetooth_receiver_msg))
+                    .setPositiveButton(R.string.quit, (DialogInterface dialog, int which) -> {
+                        receiverService.cancel();
+                        BluetoothUtils.disableBluetooth();
+                        super.onBackPressed();
+                    })
+                    .setNegativeButton(android.R.string.no, (DialogInterface dialog, int which) -> {
+                        dialog.dismiss();
+                    })
+                    .create()
+                    .show();
+        } else {
+            super.onBackPressed();
+        }
     }
 }

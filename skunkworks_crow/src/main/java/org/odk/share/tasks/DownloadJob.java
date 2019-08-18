@@ -95,6 +95,7 @@ public class DownloadJob extends Job {
     private int progress;
     private DataInputStream dis;
     private DataOutputStream dos;
+    public static final String RESULT_DIVIDER = "---------------\n";
 
     private StringBuilder sbResult;
 
@@ -131,7 +132,13 @@ public class DownloadJob extends Job {
                 BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
                 BluetoothDevice bluetoothDevice = bluetoothAdapter.getRemoteDevice(targetMacAddress);
                 if (bluetoothDevice != null) {
-                    bluetoothSocket = bluetoothDevice.createRfcommSocketToServiceRecord(SPP_UUID);
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext().getApplicationContext());
+                    boolean isSecureMode = prefs.getBoolean(PreferenceKeys.KEY_BLUETOOTH_SECURE_MODE, true);
+                    if (isSecureMode) {
+                        bluetoothSocket = bluetoothDevice.createRfcommSocketToServiceRecord(SPP_UUID);
+                    } else {
+                        bluetoothSocket = bluetoothDevice.createInsecureRfcommSocketToServiceRecord(SPP_UUID);
+                    }
 
                     if (!bluetoothSocket.isConnected()) {
                         bluetoothSocket.connect();
@@ -219,6 +226,7 @@ public class DownloadJob extends Job {
     private boolean readFormAndInstances() {
         try {
             Timber.d("readFormAndInstances");
+            String displayName = dis.readUTF();
             String formId = dis.readUTF();
             String formVersion = dis.readUTF();
             Timber.d(formId + " " + formVersion);
@@ -234,6 +242,10 @@ public class DownloadJob extends Job {
             if (!formExists) {
                 // read form
                 readForm();
+            } else {
+                setupResultFormInfo(displayName, formVersion, formId);
+                sbResult.append(getContext().getString(R.string.form_transfer_result, getContext().getString(R.string.msg_form_already_exist)));
+                sbResult.append(RESULT_DIVIDER);
             }
 
             // readInstances
@@ -249,6 +261,7 @@ public class DownloadJob extends Job {
         String formId = null;
         try {
             Timber.d("Reading blank form");
+            String displayName = dis.readUTF();
             formId = dis.readUTF();
             String formVersion = dis.readUTF();
             Timber.d(formId + " " + formVersion);
@@ -264,6 +277,10 @@ public class DownloadJob extends Job {
             if (!formExists) {
                 // read form
                 readForm();
+            } else {
+                setupResultFormInfo(displayName, formVersion, formId);
+                sbResult.append(getContext().getString(R.string.form_transfer_result, getContext().getString(R.string.msg_form_already_exist)));
+                sbResult.append(RESULT_DIVIDER);
             }
         } catch (IOException e) {
             Timber.e(e);
@@ -322,16 +339,23 @@ public class DownloadJob extends Job {
             values.put(FormsProviderAPI.FormsColumns.FORM_MEDIA_PATH, formMediaPath);
             formsDao.saveForm(values);
 
-            sbResult.append(displayName + " ");
-            if (formVersion != null) {
-                sbResult.append(getContext().getString(R.string.version, formVersion));
-            }
-            sbResult.append(getContext().getString(R.string.id, formId) + " " +
-                    getContext().getString(R.string.success, getContext().getString(R.string.blank_form_count,
-                            getContext().getString(R.string.received))));
+            setupResultFormInfo(displayName, formVersion, formId);
+            sbResult.append(getContext().getString(R.string.form_transfer_result,
+                    getContext().getString(R.string.success, ", " +
+                            getContext().getString(R.string.blank_form_count,
+                                    getContext().getString(R.string.received)))));
+            sbResult.append(RESULT_DIVIDER);
         } catch (IOException e) {
             Timber.e(e);
         }
+    }
+
+    private void setupResultFormInfo(String displayName, String formVersion, String formId) {
+        sbResult.append(getContext().getString(R.string.form_name, displayName) + "\n");
+        if (formVersion != null) {
+            sbResult.append(getContext().getString(R.string.version, formVersion) + "\n");
+        }
+        sbResult.append(getContext().getString(R.string.id, formId) + "\n");
     }
 
     private String getFormsPath() {
@@ -378,8 +402,10 @@ public class DownloadJob extends Job {
                             // send acknowledgement that form is not needed here
                             Timber.d("Form not sent from this device for review");
                             dos.writeBoolean(false);
-                            sbResult.append(displayName + " " + getContext().getString(R.string.failed,
-                                    getContext().getString(R.string.not_sent_for_review)));
+                            sbResult.append(getContext().getString(R.string.form_name, displayName) + "\n");
+                            sbResult.append(getContext().getString(R.string.form_transfer_result,
+                                    getContext().getString(R.string.failed, ", " + getContext().getString(R.string.not_sent_for_review))));
+                            sbResult.append(RESULT_DIVIDER);
                             continue;
                         }
                     }
@@ -436,8 +462,10 @@ public class DownloadJob extends Job {
                     ContentValues shareValues = new ContentValues();
                     shareValues.put(INSTANCE_ID, Long.parseLong(uri.getLastPathSegment()));
                     shareValues.put(TRANSFER_STATUS, STATUS_FORM_RECEIVE);
-                    sbResult.append(displayName + getContext().getString(R.string.success,
-                            getContext().getString(R.string.received_for_review)));
+                    sbResult.append(getContext().getString(R.string.form_name, displayName) + "\n");
+                    sbResult.append(getContext().getString(R.string.form_transfer_result,
+                            getContext().getString(R.string.success, ", " + getContext().getString(R.string.received_for_review))));
+                    sbResult.append(RESULT_DIVIDER);
                     new ShareDatabaseHelper(getContext()).insertInstance(shareValues);
                 } else {
                     String selection = InstanceProviderAPI.InstanceColumns._ID + "=?";
@@ -451,12 +479,18 @@ public class DownloadJob extends Job {
                         selection = TransferInstance.ID + " =?";
                         selectionArgs = new String[]{String.valueOf(transferInstance.getId())};
                         transferDao.updateInstance(shareValues, selection, selectionArgs);
-                        sbResult.append(displayName + getContext().getString(R.string.success, getContext().getString(R.string.review_received)));
+                        sbResult.append(getContext().getString(R.string.form_name, displayName) + "\n");
+                        sbResult.append(getContext().getString(R.string.form_transfer_result,
+                                getContext().getString(R.string.success, ", " + getContext().getString(R.string.review_received))));
+                        sbResult.append(RESULT_DIVIDER);
                     } else {
 
                         Timber.d("Writing received not first time");
                         dos.writeBoolean(true);
-                        sbResult.append(displayName + getContext().getString(R.string.success, getContext().getString(R.string.updated)));
+                        sbResult.append(getContext().getString(R.string.form_name, displayName) + "\n");
+                        sbResult.append(getContext().getString(R.string.form_transfer_result,
+                                getContext().getString(R.string.success, ", " + getContext().getString(R.string.updated))));
+                        sbResult.append(RESULT_DIVIDER);
                     }
                 }
             }

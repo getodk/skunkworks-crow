@@ -233,7 +233,7 @@ public class ReviewedInstancesFragment extends InstanceListFragment implements O
         intent.putExtra(MODE, ApplicationConstants.SEND_REVIEW_MODE);
 
         if (getContext() != null) {
-            DialogUtils.showSenderMethodsDialog(getContext(), intent, getString(R.string.title_send_options)).show();
+            DialogUtils.switchToDefaultSendingMethod(getContext(), intent);
         }
     }
 }

@@ -127,7 +127,7 @@ public class InstancesList extends InstanceListActivity implements LoaderManager
         intent.putExtra(INSTANCE_IDS, a);
         intent.putExtra(MODE, ApplicationConstants.ASK_REVIEW_MODE);
 
-        DialogUtils.showSenderMethodsDialog(this, intent, getString(R.string.title_send_options)).show();
+        DialogUtils.switchToDefaultSendingMethod(this, intent);
     }
 
     @OnClick(R.id.toggle_button)
