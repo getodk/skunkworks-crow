@@ -53,6 +53,7 @@ public class DialogUtils {
 
         alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, targetActivity.getString(R.string.switch_method), listener);
 
+        //the icons set in the dialog are for destinations.
         if (targetActivity instanceof BtReceiverActivity || targetActivity instanceof BtSenderActivity) {
             alertDialog.setIcon(R.drawable.ic_wifi_tethering_black_24dp);
             alertDialog.setTitle(targetActivity.getString(R.string.switch_to_hotspot_title));
