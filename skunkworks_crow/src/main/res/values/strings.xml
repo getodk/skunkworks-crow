@@ -132,7 +132,6 @@
     <string name="location_permission_needed">Location Permission Needed</string>
     <string name="location_settings_dialog">Enable location from the settings.</string>
     <string name="title_reset_settings">Reset Application</string>
-    <string name="message_reset_settings">Please select items to reset</string>
     <string name="reset_database"> Reset Database</string>
     <string name="reset_pref"> Rest Preferences</string>
     <string name="reset_select_nothing">Please select items to reset</string>
@@ -141,6 +140,8 @@
     <string name="reset_result">Reset Result</string>
     <string name="reset_result_pref">Reset Preference: %s</string>
     <string name="reset_result_data">Reset Database: %s \n</string>
+    <string name="reset_success">Success</string>
+    <string name="reset_failed">Failed</string>
 
     <string name="btn_refresh">Refresh</string>
     <string name="method_bluetooth">Bluetooth</string>

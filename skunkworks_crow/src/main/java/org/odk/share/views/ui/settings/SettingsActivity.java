@@ -176,7 +176,7 @@ public class SettingsActivity extends PreferenceActivity {
     }
 
     /**
-     * Reset the application settings and the application data.
+     * Reset the application settings and the database.
      */
     private void resetApplication() {
         View checkBoxView = View.inflate(this, R.layout.pref_reset_dialog, null);
@@ -185,7 +185,6 @@ public class SettingsActivity extends PreferenceActivity {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         AlertDialog resetDialog = builder.setTitle(getString(R.string.title_reset_settings))
-                .setMessage(getString(R.string.message_reset_settings))
                 .setView(checkBoxView)
                 .setCancelable(false)
                 .setPositiveButton(getString(R.string.ok), (DialogInterface dialog, int which) -> {
@@ -195,8 +194,8 @@ public class SettingsActivity extends PreferenceActivity {
                     progressDialog.setIndeterminate(true);
                     progressDialog.setCancelable(false);
                     progressDialog.show();
-
                     dialog.dismiss();
+
                     if (!cbResetData.isChecked() && !cbResetPref.isChecked()) {
                         progressDialog.dismiss();
                         Toast.makeText(this, getString(R.string.reset_select_nothing), Toast.LENGTH_LONG).show();
@@ -211,14 +210,19 @@ public class SettingsActivity extends PreferenceActivity {
         resetDialog.show();
     }
 
+    /**
+     * Start resetting the application and presenting the reset result in an {@link AlertDialog}.
+     */
     private void startRest(CheckBox cbResetPref, CheckBox cbResetData) {
         StringBuilder stringBuilder = new StringBuilder();
         if (cbResetData.isChecked()) {
-            stringBuilder.append(getString(R.string.reset_result_data, resetData() ? "Success" : "Failed"));
+            stringBuilder.append(getString(R.string.reset_result_data,
+                    resetData() ? getString(R.string.reset_success) : getString(R.string.reset_failed)));
         }
 
         if (cbResetPref.isChecked()) {
-            stringBuilder.append(getString(R.string.reset_result_pref, resetPreference() ? "Success" : "Failed"));
+            stringBuilder.append(getString(R.string.reset_result_pref,
+                    resetPreference() ? getString(R.string.reset_success) : getString(R.string.reset_failed)));
         }
 
         progressDialog.dismiss();
