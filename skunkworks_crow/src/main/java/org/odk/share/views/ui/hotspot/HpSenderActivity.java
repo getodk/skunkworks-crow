@@ -13,6 +13,8 @@ import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,9 +33,11 @@ import org.odk.share.rx.RxEventBus;
 import org.odk.share.rx.schedulers.BaseSchedulerProvider;
 import org.odk.share.services.HotspotService;
 import org.odk.share.services.SenderService;
+import org.odk.share.utilities.DialogUtils;
 import org.odk.share.utilities.PermissionUtils;
 import org.odk.share.utilities.QRCodeUtils;
 import org.odk.share.utilities.SocketUtils;
+import org.odk.share.views.ui.bluetooth.BtSenderActivity;
 import org.odk.share.views.ui.common.injectable.InjectableActivity;
 
 import javax.inject.Inject;
@@ -87,6 +91,7 @@ public class HpSenderActivity extends InjectableActivity {
     private int port;
     private long[] formIds;
     private int mode;
+    private Intent receivedIntent;
 
     private WifiManager.LocalOnlyHotspotReservation hotspotReservation;
     private WifiConfiguration currentConfig;
@@ -97,11 +102,15 @@ public class HpSenderActivity extends InjectableActivity {
         setContentView(R.layout.activity_send);
         ButterKnife.bind(this);
 
-        setTitle(getString(R.string.send_forms));
+        setTitle(" " + getString(R.string.send_forms));
         setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setIcon(R.drawable.ic_wifi_tethering_white_24dp);
+        }
 
-        formIds = getIntent().getLongArrayExtra(INSTANCE_IDS);
-        mode = getIntent().getIntExtra(MODE, ASK_REVIEW_MODE);
+        receivedIntent = getIntent();
+        formIds = receivedIntent.getLongArrayExtra(INSTANCE_IDS);
+        mode = receivedIntent.getIntExtra(MODE, ASK_REVIEW_MODE);
         if (formIds == null) {
             formIds = getIntent().getLongArrayExtra(FORM_IDS);
         }
@@ -135,6 +144,30 @@ public class HpSenderActivity extends InjectableActivity {
         } else {
             stopHotspotAlertDialog();
         }
+    }
+
+    /**
+     * Create the switch method button in the menu.
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.switch_method_menu, menu);
+        final MenuItem switchItem = menu.findItem(R.id.menu_switch);
+        switchItem.setOnMenuItemClickListener((MenuItem item) -> {
+            DialogUtils.createMethodSwitchDialog(this, (DialogInterface dialog, int which) -> {
+                receivedIntent.setClass(this, BtSenderActivity.class);
+
+                if (isHotspotRunning) {
+                    stopHotspot();
+                }
+
+                startActivity(receivedIntent);
+                finish();
+            }).show();
+            return true;
+        });
+
+        return super.onCreateOptionsMenu(menu);
     }
 
     /**

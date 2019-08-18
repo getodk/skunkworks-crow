@@ -1,13 +1,16 @@
 package org.odk.share.views.ui.settings;
 
+import android.bluetooth.BluetoothAdapter;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,12 +18,12 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+
 import com.google.android.material.textfield.TextInputLayout;
 
 import org.odk.share.R;
-
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.Toolbar;
 
 
 /**
@@ -30,9 +33,12 @@ import androidx.appcompat.widget.Toolbar;
 public class SettingsActivity extends PreferenceActivity {
 
     EditTextPreference hotspotNamePreference;
+    EditTextPreference bluetoothNamePreference;
     Preference hotspotPasswordPreference;
     CheckBoxPreference passwordRequirePreference;
+    CheckBoxPreference btSecureModePreference;
     EditTextPreference odkDestinationDirPreference;
+    ListPreference defaultMethodPreference;
     private SharedPreferences prefs;
 
     @Override
@@ -56,26 +62,39 @@ public class SettingsActivity extends PreferenceActivity {
     }
 
     private void addPreferences() {
+        defaultMethodPreference = (ListPreference) findPreference(PreferenceKeys.KEY_DEFAULT_TRANSFER_METHOD);
         hotspotNamePreference = (EditTextPreference) findPreference(PreferenceKeys.KEY_HOTSPOT_NAME);
+        bluetoothNamePreference = (EditTextPreference) findPreference(PreferenceKeys.KEY_BLUETOOTH_NAME);
         hotspotPasswordPreference = findPreference(PreferenceKeys.KEY_HOTSPOT_PASSWORD);
         passwordRequirePreference = (CheckBoxPreference) findPreference(PreferenceKeys.KEY_HOTSPOT_PWD_REQUIRE);
+        btSecureModePreference = (CheckBoxPreference) findPreference(PreferenceKeys.KEY_BLUETOOTH_SECURE_MODE);
         odkDestinationDirPreference = (EditTextPreference) findPreference(PreferenceKeys.KEY_ODK_DESTINATION_DIR);
 
         prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
+        defaultMethodPreference.setSummary(prefs.getString(PreferenceKeys.KEY_DEFAULT_TRANSFER_METHOD,
+                getString(R.string.default_hotspot_ssid)));
         hotspotNamePreference.setSummary(prefs.getString(PreferenceKeys.KEY_HOTSPOT_NAME,
                 getString(R.string.default_hotspot_ssid)));
+        String defaultBluetoothName = BluetoothAdapter.getDefaultAdapter().getName();
+        bluetoothNamePreference.setText(defaultBluetoothName);
+        bluetoothNamePreference.setDefaultValue(defaultBluetoothName);
+        bluetoothNamePreference.setSummary(prefs.getString(PreferenceKeys.KEY_BLUETOOTH_NAME, defaultBluetoothName));
         boolean isPasswordSet = prefs.getBoolean(PreferenceKeys.KEY_HOTSPOT_PWD_REQUIRE, false);
         odkDestinationDirPreference.setSummary(prefs.getString(PreferenceKeys.KEY_ODK_DESTINATION_DIR,
                 getString(R.string.default_odk_destination_dir)));
+        boolean isSecureMode = prefs.getBoolean(PreferenceKeys.KEY_BLUETOOTH_SECURE_MODE, true);
 
         hotspotPasswordPreference.setEnabled(isPasswordSet);
         passwordRequirePreference.setChecked(isPasswordSet);
+        btSecureModePreference.setChecked(isSecureMode);
 
         hotspotNamePreference.setOnPreferenceChangeListener(preferenceChangeListener());
+        bluetoothNamePreference.setOnPreferenceChangeListener(preferenceChangeListener());
         hotspotPasswordPreference.setOnPreferenceChangeListener(preferenceChangeListener());
         passwordRequirePreference.setOnPreferenceChangeListener(preferenceChangeListener());
         odkDestinationDirPreference.setOnPreferenceChangeListener(preferenceChangeListener());
+        defaultMethodPreference.setOnPreferenceChangeListener(preferenceChangeListener());
 
         hotspotPasswordPreference.setOnPreferenceClickListener(preferenceClickListener());
     }
@@ -103,6 +122,17 @@ public class SettingsActivity extends PreferenceActivity {
                         hotspotNamePreference.setSummary(name);
                     }
                     break;
+                case PreferenceKeys.KEY_BLUETOOTH_NAME:
+                    String bluetoothName = newValue.toString();
+                    if (bluetoothName.length() == 0) {
+                        Toast.makeText(getBaseContext(), getString(R.string.bluetooth_name_error), Toast.LENGTH_LONG).show();
+                        return false;
+                    } else {
+                        bluetoothNamePreference.setSummary(bluetoothName);
+                        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+                        bluetoothAdapter.setName(bluetoothName);
+                    }
+                    break;
                 case PreferenceKeys.KEY_HOTSPOT_PASSWORD:
                     String password = newValue.toString();
                     if (password.length() < 8) {
@@ -125,6 +155,12 @@ public class SettingsActivity extends PreferenceActivity {
                         return false;
                     } else {
                         odkDestinationDirPreference.setSummary(dir);
+                    }
+                    break;
+                case PreferenceKeys.KEY_DEFAULT_TRANSFER_METHOD:
+                    String method = newValue.toString();
+                    if (!TextUtils.isEmpty(method)) {
+                        defaultMethodPreference.setSummary(method);
                     }
                     break;
             }

@@ -13,7 +13,10 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,8 +32,10 @@ import org.odk.share.events.UploadEvent;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.rx.schedulers.BaseSchedulerProvider;
 import org.odk.share.services.SenderService;
+import org.odk.share.utilities.DialogUtils;
 import org.odk.share.utilities.PermissionUtils;
 import org.odk.share.views.ui.common.injectable.InjectableActivity;
+import org.odk.share.views.ui.hotspot.HpSenderActivity;
 
 import javax.inject.Inject;
 
@@ -65,6 +70,9 @@ public class BtSenderActivity extends InjectableActivity {
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
+    @BindView(R.id.progressBar)
+    ProgressBar progressBar;
+
     @Inject
     RxEventBus rxEventBus;
 
@@ -83,9 +91,9 @@ public class BtSenderActivity extends InjectableActivity {
     private AlertDialog resultDialog;
     private static final int CONNECT_TIMEOUT = 120;
     private static final int COUNT_DOWN_INTERVAL = 1000;
+    private Intent receivedIntent;
     private static final int DISCOVERABLE_CODE = 0x121;
     private static final int SUCCESS_CODE = 120;
-    private BtSenderActivity thisActivity = this;
 
     private long[] formIds;
     private int mode;
@@ -97,20 +105,28 @@ public class BtSenderActivity extends InjectableActivity {
         setContentView(R.layout.activity_bt_send);
         ButterKnife.bind(this);
 
-        setTitle(getString(R.string.send_instance_title));
+        setTitle(" " + getString(R.string.send_instance_title));
         setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setIcon(R.drawable.ic_bluetooth_white_24dp);
+        }
 
         if (!BluetoothUtils.isBluetoothEnabled()) {
             BluetoothUtils.enableBluetooth();
         }
 
+        if (getIntent() != null) {
+            receivedIntent = getIntent();
+        } else {
+            throw new IllegalArgumentException("No received intent");
+        }
+
         setupDialog();
         registerReceiver(bluetoothReceiver, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
-
         formIds = getIntent().getLongArrayExtra(INSTANCE_IDS);
         mode = getIntent().getIntExtra(MODE, ASK_REVIEW_MODE);
         if (formIds == null) {
-            formIds = getIntent().getLongArrayExtra(FORM_IDS);
+            formIds = receivedIntent.getLongArrayExtra(FORM_IDS);
         }
 
         if (BluetoothUtils.isBluetoothEnabled()) {
@@ -145,14 +161,27 @@ public class BtSenderActivity extends InjectableActivity {
                 .create();
     }
 
-    private void dismissAllDialogs() {
-        if (progressDialog != null && progressDialog.isShowing()) {
-            progressDialog.dismiss();
-        }
+    /**
+     * Create the switch method button in the menu.
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.switch_method_menu, menu);
+        final MenuItem switchItem = menu.findItem(R.id.menu_switch);
+        switchItem.setOnMenuItemClickListener((MenuItem item) -> {
+            DialogUtils.createMethodSwitchDialog(this, (DialogInterface dialog, int which) -> {
+                receivedIntent.setClass(this, HpSenderActivity.class);
+                senderService.cancel();
+                if (BluetoothUtils.isBluetoothEnabled()) {
+                    BluetoothUtils.disableBluetooth();
+                }
+                startActivity(receivedIntent);
+                finish();
+            }).show();
+            return true;
+        });
 
-        if (resultDialog != null && resultDialog.isShowing()) {
-            resultDialog.dismiss();
-        }
+        return super.onCreateOptionsMenu(menu);
     }
 
     /**
@@ -197,16 +226,23 @@ public class BtSenderActivity extends InjectableActivity {
                         case FINISHED:
                             progressDialog.dismiss();
                             isFinished = true;
+                            progressBar.setVisibility(View.GONE);
                             String result = uploadEvent.getResult();
                             resultDialog.setMessage(result);
                             resultDialog.show();
                             break;
                         case ERROR:
-                            dismissAllDialogs();
+                            progressBar.setVisibility(View.GONE);
+                            if (progressDialog != null && progressDialog.isShowing()) {
+                                progressDialog.dismiss();
+                            }
                             Toast.makeText(this, getString(R.string.error_while_uploading, uploadEvent.getResult()), Toast.LENGTH_SHORT).show();
                             break;
                         case CANCELLED:
-                            dismissAllDialogs();
+                            progressBar.setVisibility(View.GONE);
+                            if (progressDialog != null && progressDialog.isShowing()) {
+                                progressDialog.dismiss();
+                            }
                             Toast.makeText(this, getString(R.string.canceled), Toast.LENGTH_LONG).show();
                             break;
                     }
@@ -233,7 +269,7 @@ public class BtSenderActivity extends InjectableActivity {
             if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
                 if (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1)
                         == BluetoothAdapter.STATE_ON && !isDiscovering) {
-                    BtSenderActivityPermissionsDispatcher.enableDiscoveryWithPermissionCheck(thisActivity);
+                    BtSenderActivityPermissionsDispatcher.enableDiscoveryWithPermissionCheck(BtSenderActivity.this);
                 }
             }
         }
@@ -314,17 +350,11 @@ public class BtSenderActivity extends InjectableActivity {
             @Override
             public void onFinish() {
                 isDiscovering = false;
-                if (!(thisActivity).isFinishing()) {
+                if (!(BtSenderActivity.this).isFinishing()) {
                     alertDialog.show();
                 }
             }
         }.start();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        dismissAllDialogs();
     }
 
     @Override

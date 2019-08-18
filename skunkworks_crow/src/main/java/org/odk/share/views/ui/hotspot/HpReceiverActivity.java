@@ -12,6 +12,8 @@ import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -42,7 +44,10 @@ import org.odk.share.network.receivers.WifiStateBroadcastReceiver;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.rx.schedulers.BaseSchedulerProvider;
 import org.odk.share.services.ReceiverService;
+import org.odk.share.utilities.ActivityUtils;
+import org.odk.share.utilities.DialogUtils;
 import org.odk.share.views.listeners.OnItemClickListener;
+import org.odk.share.views.ui.bluetooth.BtReceiverActivity;
 import org.odk.share.views.ui.common.injectable.InjectableActivity;
 
 import java.util.ArrayList;
@@ -116,8 +121,11 @@ public class HpReceiverActivity extends InjectableActivity implements OnItemClic
         setContentView(R.layout.activity_wifi);
         ButterKnife.bind(this);
 
-        setTitle(getString(R.string.connect_wifi));
+        setTitle(" " + getString(R.string.connect_wifi));
         setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setIcon(R.drawable.ic_wifi_tethering_white_24dp);
+        }
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -194,6 +202,24 @@ public class HpReceiverActivity extends InjectableActivity implements OnItemClic
                             break;
                     }
                 }, Timber::e);
+    }
+
+    /**
+     * Create the switch method button in the menu.
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.switch_method_menu, menu);
+        final MenuItem switchItem = menu.findItem(R.id.menu_switch);
+        switchItem.setOnMenuItemClickListener((MenuItem item) -> {
+            DialogUtils.createMethodSwitchDialog(this, (DialogInterface dialog, int which) -> {
+                receiverService.cancel();
+                wifiConnector.disableWifi(wifiNetworkSSID);
+                ActivityUtils.launchActivity(this, BtReceiverActivity.class, true);
+            }).show();
+            return true;
+        });
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -379,11 +405,7 @@ public class HpReceiverActivity extends InjectableActivity implements OnItemClic
     }
 
     private void createAlertDialog(String title, String message) {
-        alertDialog = new AlertDialog.Builder(this).create();
-        alertDialog.setTitle(title);
-        alertDialog.setMessage(message);
-        alertDialog.setCancelable(false);
-        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.ok), (dialog, i) -> finish());
+        alertDialog = DialogUtils.createSimpleDialog(this, title, message);
         alertDialog.show();
     }
 

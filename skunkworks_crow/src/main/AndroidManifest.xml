@@ -28,8 +28,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".views.ui.bluetooth.BtReceiverActivity"/>
-        <activity android:name=".views.ui.bluetooth.BtSenderActivity"/>
+        <activity android:name=".views.ui.bluetooth.BtReceiverActivity" />
+        <activity android:name=".views.ui.bluetooth.BtSenderActivity" />
         <activity android:name=".views.ui.main.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

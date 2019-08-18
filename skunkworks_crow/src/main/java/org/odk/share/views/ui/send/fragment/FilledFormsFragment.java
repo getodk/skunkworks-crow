@@ -154,7 +154,7 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
         if (getContext() != null) {
             Intent intent = new Intent();
             setupSendingIntent(intent);
-            DialogUtils.showSenderMethodsDialog(getContext(), intent, getString(R.string.title_send_options)).show();
+            DialogUtils.switchToDefaultSendingMethod(getContext(), intent);
         }
     }
 

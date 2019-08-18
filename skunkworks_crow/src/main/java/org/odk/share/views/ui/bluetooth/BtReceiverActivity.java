@@ -9,6 +9,8 @@ import android.bluetooth.BluetoothDevice;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -28,8 +30,11 @@ import org.odk.share.events.DownloadEvent;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.rx.schedulers.BaseSchedulerProvider;
 import org.odk.share.services.ReceiverService;
+import org.odk.share.utilities.ActivityUtils;
+import org.odk.share.utilities.DialogUtils;
 import org.odk.share.utilities.PermissionUtils;
 import org.odk.share.views.ui.common.injectable.InjectableActivity;
+import org.odk.share.views.ui.hotspot.HpReceiverActivity;
 
 import javax.inject.Inject;
 
@@ -91,8 +96,12 @@ public class BtReceiverActivity extends InjectableActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bt_receive);
         ButterKnife.bind(this);
-        setTitle(getString(R.string.connect_bluetooth_title));
+
+        setTitle(" " + getString(R.string.connect_bluetooth_title));
         setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setIcon(R.drawable.ic_bluetooth_white_24dp);
+        }
 
         initEvents();
         setupDialogs();
@@ -315,6 +324,26 @@ public class BtReceiverActivity extends InjectableActivity implements
             Toast.makeText(this, getString(R.string.turning_on_bluetooth_message), Toast.LENGTH_SHORT).show();
             BluetoothUtils.enableBluetooth();
         }
+    }
+
+    /**
+     * Create the switch method button in the menu.
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.switch_method_menu, menu);
+        final MenuItem switchItem = menu.findItem(R.id.menu_switch);
+        switchItem.setOnMenuItemClickListener((MenuItem item) -> {
+            DialogUtils.createMethodSwitchDialog(this, (DialogInterface dialog, int which) -> {
+                receiverService.cancel();
+                if (BluetoothUtils.isBluetoothEnabled()) {
+                    BluetoothUtils.disableBluetooth();
+                }
+                ActivityUtils.launchActivity(this, HpReceiverActivity.class, true);
+            }).show();
+            return true;
+        });
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override

@@ -37,11 +37,15 @@
     <string name="open_source_licenses">Open Source Licenses</string>
     <string name="default_hotspot_ssid">hotspot</string>
     <string name="default_hotspot_password">12345678</string>
+    <string name="title_bluetooth_name">Bluetooth Name</string>
     <string name="title_hotspot_ssid">Hotspot SSID</string>
     <string name="title_hotspot_password">Set Hotspot password</string>
+    <string name="summary_security_bluetooth">Use secure transfer (needs pairing code, controlled by receiver)</string>
     <string name="set_password">Set Password</string>
+    <string name="secure_mode">Enable Secure Mode</string>
     <string name="password_hotspot">Password required to connect with hotspot</string>
     <string name="hotspot_name_error">Hotspot name should not be empty</string>
+    <string name="bluetooth_name_error">Bluetooth name should not be empty</string>
     <string name="hotspot_password_error">Password length should be atleast 8 characters long</string>
     <string name="waiting_connection">Waiting for connection to accept</string>
     <string name="waiting_hotspot">Waiting for hotspot to connect</string>
@@ -77,6 +81,7 @@
     <string name="no_forms_reviewed">No finalized %s forms reviewed</string>
     <string name="sort_list">Sort the list</string>
     <string name="search_list">Search the list</string>
+    <string name="switch_list">Switch the transfer method</string>
     <string name="search">Search</string>
 
     <string name="review_form">Review Form</string>
@@ -139,15 +144,13 @@
     <string name="location_permission_needed">Location Permission Needed</string>
     <string name="location_settings_dialog">Enable location from the settings.</string>
 
+    <string name="switch_method">Switch</string>
     <string name="btn_refresh">Refresh</string>
-    <string name="method_bluetooth">Bluetooth</string>
-    <string name="method_wifi_hotspot">Hotspot</string>
-    <string name="title_send_options">Send Options</string>
-    <string name="title_receive_options">Receive Options</string>
     <string name="connect_bluetooth_title">Device to Receive</string>
     <string name="connected_bluetooth_downloading">Connected, start downloading&#8230;</string>
     <string name="connecting_title">Connecting</string>
     <string name="scanning_title">Scanning</string>
+    <string name="bluetooth">bluetooth</string>
     <string name="scanning_msg">Scanning bluetooth devices, please wait&#8230;</string>
     <string name="bluetooth_paired">device paired</string>
     <string name="bluetooth_unpaired">device unpaired</string>
@@ -163,6 +166,12 @@
     <string name="tv_sender_wait_for_connect">waiting for connection (%ss left)&#8230; \nwill start transfer when connected </string>
     <string name="dev_already_connected">already connected to the device, start transferring now&#8230;</string>
     <string name="bluetooth_no_device_scanned">No devices are available. \n Tap refresh to search again.</string>
+    <string name="preference_default_method">Default Transfer Method</string>
+    <string name="preference_default_method_summary">Bluetooth</string>
+    <string name="bluetooth_switch_method">Are you sure to stop and switch to bluetooth method?</string>
+    <string name="hotspot_switch_method">Are you sure to stop and switch to hotspot method?</string>
+    <string name="switch_to_bluetooth_title">Switch to Bluetooth Method</string>
+    <string name="switch_to_hotspot_title">Switch to Hotspot Method</string>
     <string name="permission_location_denied">Location permission is required to send the forms using Bluetooth. Please allow it in the app settings.</string>
     <string name="permission_storage_denied">Storage permission is required. Please allow it in the app settings.</string>
     <string name="permission_open_location_info">Skunkworks-crow app requires location permission to access your Bluetooth. Please allow location permission from your app settings.</string>
