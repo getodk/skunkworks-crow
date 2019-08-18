@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 
 import org.odk.share.R;
@@ -28,7 +29,9 @@ public class DialogUtils {
     /**
      * Create a simple {@link AlertDialog} for showing messages, after that, we finish the {@link Activity}.
      */
-    public static AlertDialog createSimpleDialog(Context context, String title, String message) {
+    public static AlertDialog createSimpleDialog(@NonNull Context context,
+                                                 @NonNull String title,
+                                                 @NonNull String message) {
         AlertDialog alertDialog = new AlertDialog.Builder(context).create();
         alertDialog.setTitle(title);
         alertDialog.setMessage(message);
@@ -40,7 +43,7 @@ public class DialogUtils {
     /**
      * Create an {@link AlertDialog} for switching receive method.
      */
-    public static AlertDialog createMethodSwitchDialog(Activity targetActivity, DialogInterface.OnClickListener listener) {
+    public static AlertDialog createMethodSwitchDialog(@NonNull Activity targetActivity, DialogInterface.OnClickListener listener) {
         AlertDialog alertDialog = new AlertDialog.Builder(targetActivity).create();
         alertDialog.setCancelable(false);
         alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, targetActivity.getString(R.string.cancel),
@@ -68,7 +71,7 @@ public class DialogUtils {
     /**
      * Detecting the default set by user, and using that as main sending method.
      */
-    public static void switchToDefaultSendingMethod(Context context, Intent intent) {
+    public static void switchToDefaultSendingMethod(@NonNull Context context, Intent intent) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
         String defaultMethod = prefs.getString(PreferenceKeys.KEY_DEFAULT_TRANSFER_METHOD, context.getString(R.string.hotspot));
         if (context.getString(R.string.hotspot).equals(defaultMethod)) {
@@ -85,7 +88,7 @@ public class DialogUtils {
     /**
      * Detecting the default set by user, and using that as main receiving method.
      */
-    public static void switchToDefaultReceivingMethod(Context context) {
+    public static void switchToDefaultReceivingMethod(@NonNull Context context) {
         Intent intent = new Intent();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
         String defaultMethod = prefs.getString(PreferenceKeys.KEY_DEFAULT_TRANSFER_METHOD, context.getString(R.string.hotspot));
