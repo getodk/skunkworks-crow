@@ -114,7 +114,6 @@ public class HpReceiverActivity extends InjectableActivity implements OnItemClic
     private WifiConnector wifiConnector;
     private WifiStateBroadcastReceiver wifiStateBroadcastReceiver;
     private boolean isConnected = false;
-    private HpReceiverActivity thisActivity = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -212,16 +211,13 @@ public class HpReceiverActivity extends InjectableActivity implements OnItemClic
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.switch_method_menu, menu);
         final MenuItem switchItem = menu.findItem(R.id.menu_switch);
-
-        switchItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                DialogUtils.createMethodSwitchDialog(thisActivity, (DialogInterface dialog, int which) -> {
-                    receiverService.cancel();
-                    ActivityUtils.launchActivity(thisActivity, BtReceiverActivity.class, true);
-                }).show();
-                return true;
-            }
+        switchItem.setOnMenuItemClickListener((MenuItem item) -> {
+            DialogUtils.createMethodSwitchDialog(this, (DialogInterface dialog, int which) -> {
+                receiverService.cancel();
+                wifiConnector.disableWifi(wifiNetworkSSID);
+                ActivityUtils.launchActivity(this, BtReceiverActivity.class, true);
+            }).show();
+            return true;
         });
         return super.onCreateOptionsMenu(menu);
     }

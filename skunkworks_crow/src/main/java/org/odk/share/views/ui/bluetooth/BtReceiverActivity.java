@@ -87,7 +87,6 @@ public class BtReceiverActivity extends InjectableActivity implements
     private boolean isConnected = false;
     private ProgressDialog progressDialog;
     private ProgressDialog scanningDialog;
-    private BtReceiverActivity thisActivity = this;
     private AlertDialog resultDialog;
 
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
@@ -334,16 +333,15 @@ public class BtReceiverActivity extends InjectableActivity implements
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.switch_method_menu, menu);
         final MenuItem switchItem = menu.findItem(R.id.menu_switch);
-
-        switchItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                DialogUtils.createMethodSwitchDialog(thisActivity, (DialogInterface dialog, int which) -> {
-                    receiverService.cancel();
-                    ActivityUtils.launchActivity(thisActivity, HpReceiverActivity.class, true);
-                }).show();
-                return true;
-            }
+        switchItem.setOnMenuItemClickListener((MenuItem item) -> {
+            DialogUtils.createMethodSwitchDialog(this, (DialogInterface dialog, int which) -> {
+                receiverService.cancel();
+                if (BluetoothUtils.isBluetoothEnabled()) {
+                    BluetoothUtils.disableBluetooth();
+                }
+                ActivityUtils.launchActivity(this, HpReceiverActivity.class, true);
+            }).show();
+            return true;
         });
         return super.onCreateOptionsMenu(menu);
     }

@@ -91,7 +91,6 @@ public class BtSenderActivity extends InjectableActivity {
     private AlertDialog resultDialog;
     private static final int CONNECT_TIMEOUT = 120;
     private static final int COUNT_DOWN_INTERVAL = 1000;
-    private BtSenderActivity thisActivity = this;
     private Intent receivedIntent;
     private static final int DISCOVERABLE_CODE = 0x121;
     private static final int SUCCESS_CODE = 120;
@@ -116,10 +115,14 @@ public class BtSenderActivity extends InjectableActivity {
             BluetoothUtils.enableBluetooth();
         }
 
-        setupDialog();
-        receivedIntent = getIntent();
-        registerReceiver(bluetoothReceiver, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
+        if (getIntent() != null) {
+            receivedIntent = getIntent();
+        } else {
+            throw new IllegalArgumentException("No received intent");
+        }
 
+        setupDialog();
+        registerReceiver(bluetoothReceiver, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
         formIds = getIntent().getLongArrayExtra(INSTANCE_IDS);
         mode = getIntent().getIntExtra(MODE, ASK_REVIEW_MODE);
         if (formIds == null) {
@@ -165,19 +168,17 @@ public class BtSenderActivity extends InjectableActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.switch_method_menu, menu);
         final MenuItem switchItem = menu.findItem(R.id.menu_switch);
-
-        switchItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                DialogUtils.createMethodSwitchDialog(thisActivity, (DialogInterface dialog, int which) -> {
-                    Intent intent = receivedIntent;
-                    intent.setClass(thisActivity, HpSenderActivity.class);
-                    senderService.cancel();
-                    startActivity(intent);
-                    finish();
-                }).show();
-                return true;
-            }
+        switchItem.setOnMenuItemClickListener((MenuItem item) -> {
+            DialogUtils.createMethodSwitchDialog(this, (DialogInterface dialog, int which) -> {
+                receivedIntent.setClass(this, HpSenderActivity.class);
+                senderService.cancel();
+                if (BluetoothUtils.isBluetoothEnabled()) {
+                    BluetoothUtils.disableBluetooth();
+                }
+                startActivity(receivedIntent);
+                finish();
+            }).show();
+            return true;
         });
 
         return super.onCreateOptionsMenu(menu);
@@ -268,7 +269,7 @@ public class BtSenderActivity extends InjectableActivity {
             if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
                 if (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1)
                         == BluetoothAdapter.STATE_ON && !isDiscovering) {
-                    BtSenderActivityPermissionsDispatcher.enableDiscoveryWithPermissionCheck(thisActivity);
+                    BtSenderActivityPermissionsDispatcher.enableDiscoveryWithPermissionCheck(BtSenderActivity.this);
                 }
             }
         }
@@ -349,7 +350,7 @@ public class BtSenderActivity extends InjectableActivity {
             @Override
             public void onFinish() {
                 isDiscovering = false;
-                if (!(thisActivity).isFinishing()) {
+                if (!(BtSenderActivity.this).isFinishing()) {
                     alertDialog.show();
                 }
             }

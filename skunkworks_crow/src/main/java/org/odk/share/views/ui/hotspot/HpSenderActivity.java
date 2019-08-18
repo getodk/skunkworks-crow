@@ -91,7 +91,6 @@ public class HpSenderActivity extends InjectableActivity {
     private int port;
     private long[] formIds;
     private int mode;
-    private HpSenderActivity thisActivity = this;
     private Intent receivedIntent;
 
     private WifiManager.LocalOnlyHotspotReservation hotspotReservation;
@@ -154,23 +153,18 @@ public class HpSenderActivity extends InjectableActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.switch_method_menu, menu);
         final MenuItem switchItem = menu.findItem(R.id.menu_switch);
+        switchItem.setOnMenuItemClickListener((MenuItem item) -> {
+            DialogUtils.createMethodSwitchDialog(this, (DialogInterface dialog, int which) -> {
+                receivedIntent.setClass(this, BtSenderActivity.class);
 
-        switchItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                DialogUtils.createMethodSwitchDialog(thisActivity, (DialogInterface dialog, int which) -> {
-                    Intent intent = receivedIntent;
-                    intent.setClass(thisActivity, BtSenderActivity.class);
+                if (isHotspotRunning) {
+                    stopHotspot();
+                }
 
-                    if (isHotspotRunning) {
-                        stopHotspot();
-                    }
-
-                    startActivity(intent);
-                    finish();
-                }).show();
-                return true;
-            }
+                startActivity(receivedIntent);
+                finish();
+            }).show();
+            return true;
         });
 
         return super.onCreateOptionsMenu(menu);
