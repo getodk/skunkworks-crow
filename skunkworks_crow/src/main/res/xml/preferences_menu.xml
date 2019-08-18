@@ -10,7 +10,7 @@
             android:title="@string/title_odk_destination_dir" />
 
         <ListPreference
-            android:defaultValue="@string/hotspot"
+            android:defaultValue="@string/default_hotspot_ssid"
             android:entries="@array/methods_array"
             android:entryValues="@array/methods_array"
             android:icon="@drawable/ic_compare_arrows_black_24dp"

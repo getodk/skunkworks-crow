@@ -136,8 +136,8 @@ public class SettingsActivityTest {
     @Test
     public void listPreferenceTest() {
         defaultMethodPreference = (ListPreference) settingsActivity.findPreference(PreferenceKeys.KEY_DEFAULT_TRANSFER_METHOD);
-        defaultMethodPreference.setValue(settingsActivity.getString(R.string.hotspot));
-        assertEquals(settingsActivity.getString(R.string.hotspot), defaultMethodPreference.getValue());
+        defaultMethodPreference.setValue(settingsActivity.getString(R.string.default_hotspot_ssid));
+        assertEquals(settingsActivity.getString(R.string.default_hotspot_ssid), defaultMethodPreference.getValue());
         defaultMethodPreference.setValue(settingsActivity.getString(R.string.bluetooth));
         assertEquals(settingsActivity.getString(R.string.bluetooth), defaultMethodPreference.getValue());
         assertEquals(defaultMethodPreference.getEntries().length, settingsActivity.getResources().getStringArray(R.array.methods_array).length);

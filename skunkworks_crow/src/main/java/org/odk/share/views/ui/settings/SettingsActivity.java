@@ -73,7 +73,7 @@ public class SettingsActivity extends PreferenceActivity {
         prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
         defaultMethodPreference.setSummary(prefs.getString(PreferenceKeys.KEY_DEFAULT_TRANSFER_METHOD,
-                getString(R.string.hotspot)));
+                getString(R.string.default_hotspot_ssid)));
         hotspotNamePreference.setSummary(prefs.getString(PreferenceKeys.KEY_HOTSPOT_NAME,
                 getString(R.string.default_hotspot_ssid)));
         String defaultBluetoothName = BluetoothAdapter.getDefaultAdapter().getName();

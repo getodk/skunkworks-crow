@@ -72,10 +72,10 @@ public class DialogUtils {
     /**
      * Detecting the default set by user, and using that as main sending method.
      */
-    public static void switchToDefaultSendingMethod(@NonNull Context context, Intent intent) {
+    public static void switchToDefaultSendingMethod(@NonNull Context context, @NonNull Intent intent) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-        String defaultMethod = prefs.getString(PreferenceKeys.KEY_DEFAULT_TRANSFER_METHOD, context.getString(R.string.hotspot));
-        if (context.getString(R.string.hotspot).equals(defaultMethod)) {
+        String defaultMethod = prefs.getString(PreferenceKeys.KEY_DEFAULT_TRANSFER_METHOD, context.getString(R.string.default_hotspot_ssid));
+        if (context.getString(R.string.default_hotspot_ssid).equals(defaultMethod)) {
             intent.setClass(ActivityUtils.getActivity(context), HpSenderActivity.class);
         } else if (context.getString(R.string.bluetooth).equals(defaultMethod)) {
             intent.setClass(ActivityUtils.getActivity(context), BtSenderActivity.class);
@@ -92,8 +92,8 @@ public class DialogUtils {
     public static void switchToDefaultReceivingMethod(@NonNull Context context) {
         Intent intent = new Intent();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-        String defaultMethod = prefs.getString(PreferenceKeys.KEY_DEFAULT_TRANSFER_METHOD, context.getString(R.string.hotspot));
-        if (context.getString(R.string.hotspot).equals(defaultMethod)) {
+        String defaultMethod = prefs.getString(PreferenceKeys.KEY_DEFAULT_TRANSFER_METHOD, context.getString(R.string.default_hotspot_ssid));
+        if (context.getString(R.string.default_hotspot_ssid).equals(defaultMethod)) {
             intent.setClass(ActivityUtils.getActivity(context), HpReceiverActivity.class);
         } else if (context.getString(R.string.bluetooth).equals(defaultMethod)) {
             intent.setClass(ActivityUtils.getActivity(context), BtReceiverActivity.class);

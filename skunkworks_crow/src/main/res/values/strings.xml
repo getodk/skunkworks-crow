@@ -151,7 +151,6 @@
     <string name="connecting_title">Connecting</string>
     <string name="scanning_title">Scanning</string>
     <string name="bluetooth">bluetooth</string>
-    <string name="hotspot">@string/default_hotspot_ssid</string>
     <string name="scanning_msg">Scanning bluetooth devices, please wait&#8230;</string>
     <string name="bluetooth_paired">device paired</string>
     <string name="bluetooth_unpaired">device unpaired</string>
