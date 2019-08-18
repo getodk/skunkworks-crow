@@ -72,8 +72,8 @@ public class MainActivityTest {
         receiveButton.performClick();
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mainActivity.getApplicationContext());
-        String defaultMethod = prefs.getString(PreferenceKeys.KEY_DEFAULT_TRANSFER_METHOD, mainActivity.getString(R.string.hotspot));
-        if (mainActivity.getString(R.string.hotspot).equals(defaultMethod)) {
+        String defaultMethod = prefs.getString(PreferenceKeys.KEY_DEFAULT_TRANSFER_METHOD, mainActivity.getString(R.string.default_hotspot_ssid));
+        if (mainActivity.getString(R.string.default_hotspot_ssid).equals(defaultMethod)) {
             Intent expectedHotspotIntent = new Intent(mainActivity, HpReceiverActivity.class);
             Intent hotspotActual = shadowOf(RuntimeEnvironment.application).getNextStartedActivity();
             assertEquals(expectedHotspotIntent.getComponent(), hotspotActual.getComponent());
