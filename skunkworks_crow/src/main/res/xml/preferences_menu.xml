@@ -62,7 +62,5 @@
             android:key="bluetooth_secure_mode"
             android:summary="@string/summary_security_bluetooth"
             android:title="@string/secure_mode" />
-        >>>>>>> upstream/master
-
     </PreferenceCategory>
 </PreferenceScreen>
