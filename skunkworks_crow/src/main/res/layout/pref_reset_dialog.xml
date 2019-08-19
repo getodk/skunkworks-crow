@@ -7,6 +7,7 @@
         android:padding="4dp">
 
         <LinearLayout
+            android:layout_marginTop="6dp"
             style="@style/MatchParentWidth"
             android:orientation="horizontal">
 

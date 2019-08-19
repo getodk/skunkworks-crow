@@ -1,12 +1,8 @@
 package org.odk.share.views.ui.settings;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -33,7 +29,6 @@ import com.google.android.material.textfield.TextInputLayout;
 import org.odk.share.R;
 import org.odk.share.application.Share;
 import org.odk.share.utilities.FileUtils;
-import org.odk.share.views.ui.main.MainActivity;
 
 
 /**
@@ -272,14 +267,7 @@ public class SettingsActivity extends PreferenceActivity {
                 .setCancelable(false)
                 .setPositiveButton(getString(R.string.ok), (DialogInterface dialog, int which) -> {
                     dialog.dismiss();
-                    // restart application after that.
-                    Intent mainIntent = new Intent(this, MainActivity.class);
-                    int pendingIntentId = 0x130;
-                    PendingIntent pendingIntent = PendingIntent.getActivity(this, pendingIntentId,
-                            mainIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-                    AlarmManager mgr = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-                    mgr.set(AlarmManager.RTC, System.currentTimeMillis(), pendingIntent);
-                    System.exit(0);
+                    finish();
                 })
                 .create()
                 .show();
