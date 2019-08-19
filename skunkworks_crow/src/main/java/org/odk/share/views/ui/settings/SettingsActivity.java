@@ -272,11 +272,13 @@ public class SettingsActivity extends PreferenceActivity {
                 .setCancelable(false)
                 .setPositiveButton(getString(R.string.ok), (DialogInterface dialog, int which) -> {
                     dialog.dismiss();
+                    // restart application after that.
                     Intent mainIntent = new Intent(this, MainActivity.class);
-                    int mPendingIntentId = 0x130;
-                    PendingIntent mPendingIntent = PendingIntent.getActivity(this, mPendingIntentId, mainIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+                    int pendingIntentId = 0x130;
+                    PendingIntent pendingIntent = PendingIntent.getActivity(this, pendingIntentId,
+                            mainIntent, PendingIntent.FLAG_CANCEL_CURRENT);
                     AlarmManager mgr = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-                    mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100, mPendingIntent);
+                    mgr.set(AlarmManager.RTC, System.currentTimeMillis(), pendingIntent);
                     System.exit(0);
                 })
                 .create()
