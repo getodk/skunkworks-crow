@@ -54,11 +54,11 @@ skunkworks-crow app can be downloaded and installed from the link provided below
 [Download APK](https://github.com/opendatakit/skunkworks-crow/releases)
 
 ## 3. Using skunkworks-crow<a name="using-skunkworks-crow"></a>
-Share app can be used by enumerators in sharing forms and by supervisor in reviewing the forms.
+Skunkworks-crow app can be used by enumerators in sharing forms and by supervisor in reviewing the forms.
 
 ### 3.1 Viewing category of forms<a name="view-category"></a>
 
-Launch the app to see  a listing of all distinct versions of blank forms on the home screen. Tapping on any form will open a screen with four different tabs showing the statistics, sent, received and reviewed.
+Launch the app to see a listing of all distinct versions of blank forms on the home screen. Tapping on any form will open a screen with four different tabs showing the statistics, sent, received and reviewed.
 
 To view details of any form category tap on any category shown on home screen.
 <p align="center">
@@ -94,9 +94,6 @@ To view the details of forms received, navigate to the ‘Received’ tab. To re
 To view the details of forms reviewed, tap on the ‘Reviewed’ tab. This shows all the forms reviewed by you with the form status. To send it back to the enumerator who asked for the feedback, select the forms and tap on ‘Send’. This will send all the forms with reviewed status as well as feedback back to the enumerator. If the enumerator didn’t send those forms for review then it won’t send any forms back, only those enumerators will get the feedback who asked for it.
 
 
-
-
-
 ### 3.2 Send filled forms<a name="send-filled-forms"></a>
 
 After the launch of the app, on the home screen a 'Send' button is shown at the bottom. Tap on that button to open the screen which consists of a list showing all the filled forms available in ODK Collect and user can select any number of forms of any version of blank form which is required to be sent. It contains all the filled forms irrespective of its send/receive status.
@@ -106,6 +103,14 @@ It will display all the filled forms available in ODK Collect (it also contains 
 After selecting the forms, press ‘Send’ to initiate the connection process so that receiver can connect to your device and start receiving.
 
 Tapping on ‘Send’ button opens up the screen which will initiate the communication process and start the wifi hotspot so that receiver can connect to it and start receiving the forms.
+
+In the Skunkworks-crow, we have two ways to exchange forms, Wifi hotspot and the bluetooth. You can choose one as the default transferring method in the settings page. 
+
+<p align="center">
+  <img src="/screenshots/choose_default_method.png" width="280" height="500"/>
+</p>
+
+#### 3.2.1 Wifi Hotspot
 
 A Wifi Hotspot is used as the sender’s communication method, which creates a wifi network and sends files using the socket connection. When the wifi hotspot is initiated, it turns off the wifi if already enabled and creates new wifi configuration and saves the last saved hotspot configuration which is restored at the end of a transfer.
 
@@ -120,9 +125,20 @@ If user wants to manually connect to it then the screen shows the network name s
 For devices having Android version 7.0 and 7.1 user will be sent to settings to enable the wifi hotspot functionality. The user will then need to tap the device back button to come back to skunkworks-crow.
 And for other device it will be enabled automatically.
 
+#### 3.2.2 Bluetooth
+
+We can use bluetooth to send forms as well. The bluetooth has a shorter transferring distance than hotspot, so you may need to put sender and receiver closed to establish a valid connection. In the receiver's settings page, you can enable the secure mode of bluetooth, it allows you to establish an encrypted transmission (needs a pair code when first pairing).
+
+the bluetooth feature needs location permission. After a bluetooth socket was create, you will see a dialog to ask to make your device discoverable, after clicking that, You have 120s to let the receiver connect. Our application will automatically start data transfer if the bluetooth connection is successful.
+
+<p align="center">
+  <img src="/screenshots/send_data.gif" width="280" height="500"/>
+</p>
+
 
 ### 3.3 Receive filled forms<a name="receive-filled-forms"></a>
 
+#### 3.3.1 Wifi Hotspot
 Tap on the 'Receive' button shown at the bottom of the home screen to see a list of all wifi networks available in the nearby area which are started by only skunkworks-crow app.
 
 A receiver will need to connect to the network the sender has created. There are two ways to connect to the network:
@@ -137,6 +153,24 @@ For some devices, the user is not allowed to configure the wifi hotspot from the
   <img src="/screenshots/received_for_review.gif" width="280" height="500"/>
   <img src="/screenshots/received_qr_code.gif" width="280" height="500"/>
 </p>
+
+#### Bluetooth
+
+If we use bluetooth to receive forms, you can find a bluetooth device list in the receiver page. Just clicking the sender's item, the Skunkworks-crow will connect and start receiving once connected. You can click the `refresh` button to refresh the list if you cannot find your target sender. 
+
+<p float="left" align="center">
+  <img src="/screenshots/send_data.gif" width="280" height="500"/>
+  <img src="/screenshots/receive_data.gif" width="280" height="500"/>
+</p>
+
+## 4. Switch Transferring Method
+We have two methods to use, you can set a default method in settings. But when you have trouble sending/receiving forms, you can click the `switch` icon button in the tool bar, that offers a quick way for you to switch from this method to another. 
+
+<p align="center">
+  <img src="/screenshots/method_switching.gif" width="280" height="500"/>
+</p>
+
+If you changed the method of sender/receiver, don't forget to be consistent with another device.
 
 ## 4. Setting up your development environment<a name="setting-up-your-development-environment"/>
 
