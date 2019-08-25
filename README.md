@@ -18,9 +18,15 @@
         3. [View Received forms](#view-received-forms)
         4. [Review forms](#review-forms)
     2. [Send filled forms](#send-filled-forms)
+        1. [Hotspot](#send-hotspot)
+        2. [Bluetooth](send-bluetooth)
     3. [Receive filled forms](#receive-filled-forms)
-4. [Setting up your development environment](#setting-up-your-development-environment)
-5. [Contributing code](#contributing-code)
+        1. [Hotspot](receive-hotspot)
+        2. [Bluetooth](receive-bluetooth)
+4. [Switch Transferring Method](#switch-transferring-method)
+5. [Setting up your development environment](#setting-up-your-development-environment)
+6. [Contributing code](#contributing-code)
+
 
 
 ## 1. Introduction<a name="introduction"></a>
@@ -110,7 +116,7 @@ In the Skunkworks-crow, we have two ways to exchange forms, Wifi hotspot and the
   <img src="/screenshots/choose_default_method.png" width="280" height="500"/>
 </p>
 
-#### 3.2.1 Wifi Hotspot
+#### 3.2.1 Wifi Hotspot<a name="send-hotspot"></a>
 
 A Wifi Hotspot is used as the sender’s communication method, which creates a wifi network and sends files using the socket connection. When the wifi hotspot is initiated, it turns off the wifi if already enabled and creates new wifi configuration and saves the last saved hotspot configuration which is restored at the end of a transfer.
 
@@ -125,7 +131,7 @@ If user wants to manually connect to it then the screen shows the network name s
 For devices having Android version 7.0 and 7.1 user will be sent to settings to enable the wifi hotspot functionality. The user will then need to tap the device back button to come back to skunkworks-crow.
 And for other device it will be enabled automatically.
 
-#### 3.2.2 Bluetooth
+#### 3.2.2 Bluetooth<a name="send-bluetooth"></a>
 
 We can use bluetooth to send forms as well. The bluetooth has a shorter transferring distance than hotspot, so you may need to put sender and receiver closed to establish a valid connection. In the receiver's settings page, you can enable the secure mode of bluetooth, it allows you to establish an encrypted transmission (needs a pair code when first pairing).
 
@@ -138,7 +144,7 @@ the bluetooth feature needs location permission. After a bluetooth socket was cr
 
 ### 3.3 Receive filled forms<a name="receive-filled-forms"></a>
 
-#### 3.3.1 Wifi Hotspot
+#### 3.3.1 Wifi Hotspot<a name="receive-hotspot"></a>
 Tap on the 'Receive' button shown at the bottom of the home screen to see a list of all wifi networks available in the nearby area which are started by only skunkworks-crow app.
 
 A receiver will need to connect to the network the sender has created. There are two ways to connect to the network:
@@ -154,7 +160,7 @@ For some devices, the user is not allowed to configure the wifi hotspot from the
   <img src="/screenshots/received_qr_code.gif" width="280" height="500"/>
 </p>
 
-#### Bluetooth
+#### 3.3.2 Bluetooth<a name="receive-bluetooth"></a>
 
 If we use bluetooth to receive forms, you can find a bluetooth device list in the receiver page. Just clicking the sender's item, the Skunkworks-crow will connect and start receiving once connected. You can click the `refresh` button to refresh the list if you cannot find your target sender. 
 
@@ -163,7 +169,7 @@ If we use bluetooth to receive forms, you can find a bluetooth device list in th
   <img src="/screenshots/receive_data.gif" width="280" height="500"/>
 </p>
 
-## 4. Switch Transferring Method
+## 4. Switch Transferring Method<a name="switch-transferring-method"></a>
 We have two methods to use, you can set a default method in settings. But when you have trouble sending/receiving forms, you can click the `switch` icon button in the tool bar, that offers a quick way for you to switch from this method to another. 
 
 <p align="center">
@@ -172,7 +178,7 @@ We have two methods to use, you can set a default method in settings. But when y
 
 If you changed the method of sender/receiver, don't forget to be consistent with another device.
 
-## 4. Setting up your development environment<a name="setting-up-your-development-environment"/>
+## 5. Setting up your development environment<a name="setting-up-your-development-environment"/>
 
 1. Download and install [Git](https://git-scm.com/downloads) and add it to your PATH
 
@@ -188,7 +194,7 @@ If you changed the method of sender/receiver, don't forget to be consistent with
 
 1. Open the project in the folder of your clone from Android Studio. To run the project, click on the green arrow at the top of the screen.
 
-## 5. Contributing code<a name="contributing-code"/>
+## 6. Contributing code<a name="contributing-code"/>
 Any and all contributions to the project are welcome. Skunkworks-Crow is used across the world primarily by organizations with a social purpose so you can have real impact!
 
 Issues tagged as [good first issue](https://github.com/opendatakit/skunkworks-crow/labels/good%20first%20issue) should be a good place to start. There are also currently many issues tagged as [needs reproduction](https://github.com/opendatakit/skunkworks-crow/labels/needs%20reproduction) which need someone to try to reproduce them with the current version of Skunkwork-Crow and comment on the issue with their findings.
