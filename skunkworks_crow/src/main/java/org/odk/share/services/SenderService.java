@@ -5,6 +5,7 @@ import com.evernote.android.job.JobManager;
 import com.evernote.android.job.JobRequest;
 import com.evernote.android.job.util.support.PersistableBundleCompat;
 
+import org.odk.share.application.Share;
 import org.odk.share.events.UploadEvent;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.rx.schedulers.BaseSchedulerProvider;
@@ -58,16 +59,35 @@ public class SenderService {
                             break;
                     }
                 }).subscribe();
-
     }
 
     public void startUploading(long[] instancesToSend, int port, int mode) {
         PersistableBundleCompat extras = new PersistableBundleCompat();
+        extras.putInt("MODE_OF_TRANSFER", Share.TransferMethod.HOTSPOT);
         extras.putLongArray(UploadJob.INSTANCES, instancesToSend);
         extras.putInt(UploadJob.PORT, port);
         extras.putInt(MODE, mode);
+        startJob(extras);
+    }
 
-        // Build request
+    public void startUploading(long[] instancesToSend, int mode) {
+        PersistableBundleCompat extras = new PersistableBundleCompat();
+        extras.putInt("MODE_OF_TRANSFER", Share.TransferMethod.BLUETOOTH);
+        extras.putLongArray(UploadJob.INSTANCES, instancesToSend);
+        extras.putInt(MODE, mode);
+        startJob(extras);
+    }
+
+    /**
+     * start the uploading job or canceling the job.
+     */
+    private void startJob(JobRequest request) {
+        request.schedule();
+        Timber.d("Starting upload job %d : ", request.getJobId());
+        currentJob = request;
+    }
+
+    private void startJob(PersistableBundleCompat extras) {
         JobRequest request = new JobRequest.Builder(UploadJob.TAG)
                 .addExtras(extras)
                 .startNow()
@@ -78,12 +98,6 @@ public class SenderService {
         } else {
             startJob(request);
         }
-    }
-
-    private void startJob(JobRequest request) {
-        request.schedule();
-        Timber.d("Starting upload job %d : ", request.getJobId());
-        currentJob = request;
     }
 
     public void cancel() {

@@ -1,36 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="General Settings">
+
+        <EditTextPreference
+            android:defaultValue="@string/default_odk_destination_dir"
+            android:icon="@drawable/ic_sd_storage_black_24dp"
+            android:key="odk_destination_dir"
+            android:summary="@string/default_odk_destination_dir"
+            android:title="@string/title_odk_destination_dir" />
+
+        <ListPreference
+            android:defaultValue="@string/default_hotspot_ssid"
+            android:entries="@array/methods_array"
+            android:entryValues="@array/methods_array"
+            android:icon="@drawable/ic_compare_arrows_black_24dp"
+            android:key="default_transfer_method"
+            android:summary="@string/preference_default_method_summary"
+            android:title="@string/preference_default_method" />
+
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="Hotspot Settings">
 
         <EditTextPreference
             android:defaultValue="@string/default_hotspot_ssid"
-            android:summary="@string/default_hotspot_ssid"
-            android:title="@string/title_hotspot_ssid"
+            android:icon="@drawable/ic_wifi_tethering_black_24dp"
             android:key="hotspot_name"
-            android:icon="@drawable/ic_wifi_tethering_black_24dp"/>
+            android:summary="@string/default_hotspot_ssid"
+            android:title="@string/title_hotspot_ssid" />
 
         <Preference
             android:defaultValue="@string/default_hotspot_password"
-            android:summary="********"
-            android:title="@string/title_hotspot_password"
-            android:key="hotspot_password"
             android:enabled="false"
-            android:icon="@drawable/ic_vpn_key_black_24dp"/>
+            android:icon="@drawable/ic_vpn_key_black_24dp"
+            android:key="hotspot_password"
+            android:summary="********"
+            android:title="@string/title_hotspot_password" />
 
         <CheckBoxPreference
             android:defaultValue="false"
+            android:icon="@drawable/ic_lock_black_24dp"
             android:key="hotspot_pwd_require"
             android:summary="@string/password_hotspot"
-            android:title="@string/set_password"
-            android:icon="@drawable/ic_lock_black_24dp"/>
+            android:title="@string/set_password" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Bluetooth Settings">
 
         <EditTextPreference
-            android:defaultValue="@string/default_odk_destination_dir"
-            android:summary="@string/default_odk_destination_dir"
-            android:title="@string/title_odk_destination_dir"
-            android:key="odk_destination_dir"
-            android:icon="@drawable/ic_sd_storage_black_24dp"/>
+            android:icon="@drawable/ic_bluetooth_black_24dp"
+            android:key="bluetooth_name"
+            android:title="@string/title_bluetooth_name" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:icon="@drawable/ic_security_black_24dp"
+            android:key="bluetooth_secure_mode"
+            android:summary="@string/summary_security_bluetooth"
+            android:title="@string/secure_mode" />
 
     </PreferenceCategory>
 </PreferenceScreen>

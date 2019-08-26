@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/MatchParent"
+    tools:context=".views.ui.bluetooth.BtReceiverActivity">
+
+    <!-- Toolbar -->
+    <include layout="@layout/toolbar" />
+
+    <LinearLayout
+        style="@style/MatchParent"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/bluetooth_icon"
+            android:layout_width="match_parent"
+            android:layout_height="144dp"
+            android:src="@drawable/ic_bluetooth_logo" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="@style/HorizontalProgressBar"
+            android:layout_width="244dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:indeterminate="true" />
+
+        <TextView
+            android:id="@+id/test_text_view"
+            style="@style/MatchParentWidth"
+            android:layout_gravity="center"
+            android:layout_marginTop="28dp"
+            android:gravity="center"
+            android:textSize="20sp"
+            tools:text="@string/tv_sender_wait_for_connect" />
+    </LinearLayout>
+
+</RelativeLayout>

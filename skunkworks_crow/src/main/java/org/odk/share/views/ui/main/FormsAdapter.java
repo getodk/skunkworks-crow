@@ -73,7 +73,7 @@ public class FormsAdapter extends CursorRecyclerViewAdapter<FormsAdapter.FormHol
         viewHolder.tvSubtitle.setText(sb.toString());
         viewHolder.checkBox.setVisibility(selectedForms != null ? View.VISIBLE : View.GONE);
         viewHolder.checkBox.setChecked(selectedForms != null && selectedForms.contains(((long) form.getId())));
-        viewHolder.filledIcon.setImageResource(R.drawable.blank_form);
+        viewHolder.filledIcon.setImageResource(R.drawable.ic_blank_form);
 
         if (selectedForms == null) {
             String[] selectionArgs;

@@ -41,7 +41,7 @@
             android:text="@string/send_forms" />
 
         <Button
-            android:id="@+id/bViewWifi"
+            android:id="@+id/bReceiveForms"
             style="@style/MatchParentWidth"
             android:layout_weight="1"
             android:text="@string/receive_forms" />
