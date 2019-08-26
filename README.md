@@ -18,11 +18,11 @@
         3. [View Received forms](#view-received-forms)
         4. [Review forms](#review-forms)
     2. [Send filled forms](#send-filled-forms)
-        1. [Hotspot](#send-hotspot)
-        2. [Bluetooth](#send-bluetooth)
+        1. [hotspot](#send-hotspot)
+        2. [bluetooth](#send-bluetooth)
     3. [Receive filled forms](#receive-filled-forms)
-        1. [Hotspot](#receive-hotspot)
-        2. [Bluetooth](#receive-bluetooth)
+        1. [hotspot](#receive-hotspot)
+        2. [bluetooth](#receive-bluetooth)
 4. [Switch Transferring Method](#switch-transferring-method)
 5. [Setting up your development environment](#setting-up-your-development-environment)
 6. [Contributing code](#contributing-code)
@@ -64,7 +64,7 @@ Skunkworks-crow app can be used by enumerators in sharing forms and by superviso
 
 ### 3.1 Viewing category of forms<a name="view-category"></a>
 
-Launch the app to see a listing of all distinct versions of blank forms on the home screen. Tapping on any form will open a screen with four different tabs showing the statistics, sent, received and reviewed.
+On launching the app, the first screen that we see contains a list of forms available in ODK Collect. Tapping on any form opens a screen with 4 tabs - statistics, sent, received, and reviewed.
 
 To view details of any form category tap on any category shown on home screen.
 <p align="center">
@@ -110,7 +110,7 @@ After selecting the forms, press ‘Send’ to initiate the connection process s
 
 Tapping on ‘Send’ button opens up the screen which will initiate the communication process and start the wifi hotspot so that receiver can connect to it and start receiving the forms.
 
-In the Skunkworks-crow, we have two ways to exchange forms, Wifi hotspot and the bluetooth. You can choose one as the default transferring method in the settings page. 
+In the Skunkworks-crow, forms can be exchanged using either Wifi Hotspot or Bluetooth. The default preference for the transferring method can be modified through the settings page.
 
 <p align="center">
   <img src="/screenshots/choose_default_method.png" width="280" height="500"/>
@@ -133,9 +133,9 @@ And for other device it will be enabled automatically.
 
 #### 3.2.2 Bluetooth<a name="send-bluetooth"></a>
 
-We can use bluetooth to send forms as well. The bluetooth has a shorter transferring distance than hotspot, so you may need to put sender and receiver closed to establish a valid connection. In the receiver's settings page, you can enable the secure mode of bluetooth, it allows you to establish an encrypted transmission (needs a pair code when first pairing).
+The bluetooth has a shorter transferring distance than hotspot, so you may need to put sender and receiver closed to establish a valid connection. In the receiver's settings page, you can enable the secure mode of bluetooth, it allows you to establish an encrypted transmission (needs a pair code when first pairing).
 
-the bluetooth feature needs location permission. After a bluetooth socket was create, you will see a dialog to ask to make your device discoverable, after clicking that, You have 120s to let the receiver connect. Our application will automatically start data transfer if the bluetooth connection is successful.
+The bluetooth feature needs location permission. After a bluetooth socket was create, you will see a dialog to ask to make your device discoverable, after clicking that, You have 120s to let the receiver connect. Our application will automatically start data transfer if the bluetooth connection is successful.
 
 <p align="center">
   <img src="/screenshots/send_data.gif" width="280" height="500"/>
