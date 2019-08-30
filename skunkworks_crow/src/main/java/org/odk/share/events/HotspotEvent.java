@@ -1,6 +1,6 @@
 package org.odk.share.events;
 
-public class HotspotEvent {
+public class HotspotEvent extends RxEvent {
 
     private Status status;
 

@@ -1,4 +1,4 @@
-package org.odk.share.views.ui.receive;
+package org.odk.share.views.ui.hotspot;
 
 import android.content.Context;
 import android.net.wifi.WifiConfiguration;

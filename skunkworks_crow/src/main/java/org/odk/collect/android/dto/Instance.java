@@ -16,7 +16,7 @@
 
 package org.odk.collect.android.dto;
 
-public class Instance {
+public final class Instance {
     private final String displayName;
     private final String submissionUri;
     private final String canEditWhenComplete;
@@ -25,7 +25,6 @@ public class Instance {
     private final String jrVersion;
     private final String status;
     private final Long lastStatusChangeDate;
-    private final String displaySubtext;
     private final Long deletedDate;
 
     private final Long databaseId;
@@ -39,7 +38,6 @@ public class Instance {
         jrVersion = builder.jrVersion;
         status = builder.status;
         lastStatusChangeDate = builder.lastStatusChangeDate;
-        displaySubtext = builder.displaySubtext;
         deletedDate = builder.deletedDate;
 
         databaseId = builder.databaseId;
@@ -54,7 +52,6 @@ public class Instance {
         private String jrVersion;
         private String status;
         private Long lastStatusChangeDate;
-        private String displaySubtext;
         private Long deletedDate;
 
         private Long databaseId;
@@ -96,11 +93,6 @@ public class Instance {
 
         public Builder lastStatusChangeDate(Long lastStatusChangeDate) {
             this.lastStatusChangeDate = lastStatusChangeDate;
-            return this;
-        }
-
-        public Builder displaySubtext(String displaySubtext) {
-            this.displaySubtext = displaySubtext;
             return this;
         }
 
@@ -151,15 +143,22 @@ public class Instance {
         return lastStatusChangeDate;
     }
 
-    public String getDisplaySubtext() {
-        return displaySubtext;
-    }
-
     public Long getDeletedDate() {
         return deletedDate;
     }
 
     public Long getDatabaseId() {
         return databaseId;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return other == this || other instanceof Instance
+                && this.instanceFilePath.equals(((Instance) other).instanceFilePath);
+    }
+
+    @Override
+    public int hashCode() {
+        return instanceFilePath.hashCode();
     }
 }

@@ -1,6 +1,7 @@
 package org.odk.share.views.ui.main;
 
 import android.Manifest;
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -13,35 +14,43 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-
-import org.odk.collect.android.dao.FormsDao;
-import org.odk.collect.android.dao.InstancesDao;
-import org.odk.collect.android.dto.Form;
-import org.odk.share.R;
-import org.odk.share.views.ui.common.basecursor.BaseCursorViewHolder;
-import org.odk.share.views.listeners.ItemClickListener;
-import org.odk.share.application.Share;
-import org.odk.share.dao.TransferDao;
-import org.odk.share.views.ui.settings.SettingsActivity;
-import org.odk.share.views.ui.about.AboutActivity;
-import org.odk.share.views.ui.instance.InstanceManagerTabs;
-import org.odk.share.views.ui.send.SendFormsActivity;
-import org.odk.share.views.ui.receive.WifiActivity;
-
-import javax.inject.Inject;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import org.odk.collect.android.dao.FormsDao;
+import org.odk.collect.android.dao.InstancesDao;
+import org.odk.collect.android.dto.Form;
+import org.odk.share.R;
+import org.odk.share.application.Share;
+import org.odk.share.dao.TransferDao;
+import org.odk.share.utilities.ActivityUtils;
+import org.odk.share.utilities.DialogUtils;
+import org.odk.share.utilities.PermissionUtils;
+import org.odk.share.views.listeners.ItemClickListener;
+import org.odk.share.views.ui.about.AboutActivity;
+import org.odk.share.views.ui.common.basecursor.BaseCursorViewHolder;
+import org.odk.share.views.ui.instance.InstanceManagerTabs;
+import org.odk.share.views.ui.send.SendFormsActivity;
+import org.odk.share.views.ui.settings.SettingsActivity;
+
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import timber.log.Timber;
+
+import static org.odk.share.utilities.PermissionUtils.APP_SETTING_REQUEST_CODE;
 
 public class MainActivity extends FormListActivity implements LoaderManager.LoaderCallbacks<Cursor>, ItemClickListener {
 
@@ -57,7 +66,7 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
     Toolbar toolbar;
     @BindView(R.id.bSendForms)
     Button sendForms;
-    @BindView(R.id.bViewWifi)
+    @BindView(R.id.bReceiveForms)
     Button viewWifi;
     @BindView(R.id.recyclerview)
     RecyclerView recyclerView;
@@ -103,16 +112,14 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
         recyclerView.setAdapter(formAdapter);
     }
 
-    @OnClick(R.id.bViewWifi)
-    public void viewWifiNetworks() {
-        Intent intent = new Intent(this, WifiActivity.class);
-        startActivity(intent);
+    @OnClick(R.id.bReceiveForms)
+    public void chooseReceivingMethods() {
+        DialogUtils.switchToDefaultReceivingMethod(this);
     }
 
     @OnClick(R.id.bSendForms)
     public void selectForms() {
-        Intent intent = new Intent(this, SendFormsActivity.class);
-        startActivity(intent);
+        ActivityUtils.launchActivity(this, SendFormsActivity.class, false);
     }
 
     @Override
@@ -125,10 +132,10 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_settings:
-                startActivity(new Intent(this, SettingsActivity.class));
+                ActivityUtils.launchActivity(this, SettingsActivity.class, false);
                 return true;
             case R.id.menu_about:
-                startActivity(new Intent(this, AboutActivity.class));
+                ActivityUtils.launchActivity(this, AboutActivity.class, false);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -203,22 +210,18 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
     private void showAlertDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.install_collect);
-        builder.setPositiveButton(getString(R.string.install), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                try {
-                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + COLLECT_PACKAGE)));
-                } catch (android.content.ActivityNotFoundException e) {
-                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + COLLECT_PACKAGE)));
-                }
+
+        builder.setPositiveButton(getString(R.string.install), (DialogInterface dialog, int which) -> {
+            try {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + COLLECT_PACKAGE)));
+            } catch (ActivityNotFoundException e) {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + COLLECT_PACKAGE)));
             }
         });
-        builder.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-                finish();
-            }
+
+        builder.setNegativeButton(getString(R.string.cancel), (DialogInterface dialog, int which) -> {
+            dialog.dismiss();
+            finish();
         });
 
         builder.setCancelable(false);
@@ -248,20 +251,35 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        switch (requestCode) {
-            case STORAGE_PERMISSION_REQUEST_CODE:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    setUpLoader();
+        if (requestCode == STORAGE_PERMISSION_REQUEST_CODE) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                setUpLoader();
+            } else {
+                if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                        !shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE))) {
+                    PermissionUtils.showAppInfo(this, getPackageName(), getString(R.string.permission_open_storage_info), getString(R.string.permission_storage_denied));
                 } else {
-                    //close the app if the permission is denied
+                    Toast.makeText(this, getString(R.string.permission_storage_denied), Toast.LENGTH_SHORT).show();
                     finish();
                 }
+            }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == APP_SETTING_REQUEST_CODE) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED) {
+                PermissionUtils.showAppInfo(this, getPackageName(), getString(R.string.permission_open_storage_info), getString(R.string.permission_storage_denied));
+            } else {
+                setUpLoader();
+            }
         }
     }
 
     private void setUpLoader() {
-
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
                 checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
 
