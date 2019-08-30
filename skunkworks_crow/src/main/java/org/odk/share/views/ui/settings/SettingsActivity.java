@@ -19,11 +19,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import com.google.android.material.textfield.TextInputLayout;
-
 import org.odk.share.R;
-
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 
