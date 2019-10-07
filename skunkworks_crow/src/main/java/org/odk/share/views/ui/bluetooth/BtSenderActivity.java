@@ -386,8 +386,9 @@ public class BtSenderActivity extends InjectableActivity {
                     .setMessage(getString(R.string.stop_sending_msg))
                     .setPositiveButton(R.string.stop, (DialogInterface dialog, int which) -> {
                         senderService.cancel();
-                        if(initialStateDisabled)
+                        if (initialStateDisabled) {
                             BluetoothUtils.disableBluetooth();
+                        }
                         super.onBackPressed();
                     })
                     .setNegativeButton(R.string.cancel, (DialogInterface dialog, int which) -> {
@@ -401,8 +402,9 @@ public class BtSenderActivity extends InjectableActivity {
                     .setMessage(getString(R.string.disable_bluetooth_sender_msg))
                     .setPositiveButton(R.string.quit, (DialogInterface dialog, int which) -> {
                         senderService.cancel();
-                        if(initialStateDisabled)
+                        if (initialStateDisabled) {
                             BluetoothUtils.disableBluetooth();
+                        }
                         super.onBackPressed();
                     })
                     .setNegativeButton(android.R.string.no, (DialogInterface dialog, int which) -> {
