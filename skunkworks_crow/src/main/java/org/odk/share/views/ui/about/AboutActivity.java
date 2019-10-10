@@ -57,8 +57,7 @@ public class AboutActivity extends AppCompatActivity implements OnItemClickListe
             Intent intent = new Intent(this, WebViewActivity.class);
             intent.putExtra(OPEN_URL, LICENSES_HTML_PATH);
             startActivity(intent);
-        }
-        else if (position == 1) {
+        } else if (position == 1) {
             Intent intent = new Intent(this, WebViewActivity.class);
             intent.putExtra(OPEN_URL, USER_GUIDE_HTML_PATH);
             startActivity(intent);
