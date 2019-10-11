@@ -16,6 +16,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static org.odk.share.views.ui.about.WebViewActivity.OPEN_URL;
+import static org.odk.share.views.ui.about.WebViewActivity.TITLE;
 
 public class AboutActivity extends AppCompatActivity implements OnItemClickListener {
 
@@ -56,10 +57,12 @@ public class AboutActivity extends AppCompatActivity implements OnItemClickListe
         if (position == 0) {
             Intent intent = new Intent(this, WebViewActivity.class);
             intent.putExtra(OPEN_URL, LICENSES_HTML_PATH);
+            intent.putExtra(TITLE, getString(R.string.open_source_licenses));
             startActivity(intent);
         } else if (position == 1) {
             Intent intent = new Intent(this, WebViewActivity.class);
             intent.putExtra(OPEN_URL, USER_GUIDE_HTML_PATH);
+            intent.putExtra(TITLE, getString(R.string.user_guide));
             startActivity(intent);
         }
     }
