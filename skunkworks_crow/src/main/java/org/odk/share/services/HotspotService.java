@@ -27,11 +27,12 @@ import android.content.IntentFilter;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
+
+import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
 
 import org.odk.share.R;
-import org.odk.share.activities.MainActivity;
+import org.odk.share.views.ui.main.MainActivity;
 import org.odk.share.application.Share;
 import org.odk.share.events.HotspotEvent;
 import org.odk.share.network.WifiHospotConnector;

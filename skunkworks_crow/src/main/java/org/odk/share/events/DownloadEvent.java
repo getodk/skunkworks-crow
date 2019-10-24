@@ -1,6 +1,6 @@
 package org.odk.share.events;
 
-public class DownloadEvent {
+public class DownloadEvent extends RxEvent {
 
     private Status status;
     private String result;

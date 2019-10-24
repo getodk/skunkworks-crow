@@ -1,8 +1,12 @@
 package org.odk.share.tasks;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothServerSocket;
+import android.bluetooth.BluetoothSocket;
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.support.annotation.NonNull;
+
+import androidx.annotation.NonNull;
 
 import com.evernote.android.job.Job;
 
@@ -16,6 +20,7 @@ import org.odk.share.dao.InstanceMapDao;
 import org.odk.share.dao.TransferDao;
 import org.odk.share.database.ShareDatabaseHelper;
 import org.odk.share.dto.TransferInstance;
+import org.odk.share.events.BluetoothEvent;
 import org.odk.share.events.UploadEvent;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.utilities.ApplicationConstants;
@@ -41,13 +46,15 @@ import javax.inject.Inject;
 
 import timber.log.Timber;
 
+import static org.odk.share.bluetooth.BluetoothUtils.SPP_UUID;
 import static org.odk.share.dto.InstanceMap.INSTANCE_UUID;
 import static org.odk.share.dto.TransferInstance.INSTANCE_ID;
 import static org.odk.share.dto.TransferInstance.STATUS_FORM_SENT;
 import static org.odk.share.dto.TransferInstance.TRANSFER_STATUS;
-import static org.odk.share.fragments.ReviewedInstancesFragment.MODE;
+import static org.odk.share.tasks.DownloadJob.RESULT_DIVIDER;
 import static org.odk.share.utilities.ApplicationConstants.SEND_BLANK_FORM_MODE;
 import static org.odk.share.utilities.ApplicationConstants.SEND_FILL_FORM_MODE;
+import static org.odk.share.views.ui.instance.fragment.ReviewedInstancesFragment.MODE;
 
 public class UploadJob extends Job {
 
@@ -76,6 +83,8 @@ public class UploadJob extends Job {
     private ServerSocket serverSocket;
     private DataOutputStream dos;
     private DataInputStream dis;
+    private BluetoothServerSocket bluetoothServerSocket;
+    private BluetoothSocket bluetoothSocket;
     private int progress;
     private int total;
     private int mode;
@@ -89,36 +98,78 @@ public class UploadJob extends Job {
 
         initJob(params);
 
-        rxEventBus.post(uploadInstances());
-
         return null;
     }
 
     private void initJob(Params params) {
-        instancesToSend = ArrayUtils.toObject(params.getExtras().getLongArray(INSTANCES));
-        port = params.getExtras().getInt(PORT, -1);
-        mode = params.getExtras().getInt(MODE, ApplicationConstants.ASK_REVIEW_MODE);
         sbResult = new StringBuilder();
+        int method = params.getExtras().getInt("MODE_OF_TRANSFER", -1);
+        mode = params.getExtras().getInt(MODE, ApplicationConstants.ASK_REVIEW_MODE);
+        instancesToSend = ArrayUtils.toObject(params.getExtras().getLongArray(INSTANCES));
+        if (method == Share.TransferMethod.HOTSPOT) {
+            port = params.getExtras().getInt(PORT, -1);
+        }
+
+        setupDataStreamsAndRun(method);
+    }
+
+    private void setupDataStreamsAndRun(@Share.TransferMethod int method) {
+        try {
+            Timber.d("Waiting for receiver");
+            switch (method) {
+                case Share.TransferMethod.BLUETOOTH:
+                    BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+                    bluetoothServerSocket = bluetoothAdapter.listenUsingInsecureRfcommWithServiceRecord(TAG, SPP_UUID);
+                    bluetoothSocket = bluetoothServerSocket.accept();
+
+                    if (bluetoothSocket.isConnected()) {
+                        rxEventBus.post(new BluetoothEvent(BluetoothEvent.Status.CONNECTED));
+                    }
+
+                    dos = new DataOutputStream(bluetoothSocket.getOutputStream());
+                    dis = new DataInputStream(bluetoothSocket.getInputStream());
+                    break;
+                case Share.TransferMethod.HOTSPOT:
+                    serverSocket = new ServerSocket(port);
+                    socket = serverSocket.accept();
+                    dos = new DataOutputStream(socket.getOutputStream());
+                    dis = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+                    break;
+            }
+
+            rxEventBus.post(uploadInstances());
+        } catch (IOException e) {
+            Timber.e(e);
+        }
+    }
+
+    private void closeConnections() throws IOException {
+        if (dos != null) {
+            dos.close();
+        }
+        if (dis != null) {
+            dis.close();
+        }
+        if (socket != null) {
+            socket.close();
+        }
+        if (serverSocket != null) {
+            serverSocket.close();
+        }
+        if (bluetoothSocket != null) {
+            bluetoothSocket.close();
+        }
+        if (bluetoothServerSocket != null) {
+            bluetoothServerSocket.close();
+        }
     }
 
     private UploadEvent uploadInstances() {
         try {
-            Timber.d("Waiting for receiver");
-
-            serverSocket = new ServerSocket(port);
-            socket = serverSocket.accept();
-            dos = new DataOutputStream(socket.getOutputStream());
-            dis = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
-
             // show dialog and connected
             Timber.d("Start Sending");
             processSelectedFiles(instancesToSend);
-
-            // close connection
-            socket.close();
-            serverSocket.close();
-            dos.close();
-            dis.close();
+            closeConnections();
         } catch (IOException e) {
             Timber.e(e);
             return new UploadEvent(UploadEvent.Status.ERROR, e.getMessage());
@@ -130,18 +181,7 @@ public class UploadJob extends Job {
     @Override
     protected void onCancel() {
         try {
-            if (socket != null) {
-                socket.close();
-            }
-            if (serverSocket != null) {
-                serverSocket.close();
-            }
-            if (dos != null) {
-                dos.close();
-            }
-            if (dis != null) {
-                dis.close();
-            }
+            closeConnections();
         } catch (IOException e) {
             Timber.e(e);
         }
@@ -294,6 +334,7 @@ public class UploadJob extends Job {
         String formVersion = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.JR_VERSION));
 
         try {
+            dos.writeUTF(displayName);
             dos.writeUTF(formId);
             if (formVersion == null) {
                 dos.writeUTF("-1");
@@ -310,6 +351,12 @@ public class UploadJob extends Job {
 
             boolean formExistAtReceiver = dis.readBoolean();
             Timber.d("Form exists %b ", formExistAtReceiver);
+
+            sbResult.append(getContext().getString(R.string.form_name, displayName) + "\n");
+            if (formVersion != null) {
+                sbResult.append(getContext().getString(R.string.version, formVersion) + "\n");
+            }
+            sbResult.append(getContext().getString(R.string.id, formId) + "\n");
 
             if (!formExistAtReceiver) {
                 Timber.d("Form sent to the receiver");
@@ -345,14 +392,14 @@ public class UploadJob extends Job {
                     dos.writeInt(0);
                 }
 
-                sbResult.append(displayName + " ");
-                if (formVersion != null) {
-                    sbResult.append(getContext().getString(R.string.version, formVersion));
-                }
-                sbResult.append(getContext().getString(R.string.id, formId) + " " +
-                        getContext().getString(R.string.success, getContext().getString(R.string.blank_form_count,
-                                getContext().getString(R.string.sent))));
+                sbResult.append(getContext().getString(R.string.form_transfer_result,
+                        getContext().getString(R.string.success, ", " +
+                                getContext().getString(R.string.blank_form_count,
+                                        getContext().getString(R.string.sent)))));
+            } else {
+                sbResult.append(getContext().getString(R.string.form_transfer_result, getContext().getString(R.string.msg_form_already_exist)));
             }
+            sbResult.append(RESULT_DIVIDER);
         } catch (IOException e) {
             Timber.e(e);
         }
@@ -415,8 +462,8 @@ public class UploadJob extends Job {
                         boolean isFormSentForReview = dis.readBoolean();
                         Timber.d("isFormSentForReview " + isFormSentForReview);
                         if (!isFormSentForReview) {
-                            sbResult.append(displayName + getContext().getString(R.string.failed,
-                                    getContext().getString(R.string.review_not_asked)));
+                            setupResultText(displayName, getContext().getString(R.string.failed,
+                                    ", " + getContext().getString(R.string.review_not_asked)));
                             continue;
                         } else {
                             TransferInstance transferInstance = transferDao.getReceivedTransferInstanceFromInstanceId(id);
@@ -438,8 +485,8 @@ public class UploadJob extends Job {
 
                     if (mode == ApplicationConstants.SEND_REVIEW_MODE) {
                         // sent the review with the updated files
-                        sbResult.append(displayName + getContext().getString(R.string.success,
-                                getContext().getString(R.string.review_sent)));
+                        setupResultText(displayName, getContext().getString(R.string.success,
+                                ", " + getContext().getString(R.string.review_sent)));
                     } else {
                         // sent for review and update in transfer.db
                         // check if it already exists at receiver end or not
@@ -451,16 +498,16 @@ public class UploadJob extends Job {
                         boolean isFormAlreadySentForReview = dis.readBoolean();
                         Timber.d("isFormAlreadySentForReview " + isFormAlreadySentForReview);
                         if (isFormAlreadySentForReview) {
-                            sbResult.append(displayName + getContext().getString(R.string.success,
-                                    getContext().getString(R.string.sent_again)));
+                            setupResultText(displayName, getContext().getString(R.string.success,
+                                    ", " + getContext().getString(R.string.sent_again)));
                         } else {
                             ContentValues values = new ContentValues();
                             values.put(INSTANCE_ID,
                                     c.getLong(c.getColumnIndex(InstanceProviderAPI.InstanceColumns._ID)));
                             values.put(TRANSFER_STATUS, STATUS_FORM_SENT);
                             new ShareDatabaseHelper(getContext()).insertInstance(values);
-                            sbResult.append(displayName + getContext().getString(R.string.success,
-                                    getContext().getString(R.string.sent_for_review)));
+                            setupResultText(displayName, getContext().getString(R.string.success,
+                                    ", " + getContext().getString(R.string.sent_for_review)));
                         }
                     }
                 }
@@ -472,6 +519,12 @@ public class UploadJob extends Job {
                 c.close();
             }
         }
+    }
+
+    private void setupResultText(String formName, String status) {
+        sbResult.append(getContext().getString(R.string.form_name, formName) + "\n");
+        sbResult.append(getContext().getString(R.string.form_transfer_result, status));
+        sbResult.append(RESULT_DIVIDER);
     }
 
     private void sendFile(String filePath) {

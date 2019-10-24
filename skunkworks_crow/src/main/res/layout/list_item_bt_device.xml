@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/MatchParentWidth"
+    android:background="?android:attr/selectableItemBackground"
+    android:orientation="horizontal">
+
+    <!-- TODO: fix the selected item click not completed bug -->
+
+    <ImageView
+        android:id="@+id/iv_device"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:padding="12dp"
+        android:src="@drawable/ic_smart_phone_black" />
+
+    <LinearLayout
+        style="@style/MatchParentWidth"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_device_name"
+            style="@style/MatchParentWidth"
+            android:layout_marginStart="6dp"
+            android:layout_marginLeft="6dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="4dp"
+            android:gravity="center_vertical"
+            android:text="@string/bluetooth_instance_name_default"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tv_device_address"
+            style="@style/MatchParent"
+            android:layout_marginStart="6dp"
+            android:layout_marginLeft="6dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="2dp"
+            android:gravity="center_vertical"
+            android:textSize="12sp"
+            tools:text="default device address" />
+    </LinearLayout>
+</LinearLayout>

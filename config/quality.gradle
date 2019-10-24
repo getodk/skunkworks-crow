@@ -108,5 +108,5 @@ android {
 
 //------------------------ ALL ------------------------//
 task checkCode(type: GradleBuild) {
-    tasks = ['pmd', 'checkstyle', 'lint', 'findbugs']
+    tasks = ['pmd', 'checkstyle', 'lint', 'findbugs', 'testDebugUnitTest']
 }

@@ -28,19 +28,25 @@
     <string name="show_password">Show Password</string>
     <string name="connect">Connect</string>
     <string name="cancel">Cancel</string>
+    <string name="quit">Quit</string>
     <string name="password_empty">Password field is empty</string>
     <string name="port_empty">Port cannot be empty</string>
 
     <string name="settings">Settings</string>
     <string name="about">About</string>
     <string name="open_source_licenses">Open Source Licenses</string>
+    <string name="user_guide">User Guide</string>
     <string name="default_hotspot_ssid">hotspot</string>
     <string name="default_hotspot_password">12345678</string>
+    <string name="title_bluetooth_name">Bluetooth Name</string>
     <string name="title_hotspot_ssid">Hotspot SSID</string>
     <string name="title_hotspot_password">Set Hotspot password</string>
+    <string name="summary_security_bluetooth">Use secure transfer (needs pairing code, controlled by receiver)</string>
     <string name="set_password">Set Password</string>
+    <string name="secure_mode">Enable Secure Mode</string>
     <string name="password_hotspot">Password required to connect with hotspot</string>
     <string name="hotspot_name_error">Hotspot name should not be empty</string>
+    <string name="bluetooth_name_error">Bluetooth name should not be empty</string>
     <string name="hotspot_password_error">Password length should be atleast 8 characters long</string>
     <string name="waiting_connection">Waiting for connection to accept</string>
     <string name="waiting_hotspot">Waiting for hotspot to connect</string>
@@ -50,7 +56,10 @@
     <string name="ok">OK</string>
     <string name="canceled">Canceled</string>
     <string name="stop_sending">Stop Sending</string>
-
+    <string name="stop_sending_msg">Do you want to stop sending?</string>
+    <string name="disable_bluetooth">Disable bluetooth</string>
+    <string name="disable_bluetooth_receiver_msg">Do you want to disable the bluetooth and stop receiving of forms?</string>
+    <string name="disable_bluetooth_sender_msg">Do you want to disable the bluetooth and quit?</string>
 
     <string name="sending_items">Sending %1$s of %2$s form(s)</string>
     <string name="receiving_items">Receiving %1$s of %2$s form(s)</string>
@@ -73,8 +82,10 @@
     <string name="no_forms_reviewed">No finalized %s forms reviewed</string>
     <string name="sort_list">Sort the list</string>
     <string name="search_list">Search the list</string>
+    <string name="switch_list">Switch the transfer method</string>
     <string name="search">Search</string>
 
+    <string name="review_form">Review Form</string>
     <string name="sort_by_name_asc">Name, A-Z</string>
     <string name="sort_by_name_desc">Name, Z-A</string>
     <string name="sort_by_date_asc">Date, newest first</string>
@@ -97,17 +108,20 @@
     <string name="sent_on">Sent on %s</string>
     <string name="date_at_time">EEE, MMM dd, yyyy \'at\' HH:mm</string> <!-- http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html -->
 
-    <string name="blank_form_count">(Blank form %s)</string>
-    <string name="success">-Success %s\n</string>
-    <string name="failed">-Failed %s\n</string>
-    <string name="review_not_asked">(Review not asked by the receiver)</string>
-    <string name="not_sent_for_review">(Form not sent for review)</string>
-    <string name="review_sent">(Review sent)</string>
-    <string name="review_received">(Review received)</string>
-    <string name="sent_for_review">(Sent for review)</string>
-    <string name="received_for_review">(Received for review)</string>
-    <string name="updated">(Updated)</string>
-    <string name="sent_again">(Sent again)</string>
+    <string name="form_name">Name: %s </string>
+    <string name="form_transfer_result">Result: %s </string>
+    <string name="blank_form_count">Blank form %s \n</string>
+    <string name="success">Success %s</string>
+    <string name="failed">Failed %s</string>
+    <string name="review_not_asked">Review not asked by the receiver \n</string>
+    <string name="not_sent_for_review">Form not sent for review \n</string>
+    <string name="review_sent">Review sent \n</string>
+    <string name="review_received">Review received \n</string>
+    <string name="sent_for_review">Sent for review \n</string>
+    <string name="received_for_review">Received for review \n</string>
+    <string name="updated">Updated \n</string>
+    <string name="sent_again">Sent again \n</string>
+    <string name="msg_form_already_exist">Already exists \n</string>
     <string name="form_received_by_reviewer">%s by reviewer</string>
     <string name="accepted">Accepted</string>
     <string name="rejected">Rejected</string>
@@ -130,4 +144,44 @@
     <string name="odk_destination_dir_error">The destination should not be empty</string>
     <string name="location_permission_needed">Location Permission Needed</string>
     <string name="location_settings_dialog">Enable location from the settings.</string>
+
+    <string name="switch_method">Switch</string>
+    <string name="btn_refresh">Refresh</string>
+    <string name="connect_bluetooth_title">Device to Receive</string>
+    <string name="connected_bluetooth_downloading">Connected, start downloading&#8230;</string>
+    <string name="connecting_title">Connecting</string>
+    <string name="scanning_title">Scanning</string>
+    <string name="bluetooth">bluetooth</string>
+    <string name="scanning_msg">Scanning bluetooth devices, please wait&#8230;</string>
+    <string name="bluetooth_paired">device paired</string>
+    <string name="bluetooth_unpaired">device unpaired</string>
+    <string name="bluetooth_send_time_up">You have not connected a device for more than 60 seconds, the device is not discoverable. If you want to continue, please restart the sending page.</string>
+    <string name="timeout">Timeout</string>
+    <string name="receiving_title">Receiving</string>
+    <string name="sending_title">Sending</string>
+    <string name="connecting_message">connecting to bluetooth \n please wait&#8230;</string>
+    <string name="connecting_transfer_message">connected with bluetooth receiver! \nstarting transferring&#8230;</string>
+    <string name="turning_on_bluetooth_message">you have disabled bluetooth, turning on now&#8230;</string>
+    <string name="send_instance_title">Send Data</string>
+    <string name="bluetooth_instance_name_default">Bluetooth Device</string>
+    <string name="tv_sender_wait_for_connect">waiting for connection (%ss left)&#8230; \nwill start transfer when connected </string>
+    <string name="dev_already_connected">already connected to the device, start transferring now&#8230;</string>
+    <string name="bluetooth_no_device_scanned">No devices are available. \n Tap refresh to search again.</string>
+    <string name="preference_default_method">Default Transfer Method</string>
+    <string name="preference_default_method_summary">Bluetooth</string>
+    <string name="bluetooth_switch_method">Are you sure to stop and switch to bluetooth method?</string>
+    <string name="hotspot_switch_method">Are you sure to stop and switch to hotspot method?</string>
+    <string name="switch_to_bluetooth_title">Switch to Bluetooth Method</string>
+    <string name="switch_to_hotspot_title">Switch to Hotspot Method</string>
+    <string name="permission_location_denied">Location permission is required to send the forms using Bluetooth. Please allow it in the app settings.</string>
+    <string name="permission_storage_denied">Storage permission is required. Please allow it in the app settings.</string>
+    <string name="permission_open_location_info">Skunkworks-crow app requires location permission to access your Bluetooth. Please allow location permission from your app settings.</string>
+    <string name="permission_open_storage_info">Skunkworks-crow app requires storage permission to access ODK database. Please allow that from your app settings.</string>
+    <string name="permission_open_info_button">Open Settings</string>
+
+    <string name="added_on_date_at_time">\'Added on\' EEE, MMM dd, yyyy \'at\' HH:mm</string> <!-- http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html -->
+    <string name="saved_on_date_at_time">\'Saved on\' EEE, MMM dd, yyyy \'at\' HH:mm</string> <!-- http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html -->
+    <string name="finalized_on_date_at_time">\'Finalized on\' EEE, MMM dd, yyyy \'at\' HH:mm</string> <!-- http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html -->
+    <string name="sent_on_date_at_time">\'Sent on\' EEE, MMM dd, yyyy \'at\' HH:mm</string> <!-- http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html -->
+    <string name="sending_failed_on_date_at_time">\'Sending failed on\' EEE, MMM dd, yyyy \'at\' HH:mm</string> <!-- http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html -->
 </resources>

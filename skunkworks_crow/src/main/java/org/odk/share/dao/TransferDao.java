@@ -3,7 +3,7 @@ package org.odk.share.dao;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.support.v4.content.CursorLoader;
+import androidx.loader.content.CursorLoader;
 
 import org.odk.share.dto.TransferInstance;
 

@@ -9,12 +9,13 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import org.odk.share.application.Share;
 import org.odk.share.database.ShareDatabaseHelper;
 import org.odk.share.dto.TransferInstance;
+
+import androidx.annotation.NonNull;
 
 import static org.odk.share.database.ShareDatabaseHelper.SHARE_TABLE_NAME;
 
