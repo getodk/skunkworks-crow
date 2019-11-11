@@ -1,6 +1,7 @@
 package org.odk.share.views.ui.settings;
 
 import android.bluetooth.BluetoothAdapter;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -10,7 +11,9 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -52,6 +55,8 @@ public class SettingsActivity extends PreferenceActivity {
         addPreferencesFromResource(R.xml.preferences_menu);
         addPreferences();
     }
+
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -183,13 +188,22 @@ public class SettingsActivity extends PreferenceActivity {
         View dialogView = factory.inflate(R.layout.dialog_password_til, null);
         TextInputLayout tlPassword = dialogView.findViewById(R.id.et_password_layout);
         tlPassword.getEditText().setText(prefs.getString(PreferenceKeys.KEY_HOTSPOT_PASSWORD, getString(R.string.default_hotspot_password)));
-
         builder.setTitle(getString(R.string.title_hotspot_password));
         builder.setView(dialogView);
+
         builder.setPositiveButton(getString(R.string.ok), (dialog, which) -> {
             String password = tlPassword.getEditText().getText().toString();
-            prefs.edit().putString(PreferenceKeys.KEY_HOTSPOT_PASSWORD, password).apply();
+
+            if(password.length()<8)
+            {
+                Toast.makeText(this, "Password length must be atleast 8 characters long", Toast.LENGTH_SHORT).show();
+            }
+            else {
+                prefs.edit().putString(PreferenceKeys.KEY_HOTSPOT_PASSWORD, password).apply();
+            }
         });
+
+
         builder.setNegativeButton(getString(R.string.cancel), (dialog, which) -> dialog.dismiss());
 
         builder.setCancelable(false);
