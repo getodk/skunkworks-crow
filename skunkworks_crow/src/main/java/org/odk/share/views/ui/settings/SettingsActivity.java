@@ -1,6 +1,8 @@
 package org.odk.share.views.ui.settings;
 
+import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.CheckBox;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -24,6 +27,8 @@ import androidx.appcompat.widget.Toolbar;
 import com.google.android.material.textfield.TextInputLayout;
 
 import org.odk.share.R;
+import org.odk.share.application.Share;
+import org.odk.share.utilities.FileUtils;
 
 
 /**
@@ -35,11 +40,13 @@ public class SettingsActivity extends PreferenceActivity {
     EditTextPreference hotspotNamePreference;
     EditTextPreference bluetoothNamePreference;
     Preference hotspotPasswordPreference;
+    Preference resetPreference;
     CheckBoxPreference passwordRequirePreference;
     CheckBoxPreference btSecureModePreference;
     EditTextPreference odkDestinationDirPreference;
     ListPreference defaultMethodPreference;
     private SharedPreferences prefs;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +69,7 @@ public class SettingsActivity extends PreferenceActivity {
     }
 
     private void addPreferences() {
+        resetPreference = findPreference(PreferenceKeys.KEY_RESET_SETTINGS);
         defaultMethodPreference = (ListPreference) findPreference(PreferenceKeys.KEY_DEFAULT_TRANSFER_METHOD);
         hotspotNamePreference = (EditTextPreference) findPreference(PreferenceKeys.KEY_HOTSPOT_NAME);
         bluetoothNamePreference = (EditTextPreference) findPreference(PreferenceKeys.KEY_BLUETOOTH_NAME);
@@ -78,8 +86,8 @@ public class SettingsActivity extends PreferenceActivity {
                 getString(R.string.default_hotspot_ssid)));
         String defaultBluetoothName = BluetoothAdapter.getDefaultAdapter().getName();
         bluetoothNamePreference.setText(defaultBluetoothName);
-        bluetoothNamePreference.setDefaultValue(defaultBluetoothName);
         bluetoothNamePreference.setSummary(prefs.getString(PreferenceKeys.KEY_BLUETOOTH_NAME, defaultBluetoothName));
+
         boolean isPasswordSet = prefs.getBoolean(PreferenceKeys.KEY_HOTSPOT_PWD_REQUIRE, false);
         odkDestinationDirPreference.setSummary(prefs.getString(PreferenceKeys.KEY_ODK_DESTINATION_DIR,
                 getString(R.string.default_odk_destination_dir)));
@@ -96,6 +104,7 @@ public class SettingsActivity extends PreferenceActivity {
         odkDestinationDirPreference.setOnPreferenceChangeListener(preferenceChangeListener());
         defaultMethodPreference.setOnPreferenceChangeListener(preferenceChangeListener());
 
+        resetPreference.setOnPreferenceClickListener(preferenceClickListener());
         hotspotPasswordPreference.setOnPreferenceClickListener(preferenceClickListener());
     }
 
@@ -104,6 +113,9 @@ public class SettingsActivity extends PreferenceActivity {
             switch (preference.getKey()) {
                 case PreferenceKeys.KEY_HOTSPOT_PASSWORD:
                     showPasswordDialog();
+                    break;
+                case PreferenceKeys.KEY_RESET_SETTINGS:
+                    resetApplication();
                     break;
             }
             return false;
@@ -129,8 +141,7 @@ public class SettingsActivity extends PreferenceActivity {
                         return false;
                     } else {
                         bluetoothNamePreference.setSummary(bluetoothName);
-                        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-                        bluetoothAdapter.setName(bluetoothName);
+                        BluetoothAdapter.getDefaultAdapter().setName(bluetoothName);
                     }
                     break;
                 case PreferenceKeys.KEY_HOTSPOT_PASSWORD:
@@ -197,5 +208,87 @@ public class SettingsActivity extends PreferenceActivity {
         alertDialog.show();
         alertDialog.setCancelable(true);
         alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+    }
+
+    /**
+     * Reset the application settings and the database.
+     */
+    private void resetApplication() {
+        View checkBoxView = View.inflate(this, R.layout.pref_reset_dialog, null);
+        CheckBox cbResetPref = checkBoxView.findViewById(R.id.cb_reset_pref);
+        CheckBox cbResetData = checkBoxView.findViewById(R.id.cb_clear_db);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog resetDialog = builder.setTitle(getString(R.string.title_reset_settings))
+                .setView(checkBoxView)
+                .setCancelable(false)
+                .setPositiveButton(getString(R.string.ok), (DialogInterface dialog, int which) -> {
+                    progressDialog = new ProgressDialog(this);
+                    progressDialog.setTitle(getString(R.string.resetting));
+                    progressDialog.setMessage(getString(R.string.resetting_msg));
+                    progressDialog.setIndeterminate(true);
+                    progressDialog.setCancelable(false);
+                    progressDialog.show();
+                    dialog.dismiss();
+
+                    if (!cbResetData.isChecked() && !cbResetPref.isChecked()) {
+                        progressDialog.dismiss();
+                        Toast.makeText(this, getString(R.string.reset_select_nothing), Toast.LENGTH_LONG).show();
+                    } else {
+                        startReset(cbResetPref, cbResetData);
+                    }
+                })
+                .setNegativeButton(getString(R.string.cancel), (DialogInterface dialog, int which) -> {
+                    dialog.dismiss();
+                })
+                .create();
+        resetDialog.show();
+    }
+
+    /**
+     * Start resetting the application and presenting the reset result in an {@link AlertDialog}.
+     */
+    private void startReset(CheckBox cbResetPref, CheckBox cbResetData) {
+        StringBuilder stringBuilder = new StringBuilder();
+        if (cbResetData.isChecked()) {
+            stringBuilder.append(getString(R.string.reset_result_data,
+                    resetData() ? getString(R.string.reset_success) : getString(R.string.reset_failed)));
+        }
+
+        if (cbResetPref.isChecked()) {
+            stringBuilder.append(getString(R.string.reset_result_pref,
+                    resetPreference() ? getString(R.string.reset_success) : getString(R.string.reset_failed)));
+        }
+
+        progressDialog.dismiss();
+        new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.reset_result))
+                .setMessage(stringBuilder.toString())
+                .setCancelable(false)
+                .setPositiveButton(getString(R.string.ok), (DialogInterface dialog, int which) -> {
+                    dialog.dismiss();
+                    finish();
+                })
+                .create()
+                .show();
+    }
+
+    /**
+     * Reset the preference by resetting the {@link SharedPreferences}.
+     */
+    private boolean resetPreference() {
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.clear();
+        return editor.commit();
+    }
+
+    /**
+     * Removing the cache and database table by deleting the share
+     * folder and create a new one.
+     */
+    private boolean resetData() {
+        boolean result = FileUtils.deleteFolderContents(Share.ODK_ROOT);
+        Share.createODKDirs(this);
+        return result;
     }
 }

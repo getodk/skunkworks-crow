@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory android:title="General Settings">
-
         <EditTextPreference
             android:defaultValue="@string/default_odk_destination_dir"
             android:icon="@drawable/ic_sd_storage_black_24dp"
@@ -18,6 +17,10 @@
             android:summary="@string/preference_default_method_summary"
             android:title="@string/preference_default_method" />
 
+        <Preference
+            android:icon="@drawable/ic_refresh_black_24dp"
+            android:key="reset_settings"
+            android:title="@string/title_reset_settings" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Hotspot Settings">
@@ -59,6 +62,5 @@
             android:key="bluetooth_secure_mode"
             android:summary="@string/summary_security_bluetooth"
             android:title="@string/secure_mode" />
-
     </PreferenceCategory>
 </PreferenceScreen>

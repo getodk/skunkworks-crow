@@ -1,0 +1,67 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/MatchParentWidth">
+
+    <LinearLayout
+        style="@style/MatchParent"
+        android:orientation="vertical"
+        android:padding="4dp">
+
+        <LinearLayout
+            android:layout_marginTop="6dp"
+            style="@style/MatchParentWidth"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/cb_reset_pref"
+                style="?android:attr/textAppearanceMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="6dp"
+                android:layout_marginEnd="6dp" />
+
+            <LinearLayout
+                style="@style/MatchParentWidth"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+                <TextView
+                    style="@style/MatchParent"
+                    android:text="@string/reset_pref"
+                    android:textStyle="bold" />
+
+                <TextView
+                    style="@style/MatchParent"
+                    android:text="@string/reset_pref_msg" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            style="@style/MatchParentWidth"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/cb_clear_db"
+                style="?android:attr/textAppearanceMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="6dp"
+                android:layout_marginEnd="6dp" />
+
+            <LinearLayout
+                style="@style/MatchParentWidth"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <TextView
+                    style="@style/MatchParent"
+                    android:text="@string/reset_database"
+                    android:textStyle="bold" />
+
+                <TextView
+                    style="@style/MatchParent"
+                    android:text="@string/reset_database_msg" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

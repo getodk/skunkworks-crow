@@ -144,6 +144,19 @@
     <string name="odk_destination_dir_error">The destination should not be empty</string>
     <string name="location_permission_needed">Location Permission Needed</string>
     <string name="location_settings_dialog">Enable location from the settings.</string>
+    <string name="title_reset_settings">Reset Application</string>
+    <string name="reset_database">Reset Saved Forms</string>
+    <string name="reset_database_msg">reset forms sent for review and forms received for review.</string>
+    <string name="reset_pref">Reset All Settings</string>
+    <string name="reset_pref_msg">reset internal settings and saved settings.</string>
+    <string name="reset_select_nothing">Please select items to reset</string>
+    <string name="resetting">Resetting</string>
+    <string name="resetting_msg">Resetting application, please wait&#8230;</string>
+    <string name="reset_result">Reset Results</string>
+    <string name="reset_result_pref">All Settings: %s</string>
+    <string name="reset_result_data">Saved Forms: %s \n</string>
+    <string name="reset_success">Success</string>
+    <string name="reset_failed">Failed</string>
 
     <string name="switch_method">Switch</string>
     <string name="btn_refresh">Refresh</string>
