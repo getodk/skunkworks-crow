@@ -1,25 +1,13 @@
-<?xml version="1.0"?><!--
-  ~ Copyright 2015 Vincent Brison.
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~    http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
+<?xml version="1.0"?>
 
-<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Android Application Rules"
-    xmlns="http://pmd.sf.net/ruleset/1.0.0"
-    xsi:noNamespaceSchemaLocation="http://pmd.sf.net/ruleset_xml_schema.xsd"
-    xsi:schemaLocation="http://pmd.sf.net/ruleset/1.0.0 http://pmd.sf.net/ruleset_xml_schema.xsd">
+<ruleset name="Custom Rules"
+    xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.net/ruleset_2_0_0.xsd">
 
-    <description>Custom rule-set for Android application</description>
+    <description>
+        Custom rule-set for Android application
+    </description>
 
     <exclude-pattern>.*/R.java</exclude-pattern>
     <exclude-pattern>.*/gen/.*</exclude-pattern>
@@ -48,52 +36,26 @@
         <exclude name="AvoidBranchingStatementAsLastInLoop" />
         <exclude name="ReturnFromFinallyBlock" />
     </rule>
-    <rule ref="rulesets/java/naming.xml">
-        <exclude name="AbstractNaming" />
-        <exclude name="LongVariable" />
-        <exclude name="ShortMethodName" />
-        <exclude name="ShortVariable" />
-        <exclude name="VariableNamingConventions" />
-        <exclude name="AvoidFieldNameMatchingMethodName" />
-        <exclude name="ShortClassName" />
-        <exclude name="MethodNamingConventions" />
-        <exclude name="AvoidFieldNameMatchingTypeName" />
-    </rule>
-    <rule ref="rulesets/java/design.xml">
-        <exclude name="ConfusingTernary" />
-        <exclude name="TooFewBranchesForASwitchStatement" />
-        <exclude name="AbstractClassWithoutAbstractMethod" />
-        <exclude name="SwitchStmtsShouldHaveDefault" />
-        <exclude name="AvoidDeeplyNestedIfStmts" />
-        <exclude name="ImmutableField" />
-        <exclude name="GodClass" />
-        <exclude name="FieldDeclarationsShouldBeAtStartOfClass" />
-        <exclude name="SwitchDensity" />
-        <exclude name="UseCollectionIsEmpty" />
-        <exclude name="UncommentedEmptyMethodBody" />
-        <exclude name="MissingBreakInSwitch" />
-        <exclude name="CompareObjectsWithEquals" />
-        <exclude name="SimplifyConditional" />
-        <exclude name="SingularField" />
-        <exclude name="UseVarargs" />
-        <exclude name="UncommentedEmptyConstructor" />
-        <exclude name="AccessorClassGeneration" />
-        <exclude name="AvoidReassigningParameters" />
-        <exclude name="AvoidProtectedMethodInFinalClassNotExtending" />
-        <exclude name="AvoidSynchronizedAtMethodLevel" />
-        <exclude name="PreserveStackTrace" />
-        <exclude name="ConstructorCallsOverridableMethod" />
-        <exclude name="PositionLiteralsFirstInCaseInsensitiveComparisons" />
-        <exclude name="PositionLiteralsFirstInComparisons" />
-        <exclude name="AvoidInstanceofChecksInCatchClause" />
-        <exclude name="LogicInversion" />
-        <exclude name="SimplifyBooleanReturns" />
-        <exclude name="EmptyMethodInAbstractClassShouldBeAbstract" />
-        <exclude name="UseUtilityClass" />
+    <rule ref="category/java/design.xml">
+        <exclude name="AvoidCatchingGenericException" />
+        <exclude name="AvoidThrowingRawExceptionTypes" />
         <exclude name="ClassWithOnlyPrivateConstructorsShouldBeFinal" />
-        <exclude name="AssignmentToNonFinalStatic" />
-        <exclude name="OptimizableToArrayCall" />
-        <exclude name="AccessorMethodGeneration" />
+        <exclude name="CollapsibleIfStatements" />
+        <exclude name="CyclomaticComplexity" />
+        <exclude name="DataClass" />
+        <exclude name="ExcessiveImports" />
+        <exclude name="ExcessiveMethodLength" />
+        <exclude name="GodClass" />
+        <exclude name="ImmutableField" />
+        <exclude name="LawOfDemeter" />
+        <exclude name="NcssCount" />
+        <exclude name="NPathComplexity" />
+        <exclude name="SignatureDeclareThrowsException" />
+        <exclude name="SingularField" />
+        <exclude name="SwitchDensity" />
+        <exclude name="TooManyFields" />
+        <exclude name="TooManyMethods" />
+        <exclude name="UseObjectForClearerAPI" />
     </rule>
     <rule ref="rulesets/java/optimizations.xml">
         <exclude name="LocalVariableCouldBeFinal" />
@@ -121,18 +83,27 @@
         <!-- Decided not to use in #1519 -->
         <exclude name="UselessParentheses" />
     </rule>
-    <rule ref="rulesets/java/codesize.xml">
-        <exclude name="CyclomaticComplexity" />
-        <exclude name="TooManyMethods" />
-        <exclude name="ModifiedCyclomaticComplexity" />
-        <exclude name="StdCyclomaticComplexity" />
-        <exclude name="TooManyFields" />
-        <exclude name="ExcessiveMethodLength" />
-        <exclude name="NPathComplexity" />
-        <exclude name="NcssConstructorCount" />
-        <exclude name="ExcessivePublicCount" />
-        <exclude name="ExcessiveClassLength" />
-        <exclude name="NcssMethodCount" />
+    <rule ref="category/java/codestyle.xml">
+        <exclude name="AtLeastOneConstructor" />
+        <exclude name="CallSuperInConstructor" />
+        <exclude name="ClassNamingConventions" />
+        <exclude name="CommentDefaultAccessModifier" />
+        <exclude name="ConfusingTernary" />
+        <exclude name="DefaultPackage" />
+        <exclude name="FieldDeclarationsShouldBeAtStartOfClass" />
+        <exclude name="FieldNamingConventions" />
+        <exclude name="IdenticalCatchBranches" />
+        <exclude name="LinguisticNaming" />
+        <exclude name="LocalVariableCouldBeFinal" />
+        <exclude name="LongVariable" />
+        <exclude name="MethodArgumentCouldBeFinal" />
+        <exclude name="OnlyOneReturn" />
+        <exclude name="ShortClassName" />
+        <exclude name="ShortMethodName" />
+        <exclude name="ShortVariable" />
+        <exclude name="TooManyStaticImports" />
+        <exclude name="UnnecessaryConstructor" />
+        <exclude name="UselessParentheses" />
     </rule>
     <rule ref="rulesets/java/unusedcode.xml" />
 </ruleset>
