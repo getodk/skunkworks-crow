@@ -43,6 +43,9 @@ public class SettingsActivity extends PreferenceActivity {
     EditTextPreference odkDestinationDirPreference;
     ListPreference defaultMethodPreference;
     private SharedPreferences prefs;
+    String n;
+    String m;
+    TextInputEditText edtpass;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -180,36 +183,76 @@ public class SettingsActivity extends PreferenceActivity {
             return (ViewGroup) findViewById(android.R.id.list).getParent();
         }
     }
-
-    private void showPasswordDialog() {
+    
+        private void showPasswordDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+
         LayoutInflater factory = LayoutInflater.from(this);
 
         View dialogView = factory.inflate(R.layout.dialog_password_til, null);
         TextInputLayout tlPassword = dialogView.findViewById(R.id.et_password_layout);
         tlPassword.getEditText().setText(prefs.getString(PreferenceKeys.KEY_HOTSPOT_PASSWORD, getString(R.string.default_hotspot_password)));
+
+        edtpass = (TextInputEditText)dialogView.findViewById(R.id.edtpass);
+
+        n=prefs.getString(PreferenceKeys.KEY_HOTSPOT_PASSWORD, getString(R.string.default_hotspot_password));
+
         builder.setTitle(getString(R.string.title_hotspot_password));
         builder.setView(dialogView);
-
         builder.setPositiveButton(getString(R.string.ok), (dialog, which) -> {
+
+
+            ((AlertDialog)dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+
             String password = tlPassword.getEditText().getText().toString();
-
-            if(password.length()<8)
-            {
-                Toast.makeText(this, "Password length must be atleast 8 characters long", Toast.LENGTH_SHORT).show();
-            }
-            else {
-                prefs.edit().putString(PreferenceKeys.KEY_HOTSPOT_PASSWORD, password).apply();
-            }
+            prefs.edit().putString(PreferenceKeys.KEY_HOTSPOT_PASSWORD, password).apply();
         });
-
-
         builder.setNegativeButton(getString(R.string.cancel), (dialog, which) -> dialog.dismiss());
 
         builder.setCancelable(false);
         AlertDialog alertDialog = builder.create();
+
+        alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+
+            @Override
+            public void onShow(DialogInterface dialog) {
+                //set positive OK button to be disabled by default
+                //((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+
+
+            edtpass.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    ((AlertDialog)dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    if(edtpass.getText().toString().length()>=8)
+                    {
+                        ((AlertDialog)dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+                    }
+                    if(edtpass.getText().toString().length()<8)
+                    {
+                        ((AlertDialog)dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+                    }
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+
+                }
+            });
+
+            }
+        });
+
+
         alertDialog.show();
+
         alertDialog.setCancelable(true);
         alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
     }
+
 }
