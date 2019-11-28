@@ -12,6 +12,7 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -19,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -26,6 +28,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.android.material.textfield.TextInputEditText;
 
 import org.odk.share.R;
 
@@ -44,7 +47,12 @@ public class SettingsActivity extends PreferenceActivity {
     EditTextPreference odkDestinationDirPreference;
     ListPreference defaultMethodPreference;
     private SharedPreferences prefs;
+<<<<<<< HEAD
     String npass;
+=======
+    String n;
+    String m;
+>>>>>>> d772c59312329a56228f0556aafe8a3024110d78
     TextInputEditText edtpass;
 
     @Override
@@ -183,8 +191,16 @@ public class SettingsActivity extends PreferenceActivity {
             return (ViewGroup) findViewById(android.R.id.list).getParent();
         }
     }
+<<<<<<< HEAD
 
     private void showPasswordDialog() {
+=======
+    
+        private void showPasswordDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+
+>>>>>>> d772c59312329a56228f0556aafe8a3024110d78
         LayoutInflater factory = LayoutInflater.from(this);
 
         View dialogView = factory.inflate(R.layout.dialog_password_til, null);
@@ -192,17 +208,27 @@ public class SettingsActivity extends PreferenceActivity {
         TextInputLayout tlPassword = dialogView.findViewById(R.id.et_password_layout);
         tlPassword.getEditText().setText(prefs.getString(PreferenceKeys.KEY_HOTSPOT_PASSWORD, getString(R.string.default_hotspot_password)));
 
+<<<<<<< HEAD
         edtpass = (TextInputEditText) dialogView.findViewById(R.id.edtpass);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         npass = prefs.getString(PreferenceKeys.KEY_HOTSPOT_PASSWORD, getString(R.string.default_hotspot_password));
+=======
+        edtpass = (TextInputEditText)dialogView.findViewById(R.id.edtpass);
+
+        n=prefs.getString(PreferenceKeys.KEY_HOTSPOT_PASSWORD, getString(R.string.default_hotspot_password));
+>>>>>>> d772c59312329a56228f0556aafe8a3024110d78
 
         builder.setTitle(getString(R.string.title_hotspot_password));
         builder.setView(dialogView);
         builder.setPositiveButton(getString(R.string.ok), (dialog, which) -> {
 
 
+<<<<<<< HEAD
             ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+=======
+            ((AlertDialog)dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+>>>>>>> d772c59312329a56228f0556aafe8a3024110d78
 
             String password = tlPassword.getEditText().getText().toString();
             prefs.edit().putString(PreferenceKeys.KEY_HOTSPOT_PASSWORD, password).apply();
@@ -216,15 +242,26 @@ public class SettingsActivity extends PreferenceActivity {
 
             @Override
             public void onShow(DialogInterface dialog) {
+<<<<<<< HEAD
+=======
+                //set positive OK button to be disabled by default
+                //((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+
+>>>>>>> d772c59312329a56228f0556aafe8a3024110d78
 
             edtpass.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+<<<<<<< HEAD
                     ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+=======
+                    ((AlertDialog)dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+>>>>>>> d772c59312329a56228f0556aafe8a3024110d78
                 }
 
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
+<<<<<<< HEAD
 
                     if (edtpass.getText().toString().length() >= 8) {
                         ((AlertDialog) dialog) .getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
@@ -232,6 +269,15 @@ public class SettingsActivity extends PreferenceActivity {
 
                     if (edtpass.getText().toString().length() < 8) {
                         ((AlertDialog) dialog) .getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+=======
+                    if(edtpass.getText().toString().length()>=8)
+                    {
+                        ((AlertDialog)dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+                    }
+                    if(edtpass.getText().toString().length()<8)
+                    {
+                        ((AlertDialog)dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+>>>>>>> d772c59312329a56228f0556aafe8a3024110d78
                     }
                 }
 
@@ -240,6 +286,10 @@ public class SettingsActivity extends PreferenceActivity {
 
                 }
             });
+<<<<<<< HEAD
+=======
+
+>>>>>>> d772c59312329a56228f0556aafe8a3024110d78
             }
         });
 
