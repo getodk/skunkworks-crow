@@ -1,6 +1,7 @@
 package org.odk.share.views.ui.settings;
 
 import android.bluetooth.BluetoothAdapter;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -10,18 +11,21 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 
-import com.google.android.material.textfield.TextInputLayout;
+import com.google.android.material.textfield.TextInputEditText;
 
 import org.odk.share.R;
 
@@ -133,13 +137,6 @@ public class SettingsActivity extends PreferenceActivity {
                         bluetoothAdapter.setName(bluetoothName);
                     }
                     break;
-                case PreferenceKeys.KEY_HOTSPOT_PASSWORD:
-                    String password = newValue.toString();
-                    if (password.length() < 8) {
-                        Toast.makeText(getBaseContext(), getString(R.string.hotspot_password_error), Toast.LENGTH_LONG).show();
-                        return false;
-                    }
-                    break;
                 case PreferenceKeys.KEY_HOTSPOT_PWD_REQUIRE:
                     boolean isRequire = (Boolean) newValue;
                     if (isRequire) {
@@ -181,21 +178,47 @@ public class SettingsActivity extends PreferenceActivity {
         LayoutInflater factory = LayoutInflater.from(this);
 
         View dialogView = factory.inflate(R.layout.dialog_password_til, null);
-        TextInputLayout tlPassword = dialogView.findViewById(R.id.et_password_layout);
-        tlPassword.getEditText().setText(prefs.getString(PreferenceKeys.KEY_HOTSPOT_PASSWORD, getString(R.string.default_hotspot_password)));
+        TextInputEditText etPassword = dialogView.findViewById(R.id.et_set_password);
+        etPassword.setText(prefs.getString(PreferenceKeys.KEY_HOTSPOT_PASSWORD, getString(R.string.default_hotspot_password)));
 
         builder.setTitle(getString(R.string.title_hotspot_password));
         builder.setView(dialogView);
         builder.setPositiveButton(getString(R.string.ok), (dialog, which) -> {
-            String password = tlPassword.getEditText().getText().toString();
+            String password = etPassword.getText().toString();
             prefs.edit().putString(PreferenceKeys.KEY_HOTSPOT_PASSWORD, password).apply();
         });
         builder.setNegativeButton(getString(R.string.cancel), (dialog, which) -> dialog.dismiss());
+        TextView tvPasswordInstruction = dialogView.findViewById(R.id.tv_password_instruction);
+        tvPasswordInstruction.setText(getString(R.string.hotspot_password_length_instruction));
 
         builder.setCancelable(false);
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
+        etPassword.setSelectAllOnFocus(true);
+        etPassword.requestFocus();
         alertDialog.setCancelable(true);
+        alertDialog.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(true);
         alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+
+        etPassword.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                String newPassword = editable.toString();
+                if (newPassword.length() < 8) {
+                    alertDialog.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(false);
+                    tvPasswordInstruction.setVisibility(View.VISIBLE);
+                } else {
+                    alertDialog.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(true);
+                    tvPasswordInstruction.setVisibility(View.INVISIBLE);
+                }
+                etPassword.setSelectAllOnFocus(false);
+            }
+        });
     }
 }
