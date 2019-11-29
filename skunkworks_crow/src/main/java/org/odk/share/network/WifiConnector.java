@@ -18,7 +18,6 @@ import timber.log.Timber;
 public final class WifiConnector {
 
     private final WifiManager wifiManager;
-    private List<WifiConfiguration> configuredNetworks;
 
     public WifiConnector(Context context) {
         wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
@@ -50,12 +49,7 @@ public final class WifiConnector {
         }
 
         int highestPriorityNumber = 0;
-        try {
-            configuredNetworks = wifiManager.getConfiguredNetworks();
-        } catch (SecurityException e) {
-            Timber.e(e);
-        }
-        for (WifiConfiguration config : configuredNetworks) {
+        for (WifiConfiguration config : wifiManager.getConfiguredNetworks()) {
             if (config.priority > highestPriorityNumber) {
                 highestPriorityNumber = config.priority;
             }
@@ -94,13 +88,7 @@ public final class WifiConnector {
     }
 
     private int getExistingNetworkId(String ssid) {
-
-        try {
-            configuredNetworks = wifiManager.getConfiguredNetworks();
-        } catch (SecurityException e) {
-            Timber.e(e);
-        }
-
+        List<WifiConfiguration> configuredNetworks = wifiManager.getConfiguredNetworks();
         if (configuredNetworks != null) {
             for (WifiConfiguration existingConfig : configuredNetworks) {
                 if (existingConfig.SSID.equals(ssid)) {
@@ -162,13 +150,9 @@ public final class WifiConnector {
     }
 
     private void removeNetworkAndEnableOther(String ssid) {
-        try {
-            configuredNetworks = wifiManager.getConfiguredNetworks();
-        } catch (SecurityException e) {
-            Timber.e(e);
-        }
+        List<WifiConfiguration> wifiConfigurationList = wifiManager.getConfiguredNetworks();
 
-        for (WifiConfiguration config : configuredNetworks) {
+        for (WifiConfiguration config : wifiConfigurationList) {
             if (config.SSID.equals("\"" + ssid + "\"")) {
                 wifiManager.disableNetwork(config.networkId);
                 wifiManager.removeNetwork(config.networkId);
