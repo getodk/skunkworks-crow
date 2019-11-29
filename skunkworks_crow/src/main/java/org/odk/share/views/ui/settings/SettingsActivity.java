@@ -127,7 +127,6 @@ public class SettingsActivity extends PreferenceActivity {
                 case PreferenceKeys.KEY_ODK_DESTINATION_DIR_DIRECTORY_PICKER:
                     chooseDirectory();
                     break;
-                    
             }
             return false;
         };

@@ -370,7 +370,6 @@ public class DownloadJob extends Job {
 
     private String getOdkDestinationDir() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext().getApplicationContext());
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             directoryPath = prefs.getString(PreferenceKeys.KEY_ODK_DESTINATION_DIR_DIRECTORY_PICKER,
                     getContext().getString(R.string.default_odk_destination_dir));
