@@ -7,6 +7,7 @@ import android.content.ContentValues;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.preference.PreferenceManager;
 
 import androidx.annotation.NonNull;
@@ -93,6 +94,7 @@ public class DownloadJob extends Job {
 
     private int total;
     private int progress;
+    private String directoryPath = null;
     private DataInputStream dis;
     private DataOutputStream dos;
     public static final String RESULT_DIVIDER = "---------------\n";
@@ -368,9 +370,15 @@ public class DownloadJob extends Job {
 
     private String getOdkDestinationDir() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext().getApplicationContext());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            directoryPath = prefs.getString(PreferenceKeys.KEY_ODK_DESTINATION_DIR_DIRECTORY_PICKER,
+                    getContext().getString(R.string.default_odk_destination_dir));
+        } else {
+            directoryPath = prefs.getString(PreferenceKeys.KEY_ODK_DESTINATION_DIR_EDIT_TEXT,
+                    getContext().getString(R.string.default_odk_destination_dir));
 
-        return prefs.getString(PreferenceKeys.KEY_ODK_DESTINATION_DIR,
-                getContext().getString(R.string.default_odk_destination_dir));
+        }
+        return directoryPath;
     }
 
     private void readInstances(String formId, String formVersion) {

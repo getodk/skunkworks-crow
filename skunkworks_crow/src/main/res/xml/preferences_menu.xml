@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory android:title="General Settings">
+    <PreferenceCategory
+        android:key="hotspot_setting"
+        android:title="General Settings">
+
+        <Preference
+            android:defaultValue="@string/default_odk_destination_dir"
+            android:icon="@drawable/ic_sd_storage_black_24dp"
+            android:key="odk_destination_dir_directory_picker"
+            android:summary="@string/default_odk_destination_dir"
+            android:title="@string/title_odk_destination_dir" />
 
         <EditTextPreference
             android:defaultValue="@string/default_odk_destination_dir"
             android:icon="@drawable/ic_sd_storage_black_24dp"
-            android:key="odk_destination_dir"
+            android:key="odk_destination_dir_edit_text"
             android:summary="@string/default_odk_destination_dir"
             android:title="@string/title_odk_destination_dir" />
 

@@ -1,6 +1,7 @@
 package org.odk.share.views.ui.settings;
 
 import android.bluetooth.BluetoothAdapter;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -9,6 +10,7 @@ import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -25,6 +27,8 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import org.odk.share.R;
 
+import timber.log.Timber;
+
 
 /**
  * Created by laksh on 5/27/2018.
@@ -37,9 +41,12 @@ public class SettingsActivity extends PreferenceActivity {
     Preference hotspotPasswordPreference;
     CheckBoxPreference passwordRequirePreference;
     CheckBoxPreference btSecureModePreference;
-    EditTextPreference odkDestinationDirPreference;
+    EditTextPreference odkDestinationDirPreferenceEditText;
     ListPreference defaultMethodPreference;
+    Preference odkDestinationDirPreferenceDirectoryPicker;
     private SharedPreferences prefs;
+
+    private static final int DIRECTORY_REQUEST_CODE = 9999;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +58,13 @@ public class SettingsActivity extends PreferenceActivity {
 
         addPreferencesFromResource(R.xml.preferences_menu);
         addPreferences();
+
+        PreferenceCategory preferenceCategory = (PreferenceCategory) findPreference(PreferenceKeys.KEY_ODK_SETTINGS);
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {
+            preferenceCategory.removePreference(odkDestinationDirPreferenceEditText);
+        } else {
+            preferenceCategory.removePreference(odkDestinationDirPreferenceDirectoryPicker);
+        }
     }
 
     @Override
@@ -68,7 +82,8 @@ public class SettingsActivity extends PreferenceActivity {
         hotspotPasswordPreference = findPreference(PreferenceKeys.KEY_HOTSPOT_PASSWORD);
         passwordRequirePreference = (CheckBoxPreference) findPreference(PreferenceKeys.KEY_HOTSPOT_PWD_REQUIRE);
         btSecureModePreference = (CheckBoxPreference) findPreference(PreferenceKeys.KEY_BLUETOOTH_SECURE_MODE);
-        odkDestinationDirPreference = (EditTextPreference) findPreference(PreferenceKeys.KEY_ODK_DESTINATION_DIR);
+        odkDestinationDirPreferenceEditText = (EditTextPreference) findPreference(PreferenceKeys.KEY_ODK_DESTINATION_DIR_EDIT_TEXT);
+        odkDestinationDirPreferenceDirectoryPicker = (Preference) findPreference(PreferenceKeys.KEY_ODK_DESTINATION_DIR_DIRECTORY_PICKER);
 
         prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
@@ -81,7 +96,10 @@ public class SettingsActivity extends PreferenceActivity {
         bluetoothNamePreference.setDefaultValue(defaultBluetoothName);
         bluetoothNamePreference.setSummary(prefs.getString(PreferenceKeys.KEY_BLUETOOTH_NAME, defaultBluetoothName));
         boolean isPasswordSet = prefs.getBoolean(PreferenceKeys.KEY_HOTSPOT_PWD_REQUIRE, false);
-        odkDestinationDirPreference.setSummary(prefs.getString(PreferenceKeys.KEY_ODK_DESTINATION_DIR,
+
+
+        odkDestinationDirPreferenceDirectoryPicker.setSummary(prefs.getString(PreferenceKeys.KEY_ODK_DESTINATION_DIR_DIRECTORY_PICKER, getString(R.string.default_odk_destination_dir)));
+        odkDestinationDirPreferenceEditText.setSummary(prefs.getString(PreferenceKeys.KEY_ODK_DESTINATION_DIR_EDIT_TEXT,
                 getString(R.string.default_odk_destination_dir)));
         boolean isSecureMode = prefs.getBoolean(PreferenceKeys.KEY_BLUETOOTH_SECURE_MODE, true);
 
@@ -93,7 +111,8 @@ public class SettingsActivity extends PreferenceActivity {
         bluetoothNamePreference.setOnPreferenceChangeListener(preferenceChangeListener());
         hotspotPasswordPreference.setOnPreferenceChangeListener(preferenceChangeListener());
         passwordRequirePreference.setOnPreferenceChangeListener(preferenceChangeListener());
-        odkDestinationDirPreference.setOnPreferenceChangeListener(preferenceChangeListener());
+        odkDestinationDirPreferenceEditText.setOnPreferenceChangeListener(preferenceChangeListener());
+        odkDestinationDirPreferenceDirectoryPicker.setOnPreferenceClickListener(preferenceClickListener());
         defaultMethodPreference.setOnPreferenceChangeListener(preferenceChangeListener());
 
         hotspotPasswordPreference.setOnPreferenceClickListener(preferenceClickListener());
@@ -104,6 +123,9 @@ public class SettingsActivity extends PreferenceActivity {
             switch (preference.getKey()) {
                 case PreferenceKeys.KEY_HOTSPOT_PASSWORD:
                     showPasswordDialog();
+                    break;
+                case PreferenceKeys.KEY_ODK_DESTINATION_DIR_DIRECTORY_PICKER:
+                    chooseDirectory();
                     break;
             }
             return false;
@@ -148,13 +170,14 @@ public class SettingsActivity extends PreferenceActivity {
                         hotspotPasswordPreference.setEnabled(false);
                     }
                     break;
-                case PreferenceKeys.KEY_ODK_DESTINATION_DIR:
+                case PreferenceKeys.KEY_ODK_DESTINATION_DIR_EDIT_TEXT:
                     String dir = newValue.toString();
                     if (dir.length() == 0) {
                         Toast.makeText(getApplicationContext(), getString(R.string.odk_destination_dir_error), Toast.LENGTH_LONG).show();
                         return false;
                     } else {
-                        odkDestinationDirPreference.setSummary(dir);
+                        odkDestinationDirPreferenceEditText.setSummary(dir);
+                        prefs.edit().putString(PreferenceKeys.KEY_ODK_DESTINATION_DIR_DIRECTORY_PICKER, null).apply();
                     }
                     break;
                 case PreferenceKeys.KEY_DEFAULT_TRANSFER_METHOD:
@@ -198,4 +221,26 @@ public class SettingsActivity extends PreferenceActivity {
         alertDialog.setCancelable(true);
         alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
     }
+
+    public void chooseDirectory() {
+        Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        i.addCategory(Intent.CATEGORY_DEFAULT);
+        startActivityForResult(Intent.createChooser(i, getString(R.string.choose_directory)), DIRECTORY_REQUEST_CODE);
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case DIRECTORY_REQUEST_CODE:
+                try {
+                    String filePath = data.getData().getPath() + getString(R.string.directory_odk);
+                    prefs.edit().putString(PreferenceKeys.KEY_ODK_DESTINATION_DIR_DIRECTORY_PICKER, filePath).apply();
+                    prefs.edit().putString(PreferenceKeys.KEY_ODK_DESTINATION_DIR_EDIT_TEXT, null).apply();
+                    odkDestinationDirPreferenceDirectoryPicker.setSummary(prefs.getString(PreferenceKeys.KEY_ODK_DESTINATION_DIR_DIRECTORY_PICKER, getString(R.string.default_odk_destination_dir)));
+                } catch (Exception e) {
+                    Timber.e("Can not choose the Directory");
+                }
+                break;
+        }
+    }
 }
+

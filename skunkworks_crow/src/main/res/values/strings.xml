@@ -141,6 +141,8 @@
 
     <string name="default_odk_destination_dir">\/sdcard\/odk</string>
     <string name="title_odk_destination_dir">ODK Destination Directory</string>
+    <string name="directory_odk">/odk</string>
+    <string name="choose_directory">Choose Directory</string>
     <string name="odk_destination_dir_error">The destination should not be empty</string>
     <string name="location_permission_needed">Location Permission Needed</string>
     <string name="location_settings_dialog">Enable location from the settings.</string>

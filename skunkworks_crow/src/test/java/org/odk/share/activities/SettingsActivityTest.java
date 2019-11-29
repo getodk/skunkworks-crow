@@ -2,6 +2,7 @@ package org.odk.share.activities;
 
 import android.bluetooth.BluetoothAdapter;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
@@ -19,6 +20,7 @@ import org.odk.share.views.ui.settings.SettingsActivity;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
+import org.robolectric.annotation.Config;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -26,6 +28,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(RobolectricTestRunner.class)
+@Config(sdk = Build.VERSION_CODES.O_MR1)
 public class SettingsActivityTest {
 
     private SettingsActivity settingsActivity;
@@ -33,10 +36,12 @@ public class SettingsActivityTest {
     private Preference hotspotPasswordPreference;
     private CheckBoxPreference passwordRequirePreference;
     private EditTextPreference hotspotNamePreference;
-    private EditTextPreference odkDestinationDirPreference;
+    private EditTextPreference odkDestinationDirPreferenceEditText;
     private CheckBoxPreference btSecureModePreference;
     private ListPreference defaultMethodPreference;
     private EditTextPreference bluetoothNamePreference;
+    private Preference odkDestinationDirDirectoryPicker;
+
 
     @Before
     public void setUp() throws Exception {
@@ -75,8 +80,10 @@ public class SettingsActivityTest {
         assertNotNull(settingsActivity.findPreference(PreferenceKeys.KEY_HOTSPOT_PASSWORD));
         //test for passwordRequirePreference
         assertNotNull(settingsActivity.findPreference(PreferenceKeys.KEY_HOTSPOT_PWD_REQUIRE));
-        //test for odkDestinationDirPreference
-        assertNotNull(settingsActivity.findPreference(PreferenceKeys.KEY_ODK_DESTINATION_DIR));
+        //test for odkDestinationDirPreferenceEditText
+        assertNotNull(settingsActivity.findPreference(PreferenceKeys.KEY_ODK_DESTINATION_DIR_EDIT_TEXT));
+        //test for odkDestinationDirDirectoryPicker
+        assertNotNull(settingsActivity.findPreference(PreferenceKeys.KEY_ODK_DESTINATION_DIR_DIRECTORY_PICKER));
         //test for KEY_BLUETOOTH_SECURE_MODE
         assertNotNull(settingsActivity.findPreference(PreferenceKeys.KEY_BLUETOOTH_SECURE_MODE));
         //test for KEY_BLUETOOTH_NAME
@@ -91,15 +98,20 @@ public class SettingsActivityTest {
     @Test
     public void preferenceSummaryTest() {
         hotspotNamePreference = (EditTextPreference) settingsActivity.findPreference(PreferenceKeys.KEY_HOTSPOT_NAME);
-        odkDestinationDirPreference = (EditTextPreference) settingsActivity.findPreference(PreferenceKeys.KEY_ODK_DESTINATION_DIR);
+        odkDestinationDirPreferenceEditText = (EditTextPreference) settingsActivity.findPreference(PreferenceKeys.KEY_ODK_DESTINATION_DIR_EDIT_TEXT);
+        odkDestinationDirDirectoryPicker = settingsActivity.findPreference(PreferenceKeys.KEY_ODK_DESTINATION_DIR_DIRECTORY_PICKER);
         bluetoothNamePreference = (EditTextPreference) settingsActivity.findPreference(PreferenceKeys.KEY_BLUETOOTH_NAME);
 
         //test the summary
         assertEquals(prefs.getString(PreferenceKeys.KEY_HOTSPOT_NAME,
                 settingsActivity.getString(R.string.default_hotspot_ssid)), hotspotNamePreference.getSummary());
-
-        assertEquals(prefs.getString(PreferenceKeys.KEY_ODK_DESTINATION_DIR,
-                settingsActivity.getString(R.string.default_odk_destination_dir)), odkDestinationDirPreference.getSummary());
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {
+            assertEquals(prefs.getString(PreferenceKeys.KEY_ODK_DESTINATION_DIR_DIRECTORY_PICKER,
+                    settingsActivity.getString(R.string.default_odk_destination_dir)), odkDestinationDirDirectoryPicker.getSummary());
+        } else {
+            assertEquals(prefs.getString(PreferenceKeys.KEY_ODK_DESTINATION_DIR_EDIT_TEXT,
+                    settingsActivity.getString(R.string.default_odk_destination_dir)), odkDestinationDirPreferenceEditText.getSummary());
+        }
 
         assertEquals(prefs.getString(PreferenceKeys.KEY_BLUETOOTH_NAME,
                 BluetoothAdapter.getDefaultAdapter().getName()), bluetoothNamePreference.getSummary());
