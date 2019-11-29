@@ -15,8 +15,7 @@ public class PreferenceKeys {
     public static final String KEY_BLUETOOTH_NAME = "bluetooth_name";
     public static final String KEY_BLUETOOTH_SECURE_MODE = "bluetooth_secure_mode";
     public static final String KEY_ODK_SETTINGS = "hotspot_setting";
-
-
+    
     private PreferenceKeys() {
 
     }
