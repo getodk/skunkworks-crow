@@ -218,7 +218,7 @@ public class SettingsActivity extends PreferenceActivity {
                 edtpass.addTextChangedListener(new TextWatcher() {
                     @Override
                     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                        ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+                 
                     }
 
                     @Override
@@ -228,7 +228,7 @@ public class SettingsActivity extends PreferenceActivity {
                             ((AlertDialog) dialog) .getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
                         }
 
-                        if (edtpass.getText().toString().length() < 8) {
+                        else if (edtpass.getText().toString().length() < 8) {
                             ((AlertDialog) dialog) .getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
                         }
                     }
