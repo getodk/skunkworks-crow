@@ -64,8 +64,7 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
     private InstanceAdapter instanceAdapter;
     private LinkedHashSet<Long> selectedInstances;
 
-    public FilledFormsFragment() {
-    }
+    public FilledFormsFragment() { }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -79,6 +78,7 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         llm.setOrientation(RecyclerView.VERTICAL);
         recyclerView.setLayoutManager(llm);
+        addListItemDivider();
         return view;
     }
 
@@ -110,13 +110,11 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
         } else {
             setEmptyViewVisibility(0);
         }
-        addListItemDivider();
     }
 
 
     @Override
-    public void onLoaderReset(@NonNull Loader loader) {
-    }
+    public void onLoaderReset(@NonNull Loader loader) { }
 
     private void onListItemClick(View view, int position) {
         Cursor cursor = instanceAdapter.getCursor();
