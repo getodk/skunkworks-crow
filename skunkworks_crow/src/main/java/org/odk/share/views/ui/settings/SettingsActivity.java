@@ -226,7 +226,7 @@ public class SettingsActivity extends PreferenceActivity {
 
                         if (edtpass.getText().toString().length() >= 8) {
                             ((AlertDialog) dialog) .getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
-                        } else if (edtpass.getText().toString().length() < 8) {
+                        } else {
                             ((AlertDialog) dialog) .getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
                         }
                     }
