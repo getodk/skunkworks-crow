@@ -1,6 +1,7 @@
 package org.odk.share.views.ui.settings;
 
 import android.bluetooth.BluetoothAdapter;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -10,7 +11,9 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,6 +24,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
 import org.odk.share.R;
@@ -40,6 +44,8 @@ public class SettingsActivity extends PreferenceActivity {
     EditTextPreference odkDestinationDirPreference;
     ListPreference defaultMethodPreference;
     private SharedPreferences prefs;
+    String npass;
+    TextInputEditText edtpass;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -177,16 +183,25 @@ public class SettingsActivity extends PreferenceActivity {
     }
 
     private void showPasswordDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater factory = LayoutInflater.from(this);
 
         View dialogView = factory.inflate(R.layout.dialog_password_til, null);
+
         TextInputLayout tlPassword = dialogView.findViewById(R.id.et_password_layout);
         tlPassword.getEditText().setText(prefs.getString(PreferenceKeys.KEY_HOTSPOT_PASSWORD, getString(R.string.default_hotspot_password)));
+
+        edtpass = (TextInputEditText) dialogView.findViewById(R.id.edtpass);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        npass = prefs.getString(PreferenceKeys.KEY_HOTSPOT_PASSWORD, getString(R.string.default_hotspot_password));
 
         builder.setTitle(getString(R.string.title_hotspot_password));
         builder.setView(dialogView);
         builder.setPositiveButton(getString(R.string.ok), (dialog, which) -> {
+
+
+            ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+
             String password = tlPassword.getEditText().getText().toString();
             prefs.edit().putString(PreferenceKeys.KEY_HOTSPOT_PASSWORD, password).apply();
         });
@@ -194,8 +209,42 @@ public class SettingsActivity extends PreferenceActivity {
 
         builder.setCancelable(false);
         AlertDialog alertDialog = builder.create();
+
+        alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+
+            @Override
+            public void onShow(DialogInterface dialog) {
+
+                edtpass.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                 
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                        if (edtpass.getText().toString().length() >= 8) {
+                            ((AlertDialog) dialog) .getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+                        } else {
+                            ((AlertDialog) dialog) .getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+                        }
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+
+                    }
+                });
+            }
+        });
+
+
         alertDialog.show();
+
         alertDialog.setCancelable(true);
         alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
     }
+
 }
+
