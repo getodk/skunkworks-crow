@@ -1,0 +1,116 @@
+<html>
+<head>
+    <style>
+            body {
+                font-family: sans-serif;
+             }
+            pre {
+            background-color: #eeeeee;
+            padding: 1em;
+            white-space: pre-wrap;
+                }
+        </style>
+</head>
+
+<body>
+<h2>About skunkworks-crow</h2>
+<pre>skunkworks-crow is an Android application which is a companion app to ODK Collect and it helps different enumerators to share the filled and blanks forms with each other, it also helps organization’s supervisor in reviewing the forms before actually submitting to the server.
+        </pre>
+
+<h2>Why skunkworks-crow</h2>
+<pre>skunkworks-crow is designed to enable offline transfer of blank and filled forms. There are three major use cases for this: multi-part surveys, supervisor review and blank form distribution. ODK Collect is designed in such a way that it allows enumerators to download the blank forms and provide them with the interface to fill the blank forms, but sometimes there can be more than one enumerators who want to fill the same form. Collect doesn’t allow more than one enumerators to collaborate on a single form. This is where skunkworks-crow comes into the picture using skunkworks-crow one can select any number of forms and can send to the other enumerator will all the resources attached to it.
+
+Also, sometimes organizations want to review filled forms before sending to the server. So enumerators can send the forms to the supervisor then the supervisor can mark forms as reviewed (accepted/rejected) with some feedback and then can send back to the same enumerator if required.
+
+In some areas, enumerators don’t have any internet connectivity, so they can’t fetch blank forms from the server. skunkworks-crow also allows to send a blank form in case of no internet connectivity provided the devices should be close enough to create a local connection.
+        </pre>
+
+<h2>Using skunkworks-crow</h2>
+<h3>1.Viewing category of forms</h3>
+<pre>On launching the app, the first screen that we see contains a list of forms available in ODK Collect. Tapping on any form opens a screen with 4 tabs - statistics, sent, received, and reviewed.
+
+To view details of any form category tap on any category shown on home screen.
+
+<img src="home_screen.png" alt="Home Screen" height="500" width="300">
+        </pre>
+
+<h3>1.1View statistics of forms received</h3>
+<pre>To view the statistics of any specific blank form on the device, tap on any item on the home screen. The statistics screen will show the number of filled forms sent, filled forms reviewed and unreviewed. This will give the supervisor a glimpse of all the details of form transfer that happened through the device.
+
+        <img src="statistics_tab.png" alt="Statistics Tab" height="500" width="300">
+        </pre>
+
+<h3>1.2View sent forms</h3>
+<pre>To view the details of the form sent from the device, navigate to ‘Sent’ tabs, the screen shows the details of sent filled forms. If any forms were sent for a review and the supervisor sent back the forms with feedback, then the user will be able to see the form reviewed status with feedback.
+
+<img src="send_tab.png" alt="Send Tab" height="500" width="300">
+        </pre>
+
+<h3>1.3View Received forms</h3>
+<pre>To view the details of forms received, navigate to the ‘Received’ tab. To review the forms, tap on any received form to open the filled form in ODK Collect. After viewing the form, the user will be navigated to a screen asking for feedback and can mark the form as approved or rejected. If the user is not ready to provide feedback, he can review later tap by tapping “Review later”. Using this option user will be navigated back to the receive screen so that user can review other forms. If supervisor already opened the form previously then the user will be navigated to a feedback screen directly. If the supervisor wants to view the form again then he can tap on “View from in ODK Collect” to view it again.
+
+<img src="review.gif" alt="Review" height="500" width="300">
+<img src="receive_review.gif" alt="Receive Review" height="500" width="300">
+        </pre>
+
+<h3>1.4Review forms</h3>
+<pre>To view the details of forms reviewed, tap on the ‘Reviewed’ tab. This shows all the forms reviewed by you with the form status. To send it back to the enumerator who asked for the feedback, select the forms and tap on ‘Send’. This will send all the forms with reviewed status as well as feedback back to the enumerator. If the enumerator didn’t send those forms for review then it won’t send any forms back, only those enumerators will get the feedback who asked for it.
+        </pre>
+
+<h3>2.Send filled forms</h3>
+<pre>After the launch of the app, on the home screen a 'Send' button is shown at the bottom. Tap on that button to open the screen which consists of a list showing all the filled forms available in ODK Collect and user can select any number of forms of any version of blank form which is required to be sent. It contains all the filled forms irrespective of its send/receive status.
+
+It will display all the filled forms available in ODK Collect (it also contains the received forms so that user can pass that to another enumerator for further form filling)
+
+After selecting the forms, press ‘Send’ to initiate the connection process so that receiver can connect to your device and start receiving.
+
+Tapping on ‘Send’ button opens up the screen which will initiate the communication process and start the wifi hotspot so that receiver can connect to it and start receiving the forms.
+
+In the Skunkworks-crow, forms can be exchanged using either Wifi Hotspot or Bluetooth. The default preference for the transferring method can be modified through the settings page.
+
+<img src="choose_default_method.png" alt="Statistics Tab" height="500" width="300">
+        </pre>
+
+<h3>2.1Wifi Hotspot</h3>
+<pre>A Wifi Hotspot is used as the sender’s communication method, which creates a wifi network and sends files using the socket connection. When the wifi hotspot is initiated, it turns off the wifi if already enabled and creates new wifi configuration and saves the last saved hotspot configuration which is restored at the end of a transfer.
+
+If hotspot initiation is successful then the screen will show the QR Code generated so that receiver can scan the QR Code to connect to it and start receiving the forms.
+
+If user wants to manually connect to it then the screen shows the network name so that user can connect to it by tapping on the network, and after wifi is connected it will ask for a port number which is required to create the connection.
+
+<img src="send_normal_mode.gif" alt="send normal mode.gif" height="500" width="300">
+
+For devices having Android version 7.0 and 7.1 user will be sent to settings to enable the wifi hotspot functionality. The user will then need to tap the device back button to come back to skunkworks-crow. And for other device it will be enabled automatically
+        </pre>
+
+<h3>2.2Bluetooth</h3>
+<pre>The bluetooth has a shorter transferring distance than hotspot, so you may need to put sender and receiver closed to establish a valid connection. In the receiver's settings page, you can enable the secure mode of bluetooth, it allows you to establish an encrypted transmission (needs a pair code when first pairing).
+
+The bluetooth feature needs location permission. After a bluetooth socket was create, you will see a dialog to ask to make your device discoverable, after clicking that, You have 120s to let the receiver connect. Our application will automatically start data transfer if the bluetooth connection is successful.
+
+<img src="send_data.gif" alt="Send Data" height="500" width="300">
+        </pre>
+
+<h2>3.Receive filled forms</h2>
+<h3>3.1Wifi Hotspot</h3>received_for_review.gif
+<pre>Tap on the 'Receive' button shown at the bottom of the home screen to see a list of all wifi networks available in the nearby area which are started by only skunkworks-crow app.
+
+A receiver will need to connect to the network the sender has created. There are two ways to connect to the network: A QR code generated by the sender that can be scanned by a receiver, it will get all the information required to connect to the sender (wifi name, port, and password if the connection is protected). Or else, tap on the wifi network available to connect and after successful connection enter port number to start receiving the forms.
+
+Connecting to the sender’s network will disable all the wifi network available so that no other network can interrupt the current connection. After receiving the forms it will restore the last saved state.
+
+For some devices, the user is not allowed to configure the wifi hotspot from the app. Currently for Android versions < 8, “ODK-SKUNKWORKS-odk-skunkworks” is set as the default network name and for versions >= 8 it is AndroidShare-XXXX which is set by Android.
+
+<img src="received_for_review.gif" alt="received for review" height="500" width="300">
+<img src="received_qr_code.gif" alt="received qr code" height="500" width="300">
+        </pre>
+
+<h3>3.2Bluetooth</h3>
+<pre>If we use bluetooth to receive forms, you can find a bluetooth device list in the receiver page. Just clicking the sender's item, the Skunkworks-crow will connect and start receiving once connected. You can click the refresh button to refresh the list if you cannot find your target sender.
+
+<img src="send_data.gif" alt="Send data" height="500" width="300">
+<img src="receive_data.gif" alt="Receive data" height="500" width="300">
+        </pre>
+
+</body>
+</html>

@@ -34,6 +34,7 @@
 
     <string name="settings">Settings</string>
     <string name="about">About</string>
+    <string name="app_information">App Information</string>
     <string name="open_source_licenses">Open Source Licenses</string>
     <string name="user_guide">User Guide</string>
     <string name="default_hotspot_ssid">hotspot</string>

@@ -22,6 +22,7 @@ public class AboutActivity extends AppCompatActivity implements OnItemClickListe
 
     private static final String LICENSES_HTML_PATH = "file:///android_asset/open_source_licenses.html";
     private static final String USER_GUIDE_HTML_PATH = "file:///android_asset/user_guide.html";
+    private static final String APP_INFO_HTML_PATH = "file:///android_asset/app_information.html";
 
     @BindView(R.id.recyclerview)
     RecyclerView recyclerView;
@@ -47,6 +48,7 @@ public class AboutActivity extends AppCompatActivity implements OnItemClickListe
         llm.setOrientation(RecyclerView.VERTICAL);
         recyclerView.setLayoutManager(llm);
         adapter = new AboutAdapter(this, this);
+        adapter.addItem(new AboutItem(R.string.app_information, R.drawable.ic_stars));
         adapter.addItem(new AboutItem(R.string.open_source_licenses, R.drawable.ic_stars));
         adapter.addItem(new AboutItem(R.string.user_guide, R.drawable.ic_stars));
         recyclerView.setAdapter(adapter);
@@ -56,10 +58,15 @@ public class AboutActivity extends AppCompatActivity implements OnItemClickListe
     public void onItemClick(View view, int position) {
         if (position == 0) {
             Intent intent = new Intent(this, WebViewActivity.class);
+            intent.putExtra(OPEN_URL, APP_INFO_HTML_PATH);
+            intent.putExtra(TITLE, getString(R.string.app_information));
+            startActivity(intent);
+        } else if (position == 1) {
+            Intent intent = new Intent(this, WebViewActivity.class);
             intent.putExtra(OPEN_URL, LICENSES_HTML_PATH);
             intent.putExtra(TITLE, getString(R.string.open_source_licenses));
             startActivity(intent);
-        } else if (position == 1) {
+        } else if (position == 2)  {
             Intent intent = new Intent(this, WebViewActivity.class);
             intent.putExtra(OPEN_URL, USER_GUIDE_HTML_PATH);
             intent.putExtra(TITLE, getString(R.string.user_guide));
