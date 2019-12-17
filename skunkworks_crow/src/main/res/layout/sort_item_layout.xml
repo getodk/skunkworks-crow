@@ -34,7 +34,11 @@ the License.
         style="@style/WrapContent"
         android:layout_gravity="center"
         android:layout_marginLeft="@dimen/text_view_margin_left"
+        android:layout_marginStart="@dimen/text_view_margin_left"
         android:layout_marginRight="@dimen/text_view_margin_right"
+
+        android:layout_marginEnd="@dimen/text_view_margin_right"
+
         android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
         tools:text="Sort by Name" />
 </LinearLayout>
