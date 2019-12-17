@@ -9,8 +9,8 @@
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         android:gravity="center"
-        android:padding="10dp"
-        android:textSize="22sp" />
+        android:padding="@dimen/text_view_padding"
+        android:textSize="@dimen/text_view_primary_text_size" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerview"
@@ -29,10 +29,10 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:padding="12dp"
+            android:padding="@dimen/button_padding"
             android:text="@string/select_all"
             android:textAllCaps="false"
-            android:textSize="16sp" />
+            android:textSize="@dimen/button_text_size" />
 
         <Button
             android:id="@+id/send_button"
@@ -40,10 +40,10 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:enabled="false"
-            android:padding="12dp"
+            android:padding="@dimen/button_padding"
             android:text="@string/send_selected"
             android:textAllCaps="false"
-            android:textSize="16sp" />
+            android:textSize="@dimen/button_text_size" />
     </LinearLayout>
 
 </RelativeLayout>

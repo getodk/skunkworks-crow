@@ -21,8 +21,8 @@ the License.
     android:focusable="true"
     android:foreground="?android:attr/selectableItemBackground"
     android:orientation="horizontal"
-    android:paddingTop="8dp"
-    android:paddingBottom="8dp">
+    android:paddingTop="@dimen/root_layout_padding_top"
+    android:paddingBottom="@dimen/root_layout_padding_bottom">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/icon"
@@ -33,8 +33,8 @@ the License.
         android:id="@+id/title"
         style="@style/WrapContent"
         android:layout_gravity="center"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
+        android:layout_marginLeft="@dimen/text_view_margin_left"
+        android:layout_marginRight="@dimen/text_view_margin_right"
         android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
         tools:text="Sort by Name" />
 </LinearLayout>
