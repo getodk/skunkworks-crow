@@ -6,10 +6,10 @@
     <ImageView
         android:id="@+id/iconfilledform"
         style="@style/MatchParentHeight"
-        android:paddingStart="@dimen/image_view_padding_start"
-        android:paddingLeft="@dimen/image_view_padding_left"
-        android:paddingEnd="@dimen/image_view_padding_end"
-        android:paddingRight="@dimen/image_view_padding_right"
+        android:paddingStart="@dimen/image_view_padding_small"
+        android:paddingLeft="@dimen/image_view_padding_small"
+        android:paddingEnd="@dimen/image_view_padding_small"
+        android:paddingRight="@dimen/image_view_padding_small"
         android:src="@drawable/ic_assignment_black_24dp" />
 
     <RelativeLayout

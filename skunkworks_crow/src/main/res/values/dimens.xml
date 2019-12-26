@@ -21,12 +21,7 @@
     <dimen name="image_view_width">144dp</dimen>
     <dimen name="image_view_padding">12dp</dimen>
 
-    <dimen name="image_view_padding_start">6dp</dimen>
-    <dimen name="image_view_padding_left">6dp</dimen>
-    <dimen name="image_view_padding_end">6dp</dimen>
-    <dimen name="image_view_padding_right">6dp</dimen>
-
-
+    <dimen name="image_view_padding_small">6dp</dimen>
 
     <dimen name="element_image_view_height">72dp</dimen>
     <dimen name="element_image_view_width">72dp</dimen>
