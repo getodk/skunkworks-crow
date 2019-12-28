@@ -25,7 +25,7 @@ public class AboutActivity extends AppCompatActivity implements OnItemClickListe
 
     private static final String LICENSES_HTML_PATH = "file:///android_asset/open_source_licenses.html";
     private static final String USER_GUIDE_HTML_PATH = "file:///android_asset/user_guide.html";
-    static final String url = "https://github.com/opendatakit/skunkworks-crow/blob/master/README.md";
+    private static final String SKUNKWORKS_CROW_README_URL = "https://github.com/opendatakit/skunkworks-crow/blob/master/README.md";
 
     @BindView(R.id.recyclerview)
     RecyclerView recyclerView;
@@ -67,7 +67,7 @@ public class AboutActivity extends AppCompatActivity implements OnItemClickListe
             builder.addDefaultShareMenuItem();
 
             CustomTabsIntent customTabsIntent = builder.build();
-            customTabsIntent.launchUrl(this, Uri.parse(url));
+            customTabsIntent.launchUrl(this, Uri.parse(SKUNKWORKS_CROW_README_URL));
         } else if (position == 1) {
             Intent intent = new Intent(this, WebViewActivity.class);
             intent.putExtra(OPEN_URL, LICENSES_HTML_PATH);
