@@ -8,7 +8,6 @@ import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.browser.customtabs.CustomTabsIntent;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -65,15 +64,6 @@ public class AboutActivity extends AppCompatActivity implements OnItemClickListe
             new CustomTabsIntent.Builder()
                     .build()
                     .launchUrl(this, Uri.parse(SKUNKWORKS_CROW_README_URL));
-            /*CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-
-            builder.setToolbarColor(ContextCompat.getColor(this, R.color.colorPrimary));
-            builder.addDefaultShareMenuItem();
-
-            CustomTabsIntent customTabsIntent = builder.build();
-            customTabsIntent.launchUrl(this, Uri.parse(SKUNKWORKS_CROW_README_URL));
-
-             */
         } else if (position == 1) {
             Intent intent = new Intent(this, WebViewActivity.class);
             intent.putExtra(OPEN_URL, LICENSES_HTML_PATH);
