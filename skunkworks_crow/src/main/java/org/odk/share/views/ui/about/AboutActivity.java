@@ -34,6 +34,7 @@ public class AboutActivity extends AppCompatActivity implements OnItemClickListe
 
     private AboutAdapter adapter;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,17 +58,22 @@ public class AboutActivity extends AppCompatActivity implements OnItemClickListe
         recyclerView.setAdapter(adapter);
     }
 
-    @Override
+            @Override
     public void onItemClick(View view, int position) {
         if (position == 0) {
 
-            CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+            new CustomTabsIntent.Builder()
+                    .build()
+                    .launchUrl(this, Uri.parse(SKUNKWORKS_CROW_README_URL));
+            /*CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
 
             builder.setToolbarColor(ContextCompat.getColor(this, R.color.colorPrimary));
             builder.addDefaultShareMenuItem();
 
             CustomTabsIntent customTabsIntent = builder.build();
             customTabsIntent.launchUrl(this, Uri.parse(SKUNKWORKS_CROW_README_URL));
+
+             */
         } else if (position == 1) {
             Intent intent = new Intent(this, WebViewActivity.class);
             intent.putExtra(OPEN_URL, LICENSES_HTML_PATH);
