@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -13,6 +14,9 @@ import org.odk.collect.android.dao.InstancesDao;
 import org.odk.collect.android.dto.Instance;
 import org.odk.collect.android.provider.InstanceProviderAPI;
 import org.odk.share.R;
+import org.odk.share.utilities.ApplicationConstants;
+import org.odk.share.utilities.ArrayUtils;
+import org.odk.share.utilities.DialogUtils;
 import org.odk.share.views.ui.common.InstanceListFragment;
 import org.odk.share.views.ui.review.ReviewFormActivity;
 import org.odk.share.views.ui.instance.adapter.TransferInstanceAdapter;
@@ -30,9 +34,12 @@ import javax.inject.Inject;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
+import static org.odk.share.views.ui.instance.InstancesList.INSTANCE_IDS;
 import static org.odk.share.views.ui.main.MainActivity.FORM_DISPLAY_NAME;
 import static org.odk.share.views.ui.main.MainActivity.FORM_ID;
 import static org.odk.share.views.ui.main.MainActivity.FORM_VERSION;
@@ -46,6 +53,11 @@ import static org.odk.share.views.ui.review.ReviewFormActivity.TRANSFER_ID;
 public class ReceivedInstancesFragment extends InstanceListFragment implements OnItemClickListener {
 
     private static final String RECEIVED_INSTANCE_LIST_SORTING_ORDER = "receivedInstanceListSortingOrder";
+    private static final String REVIEWED_INSTANCE_LIST_SORTING_ORDER = "reviewedInstanceListSortingOrder";
+    public static final String MODE = "mode";
+    public static final int MODE_REVIEW = 1;
+    public static final int MODE_RECEIVE = 2;
+
 
     @BindView(R.id.recyclerview)
     RecyclerView recyclerView;
@@ -53,6 +65,12 @@ public class ReceivedInstancesFragment extends InstanceListFragment implements O
     LinearLayout buttonLayout;
     @BindView(R.id.empty_view)
     TextView emptyView;
+    @BindView(R.id.bToggle)
+    Button toggleButton;
+    @BindView(R.id.bAction)
+    Button sendButton;
+    @BindView(R.id.bToggleWide)
+    Button selectReviewedButton;
 
     @Inject
     InstancesDao instancesDao;
@@ -63,6 +81,8 @@ public class ReceivedInstancesFragment extends InstanceListFragment implements O
     HashMap<Long, Instance> instanceMap;
     TransferInstanceAdapter transferInstanceAdapter;
     List<TransferInstance> transferInstanceList;
+    private int activityMode;
+    private String sortingOrder;
 
     boolean showCheckBox = false;
 
@@ -76,11 +96,15 @@ public class ReceivedInstancesFragment extends InstanceListFragment implements O
         View view = inflater.inflate(R.layout.fragment_instances, container, false);
         ButterKnife.bind(this, view);
 
+        activityMode = MODE_RECEIVE;
+        sortingOrder = RECEIVED_INSTANCE_LIST_SORTING_ORDER;
+
         instanceMap = new HashMap<>();
         transferInstanceList = new ArrayList<>();
         selectedInstances = new LinkedHashSet<>();
 
         buttonLayout.setVisibility(View.GONE);
+        selectReviewedButton.setVisibility(View.VISIBLE);
 
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         llm.setOrientation(RecyclerView.VERTICAL);
@@ -91,14 +115,15 @@ public class ReceivedInstancesFragment extends InstanceListFragment implements O
 
     @Override
     public void onResume() {
-        getInstanceFromDB();
+        getReceivedInstanceFromDB(activityMode);
         setEmptyViewVisibility(getString(R.string.no_forms_received,
                 getActivity().getIntent().getStringExtra(FORM_DISPLAY_NAME)));
         transferInstanceAdapter.notifyDataSetChanged();
         super.onResume();
     }
 
-    private void getInstanceFromDB() {
+
+    private void getReceivedInstanceFromDB(int mode) {
         transferInstanceList.clear();
         selectedInstances.clear();
         String formVersion = getActivity().getIntent().getStringExtra(FORM_VERSION);
@@ -128,13 +153,24 @@ public class ReceivedInstancesFragment extends InstanceListFragment implements O
 
         Cursor cursor = instancesDao.getInstancesCursor(null, selection, selectionArgs, getSortingOrder());
         instanceMap = instancesDao.getMapFromCursor(cursor);
-        Cursor transferCursor = transferDao.getReceiveInstancesCursor();
+        Cursor transferCursor;
+        if (mode == MODE_RECEIVE) {
+            transferCursor = transferDao.getReceiveInstancesCursor();
+        } else if (mode == MODE_REVIEW) {
+            transferCursor = transferDao.getReviewedInstancesCursor();
+        } else {
+            transferCursor = transferDao.getReceiveInstancesCursor();
+        }
         List<TransferInstance> transferInstances = transferDao.getInstancesFromCursor(transferCursor);
         for (TransferInstance instance : transferInstances) {
             if (instanceMap.containsKey(instance.getInstanceId())) {
                 instance.setInstance(instanceMap.get(instance.getInstanceId()));
                 transferInstanceList.add(instance);
             }
+        }
+        if (transferInstanceList.isEmpty()){
+            buttonLayout.setVisibility(View.GONE);
+            selectReviewedButton.setVisibility(View.GONE);
         }
     }
 
@@ -157,15 +193,32 @@ public class ReceivedInstancesFragment extends InstanceListFragment implements O
 
     @Override
     public void onItemClick(View view, int position) {
-        Intent intent = new Intent(getContext(), ReviewFormActivity.class);
-        intent.putExtra(INSTANCE_ID, transferInstanceList.get(position).getInstanceId());
-        intent.putExtra(TRANSFER_ID, transferInstanceList.get(position).getId());
-        startActivity(intent);
+
+        if (activityMode == MODE_RECEIVE) {
+            Intent intent = new Intent(getContext(), ReviewFormActivity.class);
+            intent.putExtra(INSTANCE_ID, transferInstanceList.get(position).getInstanceId());
+            intent.putExtra(TRANSFER_ID, transferInstanceList.get(position).getId());
+            startActivity(intent);
+        } else if (activityMode == MODE_REVIEW) {
+
+            TransferInstance transferInstance = transferInstanceList.get(position);
+            Long id = transferInstance.getId();
+
+            if (selectedInstances.contains(id)) {
+                selectedInstances.remove(id);
+
+                view.setBackgroundResource(R.color.colorTabActive);
+            } else {
+                selectedInstances.add(id);
+                view.setBackgroundResource(R.color.colorSelected);
+            }
+            toggleButtonLabel();
+        }
     }
 
     @Override
     protected void updateAdapter() {
-        getInstanceFromDB();
+        getReceivedInstanceFromDB(activityMode);
         setEmptyViewVisibility(getString(R.string.no_forms_received,
                 getActivity().getIntent().getStringExtra(FORM_DISPLAY_NAME)));
         transferInstanceAdapter.notifyDataSetChanged();
@@ -173,6 +226,68 @@ public class ReceivedInstancesFragment extends InstanceListFragment implements O
 
     @Override
     protected String getSortingOrderKey() {
-        return RECEIVED_INSTANCE_LIST_SORTING_ORDER;
+        return sortingOrder;
+    }
+
+    private void toggleButtonLabel() {
+        toggleButton.setText(selectedInstances.size() == transferInstanceAdapter.getItemCount() ?
+                getString(R.string.clear_all) : getString(R.string.select_all));
+        sendButton.setEnabled(selectedInstances.size() > 0);
+    }
+
+
+    @OnClick(R.id.bToggleWide)
+    public void changeMode() {
+        activityMode = MODE_REVIEW;
+        sortingOrder = REVIEWED_INSTANCE_LIST_SORTING_ORDER;
+
+
+        selectReviewedButton.setVisibility(View.GONE);
+        buttonLayout.setVisibility(View.VISIBLE);
+        toggleButton.setText(getString(R.string.select_all));
+        sendButton.setText(getString(R.string.send_forms));
+
+
+        getReceivedInstanceFromDB(activityMode);
+        setEmptyViewVisibility(getString(R.string.no_forms_received,
+                getActivity().getIntent().getStringExtra(FORM_DISPLAY_NAME)));
+        transferInstanceAdapter.notifyDataSetChanged();
+
+    }
+
+    @OnClick(R.id.bToggle)
+    public void toggle() {
+        boolean newState = transferInstanceAdapter.getItemCount() > selectedInstances.size();
+
+        if (newState) {
+            for (TransferInstance instance : transferInstanceList) {
+                selectedInstances.add(instance.getId());
+            }
+        } else {
+            selectedInstances.clear();
+        }
+
+        transferInstanceAdapter.notifyDataSetChanged();
+        toggleButtonLabel();
+    }
+
+    @OnClick(R.id.bAction)
+    public void sendForms() {
+        List<Long> instanceIds = new ArrayList<>();
+        for (TransferInstance transferInstance : transferInstanceList) {
+            if (selectedInstances.contains(transferInstance.getId())) {
+                instanceIds.add(transferInstance.getInstanceId());
+            }
+        }
+
+        Intent intent = new Intent();
+        Long[] arr = instanceIds.toArray(new Long[instanceIds.size()]);
+        long[] a = ArrayUtils.toPrimitive(arr);
+        intent.putExtra(INSTANCE_IDS, a);
+        intent.putExtra(MODE, ApplicationConstants.SEND_REVIEW_MODE);
+
+        if (getContext() != null) {
+            DialogUtils.switchToDefaultSendingMethod(getContext(), intent);
+        }
     }
 }
