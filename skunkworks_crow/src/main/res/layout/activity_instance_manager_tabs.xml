@@ -16,7 +16,7 @@
             style="@style/MatchParentWidth"
             app:tabGravity="fill"
             app:tabIndicatorColor="@android:color/white"
-            app:tabMaxWidth="0dp"
+            app:tabMaxWidth="@dimen/tab_max_width"
             app:tabMode="fixed" />
     </com.google.android.material.appbar.AppBarLayout>
 

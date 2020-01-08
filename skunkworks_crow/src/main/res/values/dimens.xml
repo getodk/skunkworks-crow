@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+<!-- Common dimensions for all layout files-->
+
+<!--Layout dimens-->
+    <dimen name="linear_layout_padding">10dp</dimen>
+    <dimen name="root_layout_padding">16dp</dimen>
+    <dimen name="root_layout_padding_top">8dp</dimen>
+    <dimen name="root_layout_padding_bottom">8dp</dimen>
+
+    <dimen name="relative_layout_padding">8dp</dimen>
+
+    <dimen name="webView_root_layout_margin">0dp</dimen>
+    <dimen name="webView_root_layout_padding">0dp</dimen>
+
+
+    <!--image view dimens-->
+    <dimen name="image_view_margin">10dp</dimen>
+    <dimen name="image_view_height">144dp</dimen>
+    <dimen name="image_view_width">144dp</dimen>
+    <dimen name="image_view_padding">12dp</dimen>
+
+    <dimen name="image_view_padding_small">6dp</dimen>
+
+    <dimen name="element_image_view_height">72dp</dimen>
+    <dimen name="element_image_view_width">72dp</dimen>
+
+<!--text view dimens-->
+    <!--text view text size dimens-->
+    <dimen name="text_view_primary_text_size">21sp</dimen>
+    <dimen name="text_view_secondary_text_size">17sp</dimen>
+    <dimen name="text_view_minimal_text_size">12sp</dimen>
+
+    <!--text view margin dimens-->
+
+    <dimen name="text_view_margin_top">26dp</dimen>
+    <dimen name="text_view_margin">10dp</dimen>
+    <dimen name="text_view_margin_bottom">8dp</dimen>
+    <dimen name="text_view_margin_top_minimal">10dp</dimen>
+    <dimen name="text_view_margin_start">6dp</dimen>
+    <dimen name="text_view_margin_bottom_minimal">4dp</dimen>
+    <dimen name="text_view_margin_left_minimal">6dp</dimen>
+    <dimen name="text_view_margin_end">10dp</dimen>
+    <dimen name="text_view_margin_right_minimal">10dp</dimen>
+    <dimen name="text_view_margin_left">16dp</dimen>
+    <dimen name="text_view_margin_right">16dp</dimen>
+
+   <!--text view(secondary) margin dimens-->
+
+    <dimen name="text_view_secondary_margin_start">6dp</dimen>
+    <dimen name="text_view_secondary_margin_left">6dp</dimen>
+    <dimen name="text_view_secondary_margin_top">2dp</dimen>
+    <dimen name="text_view_secondary_margin_bottom">2dp</dimen>
+
+   <!--text view padding dimens-->
+    <dimen name="text_view_padding">10dp</dimen>
+    <dimen name="text_view_padding_top">10dp</dimen>
+    <dimen name="text_view_padding_bottom">20dp</dimen>
+
+
+<!--Button dimens-->
+
+    <dimen name="button_margin">4dp</dimen>
+    <dimen name="button_padding">12dp</dimen>
+    <dimen name="button_text_size">16sp</dimen>
+
+
+<!--progressbar dimens-->
+    <dimen name="progressbar_width">244dp</dimen>
+    <dimen name="progressbar_margin_top_minimal">28dp</dimen>
+    <dimen name="progressbar_margin_top">128dp</dimen>
+
+
+    <!--tab dimens-->
+    <dimen name="tab_max_width">0dp</dimen>
+
+<!--edit text dimens-->
+    <dimen name="edit_text_text_size">18sp</dimen>
+    <dimen name="edit_text_margin_left">10dp</dimen>
+    <dimen name="edit_text_margin_right">10dp</dimen>
+    <dimen name="edit_text_margin_top">5dp</dimen>
+
+
+
+  <!--Chart dimensions-->
+
+    <dimen name="bar_chart_height">184dp</dimen>
+    <dimen name="bar_chart_width">362dp</dimen>
+
+
+<!--toolbar dimens-->
+    <dimen name="content_inset_end">0dp</dimen>
+    <dimen name="content_inset_start">12dp</dimen>
+    <dimen name="content_inset_start_with_navigation">0dp</dimen>
+
+
+</resources>

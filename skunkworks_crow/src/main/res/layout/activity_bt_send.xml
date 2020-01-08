@@ -15,24 +15,24 @@
         <ImageView
             android:id="@+id/bluetooth_icon"
             android:layout_width="match_parent"
-            android:layout_height="144dp"
+            android:layout_height="@dimen/image_view_height"
             android:src="@drawable/ic_bluetooth_logo" />
 
         <ProgressBar
             android:id="@+id/progressBar"
             style="@style/HorizontalProgressBar"
-            android:layout_width="244dp"
+            android:layout_width="@dimen/progressbar_width"
             android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
+            android:layout_marginTop="@dimen/progressbar_margin_top_minimal"
             android:indeterminate="true" />
 
         <TextView
             android:id="@+id/test_text_view"
             style="@style/MatchParentWidth"
             android:layout_gravity="center"
-            android:layout_marginTop="28dp"
+            android:layout_marginTop="@dimen/text_view_margin_top"
             android:gravity="center"
-            android:textSize="20sp"
+            android:textSize="@dimen/text_view_primary_text_size"
             tools:text="@string/tv_sender_wait_for_connect" />
     </LinearLayout>
 
