@@ -55,27 +55,44 @@
                 <Button
                     android:id="@+id/bApprove"
                     style="@style/MatchParentWidth"
+                    android:layout_marginEnd="3dp"
+                    android:layout_marginRight="3dp"
+                    android:layout_marginBottom="5dp"
                     android:layout_weight="1"
-                    android:text="@string/approve" />
+                    android:background="@drawable/button_bottom_primary"
+                    android:text="@string/approve"
+                    android:textColor="@android:color/white" />
 
                 <Button
                     android:id="@+id/bReject"
                     style="@style/MatchParentWidth"
+                    android:layout_marginStart="3dp"
+                    android:layout_marginLeft="3dp"
+                    android:layout_marginBottom="5dp"
                     android:layout_weight="1"
-                    android:text="@string/Reject" />
+                    android:background="@drawable/button_bottom_primary"
+                    android:text="@string/Reject"
+                    android:textColor="@android:color/white" />
 
             </LinearLayout>
+
 
             <Button
                 android:id="@+id/bViewAgain"
                 style="@style/MatchParentWidth"
                 android:layout_gravity="center_horizontal"
-                android:text="@string/view_form_in_collect" />
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/button_bottom_primary"
+                android:text="@string/view_form_in_collect"
+                android:textColor="@android:color/white" />
 
             <Button
                 android:id="@+id/bReviewLater"
                 style="@style/MatchParentWidth"
-                android:text="@string/review_later" />
+                android:background="@drawable/button_bottom_primary"
+                android:text="@string/review_later"
+                android:textColor="@android:color/white" />
 
             <View
                 style="@style/MatchParentWidth"

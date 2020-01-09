@@ -37,21 +37,26 @@
 
     <LinearLayout
         android:id="@+id/buttonholder"
-        style="@style/MatchParentWidth"
-        android:layout_alignParentBottom="true"
-        android:orientation="horizontal"
-        android:weightSum="2">
+        style="@style/main_layout_button_bottom">
 
-        <Button
-            android:id="@+id/bScan"
-            style="@style/MatchParentWidth"
-            android:layout_weight="1"
-            android:text="@string/scan" />
+        <LinearLayout
+            style="@style/layout_bottom_button" >
 
-        <Button
-            android:id="@+id/bScanQRCode"
-            style="@style/MatchParentWidth"
-            android:layout_weight="1"
-            android:text="@string/scan_qr_code" />
+            <Button
+                android:id="@+id/bScan"
+                style="@style/bottom_button"
+                android:text="@string/scan" />
+        </LinearLayout>
+
+        <LinearLayout
+            style="@style/layout_bottom_button" >
+
+            <Button
+                android:id="@+id/bScanQRCode"
+                style="@style/bottom_button"
+                android:text="@string/scan_qr_code" />
+        </LinearLayout>
+
     </LinearLayout>
+
 </RelativeLayout>

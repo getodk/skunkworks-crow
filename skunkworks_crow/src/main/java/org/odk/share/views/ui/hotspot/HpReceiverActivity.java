@@ -319,6 +319,8 @@ public class HpReceiverActivity extends InjectableActivity implements OnItemClic
 
     public void startScan() {
         scanWifi.setEnabled(false);
+        scanWifi.setBackground(getResources().getDrawable(R.drawable.button_bottom_light));
+        scanWifi.setTextColor(getResources().getColor(R.color.colorPrimary));
         scanResultList.clear();
         wifiResultAdapter.notifyDataSetChanged();
         setEmptyViewVisibility(getString(R.string.scanning));
@@ -503,6 +505,10 @@ public class HpReceiverActivity extends InjectableActivity implements OnItemClic
         scanResultList.clear();
         scanResultList.addAll(list);
         wifiResultAdapter.notifyDataSetChanged();
+
+        scanWifi.setBackground(getResources().getDrawable(R.drawable.button_bottom_primary));
+        scanWifi.setTextColor(getResources().getColor(android.R.color.white));
+        scanQRCode.setTextColor(getResources().getColor(android.R.color.white));
 
         scanWifi.setEnabled(true);
         setEmptyViewVisibility(getString(R.string.no_wifi_available));

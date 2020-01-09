@@ -215,6 +215,13 @@ public class ReviewedInstancesFragment extends InstanceListFragment implements O
         toggleButton.setText(selectedInstances.size() == transferInstanceAdapter.getItemCount() ?
                 getString(R.string.clear_all) : getString(R.string.select_all));
         sendButton.setEnabled(selectedInstances.size() > 0);
+        if (selectedInstances.size() > 0) {
+            sendButton.setTextColor(getResources().getColor(android.R.color.white));
+            sendButton.setBackground(getResources().getDrawable(R.drawable.button_bottom_primary));
+        } else {
+            sendButton.setTextColor(getResources().getColor(R.color.colorPrimary));
+            sendButton.setBackground(getResources().getDrawable(R.drawable.button_bottom_light));
+        }
     }
 
     @OnClick(R.id.bAction)

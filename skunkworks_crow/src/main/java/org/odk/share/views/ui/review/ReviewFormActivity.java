@@ -93,6 +93,10 @@ public class ReviewFormActivity extends InjectableActivity {
                 cursor.close();
             }
         }
+        approveButton.setBackground(getResources().getDrawable(R.drawable.button_bottom_primary));
+        rejectButton.setBackground(getResources().getDrawable(R.drawable.button_bottom_primary));
+        reviewLaterButton.setBackground(getResources().getDrawable(R.drawable.button_bottom_primary));
+        viewForm.setBackground(getResources().getDrawable(R.drawable.button_bottom_primary));
     }
 
     @Override

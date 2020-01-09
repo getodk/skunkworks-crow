@@ -96,6 +96,8 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
         createODKDirs();
 
         sendForms.setEnabled(false);
+        sendForms.setBackground(getResources().getDrawable(R.drawable.button_bottom_light));
+        sendForms.setTextColor(getResources().getColor(R.color.colorPrimary));
 
         LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setOrientation(RecyclerView.VERTICAL);
@@ -176,6 +178,8 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
             recyclerView.setVisibility(View.VISIBLE);
             emptyView.setVisibility(View.GONE);
             sendForms.setEnabled(true);
+            sendForms.setTextColor(getResources().getColor(android.R.color.white));
+            sendForms.setBackground(getResources().getDrawable(R.drawable.button_bottom_primary));
         } else {
             recyclerView.setVisibility(View.GONE);
             emptyView.setVisibility(View.VISIBLE);

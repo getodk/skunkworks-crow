@@ -39,7 +39,7 @@
 
     <Button
         android:id="@+id/btn_refresh"
-        style="@style/MatchParentWidth"
+        style="@style/bottom_button"
         android:layout_alignParentBottom="true"
         android:layout_margin="@dimen/button_margin"
         android:text="@string/btn_refresh"
