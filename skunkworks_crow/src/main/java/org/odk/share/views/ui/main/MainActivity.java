@@ -282,7 +282,7 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
             }
         }
         if (requestCode == COLLECT_INSTALL_REQUEST_CODE) {
-            if(!isCollectInstalled()) {
+            if (!isCollectInstalled()) {
                 setUpLoader();
             }
         }
