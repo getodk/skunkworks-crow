@@ -123,7 +123,10 @@ public class ReceivedInstancesFragment extends InstanceListFragment implements O
                         + InstanceProviderAPI.InstanceColumns.JR_VERSION + "=?";
                 selectionArgs = new String[]{formId, formVersion};
             } else {
-
+                selection = InstanceProviderAPI.InstanceColumns.JR_FORM_ID + "=? AND "
+                        + InstanceProviderAPI.InstanceColumns.JR_VERSION + "=? AND "
+                        + InstanceProviderAPI.InstanceColumns.DISPLAY_NAME + " LIKE ?";
+                selectionArgs = new String[]{formId, formVersion, "%" + getFilterText() + "%"};
             }
         }
 
