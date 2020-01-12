@@ -116,22 +116,26 @@ public class SentInstancesFragment extends InstanceListFragment {
         String selection;
 
         if (formVersion == null) {
-            selection = InstanceProviderAPI.InstanceColumns.JR_FORM_ID + "=? AND "
-                    + InstanceProviderAPI.InstanceColumns.JR_VERSION + " IS NULL";
             if (getFilterText().length() == 0) {
+                selection = InstanceProviderAPI.InstanceColumns.JR_FORM_ID + "=? AND "
+                        + InstanceProviderAPI.InstanceColumns.JR_VERSION + " IS NULL";
                 selectionArgs = new String[]{formId};
             } else {
+                selection =  InstanceProviderAPI.InstanceColumns.JR_FORM_ID + "=? AND "
+                        + InstanceProviderAPI.InstanceColumns.JR_VERSION + " IS NULL AND "
+                        + InstanceProviderAPI.InstanceColumns.DISPLAY_NAME + " LIKE ?";
                 selectionArgs = new String[]{formId, "%" + getFilterText() + "%"};
-                selection = "AND " + InstanceProviderAPI.InstanceColumns.DISPLAY_NAME + " LIKE ?";
             }
         } else {
-            selection = InstanceProviderAPI.InstanceColumns.JR_FORM_ID + "=? AND "
-                    + InstanceProviderAPI.InstanceColumns.JR_VERSION + "=?";
             if (getFilterText().length() == 0) {
+                selection = InstanceProviderAPI.InstanceColumns.JR_FORM_ID + "=? AND "
+                        + InstanceProviderAPI.InstanceColumns.JR_VERSION + "=?";
                 selectionArgs = new String[]{formId, formVersion};
             } else {
-                selectionArgs = new String[]{formId, "%" + getFilterText() + "%"};
-                selection = "AND " + InstanceProviderAPI.InstanceColumns.DISPLAY_NAME + " LIKE ?";
+                selection = InstanceProviderAPI.InstanceColumns.JR_FORM_ID + "=? AND "
+                        + InstanceProviderAPI.InstanceColumns.JR_VERSION + "=? AND "
+                        + InstanceProviderAPI.InstanceColumns.DISPLAY_NAME + " LIKE ?";
+                selectionArgs = new String[]{formId, formVersion, "%" + getFilterText() + "%"};
             }
         }
 
