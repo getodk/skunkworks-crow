@@ -48,11 +48,15 @@
         <exclude name="ShortVariable" />
         <exclude name="TooManyStaticImports" />
         <exclude name="UnnecessaryConstructor" />
+        <exclude name="UseDiamondOperator" />
         <exclude name="UselessParentheses" />
+        <exclude name="UseShortArrayInitializer" />
+        <exclude name="UseUnderscoresInNumericLiterals" />
     </rule>
     <rule ref="category/java/design.xml">
         <exclude name="AvoidCatchingGenericException" />
         <exclude name="AvoidThrowingRawExceptionTypes" />
+        <exclude name="AvoidUncheckedExceptionsInSignatures" />
         <exclude name="ClassWithOnlyPrivateConstructorsShouldBeFinal" />
         <exclude name="CollapsibleIfStatements" />
         <exclude name="CyclomaticComplexity" />
@@ -84,6 +88,7 @@
         <exclude name="AvoidFieldNameMatchingMethodName" />
         <exclude name="AvoidLiteralsInIfCondition" />
         <exclude name="BeanMembersShouldSerialize" />
+        <exclude name="CloseResource" />
         <exclude name="CompareObjectsWithEquals" />
         <exclude name="DataflowAnomalyAnalysis" />
         <exclude name="DontUseFloatTypeForLoopIndices" />
