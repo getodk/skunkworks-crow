@@ -2,9 +2,13 @@
 
 package org.odk.share.views.ui.send.fragment;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -156,11 +161,30 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
     @OnClick(R.id.send_button)
     public void send() {
         if (getContext() != null) {
-            Intent intent = new Intent();
-            setupSendingIntent(intent);
-            DialogUtils.switchToDefaultSendingMethod(getContext(), intent);
+            if (ActivityCompat.checkSelfPermission(getContext(),
+                    Manifest.permission.WRITE_SETTINGS)
+                    != PackageManager.PERMISSION_GRANTED) {
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+                    if (Settings.System.canWrite(getContext())) {
+                        Intent intent = new Intent();
+                        setupSendingIntent(intent);
+                        DialogUtils.switchToDefaultSendingMethod(getContext(), intent);
+                    } else {
+                        Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
+                        startActivity(intent);
+                    }
+
+                } else {
+                    Intent intent = new Intent();
+                    setupSendingIntent(intent);
+                    DialogUtils.switchToDefaultSendingMethod(getContext(), intent);
+                }
+            }
         }
     }
+
 
     private void setupSendingIntent(Intent intent) {
         Long[] arr = selectedForms.toArray(new Long[selectedForms.size()]);
