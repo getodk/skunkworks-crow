@@ -64,7 +64,8 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
     private InstanceAdapter instanceAdapter;
     private LinkedHashSet<Long> selectedInstances;
 
-    public FilledFormsFragment() { }
+    public FilledFormsFragment() {
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -114,7 +115,8 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
 
 
     @Override
-    public void onLoaderReset(@NonNull Loader loader) { }
+    public void onLoaderReset(@NonNull Loader loader) {
+    }
 
     private void onListItemClick(View view, int position) {
         Cursor cursor = instanceAdapter.getCursor();
