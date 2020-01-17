@@ -83,7 +83,8 @@
 
         <activity
             android:name=".views.ui.send.SendFormsActivity"
-            android:parentActivityName=".views.ui.main.MainActivity">
+            android:parentActivityName=".views.ui.main.MainActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".views.ui.main.MainActivity" />
