@@ -1,9 +1,7 @@
 package org.odk.share.views.ui.review;
 
 import android.content.ContentValues;
-import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,6 +15,7 @@ import org.odk.collect.android.provider.InstanceProviderAPI;
 import org.odk.share.R;
 import org.odk.share.dao.TransferDao;
 import org.odk.share.dto.TransferInstance;
+import org.odk.share.views.customui.LaunchCollect;
 import org.odk.share.views.ui.common.injectable.InjectableActivity;
 
 import javax.inject.Inject;
@@ -50,6 +49,9 @@ public class ReviewFormActivity extends InjectableActivity {
     @Inject
     TransferDao transferDao;
 
+    @Inject
+    LaunchCollect launchCollect;
+
     public static final String TRANSFER_ID = "transfer_id";
     public static final String INSTANCE_ID = "instance_id";
 
@@ -70,7 +72,7 @@ public class ReviewFormActivity extends InjectableActivity {
         instanceID = getIntent().getLongExtra(INSTANCE_ID, -1);
 
         if (transferID == -1 || instanceID == -1) {
-           finish();
+            finish();
         }
 
         Cursor cursor = transferDao.getInstanceCursorFromId(transferID);
@@ -110,16 +112,6 @@ public class ReviewFormActivity extends InjectableActivity {
         super.onResume();
     }
 
-    private void launchCollect() {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(Uri.parse("content://org.odk.collect.android.provider.odk.instances/instances/" + instanceID));
-        intent.putExtra("formMode", "viewSent");
-        if (intent.resolveActivity(getPackageManager()) == null) {
-            Toast.makeText(this, getString(R.string.collect_not_installed), Toast.LENGTH_LONG).show();
-        } else {
-            startActivity(intent);
-        }
-    }
 
     @OnClick(R.id.bApprove)
     public void acceptForm() {
@@ -185,6 +177,7 @@ public class ReviewFormActivity extends InjectableActivity {
                 String.valueOf(transferID)
         };
         transferDao.updateInstance(values, where, whereArgs);
-        launchCollect();
+        launchCollect.openFormInCollect(instanceID);
     }
+
 }
