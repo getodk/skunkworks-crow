@@ -36,6 +36,12 @@
             android:layout_height="184dp"
             android:layout_gravity="center" />
 
+        <com.github.mikephil.charting.charts.ScatterChart
+            android:id="@+id/detailed_chart"
+            android:layout_width="362dp"
+            android:layout_height="184dp"
+            android:layout_gravity="center" />
+
         <View
             style="@style/MatchParentWidth"
             android:layout_weight="1.0" />
