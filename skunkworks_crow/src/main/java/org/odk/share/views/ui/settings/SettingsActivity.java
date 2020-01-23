@@ -41,6 +41,7 @@ public class SettingsActivity extends PreferenceActivity {
     Preference hotspotPasswordPreference;
     CheckBoxPreference passwordRequirePreference;
     CheckBoxPreference btSecureModePreference;
+    CheckBoxPreference statisticsPreference;
     EditTextPreference odkDestinationDirPreference;
     ListPreference defaultMethodPreference;
     private SharedPreferences prefs;
@@ -75,6 +76,7 @@ public class SettingsActivity extends PreferenceActivity {
         passwordRequirePreference = (CheckBoxPreference) findPreference(PreferenceKeys.KEY_HOTSPOT_PWD_REQUIRE);
         btSecureModePreference = (CheckBoxPreference) findPreference(PreferenceKeys.KEY_BLUETOOTH_SECURE_MODE);
         odkDestinationDirPreference = (EditTextPreference) findPreference(PreferenceKeys.KEY_ODK_DESTINATION_DIR);
+        statisticsPreference = (CheckBoxPreference) findPreference(PreferenceKeys.KEY_DETAILED_STATISTICS);
 
         prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
@@ -89,11 +91,12 @@ public class SettingsActivity extends PreferenceActivity {
         boolean isPasswordSet = prefs.getBoolean(PreferenceKeys.KEY_HOTSPOT_PWD_REQUIRE, false);
         odkDestinationDirPreference.setSummary(prefs.getString(PreferenceKeys.KEY_ODK_DESTINATION_DIR,
                 getString(R.string.default_odk_destination_dir)));
-        boolean isSecureMode = prefs.getBoolean(PreferenceKeys.KEY_BLUETOOTH_SECURE_MODE, true);
-
         hotspotPasswordPreference.setEnabled(isPasswordSet);
         passwordRequirePreference.setChecked(isPasswordSet);
+        boolean isSecureMode = prefs.getBoolean(PreferenceKeys.KEY_BLUETOOTH_SECURE_MODE, true);
         btSecureModePreference.setChecked(isSecureMode);
+        boolean detailedStatisticsEnabled = prefs.getBoolean(PreferenceKeys.KEY_DETAILED_STATISTICS, false);
+        statisticsPreference.setChecked(detailedStatisticsEnabled);
 
         hotspotNamePreference.setOnPreferenceChangeListener(preferenceChangeListener());
         bluetoothNamePreference.setOnPreferenceChangeListener(preferenceChangeListener());
