@@ -41,6 +41,7 @@
     <string name="title_bluetooth_name">Bluetooth Name</string>
     <string name="title_hotspot_ssid">Hotspot SSID</string>
     <string name="title_hotspot_password">Set Hotspot password</string>
+    <string name="title_select_chart">Show Detailed Statistics</string>
     <string name="summary_security_bluetooth">Use secure transfer (needs pairing code, controlled by receiver)</string>
     <string name="set_password">Set Password</string>
     <string name="secure_mode">Enable Secure Mode</string>

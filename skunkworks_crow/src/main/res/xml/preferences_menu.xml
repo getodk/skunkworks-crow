@@ -22,7 +22,7 @@
             android:defaultValue="false"
             android:icon="@drawable/ic_show_chart_black_24dp"
             android:key="detailed_statistics"
-            android:title="Show Detailed Statistics" />
+            android:title="@string/title_select_chart" />
 
     </PreferenceCategory>
 
