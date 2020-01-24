@@ -75,7 +75,8 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
     private LinkedHashSet<Long> selectedForms;
 
 
-    public BlankFormsFragment() { }
+    public BlankFormsFragment() {
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -124,7 +125,8 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
 
 
     @Override
-    public void onLoaderReset(@NonNull Loader loader) { }
+    public void onLoaderReset(@NonNull Loader loader) {
+    }
 
     @Override
     public void onItemClick(BaseCursorViewHolder holder, int position) {
