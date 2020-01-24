@@ -15,6 +15,7 @@ import org.odk.share.rx.schedulers.BaseSchedulerProvider;
 import org.odk.share.rx.schedulers.SchedulerProvider;
 import org.odk.share.services.ReceiverService;
 import org.odk.share.services.SenderService;
+import org.odk.share.views.customui.LaunchCollect;
 
 import dagger.Module;
 import dagger.Provides;
@@ -65,6 +66,11 @@ class AppModule {
     @Provides
     TransferDao provideTransferDao(Context context) {
         return new TransferDao(context);
+    }
+
+    @Provides
+    LaunchCollect provideLaunchCollect(Context context) {
+        return new LaunchCollect(context);
     }
 
     @Provides

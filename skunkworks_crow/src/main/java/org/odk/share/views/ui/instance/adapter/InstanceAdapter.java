@@ -8,16 +8,18 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
 import org.odk.collect.android.provider.InstanceProviderAPI;
 import org.odk.share.R;
+import org.odk.share.views.customui.LaunchCollect;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Locale;
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import timber.log.Timber;
@@ -32,6 +34,7 @@ public class InstanceAdapter extends RecyclerView.Adapter<InstanceAdapter.Instan
     private Context context;
     private final OnItemClickListener listener;
     private LinkedHashSet<Long> selectedInstances;
+
 
     public InstanceAdapter(Context context, Cursor cursor, OnItemClickListener listener,
                            LinkedHashSet<Long> selectedInstances) {
@@ -69,7 +72,13 @@ public class InstanceAdapter extends RecyclerView.Adapter<InstanceAdapter.Instan
         holder.reviewedForms.setVisibility(View.GONE);
         holder.unReviewedForms.setVisibility(View.GONE);
 
+        holder.itemView.setOnLongClickListener(view -> {
+            LaunchCollect launchCollect = new LaunchCollect(context);
+            launchCollect.openFormInCollect(id);
+            return true;
+        });
     }
+
 
     public static String getDisplaySubtext(Context context, String state, Date date) {
         try {
@@ -105,7 +114,6 @@ public class InstanceAdapter extends RecyclerView.Adapter<InstanceAdapter.Instan
     }
 
 
-
     public Cursor getCursor() {
         return cursor;
     }
@@ -116,9 +124,12 @@ public class InstanceAdapter extends RecyclerView.Adapter<InstanceAdapter.Instan
 
     static class InstanceHolder extends RecyclerView.ViewHolder {
 
-        @BindView(R.id.tvTitle) public TextView title;
-        @BindView(R.id.tvSubtitle) public TextView subtitle;
-        @BindView(R.id.checkbox) public CheckBox checkBox;
+        @BindView(R.id.tvTitle)
+        public TextView title;
+        @BindView(R.id.tvSubtitle)
+        public TextView subtitle;
+        @BindView(R.id.checkbox)
+        public CheckBox checkBox;
         @BindView(R.id.tvReviewForm)
         TextView reviewedForms;
         @BindView(R.id.tvUnReviewForm)
