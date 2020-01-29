@@ -34,6 +34,7 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import timber.log.Timber;
 
 import static org.odk.share.views.ui.instance.fragment.ReviewedInstancesFragment.MODE;
 
@@ -46,6 +47,7 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
     public static final String INSTANCE_IDS = "instance_ids";
     private static final String INSTANCE_LIST_ACTIVITY_SORTING_ORDER = "instanceListActivitySortingOrder";
     private static final int INSTANCE_LOADER = 1;
+    private static final String SELECTED_INSTANCES = "selectedInstances";
 
     @BindView(R.id.recyclerview)
     RecyclerView recyclerView;
@@ -80,6 +82,9 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
         llm.setOrientation(RecyclerView.VERTICAL);
         recyclerView.setLayoutManager(llm);
         addListItemDivider();
+        if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_INSTANCES)) {
+            selectedInstances = (LinkedHashSet<Long>) savedInstanceState.getSerializable(SELECTED_INSTANCES);
+        }
         return view;
     }
 
@@ -111,6 +116,21 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
         } else {
             setEmptyViewVisibility(0);
         }
+
+        try {
+            sendButton.setEnabled(selectedInstances.size() > 0);
+            toggleButtonLabel();
+        } catch (Exception e) {
+            Timber.e(e);
+        }
+    }
+
+
+    @Override
+    public void onSaveInstanceState(@NonNull final Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putSerializable(SELECTED_INSTANCES, selectedInstances);
     }
 
 
