@@ -23,10 +23,8 @@
     <PreferenceCategory android:title="Hotspot Settings">
 
         <EditTextPreference
-            android:defaultValue="@string/default_hotspot_ssid"
             android:icon="@drawable/ic_wifi_tethering_black_24dp"
             android:key="hotspot_name"
-            android:summary="@string/default_hotspot_ssid"
             android:title="@string/title_hotspot_ssid" />
 
         <Preference
