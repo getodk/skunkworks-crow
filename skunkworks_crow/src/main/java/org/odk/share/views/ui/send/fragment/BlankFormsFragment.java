@@ -38,6 +38,7 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import timber.log.Timber;
 
 import static org.odk.share.views.ui.instance.fragment.ReviewedInstancesFragment.MODE;
 
@@ -73,7 +74,7 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
 
     private FormsAdapter formAdapter;
     private LinkedHashSet<Long> selectedForms;
-
+    private static final String SELECTED_FORMS = "SelectedForms";
 
     public BlankFormsFragment() {
     }
@@ -90,6 +91,9 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
         llm.setOrientation(RecyclerView.VERTICAL);
         recyclerView.setLayoutManager(llm);
         addListItemDivider();
+        if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_FORMS)) {
+            selectedForms = (LinkedHashSet<Long>) savedInstanceState.getSerializable(SELECTED_FORMS);
+        }
         return view;
     }
 
@@ -121,6 +125,12 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
         } else {
             setEmptyViewVisibility(0);
         }
+        try {
+            sendButton.setEnabled(selectedForms.size() > 0);
+            toggleButtonLabel();
+        } catch (Exception e) {
+            Timber.e(e);
+        }
     }
 
 
@@ -140,8 +150,14 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
         }
 
         sendButton.setEnabled(selectedForms.size() > 0);
-
         toggleButtonLabel();
+    }
+
+    @Override
+    public void onSaveInstanceState(final Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putSerializable(SELECTED_FORMS, selectedForms);
     }
 
     private void setEmptyViewVisibility(int len) {
