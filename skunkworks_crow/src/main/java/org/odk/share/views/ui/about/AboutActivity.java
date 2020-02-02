@@ -8,7 +8,6 @@ import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.browser.customtabs.CustomTabsIntent;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,8 +24,7 @@ public class AboutActivity extends AppCompatActivity implements OnItemClickListe
 
     private static final String LICENSES_HTML_PATH = "file:///android_asset/open_source_licenses.html";
     private static final String USER_GUIDE_HTML_PATH = "file:///android_asset/user_guide.html";
-    static final String url = "https://github.com/opendatakit/skunkworks-crow/blob/master/README.md";
-
+    private static final String SKUNKWORKS_CROW_README_URL = "https://github.com/opendatakit/skunkworks-crow/blob/master/README.md";
 
     @BindView(R.id.recyclerview)
     RecyclerView recyclerView;
@@ -34,6 +32,7 @@ public class AboutActivity extends AppCompatActivity implements OnItemClickListe
     Toolbar toolbar;
 
     private AboutAdapter adapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,16 +57,13 @@ public class AboutActivity extends AppCompatActivity implements OnItemClickListe
         recyclerView.setAdapter(adapter);
     }
 
-    @Override
+            @Override
     public void onItemClick(View view, int position) {
         if (position == 0) {
-            CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
 
-            builder.setToolbarColor(ContextCompat.getColor(this, R.color.colorPrimary));
-            builder.addDefaultShareMenuItem();
-
-            CustomTabsIntent customTabsIntent = builder.build();
-            customTabsIntent.launchUrl(this, Uri.parse(url));
+            new CustomTabsIntent.Builder()
+                    .build()
+                    .launchUrl(this, Uri.parse(SKUNKWORKS_CROW_README_URL));
         } else if (position == 1) {
             Intent intent = new Intent(this, WebViewActivity.class);
             intent.putExtra(OPEN_URL, LICENSES_HTML_PATH);
@@ -80,6 +76,4 @@ public class AboutActivity extends AppCompatActivity implements OnItemClickListe
             startActivity(intent);
         }
     }
-
-
 }
