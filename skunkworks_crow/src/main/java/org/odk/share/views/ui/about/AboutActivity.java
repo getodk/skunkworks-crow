@@ -1,11 +1,14 @@
 package org.odk.share.views.ui.about;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.browser.customtabs.CustomTabsIntent;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -22,6 +25,8 @@ public class AboutActivity extends AppCompatActivity implements OnItemClickListe
 
     private static final String LICENSES_HTML_PATH = "file:///android_asset/open_source_licenses.html";
     private static final String USER_GUIDE_HTML_PATH = "file:///android_asset/user_guide.html";
+    static final String url = "https://github.com/opendatakit/skunkworks-crow/blob/master/README.md";
+
 
     @BindView(R.id.recyclerview)
     RecyclerView recyclerView;
@@ -47,6 +52,7 @@ public class AboutActivity extends AppCompatActivity implements OnItemClickListe
         llm.setOrientation(RecyclerView.VERTICAL);
         recyclerView.setLayoutManager(llm);
         adapter = new AboutAdapter(this, this);
+        adapter.addItem(new AboutItem(R.string.app_information, R.drawable.ic_stars));
         adapter.addItem(new AboutItem(R.string.open_source_licenses, R.drawable.ic_stars));
         adapter.addItem(new AboutItem(R.string.user_guide, R.drawable.ic_stars));
         recyclerView.setAdapter(adapter);
@@ -55,15 +61,25 @@ public class AboutActivity extends AppCompatActivity implements OnItemClickListe
     @Override
     public void onItemClick(View view, int position) {
         if (position == 0) {
+            CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+
+            builder.setToolbarColor(ContextCompat.getColor(this, R.color.colorPrimary));
+            builder.addDefaultShareMenuItem();
+
+            CustomTabsIntent customTabsIntent = builder.build();
+            customTabsIntent.launchUrl(this, Uri.parse(url));
+        } else if (position == 1) {
             Intent intent = new Intent(this, WebViewActivity.class);
             intent.putExtra(OPEN_URL, LICENSES_HTML_PATH);
             intent.putExtra(TITLE, getString(R.string.open_source_licenses));
             startActivity(intent);
-        } else if (position == 1) {
+        } else if (position == 2)  {
             Intent intent = new Intent(this, WebViewActivity.class);
             intent.putExtra(OPEN_URL, USER_GUIDE_HTML_PATH);
             intent.putExtra(TITLE, getString(R.string.user_guide));
             startActivity(intent);
         }
     }
+
+
 }
