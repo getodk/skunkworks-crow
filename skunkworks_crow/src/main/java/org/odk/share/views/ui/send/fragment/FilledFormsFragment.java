@@ -91,6 +91,8 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
     @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        instanceAdapter = new InstanceAdapter(getActivity(), null, this::onListItemClick, selectedInstances);
+        recyclerView.setAdapter(instanceAdapter);
         return instancesDao.getSavedInstancesCursorLoader(getFilterText(), getSortingOrder());
     }
 
@@ -98,8 +100,7 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
         if (cursor != null) {
             cursor.moveToFirst();
-            instanceAdapter = new InstanceAdapter(getActivity(), cursor, this::onListItemClick, selectedInstances);
-            recyclerView.setAdapter(instanceAdapter);
+            instanceAdapter.setCursor(cursor);
             setEmptyViewVisibility(cursor.getCount());
             if (instanceAdapter.getItemCount() > 0) {
                 toggleButton.setText(getString(R.string.select_all));
@@ -112,9 +113,10 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
         }
     }
 
-
     @Override
-    public void onLoaderReset(@NonNull Loader loader) { }
+    public void onLoaderReset(@NonNull Loader loader) {
+        instanceAdapter.setCursor(null);
+    }
 
     private void onListItemClick(View view, int position) {
         Cursor cursor = instanceAdapter.getCursor();
