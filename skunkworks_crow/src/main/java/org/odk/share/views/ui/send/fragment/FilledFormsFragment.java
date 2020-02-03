@@ -114,7 +114,9 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
     }
 
     @Override
-    public void onLoaderReset(@NonNull Loader loader) { }
+    public void onLoaderReset(@NonNull Loader loader) {
+        instanceAdapter.setCursor(null);
+    }
 
     private void onListItemClick(View view, int position) {
         Cursor cursor = instanceAdapter.getCursor();

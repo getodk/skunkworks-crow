@@ -125,7 +125,9 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
 
 
     @Override
-    public void onLoaderReset(@NonNull Loader loader) { }
+    public void onLoaderReset(@NonNull Loader loader) {
+        formAdapter.swapCursor(null);
+    }
 
     @Override
     public void onItemClick(BaseCursorViewHolder holder, int position) {
