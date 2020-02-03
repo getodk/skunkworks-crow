@@ -2,11 +2,12 @@ package org.odk.share.activities;
 
 import android.bluetooth.BluetoothAdapter;
 import android.content.SharedPreferences;
-import android.preference.CheckBoxPreference;
+import android.os.Build;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
+import android.preference.SwitchPreference;
 
 import androidx.appcompat.widget.Toolbar;
 
@@ -31,10 +32,10 @@ public class SettingsActivityTest {
     private SettingsActivity settingsActivity;
     private SharedPreferences prefs;
     private Preference hotspotPasswordPreference;
-    private CheckBoxPreference passwordRequirePreference;
+    private SwitchPreference passwordRequirePreference;
     private EditTextPreference hotspotNamePreference;
     private EditTextPreference odkDestinationDirPreference;
-    private CheckBoxPreference btSecureModePreference;
+    private SwitchPreference btSecureModePreference;
     private ListPreference defaultMethodPreference;
     private EditTextPreference bluetoothNamePreference;
 
@@ -96,7 +97,7 @@ public class SettingsActivityTest {
 
         //test the summary
         assertEquals(prefs.getString(PreferenceKeys.KEY_HOTSPOT_NAME,
-                settingsActivity.getString(R.string.default_hotspot_ssid)), hotspotNamePreference.getSummary());
+                settingsActivity.getString(R.string.app_name) + settingsActivity.getString(R.string.one_space) + Build.MODEL), hotspotNamePreference.getSummary());
 
         assertEquals(prefs.getString(PreferenceKeys.KEY_ODK_DESTINATION_DIR,
                 settingsActivity.getString(R.string.default_odk_destination_dir)), odkDestinationDirPreference.getSummary());
@@ -110,9 +111,9 @@ public class SettingsActivityTest {
      */
     @Test
     public void preferenceStatusTest() {
-        btSecureModePreference = (CheckBoxPreference) settingsActivity.findPreference(PreferenceKeys.KEY_BLUETOOTH_SECURE_MODE);
+        btSecureModePreference = (SwitchPreference) settingsActivity.findPreference(PreferenceKeys.KEY_BLUETOOTH_SECURE_MODE);
         hotspotPasswordPreference = settingsActivity.findPreference(PreferenceKeys.KEY_HOTSPOT_PASSWORD);
-        passwordRequirePreference = (CheckBoxPreference) settingsActivity.findPreference(PreferenceKeys.KEY_HOTSPOT_PWD_REQUIRE);
+        passwordRequirePreference = (SwitchPreference) settingsActivity.findPreference(PreferenceKeys.KEY_HOTSPOT_PWD_REQUIRE);
 
         hotspotPasswordPreference.setEnabled(false);
         assertFalse(hotspotPasswordPreference.isEnabled());
