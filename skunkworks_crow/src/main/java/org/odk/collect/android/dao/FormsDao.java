@@ -29,7 +29,6 @@ import org.odk.collect.android.provider.FormsProviderAPI;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class FormsDao {
 
     private Context context;

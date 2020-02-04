@@ -1,6 +1,5 @@
 package org.odk.share.injection.config.scopes;
 
-
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 

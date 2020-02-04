@@ -2,7 +2,6 @@ package org.odk.share.rx.schedulers;
 
 import io.reactivex.Scheduler;
 
-
 /**
  * Allow providing different types of {@link Scheduler}s.
  */

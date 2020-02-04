@@ -1,6 +1,5 @@
 package org.odk.share.rx;
 
-
 import com.jakewharton.rxrelay2.PublishRelay;
 import com.jakewharton.rxrelay2.Relay;
 
@@ -34,7 +33,6 @@ public class RxEventBus {
                 .filter(event -> event.getClass().equals(eventClass))
                 .map(obj -> (T) obj);
     }
-
 
     /**
      * Sends an event to all the observers who have registered to receive the event type.

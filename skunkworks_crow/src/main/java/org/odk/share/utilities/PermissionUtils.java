@@ -1,6 +1,5 @@
 package org.odk.share.utilities;
 
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;

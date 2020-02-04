@@ -104,8 +104,6 @@ public class InstanceAdapter extends RecyclerView.Adapter<InstanceAdapter.Instan
         return !cursor.isClosed() ? cursor.getCount() : 0;
     }
 
-
-
     public Cursor getCursor() {
         return cursor;
     }

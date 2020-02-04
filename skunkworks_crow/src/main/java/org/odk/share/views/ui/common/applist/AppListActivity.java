@@ -41,7 +41,6 @@ import timber.log.Timber;
 
 import static org.odk.share.utilities.ApplicationConstants.SortingOrder.BY_NAME_ASC;
 
-
 public abstract class AppListActivity extends InjectableActivity {
 
     private static final String SELECTED_INSTANCES = "selectedInstances";

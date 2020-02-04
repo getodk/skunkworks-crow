@@ -94,7 +94,6 @@ public class InstancesList extends InstanceListActivity implements LoaderManager
         }
     }
 
-
     @Override
     public void onLoaderReset(@NonNull Loader loader) {
     }
