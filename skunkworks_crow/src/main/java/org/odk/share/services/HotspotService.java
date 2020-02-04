@@ -43,7 +43,6 @@ import javax.inject.Inject;
 
 import io.reactivex.disposables.CompositeDisposable;
 
-
 public class HotspotService extends Service {
 
     public static final String ACTION_START = "hotspot_start";

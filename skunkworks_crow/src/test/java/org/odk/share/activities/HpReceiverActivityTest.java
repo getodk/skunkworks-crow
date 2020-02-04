@@ -1,6 +1,5 @@
 package org.odk.share.activities;
 
-
 import androidx.appcompat.widget.Toolbar;
 
 import org.junit.Before;

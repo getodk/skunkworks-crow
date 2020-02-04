@@ -84,7 +84,6 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
 
     private FormsAdapter formAdapter;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

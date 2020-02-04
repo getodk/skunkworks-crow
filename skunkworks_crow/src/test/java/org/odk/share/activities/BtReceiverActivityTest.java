@@ -1,6 +1,5 @@
 package org.odk.share.activities;
 
-
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;

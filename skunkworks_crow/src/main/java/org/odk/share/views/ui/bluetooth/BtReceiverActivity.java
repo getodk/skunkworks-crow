@@ -1,6 +1,5 @@
 package org.odk.share.views.ui.bluetooth;
 
-
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;

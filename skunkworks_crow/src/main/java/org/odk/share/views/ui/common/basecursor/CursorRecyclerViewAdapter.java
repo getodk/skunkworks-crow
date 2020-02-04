@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.odk.share.views.listeners.ItemClickListener;
 
-
 public abstract class CursorRecyclerViewAdapter<T extends BaseCursorViewHolder> extends RecyclerView.Adapter<T> {
 
     protected Context context;

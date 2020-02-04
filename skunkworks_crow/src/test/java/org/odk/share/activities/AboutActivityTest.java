@@ -1,6 +1,5 @@
 package org.odk.share.activities;
 
-
 import android.content.Intent;
 import android.view.View;
 

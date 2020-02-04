@@ -112,7 +112,6 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
         }
     }
 
-
     @Override
     public void onLoaderReset(@NonNull Loader loader) { }
 

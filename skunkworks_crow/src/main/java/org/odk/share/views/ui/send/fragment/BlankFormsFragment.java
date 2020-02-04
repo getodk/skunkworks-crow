@@ -1,5 +1,3 @@
-
-
 package org.odk.share.views.ui.send.fragment;
 
 import android.content.Intent;
@@ -74,7 +72,6 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
     private FormsAdapter formAdapter;
     private LinkedHashSet<Long> selectedForms;
 
-
     public BlankFormsFragment() { }
 
     @Override
@@ -121,7 +118,6 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
             setEmptyViewVisibility(0);
         }
     }
-
 
     @Override
     public void onLoaderReset(@NonNull Loader loader) { }

@@ -1,6 +1,5 @@
 package org.odk.share.rx;
 
-
 import com.jakewharton.rxrelay2.PublishRelay;
 import com.jakewharton.rxrelay2.Relay;
 

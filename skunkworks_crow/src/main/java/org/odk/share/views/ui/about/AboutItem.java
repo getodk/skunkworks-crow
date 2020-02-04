@@ -1,6 +1,5 @@
 package org.odk.share.views.ui.about;
 
-
 import androidx.annotation.DrawableRes;
 import androidx.annotation.StringRes;
 

@@ -1,6 +1,5 @@
 package org.odk.share.views.ui.main;
 
-
 import org.odk.collect.android.provider.FormsProviderAPI;
 import org.odk.share.views.ui.common.applist.AppListActivity;
 

@@ -1,6 +1,5 @@
 package org.odk.share.injection.config;
 
-
 import android.app.Application;
 import android.content.Context;
 
