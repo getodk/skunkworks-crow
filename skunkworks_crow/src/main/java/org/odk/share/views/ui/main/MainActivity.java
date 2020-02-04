@@ -107,6 +107,15 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
         addListItemDivider();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        //update the list
+        if (formAdapter != null) {
+            formAdapter.notifyDataSetChanged();
+        }
+    }
+
     private void setupAdapter() {
         formAdapter = new FormsAdapter(this, null, this, instancesDao, transferDao);
         recyclerView.setAdapter(formAdapter);
