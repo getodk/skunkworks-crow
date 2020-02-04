@@ -23,7 +23,6 @@ import butterknife.ButterKnife;
 import static android.bluetooth.BluetoothDevice.BOND_BONDED;
 import static android.bluetooth.BluetoothDevice.BOND_NONE;
 
-
 /**
  * BluetoothListAdapter: {@link RecyclerView.Adapter} for {@link BluetoothDevice}.
  *

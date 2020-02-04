@@ -29,7 +29,6 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import org.odk.share.R;
 
-
 /**
  * Created by laksh on 5/27/2018.
  */

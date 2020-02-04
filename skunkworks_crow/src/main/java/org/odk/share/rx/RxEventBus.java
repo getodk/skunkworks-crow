@@ -34,7 +34,6 @@ public class RxEventBus {
                 .map(obj -> (T) obj);
     }
 
-
     /**
      * Sends an event to all the observers who have registered to receive the event type.
      *

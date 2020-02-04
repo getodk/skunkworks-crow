@@ -72,7 +72,8 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
     private FormsAdapter formAdapter;
     private LinkedHashSet<Long> selectedForms;
 
-    public BlankFormsFragment() { }
+    public BlankFormsFragment() {
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

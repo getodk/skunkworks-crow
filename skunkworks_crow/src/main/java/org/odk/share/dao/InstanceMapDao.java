@@ -12,7 +12,6 @@ import static org.odk.share.dto.InstanceMap.INSTANCE_ID;
 import static org.odk.share.dto.InstanceMap.INSTANCE_UUID;
 import static org.odk.share.provider.InstanceMapProvider.CONTENT_URI;
 
-
 /**
  * Created by laksh on 8/2/2018.
  */
