@@ -1,11 +1,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     style="@style/MatchParent"
-    android:layout_marginLeft="0dp"
-    android:layout_marginTop="0dp"
-    android:layout_marginRight="0dp"
-    android:layout_marginBottom="0dp"
+    android:layout_margin="@dimen/webView_root_layout_margin"
     android:orientation="vertical"
-    android:padding="0dp">
+    android:padding="@dimen/webView_root_layout_padding">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"

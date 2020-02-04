@@ -85,7 +85,7 @@ public class FormsDao {
             cursorLoader = getFormsCursorLoader(sortOrder, newestByFormId);
         } else {
             String selection = FormsProviderAPI.FormsColumns.DISPLAY_NAME + " LIKE ?";
-            String[] selectionArgs = new String[]{"%" + charSequence + "%"};
+            String[] selectionArgs = {"%" + charSequence + "%"};
 
             cursorLoader = getFormsCursorLoader(selection, selectionArgs, sortOrder, newestByFormId);
         }

@@ -1,12 +1,12 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     style="@style/MatchParentWidth"
     android:orientation="horizontal"
-    android:padding="10dp">
+    android:padding="@dimen/root_layout_padding">
 
     <ImageView
         android:id="@+id/ivIcon"
         style="@style/WrapContent"
-        android:layout_margin="10dp"
+        android:layout_margin="@dimen/image_view_margin"
         android:src="@drawable/ic_stars" />
 
     <TextView

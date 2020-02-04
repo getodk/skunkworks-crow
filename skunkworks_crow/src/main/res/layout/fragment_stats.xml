@@ -5,7 +5,7 @@
     <LinearLayout
         style="@style/MatchParentWidth"
         android:orientation="vertical"
-        android:padding="10dp">
+        android:padding="@dimen/linear_layout_padding">
 
         <View
             style="@style/MatchParentWidth"
@@ -16,9 +16,9 @@
             style="@style/WrapContent"
             android:layout_gravity="center"
             android:gravity="center"
-            android:paddingTop="10dp"
+            android:paddingTop="@dimen/text_view_padding_top"
             android:textColor="@color/colorPrimary"
-            android:textSize="21sp"
+            android:textSize="@dimen/text_view_primary_text_size"
             android:textStyle="bold" />
 
         <TextView
@@ -26,14 +26,14 @@
             style="@style/WrapContent"
             android:layout_gravity="center"
             android:gravity="center"
-            android:paddingBottom="20dp"
+            android:paddingBottom="@dimen/text_view_padding_bottom"
             android:textColor="@color/colorPrimary"
-            android:textSize="18sp" />
+            android:textSize="@dimen/text_view_secondary_text_size" />
 
         <com.github.mikephil.charting.charts.BarChart
             android:id="@+id/chart"
-            android:layout_width="362dp"
-            android:layout_height="184dp"
+            android:layout_width="@dimen/bar_chart_width"
+            android:layout_height="@dimen/bar_chart_height"
             android:layout_gravity="center" />
 
         <View

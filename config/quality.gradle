@@ -21,7 +21,7 @@ def reportsDir = "${project.buildDir}/reports"
 
 apply plugin: 'checkstyle'
 
-checkstyle.toolVersion = '7.6.1'
+checkstyle.toolVersion = '8.28'
 
 task checkstyle(type: Checkstyle) {
     configFile file("$configDir/checkstyle.xml")
@@ -71,6 +71,10 @@ task findbugs(type: FindBugs, dependsOn: "assembleDebug") {
 //------------------------Pmd------------------------//
 
 apply plugin: 'pmd'
+
+pmd {
+    toolVersion = '6.20.0'
+}
 
 task pmd(type: Pmd) {
     ignoreFailures = false // Fail early

@@ -9,10 +9,10 @@
         android:id="@+id/tvConnectStatus"
         style="@style/MatchParentWidth"
         android:layout_below="@id/toolbar"
-        android:layout_margin="10dp"
+        android:layout_margin="@dimen/text_view_margin"
         android:gravity="center"
         android:text="@string/waiting_hotspot"
-        android:textSize="20sp" />
+        android:textSize="@dimen/text_view_primary_text_size" />
 
     <ImageView
         android:id="@+id/ivQRcode"
@@ -25,8 +25,8 @@
         android:id="@+id/tvConnectInfo"
         style="@style/MatchParentWidth"
         android:layout_alignParentBottom="true"
-        android:layout_margin="10dp"
+        android:layout_margin="@dimen/text_view_margin"
         android:gravity="center"
-        android:paddingBottom="20dp"
-        android:textSize="16sp" />
+        android:paddingBottom="@dimen/text_view_padding_bottom"
+        android:textSize="@dimen/text_view_secondary_text_size" />
 </RelativeLayout>

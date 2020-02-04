@@ -6,8 +6,8 @@
     android:layout_height="?attr/actionBarSize"
     android:background="?attr/colorPrimary"
     android:minHeight="?attr/actionBarSize"
-    app:contentInsetEnd="0dp"
-    app:contentInsetStart="12dp"
-    app:contentInsetStartWithNavigation="0dp"
+    app:contentInsetEnd="@dimen/content_inset_end"
+    app:contentInsetStart="@dimen/content_inset_start"
+    app:contentInsetStartWithNavigation="@dimen/content_inset_start_with_navigation"
     app:titleTextColor="@android:color/white"
     app:theme="@style/AppTheme.ActionBar" />
