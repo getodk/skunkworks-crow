@@ -51,7 +51,7 @@ public class Share extends DaggerApplication {
      *
      * @throws RuntimeException if there is no SDCard or the directory exists as a non directory
      */
-    public static void createODKDirs(Context context) throws RuntimeException {
+    public static void createODKDirs(Context context) {
         String cardstatus = Environment.getExternalStorageState();
 
         if (!cardstatus.equals(Environment.MEDIA_MOUNTED)) {

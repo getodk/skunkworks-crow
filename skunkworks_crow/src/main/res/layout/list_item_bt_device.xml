@@ -9,9 +9,9 @@
 
     <ImageView
         android:id="@+id/iv_device"
-        android:layout_width="72dp"
-        android:layout_height="72dp"
-        android:padding="12dp"
+        android:layout_width="@dimen/element_image_view_width"
+        android:layout_height="@dimen/element_image_view_height"
+        android:padding="@dimen/image_view_padding"
         android:src="@drawable/ic_smart_phone_black" />
 
     <LinearLayout
@@ -21,23 +21,23 @@
         <TextView
             android:id="@+id/tv_device_name"
             style="@style/MatchParentWidth"
-            android:layout_marginStart="6dp"
-            android:layout_marginLeft="6dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="4dp"
+            android:layout_marginStart="@dimen/text_view_margin_start"
+            android:layout_marginLeft="@dimen/text_view_secondary_margin_left"
+            android:layout_marginTop="@dimen/text_view_margin_top_minimal"
+            android:layout_marginBottom="@dimen/text_view_margin_bottom_minimal"
             android:gravity="center_vertical"
             android:text="@string/bluetooth_instance_name_default"
-            android:textSize="16sp" />
+            android:textSize="@dimen/text_view_secondary_text_size" />
 
         <TextView
             android:id="@+id/tv_device_address"
             style="@style/MatchParent"
-            android:layout_marginStart="6dp"
-            android:layout_marginLeft="6dp"
-            android:layout_marginTop="2dp"
-            android:layout_marginBottom="2dp"
+            android:layout_marginStart="@dimen/text_view_secondary_margin_start"
+            android:layout_marginLeft="@dimen/text_view_secondary_margin_left"
+            android:layout_marginTop="@dimen/text_view_secondary_margin_top"
+            android:layout_marginBottom="@dimen/text_view_secondary_margin_bottom"
             android:gravity="center_vertical"
-            android:textSize="12sp"
+            android:textSize="@dimen/text_view_minimal_text_size"
             tools:text="default device address" />
     </LinearLayout>
 </LinearLayout>

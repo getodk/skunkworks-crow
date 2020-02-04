@@ -15,7 +15,7 @@
         <LinearLayout
             style="@style/MatchParentWidth"
             android:orientation="vertical"
-            android:padding="10dp">
+            android:padding="@dimen/linear_layout_padding">
 
             <View
                 style="@style/MatchParentWidth"
@@ -27,10 +27,10 @@
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:lineSpacingMultiplier="1.2"
-                android:paddingTop="10dp"
-                android:paddingBottom="20dp"
+                android:paddingTop="@dimen/text_view_padding_top"
+                android:paddingBottom="@dimen/text_view_padding_bottom"
                 android:textColor="@color/colorPrimary"
-                android:textSize="21sp"
+                android:textSize="@dimen/text_view_primary_text_size"
                 android:textStyle="bold" />
 
             <com.google.android.material.textfield.TextInputLayout
@@ -42,7 +42,7 @@
                     style="@style/MatchParentWidth"
                     android:hint="@string/add_feedback"
                     android:inputType="text"
-                    android:textSize="18sp"
+                    android:textSize="@dimen/edit_text_text_size"
                     tools:ignore="Autofill" />
 
             </com.google.android.material.textfield.TextInputLayout>

@@ -9,8 +9,8 @@
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         android:gravity="center"
-        android:padding="10dp"
-        android:textSize="22sp" />
+        android:padding="@dimen/text_view_padding"
+        android:textSize="@dimen/text_view_primary_text_size" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerview"

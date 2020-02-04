@@ -1,6 +1,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     style="@style/MatchParentWidth"
-    android:padding="10dp">
+    android:padding="@dimen/linear_layout_padding">
 
     <TextView
         android:id="@+id/tvTitle"

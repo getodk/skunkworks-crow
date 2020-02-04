@@ -558,7 +558,7 @@ public class UploadJob extends Job {
         File[] allFiles = instanceFile.getParentFile().listFiles();
 
         // add media files
-        List<File> files = new ArrayList<File>();
+        List<File> files = new ArrayList<>();
         files.add(instanceFile);
         if (allFiles != null) {
             for (File f : allFiles) {

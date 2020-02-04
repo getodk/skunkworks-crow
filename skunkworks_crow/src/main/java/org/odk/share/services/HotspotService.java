@@ -51,7 +51,7 @@ public class HotspotService extends Service {
     public static final String ACTION_STATUS = "hotspot_status";
     private static final int notify_stop = 5000;
     private static final int notify_start = 1000;
-    private static final int HOTSPOT_NOTIFICATION_ID = 34567;
+    private static final int HOTSPOT_NOTIFICATION_ID = 34_567;
     private static final int START = 1;
     private static final int STATUS = 2;
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
