@@ -25,6 +25,7 @@ import static android.bluetooth.BluetoothDevice.BOND_BONDED;
 import static android.bluetooth.BluetoothDevice.BOND_NONE;
 
 /**
+ * //llllll
  * BluetoothListAdapter: {@link RecyclerView.Adapter} for {@link BluetoothDevice}.
  *
  * @author huangyz0918 (huangyz0918@gmail.com)
