@@ -34,7 +34,6 @@ public class BluetoothListAdapter extends RecyclerView.Adapter<BluetoothListAdap
 
     private List<BluetoothDevice> bluetoothDeviceList;
     private OnDeviceClickListener btDeviceClickListener;
-    ProgressBar progressBar;
 
     public BluetoothListAdapter(OnDeviceClickListener btDeviceClickListener) {
         this.btDeviceClickListener = btDeviceClickListener;
