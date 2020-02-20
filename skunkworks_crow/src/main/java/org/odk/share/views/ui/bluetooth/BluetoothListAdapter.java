@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -33,6 +34,7 @@ public class BluetoothListAdapter extends RecyclerView.Adapter<BluetoothListAdap
 
     private List<BluetoothDevice> bluetoothDeviceList;
     private OnDeviceClickListener btDeviceClickListener;
+    ProgressBar progressBar;
 
     public BluetoothListAdapter(OnDeviceClickListener btDeviceClickListener) {
         this.btDeviceClickListener = btDeviceClickListener;
@@ -73,7 +75,12 @@ public class BluetoothListAdapter extends RecyclerView.Adapter<BluetoothListAdap
         if (deviceBondState == BOND_BONDED) {
             viewHolder.deviceLogo.setImageResource(R.drawable.ic_smart_phone_yellow);
         }
+
+
     }
+
+
+
 
     @Override
     public int getItemCount() {

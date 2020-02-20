@@ -8,6 +8,31 @@
     <!-- Toolbar -->
     <include layout="@layout/toolbar" />
 
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        android:layout_marginTop="?attr/actionBarSize">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Available Device"
+            android:textSize="20sp"/>
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="25dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+
+
+            />
+    </RelativeLayout>
+
+
+
     <LinearLayout
         android:id="@+id/no_devices_view"
         style="@style/MatchParent"
@@ -31,10 +56,13 @@
 
     </LinearLayout>
 
+
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/list_bt_device"
         style="@style/MatchParent"
         android:layout_above="@id/btn_refresh"
+        android:layout_marginTop="45dp"
         android:layout_below="@id/toolbar" />
 
     <Button

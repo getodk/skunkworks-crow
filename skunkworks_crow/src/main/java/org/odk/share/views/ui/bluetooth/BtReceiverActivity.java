@@ -103,7 +103,7 @@ public class BtReceiverActivity extends InjectableActivity implements
         }
 
         initEvents();
-        setupDialogs();
+       // setupDialogs();
     }
 
     /**
@@ -281,14 +281,14 @@ public class BtReceiverActivity extends InjectableActivity implements
 
     @Override
     public void onDiscoveryStarted() {
-        scanningDialog.show();
+       // scanningDialog.show();
         checkEmptyList();
         bluetoothListAdapter.clearBluetoothDeviceList();
     }
 
     @Override
     public void onDiscoveryFinished() {
-        scanningDialog.dismiss();
+       // scanningDialog.dismiss();
         checkEmptyList();
     }
 
