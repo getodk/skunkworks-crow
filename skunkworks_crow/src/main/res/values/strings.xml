@@ -45,8 +45,6 @@
     <string name="set_password">Set Password</string>
     <string name="secure_mode">Enable Secure Mode</string>
     <string name="password_hotspot">Password required to connect with hotspot</string>
-    <string name="hotspot_name_error">Hotspot name should not be empty</string>
-    <string name="bluetooth_name_error">Bluetooth name should not be empty</string>
     <string name="hotspot_password_error">Password length should be atleast 8 characters long</string>
     <string name="waiting_connection">Waiting for connection to accept</string>
     <string name="waiting_hotspot">Waiting for hotspot to connect</string>
@@ -141,7 +139,6 @@
 
     <string name="default_odk_destination_dir">\/sdcard\/odk</string>
     <string name="title_odk_destination_dir">ODK Destination Directory</string>
-    <string name="odk_destination_dir_error">The destination should not be empty</string>
     <string name="location_permission_needed">Location Permission Needed</string>
     <string name="location_settings_dialog">Enable location from the settings.</string>
 
@@ -184,4 +181,6 @@
     <string name="finalized_on_date_at_time">\'Finalized on\' EEE, MMM dd, yyyy \'at\' HH:mm</string> <!-- http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html -->
     <string name="sent_on_date_at_time">\'Sent on\' EEE, MMM dd, yyyy \'at\' HH:mm</string> <!-- http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html -->
     <string name="sending_failed_on_date_at_time">\'Sending failed on\' EEE, MMM dd, yyyy \'at\' HH:mm</string> <!-- http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html -->
+
+    <string name="one_space">\u0020</string>
 </resources>

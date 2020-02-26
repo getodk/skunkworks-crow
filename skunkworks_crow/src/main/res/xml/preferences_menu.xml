@@ -23,10 +23,8 @@
     <PreferenceCategory android:title="Hotspot Settings">
 
         <EditTextPreference
-            android:defaultValue="@string/default_hotspot_ssid"
             android:icon="@drawable/ic_wifi_tethering_black_24dp"
             android:key="hotspot_name"
-            android:summary="@string/default_hotspot_ssid"
             android:title="@string/title_hotspot_ssid" />
 
         <Preference
@@ -37,7 +35,7 @@
             android:summary="********"
             android:title="@string/title_hotspot_password" />
 
-        <CheckBoxPreference
+        <SwitchPreference
             android:defaultValue="false"
             android:icon="@drawable/ic_lock_black_24dp"
             android:key="hotspot_pwd_require"
@@ -53,7 +51,7 @@
             android:key="bluetooth_name"
             android:title="@string/title_bluetooth_name" />
 
-        <CheckBoxPreference
+        <SwitchPreference
             android:defaultValue="true"
             android:icon="@drawable/ic_security_black_24dp"
             android:key="bluetooth_secure_mode"

@@ -1,16 +1,17 @@
 package org.odk.share.views.ui.settings;
 
+import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+import android.preference.SwitchPreference;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -19,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -38,8 +40,8 @@ public class SettingsActivity extends PreferenceActivity {
     EditTextPreference hotspotNamePreference;
     EditTextPreference bluetoothNamePreference;
     Preference hotspotPasswordPreference;
-    CheckBoxPreference passwordRequirePreference;
-    CheckBoxPreference btSecureModePreference;
+    SwitchPreference passwordRequirePreference;
+    SwitchPreference btSecureModePreference;
     EditTextPreference odkDestinationDirPreference;
     ListPreference defaultMethodPreference;
     private SharedPreferences prefs;
@@ -71,16 +73,20 @@ public class SettingsActivity extends PreferenceActivity {
         hotspotNamePreference = (EditTextPreference) findPreference(PreferenceKeys.KEY_HOTSPOT_NAME);
         bluetoothNamePreference = (EditTextPreference) findPreference(PreferenceKeys.KEY_BLUETOOTH_NAME);
         hotspotPasswordPreference = findPreference(PreferenceKeys.KEY_HOTSPOT_PASSWORD);
-        passwordRequirePreference = (CheckBoxPreference) findPreference(PreferenceKeys.KEY_HOTSPOT_PWD_REQUIRE);
-        btSecureModePreference = (CheckBoxPreference) findPreference(PreferenceKeys.KEY_BLUETOOTH_SECURE_MODE);
+        passwordRequirePreference = (SwitchPreference) findPreference(PreferenceKeys.KEY_HOTSPOT_PWD_REQUIRE);
+        btSecureModePreference = (SwitchPreference) findPreference(PreferenceKeys.KEY_BLUETOOTH_SECURE_MODE);
         odkDestinationDirPreference = (EditTextPreference) findPreference(PreferenceKeys.KEY_ODK_DESTINATION_DIR);
 
         prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
         defaultMethodPreference.setSummary(prefs.getString(PreferenceKeys.KEY_DEFAULT_TRANSFER_METHOD,
                 getString(R.string.default_hotspot_ssid)));
-        hotspotNamePreference.setSummary(prefs.getString(PreferenceKeys.KEY_HOTSPOT_NAME,
-                getString(R.string.default_hotspot_ssid)));
+
+        String defaultHotspotName = getString(R.string.app_name) + getString(R.string.one_space) + Build.MODEL;
+        hotspotNamePreference.setSummary(prefs.getString(PreferenceKeys.KEY_HOTSPOT_NAME, defaultHotspotName));
+        hotspotNamePreference.setDefaultValue(defaultHotspotName);
+        hotspotNamePreference.setText(prefs.getString(PreferenceKeys.KEY_HOTSPOT_NAME, defaultHotspotName));
+
         String defaultBluetoothName = BluetoothAdapter.getDefaultAdapter().getName();
         bluetoothNamePreference.setText(defaultBluetoothName);
         bluetoothNamePreference.setDefaultValue(defaultBluetoothName);
@@ -102,6 +108,10 @@ public class SettingsActivity extends PreferenceActivity {
         defaultMethodPreference.setOnPreferenceChangeListener(preferenceChangeListener());
 
         hotspotPasswordPreference.setOnPreferenceClickListener(preferenceClickListener());
+
+        checkNullEditTextPreference(odkDestinationDirPreference);
+        checkNullEditTextPreference(hotspotNamePreference);
+        checkNullEditTextPreference(bluetoothNamePreference);
     }
 
     private Preference.OnPreferenceClickListener preferenceClickListener() {
@@ -115,28 +125,49 @@ public class SettingsActivity extends PreferenceActivity {
         };
     }
 
+    private void checkNullEditTextPreference(EditTextPreference editTextPreference) {
+        editTextPreference.getEditText().addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                Dialog dlg = editTextPreference.getDialog();
+                if (dlg instanceof android.app.AlertDialog) {
+                    android.app.AlertDialog alertDlg = (android.app.AlertDialog) dlg;
+                    Button positiveButton = alertDlg.getButton(AlertDialog.BUTTON_POSITIVE);
+
+                    if (editTextPreference.getEditText().getText().toString().trim().equals("")) {
+                        positiveButton.setEnabled(false);
+                    } else {
+                        positiveButton.setEnabled(true);
+                    }
+                }
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+    }
+
     private Preference.OnPreferenceChangeListener preferenceChangeListener() {
         return (preference, newValue) -> {
             switch (preference.getKey()) {
                 case PreferenceKeys.KEY_HOTSPOT_NAME:
                     String name = newValue.toString();
-                    if (name.length() == 0) {
-                        Toast.makeText(getBaseContext(), getString(R.string.hotspot_name_error), Toast.LENGTH_LONG).show();
-                        return false;
-                    } else {
-                        hotspotNamePreference.setSummary(name);
-                    }
+                    hotspotNamePreference.setSummary(name);
                     break;
                 case PreferenceKeys.KEY_BLUETOOTH_NAME:
                     String bluetoothName = newValue.toString();
-                    if (bluetoothName.length() == 0) {
-                        Toast.makeText(getBaseContext(), getString(R.string.bluetooth_name_error), Toast.LENGTH_LONG).show();
-                        return false;
-                    } else {
-                        bluetoothNamePreference.setSummary(bluetoothName);
-                        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-                        bluetoothAdapter.setName(bluetoothName);
-                    }
+                    bluetoothNamePreference.setSummary(bluetoothName);
+                    BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+                    bluetoothAdapter.setName(bluetoothName);
                     break;
                 case PreferenceKeys.KEY_HOTSPOT_PASSWORD:
                     String password = newValue.toString();
@@ -155,12 +186,7 @@ public class SettingsActivity extends PreferenceActivity {
                     break;
                 case PreferenceKeys.KEY_ODK_DESTINATION_DIR:
                     String dir = newValue.toString();
-                    if (dir.length() == 0) {
-                        Toast.makeText(getApplicationContext(), getString(R.string.odk_destination_dir_error), Toast.LENGTH_LONG).show();
-                        return false;
-                    } else {
-                        odkDestinationDirPreference.setSummary(dir);
-                    }
+                    odkDestinationDirPreference.setSummary(dir);
                     break;
                 case PreferenceKeys.KEY_DEFAULT_TRANSFER_METHOD:
                     String method = newValue.toString();
@@ -217,16 +243,16 @@ public class SettingsActivity extends PreferenceActivity {
                 edtpass.addTextChangedListener(new TextWatcher() {
                     @Override
                     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                 
+
                     }
 
                     @Override
                     public void onTextChanged(CharSequence s, int start, int before, int count) {
 
                         if (edtpass.getText().toString().length() >= 8) {
-                            ((AlertDialog) dialog) .getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+                            ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
                         } else {
-                            ((AlertDialog) dialog) .getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+                            ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
                         }
                     }
 
