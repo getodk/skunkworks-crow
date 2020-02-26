@@ -101,11 +101,18 @@ public class InstanceAdapter extends RecyclerView.Adapter<InstanceAdapter.Instan
 
     @Override
     public int getItemCount() {
+        if (cursor == null) {
+            return 0;
+        }
         return !cursor.isClosed() ? cursor.getCount() : 0;
     }
 
     public Cursor getCursor() {
         return cursor;
+    }
+
+    public void setCursor(Cursor cursor) {
+        this.cursor = cursor;
     }
 
     public interface OnItemClickListener {

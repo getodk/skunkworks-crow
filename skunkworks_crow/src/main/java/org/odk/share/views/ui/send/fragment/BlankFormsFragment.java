@@ -99,6 +99,8 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
     @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        formAdapter = new FormsAdapter(getActivity(), null, this, selectedForms, instancesDao, transferDao);
+        recyclerView.setAdapter(formAdapter);
         return formsDao.getFormsCursorLoader(getFilterText(), getSortingOrder());
     }
 
@@ -106,8 +108,7 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
         if (cursor != null) {
             cursor.moveToFirst();
-            formAdapter = new FormsAdapter(getActivity(), cursor, this, selectedForms, instancesDao, transferDao);
-            recyclerView.setAdapter(formAdapter);
+            formAdapter.swapCursor(cursor);
             setEmptyViewVisibility(cursor.getCount());
             if (formAdapter.getItemCount() > 0) {
                 toggleButton.setText(getString(R.string.select_all));
@@ -122,6 +123,7 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
 
     @Override
     public void onLoaderReset(@NonNull Loader loader) {
+        formAdapter.swapCursor(null);
     }
 
     @Override
