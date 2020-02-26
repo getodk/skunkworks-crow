@@ -110,7 +110,6 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
     @Override
     public void onResume() {
         super.onResume();
-        //update the list
         if (formAdapter != null) {
             formAdapter.notifyDataSetChanged();
         }
