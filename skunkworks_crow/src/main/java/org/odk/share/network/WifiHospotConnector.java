@@ -75,9 +75,9 @@ public class WifiHospotConnector {
     }
 
     public WifiConfiguration getWifiConfig() {
-        Object obj = null;
+        Object obj;
         try {
-            obj = getWifiApConfig.invoke(wifiManager, obj);
+            obj = getWifiApConfig.invoke(wifiManager);
             if (obj != null) {
                 return (WifiConfiguration) obj;
             }
