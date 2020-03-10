@@ -64,12 +64,7 @@ public class SettingsActivity extends PreferenceActivity {
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    Intent intent = new Intent(SettingsActivity.this, MainActivity.class);
-                    startActivity(intent);
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
+                onBackPressed();
             }
 
         });

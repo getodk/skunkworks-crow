@@ -50,9 +50,6 @@
             android:parentActivityName=".views.ui.main.MainActivity"
 
             >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".views.ui.main.MainActivity" />
         </activity>
         <activity android:name=".views.ui.about.WebViewActivity" />
         <activity
