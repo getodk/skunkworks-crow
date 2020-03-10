@@ -2,6 +2,7 @@ package org.odk.share.views.ui.settings;
 
 import android.bluetooth.BluetoothAdapter;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,19 +22,24 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
 import org.odk.share.R;
+import org.odk.share.views.ui.main.MainActivity;
 
 /**
  * Created by laksh on 5/27/2018.
  */
 
 public class SettingsActivity extends PreferenceActivity {
+
+
 
     EditTextPreference hotspotNamePreference;
     EditTextPreference bluetoothNamePreference;
@@ -48,11 +54,25 @@ public class SettingsActivity extends PreferenceActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         ViewGroup root = getRootView();
         Toolbar toolbar = (Toolbar) View.inflate(this, R.layout.toolbar, null);
         toolbar.setTitle(getString(R.string.settings));
         root.addView(toolbar, 0);
+        toolbar.setNavigationIcon(R.drawable.ic_back_navigation);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    Intent intent = new Intent(SettingsActivity.this, MainActivity.class);
+                    startActivity(intent);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+
+        });
 
         addPreferencesFromResource(R.xml.preferences_menu);
         addPreferences();
@@ -60,9 +80,7 @@ public class SettingsActivity extends PreferenceActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            onBackPressed();
-        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -74,6 +92,7 @@ public class SettingsActivity extends PreferenceActivity {
         passwordRequirePreference = (CheckBoxPreference) findPreference(PreferenceKeys.KEY_HOTSPOT_PWD_REQUIRE);
         btSecureModePreference = (CheckBoxPreference) findPreference(PreferenceKeys.KEY_BLUETOOTH_SECURE_MODE);
         odkDestinationDirPreference = (EditTextPreference) findPreference(PreferenceKeys.KEY_ODK_DESTINATION_DIR);
+
 
         prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
@@ -217,16 +236,16 @@ public class SettingsActivity extends PreferenceActivity {
                 edtpass.addTextChangedListener(new TextWatcher() {
                     @Override
                     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                 
+
                     }
 
                     @Override
                     public void onTextChanged(CharSequence s, int start, int before, int count) {
 
                         if (edtpass.getText().toString().length() >= 8) {
-                            ((AlertDialog) dialog) .getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+                            ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
                         } else {
-                            ((AlertDialog) dialog) .getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+                            ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
                         }
                     }
 
@@ -244,6 +263,5 @@ public class SettingsActivity extends PreferenceActivity {
         alertDialog.setCancelable(true);
         alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
     }
-
 }
 
