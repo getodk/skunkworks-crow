@@ -27,8 +27,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        tools:ignore="GoogleAppIndexingWarning">
+        android:theme="@style/AppTheme">
         <activity android:name=".views.ui.bluetooth.BtReceiverActivity" />
         <activity android:name=".views.ui.bluetooth.BtSenderActivity" />
         <activity android:name=".views.ui.main.MainActivity">
@@ -47,9 +46,8 @@
         </activity>
         <activity android:name=".views.ui.instance.InstancesList" />
         <activity android:name=".views.ui.settings.SettingsActivity"
-            android:parentActivityName=".views.ui.main.MainActivity"
+            android:parentActivityName=".views.ui.main.MainActivity">
 
-            >
         </activity>
         <activity android:name=".views.ui.about.WebViewActivity" />
         <activity
@@ -61,11 +59,7 @@
         </activity>
         <activity
             android:name=".views.ui.hotspot.HpSenderActivity"
-            android:parentActivityName=".views.ui.send.SendFormsActivity"            >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".views.ui.send.SendFormsActivity" />
-        </activity>
+            android:configChanges="orientation|screenSize" />
 
         <service android:name=".services.HotspotService" />
 
@@ -97,8 +91,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".views.ui.main.MainActivity" />
         </activity>
-
-
     </application>
 
 </manifest>

@@ -252,11 +252,8 @@ public class SettingsActivity extends PreferenceActivity {
             }
         });
 
-
         alertDialog.show();
-
         alertDialog.setCancelable(true);
         alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
     }
 }
-
