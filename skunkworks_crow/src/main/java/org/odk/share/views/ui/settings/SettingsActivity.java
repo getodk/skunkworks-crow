@@ -1,7 +1,6 @@
 package org.odk.share.views.ui.settings;
 
 import android.bluetooth.BluetoothAdapter;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,21 +10,13 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
-import android.text.Editable;
 import android.text.TextUtils;
-import android.text.TextWatcher;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
-
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
 
 import org.odk.share.R;
 
@@ -43,8 +34,6 @@ public class SettingsActivity extends PreferenceActivity {
     EditTextPreference odkDestinationDirPreference;
     ListPreference defaultMethodPreference;
     private SharedPreferences prefs;
-    String npass;
-    TextInputEditText edtpass;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -26,11 +26,9 @@ public class SetHotspotPasswordDialog extends DialogFragment {
     private View dialogView;
     private TextInputLayout tlPassword;
     private TextInputEditText edtpass;
-    private String npass;
 
     public static SetHotspotPasswordDialog newInstance() {
-        SetHotspotPasswordDialog setHotspotPasswordDialog = new SetHotspotPasswordDialog();
-        return setHotspotPasswordDialog;
+        return new SetHotspotPasswordDialog();
     }
 
     @Override
@@ -57,7 +55,6 @@ public class SetHotspotPasswordDialog extends DialogFragment {
         if (alertDialog == null) {
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            npass = prefs.getString(PreferenceKeys.KEY_HOTSPOT_PASSWORD, getString(R.string.default_hotspot_password));
 
             builder.setTitle(getString(R.string.title_hotspot_password));
             builder.setView(dialogView);
@@ -81,6 +78,7 @@ public class SetHotspotPasswordDialog extends DialogFragment {
                         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
                         }
+
                         @Override
                         public void onTextChanged(CharSequence s, int start, int before, int count) {
                             if (edtpass.getText().toString().length() >= 8) {
