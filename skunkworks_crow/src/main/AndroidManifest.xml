@@ -45,7 +45,10 @@
                 android:value=".views.ui.main.MainActivity" />
         </activity>
         <activity android:name=".views.ui.instance.InstancesList" />
-        <activity android:name=".views.ui.settings.SettingsActivity" />
+        <activity android:name=".views.ui.settings.SettingsActivity"
+            android:parentActivityName=".views.ui.main.MainActivity">
+
+        </activity>
         <activity android:name=".views.ui.about.WebViewActivity" />
         <activity
             android:name=".views.ui.about.AboutActivity"
