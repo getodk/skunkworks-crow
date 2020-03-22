@@ -106,16 +106,6 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
         addListItemDivider();
     }
 
-    @Override
-    public void onBackPressed(){
-        new AlertDialog.Builder(this).setIcon(R.drawable.ic_launcher_foreground).setTitle("Closing Skunkworks Crow").setMessage("Are you sure you want to close the app")
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        finish();
-                    }
-                }).setNegativeButton("No",null).show();
-    }
     private void setupAdapter() {
         formAdapter = new FormsAdapter(this, null, this, instancesDao, transferDao);
         recyclerView.setAdapter(formAdapter);
