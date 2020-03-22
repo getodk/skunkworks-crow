@@ -10,21 +10,25 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import org.odk.collect.android.dao.InstancesDao;
 import org.odk.collect.android.dto.Form;
+import org.odk.collect.android.dto.Instance;
 import org.odk.collect.android.provider.FormsProviderAPI;
 import org.odk.collect.android.provider.InstanceProviderAPI;
 import org.odk.share.R;
-import org.odk.share.views.ui.common.basecursor.BaseCursorViewHolder;
-import org.odk.share.views.ui.common.basecursor.CursorRecyclerViewAdapter;
-import org.odk.share.views.listeners.ItemClickListener;
 import org.odk.share.dao.TransferDao;
 import org.odk.share.dto.TransferInstance;
+import org.odk.share.views.listeners.ItemClickListener;
+import org.odk.share.views.ui.common.basecursor.BaseCursorViewHolder;
+import org.odk.share.views.ui.common.basecursor.CursorRecyclerViewAdapter;
 
+import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -88,45 +92,30 @@ public class FormsAdapter extends CursorRecyclerViewAdapter<FormsAdapter.FormHol
                 selection = InstanceProviderAPI.InstanceColumns.JR_FORM_ID + "=? AND "
                         + InstanceProviderAPI.InstanceColumns.JR_VERSION + "=?";
             }
-            int reviewed = 0;
-            int unreviewed = 0;
-            try (Cursor instanceCursor = instancesDao.getInstancesCursor(selection, selectionArgs)) {
-                int len = instanceCursor.getCount();
-                StringBuilder selectionBuf = new StringBuilder(InstanceProviderAPI.InstanceColumns._ID + " IN (");
-                selectionArgs = new String[len + 1];
-                int i = 0;
-                if (instanceCursor.getCount() > 0) {
-                    instanceCursor.moveToPosition(-1);
-                    while (instanceCursor.moveToNext()) {
-                        if (i > 0) {
-                            selectionBuf.append(",");
-                        }
-                        selectionBuf.append("?");
-                        selectionArgs[i++] = String.valueOf(instanceCursor.getLong(instanceCursor.getColumnIndex(InstanceProviderAPI.InstanceColumns._ID)));
-                    }
-                }
 
+            cursor = instancesDao.getInstancesCursor(selection, selectionArgs);
+            HashMap<Long, Instance> instanceMap = instancesDao.getMapFromCursor(cursor);
 
-                selectionBuf.append(") AND " + TransferInstance.TRANSFER_STATUS + " =?");
-                selection = selectionBuf.toString();
-                selectionArgs[i] = TransferInstance.STATUS_FORM_RECEIVE;
-
-                try (Cursor transferCursor = transferDao.getInstancesCursor(null, selection, selectionArgs, null)) {
-                    if (transferCursor != null && transferCursor.getCount() > 0) {
-                        transferCursor.moveToPosition(-1);
-                        while (transferCursor.moveToNext()) {
-                            long status = transferCursor.getLong(transferCursor.getColumnIndex(TransferInstance.REVIEW_STATUS));
-                            if (status == TransferInstance.STATUS_ACCEPTED || status == TransferInstance.STATUS_REJECTED) {
-                                reviewed++;
-                            } else {
-                                unreviewed++;
-                            }
-                        }
-                    }
+            Cursor transferCursor = transferDao.getReceiveInstancesCursor();
+            List<TransferInstance> transferInstances = transferDao.getInstancesFromCursor(transferCursor);
+            int receiveCount = 0;
+            for (TransferInstance instance : transferInstances) {
+                if (instanceMap.containsKey(instance.getInstanceId())) {
+                    receiveCount++;
                 }
             }
-            viewHolder.reviewedForms.setText(context.getString(R.string.num_reviewed, String.valueOf(reviewed)));
-            viewHolder.unReviewedForms.setText(context.getString(R.string.num_unreviewed, String.valueOf(unreviewed)));
+
+            transferCursor = transferDao.getReviewedInstancesCursor();
+            transferInstances = transferDao.getInstancesFromCursor(transferCursor);
+            int reviewCount = 0;
+            for (TransferInstance instance : transferInstances) {
+                if (instanceMap.containsKey(instance.getInstanceId())) {
+                    reviewCount++;
+                }
+            }
+
+            viewHolder.reviewedForms.setText(context.getString(R.string.num_reviewed, String.valueOf(reviewCount)));
+            viewHolder.unReviewedForms.setText(context.getString(R.string.num_unreviewed, String.valueOf(receiveCount - reviewCount)));
         } else {
             viewHolder.reviewedForms.setVisibility(View.GONE);
             viewHolder.unReviewedForms.setVisibility(View.GONE);
