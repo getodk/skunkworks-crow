@@ -74,4 +74,5 @@ dependencies {
     // Permissions Dispatcher
     implementation "org.permissionsdispatcher:permissionsdispatcher:4.5.0"
     annotationProcessor "org.permissionsdispatcher:permissionsdispatcher-processor:4.5.0"
+    implementation 'androidx.browser:browser:1.2.0'
 }
