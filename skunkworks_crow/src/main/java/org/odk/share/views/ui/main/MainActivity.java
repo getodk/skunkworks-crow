@@ -9,6 +9,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -61,6 +62,8 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
     private static final String COLLECT_PACKAGE = "org.odk.collect.android";
     private static final int STORAGE_PERMISSION_REQUEST_CODE = 101;
     private static final int FORM_LOADER = 2;
+    public static final int BACK_TIME = 2000;
+    public static boolean BACK_FLAG = false;
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -299,5 +302,22 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
                 showAlertDialog();
             }
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(BACK_FLAG){
+            super.onBackPressed();
+            return;
+        }
+        BACK_FLAG = true;
+        Toast.makeText(getApplicationContext(),getString(R.string.exit_toast),Toast.LENGTH_SHORT).show();
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                BACK_FLAG = false;
+            }
+        },BACK_TIME);
     }
 }
