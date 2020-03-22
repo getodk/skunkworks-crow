@@ -29,6 +29,7 @@ public class QRCodeUtils {
     public static final String PORT = "port";
     public static final String PROTECTED = "protected";
     public static final String PASSWORD = "password";
+    public static final int SIDE_LENGTH = 400;
 
     private QRCodeUtils() {
     }
@@ -36,7 +37,7 @@ public class QRCodeUtils {
     public static Observable<Bitmap> generateQRCode(String ssid, int port, String password) {
         return Observable.create(emitter -> {
             String qrCodeInfo = createHotspotInfo(ssid, port, password);
-            emitter.onNext(generateQRBitMap(qrCodeInfo, 400));
+            emitter.onNext(generateQRBitMap(qrCodeInfo, SIDE_LENGTH));
             emitter.onComplete();
         });
     }
