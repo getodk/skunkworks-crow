@@ -9,6 +9,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,6 +21,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
@@ -119,7 +121,23 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
 
     @OnClick(R.id.bSendForms)
     public void selectForms() {
-        ActivityUtils.launchActivity(this, SendFormsActivity.class, false);
+        if (ActivityCompat.checkSelfPermission(getApplicationContext(),
+                Manifest.permission.WRITE_SETTINGS)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+                if (Settings.System.canWrite(getApplicationContext())) {
+                    ActivityUtils.launchActivity(this, SendFormsActivity.class, false);
+                } else {
+                    Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
+                    startActivity(intent);
+                }
+
+            } else {
+                ActivityUtils.launchActivity(this, SendFormsActivity.class, false);
+            }
+        }
     }
 
     @Override

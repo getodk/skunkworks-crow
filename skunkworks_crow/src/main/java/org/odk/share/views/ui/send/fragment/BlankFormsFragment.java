@@ -161,27 +161,9 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
     @OnClick(R.id.send_button)
     public void send() {
         if (getContext() != null) {
-            if (ActivityCompat.checkSelfPermission(getContext(),
-                    Manifest.permission.WRITE_SETTINGS)
-                    != PackageManager.PERMISSION_GRANTED) {
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-
-                    if (Settings.System.canWrite(getContext())) {
-                        Intent intent = new Intent();
-                        setupSendingIntent(intent);
-                        DialogUtils.switchToDefaultSendingMethod(getContext(), intent);
-                    } else {
-                        Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
-                        startActivity(intent);
-                    }
-
-                } else {
-                    Intent intent = new Intent();
-                    setupSendingIntent(intent);
-                    DialogUtils.switchToDefaultSendingMethod(getContext(), intent);
-                }
-            }
+            Intent intent = new Intent();
+            setupSendingIntent(intent);
+            DialogUtils.switchToDefaultSendingMethod(getContext(), intent);
         }
     }
 
