@@ -2,7 +2,6 @@ package org.odk.share.views.ui.settings;
 
 import android.bluetooth.BluetoothAdapter;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -22,16 +21,14 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Toast;
 
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
 import org.odk.share.R;
-import org.odk.share.views.ui.main.MainActivity;
+
 
 /**
  * Created by laksh on 5/27/2018.

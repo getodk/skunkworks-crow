@@ -9,4 +9,7 @@
         android:id="@+id/menu_about"
         android:title="@string/about"
         app:showAsAction="never"/>
+    <item
+        android:title="Bug/Feedback"
+        />
 </menu>
