@@ -12,4 +12,4 @@ Thank you for contributing to ODK!
 
 #### Before submitting this PR, please make sure you have:
 - [ ] run `./gradlew checkCode` and confirmed all checks still pass OR confirm CircleCI build passes
-- [ ] verified that any code or assets from external sources are properly credited in comments and/or in the [about file](https://github.com/opendatakit/share/blob/master/share_app/src/main/assets/open_source_licenses.html).
+- [ ] verified that any code or assets from external sources are properly credited in comments and/or in the [about file](https://github.com/getodk/share/blob/master/share_app/src/main/assets/open_source_licenses.html).

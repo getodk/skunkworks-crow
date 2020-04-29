@@ -1,8 +1,8 @@
 # skunkworks-crow
 ![Platform](https://img.shields.io/badge/platform-Android-blue.svg)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Build status](https://circleci.com/gh/opendatakit/skunkworks-crow.svg?style=shield&circle-token=:circle-token)](https://circleci.com/gh/opendatakit/skunkworks-crow)
-[![Slack status](http://slack.opendatakit.org/badge.svg)](http://slack.opendatakit.org)
+[![Build status](https://circleci.com/gh/getodk/skunkworks-crow.svg?style=shield&circle-token=:circle-token)](https://circleci.com/gh/getodk/skunkworks-crow)
+[![Slack status](http://slack.getodk.org/badge.svg)](http://slack.getodk.org)
 
 ## Table of Contents
 1. [Introduction](#introduction)
@@ -50,14 +50,14 @@ The skunkworks-crow app requires ODK Collect installed on the device first becau
 
 ### 2.1 Install and setting up ODK Collect<a name="install-collect"></a>
 
-To install ODK Collect visit [this](https://docs.opendatakit.org/collect-install) link.
-To know more about ODK Collect visit the [documentation](https://docs.opendatakit.org/collect-intro) page
+To install ODK Collect visit [this](https://docs.getodk.org/collect-install) link.
+To know more about ODK Collect visit the [documentation](https://docs.getodk.org/collect-intro) page
 
 ### 2.2 Install skunkworks-crow<a name="install-skunkworks-crow"></a>
 
 skunkworks-crow app can be downloaded and installed from the link provided below.
 
-[Download APK](https://github.com/opendatakit/skunkworks-crow/releases)
+[Download APK](https://github.com/getodk/skunkworks-crow/releases)
 
 ## 3. Using skunkworks-crow<a name="using-skunkworks-crow"></a>
 Skunkworks-crow app can be used by enumerators in sharing forms and by supervisor in reviewing the forms.
@@ -197,6 +197,6 @@ If you changed the method of sender/receiver, don't forget to be consistent with
 ## 6. Contributing code<a name="contributing-code"/>
 Any and all contributions to the project are welcome. Skunkworks-Crow is used across the world primarily by organizations with a social purpose so you can have real impact!
 
-Issues tagged as [good first issue](https://github.com/opendatakit/skunkworks-crow/labels/good%20first%20issue) should be a good place to start. There are also currently many issues tagged as [needs reproduction](https://github.com/opendatakit/skunkworks-crow/labels/needs%20reproduction) which need someone to try to reproduce them with the current version of Skunkwork-Crow and comment on the issue with their findings.
+Issues tagged as [good first issue](https://github.com/getodk/skunkworks-crow/labels/good%20first%20issue) should be a good place to start. There are also currently many issues tagged as [needs reproduction](https://github.com/getodk/skunkworks-crow/labels/needs%20reproduction) which need someone to try to reproduce them with the current version of Skunkwork-Crow and comment on the issue with their findings.
 If you're ready to contribute code, see [the contribution guide](CONTRIBUTING.md).
 
