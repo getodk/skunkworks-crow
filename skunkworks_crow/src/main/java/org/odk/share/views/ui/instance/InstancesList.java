@@ -30,7 +30,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-import static org.odk.share.views.ui.instance.fragment.ReviewedInstancesFragment.MODE;
+import static org.odk.share.views.ui.instance.fragment.ReceivedInstancesFragment.MODE;
 
 public class InstancesList extends InstanceListActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
