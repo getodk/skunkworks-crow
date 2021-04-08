@@ -1,4 +1,9 @@
 # skunkworks-crow
+This project is not actively maintained. It is archived here for reference purposes.
+
+If you wish to maintain it, please contact the ODK team at https://getodk.org.
+
+## Overview
 ![Platform](https://img.shields.io/badge/platform-Android-blue.svg)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Build status](https://circleci.com/gh/opendatakit/skunkworks-crow.svg?style=shield&circle-token=:circle-token)](https://circleci.com/gh/opendatakit/skunkworks-crow)
