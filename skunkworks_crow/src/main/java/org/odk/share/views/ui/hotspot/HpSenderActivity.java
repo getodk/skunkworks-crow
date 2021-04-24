@@ -373,29 +373,31 @@ public class HpSenderActivity extends InjectableActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void turnOnHotspot() {
-        WifiManager manager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        manager.startLocalOnlyHotspot(new WifiManager.LocalOnlyHotspotCallback() {
+        if (!isHotspotInitiated) {
+            WifiManager manager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+            manager.startLocalOnlyHotspot(new WifiManager.LocalOnlyHotspotCallback() {
 
-            @Override
-            public void onStarted(WifiManager.LocalOnlyHotspotReservation reservation) {
-                super.onStarted(reservation);
-                hotspotReservation = reservation;
-                currentConfig = reservation.getWifiConfiguration();
-                startSending();
-            }
+                @Override
+                public void onStarted(WifiManager.LocalOnlyHotspotReservation reservation) {
+                    super.onStarted(reservation);
+                    hotspotReservation = reservation;
+                    currentConfig = reservation.getWifiConfiguration();
+                    startSending();
+                }
 
-            @Override
-            public void onStopped() {
-                super.onStopped();
-                Timber.d("Local Hotspot Stopped");
-            }
+                @Override
+                public void onStopped() {
+                    super.onStopped();
+                    Timber.d("Local Hotspot Stopped");
+                }
 
-            @Override
-            public void onFailed(int reason) {
-                super.onFailed(reason);
-                Timber.d("Local Hotspot failed to start");
-            }
-        }, new Handler());
+                @Override
+                public void onFailed(int reason) {
+                    super.onFailed(reason);
+                    Timber.d("Local Hotspot failed to start");
+                }
+            }, new Handler());
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
