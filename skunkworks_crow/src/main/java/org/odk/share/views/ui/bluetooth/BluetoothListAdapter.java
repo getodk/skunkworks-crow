@@ -1,5 +1,6 @@
 package org.odk.share.views.ui.bluetooth;
 
+import android.bluetooth.BluetoothClass;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -47,8 +48,10 @@ public class BluetoothListAdapter extends RecyclerView.Adapter<BluetoothListAdap
     }
 
     public void addDevice(BluetoothDevice bluetoothDevice) {
-        if (!bluetoothDeviceList.contains(bluetoothDevice)) {
-            this.bluetoothDeviceList.add(bluetoothDevice);
+        if (!bluetoothDeviceList.contains(bluetoothDevice) && bluetoothDevice.getBluetoothClass().getDeviceClass() != -1) {
+            if (bluetoothDevice.getBluetoothClass().getDeviceClass() == BluetoothClass.Device.PHONE_SMART) {
+                this.bluetoothDeviceList.add(bluetoothDevice);
+            }
         }
         notifyDataSetChanged();
     }
