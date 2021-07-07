@@ -128,6 +128,14 @@
     <string name="feedback_sent">\nFeedback sent by reviewer: %s</string>
     <string name="no_feedback_sent">\nNo feedback sent by the reviewer</string>
 
+    <!--App shortcuts-->
+    <string name="send_short">Send</string>
+    <string name="send_long">Send forms in skunkworks-crow</string>
+    <string name="receive_hotspot_short">Receive-hotspot</string>
+    <string name="receive_hotspot_long">Receive forms through hotspot in skunkworks-crow</string>
+    <string name="receive_bluetooth_short">Receive-bluetooth</string>
+    <string name="receive_bluetooth_long">Receive forms through bluetooth in skunkworks-crow</string>
+
     <string-array name="stats_field">
         <item name="sent">Sent</item>
         <item name="received">Received</item>
