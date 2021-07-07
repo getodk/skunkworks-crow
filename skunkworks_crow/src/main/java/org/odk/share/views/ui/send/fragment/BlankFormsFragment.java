@@ -162,6 +162,7 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
         }
     }
 
+
     private void setupSendingIntent(Intent intent) {
         Long[] arr = selectedForms.toArray(new Long[selectedForms.size()]);
         long[] a = ArrayUtils.toPrimitive(arr);
