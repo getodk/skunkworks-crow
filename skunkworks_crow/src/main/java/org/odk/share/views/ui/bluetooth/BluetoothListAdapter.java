@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -24,6 +25,7 @@ import static android.bluetooth.BluetoothDevice.BOND_BONDED;
 import static android.bluetooth.BluetoothDevice.BOND_NONE;
 
 /**
+ * //llllll
  * BluetoothListAdapter: {@link RecyclerView.Adapter} for {@link BluetoothDevice}.
  *
  * @author huangyz0918 (huangyz0918@gmail.com)
@@ -73,7 +75,12 @@ public class BluetoothListAdapter extends RecyclerView.Adapter<BluetoothListAdap
         if (deviceBondState == BOND_BONDED) {
             viewHolder.deviceLogo.setImageResource(R.drawable.ic_smart_phone_yellow);
         }
+
+
     }
+
+
+
 
     @Override
     public int getItemCount() {
