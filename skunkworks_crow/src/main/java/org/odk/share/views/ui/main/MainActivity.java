@@ -60,6 +60,7 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
     private static final String FORM_CHOOSER_LIST_SORTING_ORDER = "formChooserListSortingOrder";
     private static final String COLLECT_PACKAGE = "org.odk.collect.android";
     private static final int STORAGE_PERMISSION_REQUEST_CODE = 101;
+    private static final int COLLECT_INSTALL_REQUEST_CODE = 102;
     private static final int FORM_LOADER = 2;
 
     @BindView(R.id.toolbar)
@@ -220,9 +221,12 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
 
         builder.setPositiveButton(getString(R.string.install), (DialogInterface dialog, int which) -> {
             try {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + COLLECT_PACKAGE)));
+                startActivityForResult(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + COLLECT_PACKAGE)),
+                        COLLECT_INSTALL_REQUEST_CODE);
             } catch (ActivityNotFoundException e) {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + COLLECT_PACKAGE)));
+                startActivityForResult(new Intent(Intent.ACTION_VIEW,
+                                Uri.parse("https://play.google.com/store/apps/details?id=" + COLLECT_PACKAGE)),
+                        COLLECT_INSTALL_REQUEST_CODE);
             }
         });
 
@@ -281,6 +285,11 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
                     != PackageManager.PERMISSION_GRANTED) {
                 PermissionUtils.showAppInfo(this, getPackageName(), getString(R.string.permission_open_storage_info), getString(R.string.permission_storage_denied));
             } else {
+                setUpLoader();
+            }
+        }
+        if (requestCode == COLLECT_INSTALL_REQUEST_CODE) {
+            if (!isCollectInstalled()) {
                 setUpLoader();
             }
         }
