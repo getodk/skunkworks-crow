@@ -61,7 +61,7 @@
         <service android:name=".services.HotspotService" />
 
         <activity
-            android:name="com.journeyapps.barcodescanner.CaptureActivity"
+            android:name=".views.ui.receive.ScannerActivity"
             android:screenOrientation="portrait"
             android:stateNotNeeded="true"
             tools:replace="android:screenOrientation" />

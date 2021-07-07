@@ -31,7 +31,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
-import com.journeyapps.barcodescanner.CaptureActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,6 +48,7 @@ import org.odk.share.utilities.DialogUtils;
 import org.odk.share.views.listeners.OnItemClickListener;
 import org.odk.share.views.ui.bluetooth.BtReceiverActivity;
 import org.odk.share.views.ui.common.injectable.InjectableActivity;
+import org.odk.share.views.ui.receive.ScannerActivity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -356,7 +356,7 @@ public class HpReceiverActivity extends InjectableActivity implements OnItemClic
                 .setDesiredBarcodeFormats(QR_CODE_TYPES)
                 .setCameraId(0)
                 .setOrientationLocked(false)
-                .setCaptureActivity(CaptureActivity.class)
+                .setCaptureActivity(ScannerActivity.class)
                 .setBeepEnabled(true)
                 .initiateScan();
     }
