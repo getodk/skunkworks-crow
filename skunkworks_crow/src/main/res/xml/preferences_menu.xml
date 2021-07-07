@@ -18,6 +18,12 @@
             android:summary="@string/preference_default_method_summary"
             android:title="@string/preference_default_method" />
 
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:icon="@drawable/ic_show_chart_black_24dp"
+            android:key="detailed_statistics"
+            android:title="@string/title_select_chart" />
+
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Hotspot Settings">

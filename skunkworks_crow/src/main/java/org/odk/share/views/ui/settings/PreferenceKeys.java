@@ -13,6 +13,7 @@ public class PreferenceKeys {
     public static final String KEY_DEFAULT_TRANSFER_METHOD = "default_transfer_method";
     public static final String KEY_BLUETOOTH_NAME = "bluetooth_name";
     public static final String KEY_BLUETOOTH_SECURE_MODE = "bluetooth_secure_mode";
+    public static final String KEY_DETAILED_STATISTICS = "detailed_statistics";
 
     private PreferenceKeys() {
 
