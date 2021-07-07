@@ -29,22 +29,26 @@
 
     <LinearLayout
         android:id="@+id/buttonholder"
-        style="@style/MatchParentWidth"
-        android:layout_alignParentBottom="true"
-        android:orientation="horizontal"
-        android:weightSum="2">
+        style="@style/main_layout_button_bottom">
 
-        <Button
-            android:id="@+id/bSendForms"
-            style="@style/MatchParentWidth"
-            android:layout_weight="1"
-            android:text="@string/send_forms" />
+        <LinearLayout style="@style/layout_bottom_button">
 
-        <Button
-            android:id="@+id/bReceiveForms"
-            style="@style/MatchParentWidth"
-            android:layout_weight="1"
-            android:text="@string/receive_forms" />
+            <Button
+                android:id="@+id/bSendForms"
+                style="@style/bottom_button"
+                android:text="@string/send_forms" />
+
+        </LinearLayout>
+
+        <LinearLayout style="@style/layout_bottom_button">
+
+            <Button
+                android:id="@+id/bReceiveForms"
+                style="@style/bottom_button"
+                android:text="@string/receive_forms" />
+
+        </LinearLayout>
+
     </LinearLayout>
 
 </RelativeLayout>

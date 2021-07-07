@@ -45,4 +45,32 @@
         <item name="android:layout_width">match_parent</item>
     </style>
 
+    <style name="bottom_button">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/button_bottom_height</item>
+        <item name="android:background">@drawable/button_bottom_primary</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">@dimen/button_bottom_text_size</item>
+    </style>
+
+    <style name="layout_bottom_button">
+        <item name="android:layout_width">@dimen/bottom_button_layout_width</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:gravity">center</item>
+        <item name="android:paddingStart">@dimen/bottom_button_padding</item>
+        <item name="android:paddingLeft">@dimen/bottom_button_padding</item>
+        <item name="android:paddingRight">@dimen/bottom_button_padding</item>
+    </style>
+
+    <style name="main_layout_button_bottom">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">?android:actionBarSize</item>
+        <item name="android:layout_alignParentBottom">true</item>
+        <item name="android:background">@android:color/white</item>
+        <item name="android:baselineAligned">false</item>
+        <item name="android:orientation">horizontal</item>
+    </style>
+
 </resources>

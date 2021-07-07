@@ -19,20 +19,23 @@
 
     <LinearLayout
         android:id="@+id/buttonholder"
-        style="@style/MatchParentWidth"
-        android:layout_alignParentBottom="true"
-        android:orientation="horizontal"
-        android:weightSum="2">
+        style="@style/main_layout_button_bottom">
 
-        <Button
-            android:id="@+id/bToggle"
-            style="@style/MatchParentWidth"
-            android:layout_weight="1"
-            android:text="@string/select_all" />
+        <LinearLayout style="@style/layout_bottom_button">
 
-        <Button
-            android:id="@+id/bAction"
-            style="@style/MatchParentWidth"
-            android:layout_weight="1" />
+
+            <Button
+                android:id="@+id/bToggle"
+                style="@style/bottom_button" />
+
+        </LinearLayout>
+
+        <LinearLayout style="@style/layout_bottom_button">
+
+            <Button
+                android:id="@+id/bAction"
+                style="@style/bottom_button" />
+        </LinearLayout>
+
     </LinearLayout>
 </RelativeLayout>

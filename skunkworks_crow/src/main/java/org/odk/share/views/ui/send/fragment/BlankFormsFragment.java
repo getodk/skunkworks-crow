@@ -87,6 +87,9 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
         llm.setOrientation(RecyclerView.VERTICAL);
         recyclerView.setLayoutManager(llm);
         addListItemDivider();
+
+        sendButton.setBackground(getResources().getDrawable(R.drawable.button_bottom_light));
+        sendButton.setTextColor(getResources().getColor(R.color.colorPrimary));
         return view;
     }
 
@@ -197,8 +200,12 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
         }
         if (selectedForms.isEmpty()) {
             sendButton.setText(getString(R.string.send_forms));
+            sendButton.setBackground(getResources().getDrawable(R.drawable.button_bottom_light));
+            sendButton.setTextColor(getResources().getColor(R.color.colorPrimary));
         } else {
             sendButton.setText(String.format(getString(R.string.send_count), selectedForms.size()));
+            sendButton.setBackground(getResources().getDrawable(R.drawable.button_bottom_primary));
+            sendButton.setTextColor(getResources().getColor(android.R.color.white));
         }
     }
 

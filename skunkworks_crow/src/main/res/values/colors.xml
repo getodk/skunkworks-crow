@@ -5,4 +5,5 @@
     <color name="colorAccent">#00796B</color>
     <color name="colorTabInactive">#CFD8DC</color>
     <color name="colorTabActive">#FFFFFF</color>
+    <color name="colorButtonDisabled">#D3D3D3</color>
 </resources>
