@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.odk.share.R;
@@ -58,17 +59,15 @@ public class TransferInstanceAdapter extends RecyclerView.Adapter<TransferInstan
         holder.bind(position, listener);
         TransferInstance instance = items.get(position);
         holder.title.setText(instance.getInstance().getDisplayName());
+        holder.checkBox.setVisibility(View.GONE);
 
-        if (showCheckBox) {
-            holder.checkBox.setVisibility(View.VISIBLE);
+
             if (selectedInstances.contains(instance.getId())) {
-                holder.checkBox.setChecked(true);
+                holder.parent.setBackgroundResource(R.color.colorSelected);
             } else {
-                holder.checkBox.setChecked(false);
+                holder.parent.setBackgroundResource(R.color.colorTabActive);
             }
-        } else {
-            holder.checkBox.setVisibility(View.GONE);
-        }
+
 
         Date date = new Date(instance.getLastStatusChangeDate());
         SimpleDateFormat dateFormat = new SimpleDateFormat(context.getString(R.string.date_at_time),
@@ -114,6 +113,8 @@ public class TransferInstanceAdapter extends RecyclerView.Adapter<TransferInstan
         TextView subtitle;
         @BindView(R.id.checkbox)
         CheckBox checkBox;
+        @BindView(R.id.parent)
+        LinearLayout parent;
 
         ViewHolder(View v) {
             super(v);

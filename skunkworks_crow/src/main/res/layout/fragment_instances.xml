@@ -35,4 +35,11 @@
             style="@style/MatchParentWidth"
             android:layout_weight="1" />
     </LinearLayout>
+    <Button
+        android:id="@+id/bToggleWide"
+        style="@style/MatchParentWidth"
+        android:text="@string/send_reviewed_forms"
+        android:layout_alignParentBottom="true"
+        android:visibility="gone"
+        />
 </RelativeLayout>

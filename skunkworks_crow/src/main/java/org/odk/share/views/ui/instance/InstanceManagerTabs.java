@@ -15,7 +15,6 @@ import com.google.android.material.tabs.TabLayout;
 import org.odk.share.R;
 import org.odk.share.views.ui.common.ViewPagerAdapter;
 import org.odk.share.views.ui.instance.fragment.ReceivedInstancesFragment;
-import org.odk.share.views.ui.instance.fragment.ReviewedInstancesFragment;
 import org.odk.share.views.ui.instance.fragment.SentInstancesFragment;
 import org.odk.share.views.ui.instance.fragment.StatisticsFragment;
 import org.odk.share.views.ui.common.injectable.InjectableActivity;
@@ -33,7 +32,6 @@ public class InstanceManagerTabs extends InjectableActivity implements TabLayout
             {R.string.statistics, R.drawable.ic_stats, new StatisticsFragment()},
             {R.string.sent, R.drawable.ic_upload, new SentInstancesFragment()},
             {R.string.received, R.drawable.ic_download, new ReceivedInstancesFragment()},
-            {R.string.reviewed, R.drawable.ic_assignment, new ReviewedInstancesFragment()}
     };
 
     @BindView(R.id.toolbar)

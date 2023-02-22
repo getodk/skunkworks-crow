@@ -54,7 +54,7 @@ import static org.odk.share.dto.TransferInstance.TRANSFER_STATUS;
 import static org.odk.share.tasks.DownloadJob.RESULT_DIVIDER;
 import static org.odk.share.utilities.ApplicationConstants.SEND_BLANK_FORM_MODE;
 import static org.odk.share.utilities.ApplicationConstants.SEND_FILL_FORM_MODE;
-import static org.odk.share.views.ui.instance.fragment.ReviewedInstancesFragment.MODE;
+import static org.odk.share.views.ui.instance.fragment.ReceivedInstancesFragment.MODE;
 
 public class UploadJob extends Job {
 

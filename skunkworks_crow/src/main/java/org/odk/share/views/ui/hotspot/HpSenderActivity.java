@@ -52,7 +52,7 @@ import timber.log.Timber;
 import static android.view.View.VISIBLE;
 import static org.odk.share.utilities.ApplicationConstants.ASK_REVIEW_MODE;
 import static org.odk.share.views.ui.instance.InstancesList.INSTANCE_IDS;
-import static org.odk.share.views.ui.instance.fragment.ReviewedInstancesFragment.MODE;
+import static org.odk.share.views.ui.instance.fragment.ReceivedInstancesFragment.MODE;
 import static org.odk.share.views.ui.send.fragment.BlankFormsFragment.FORM_IDS;
 
 /**

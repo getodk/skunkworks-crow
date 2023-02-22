@@ -35,7 +35,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-import static org.odk.share.views.ui.instance.fragment.ReviewedInstancesFragment.MODE;
+import static org.odk.share.views.ui.instance.fragment.ReceivedInstancesFragment.MODE;
 
 /**
  * Created by laksh on 10/29/2018.
