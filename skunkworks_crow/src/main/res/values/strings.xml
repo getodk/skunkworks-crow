@@ -36,6 +36,7 @@
     <string name="about">About</string>
     <string name="open_source_licenses">Open Source Licenses</string>
     <string name="user_guide">User Guide</string>
+    <string name="app_information">App Information</string>
     <string name="default_hotspot_ssid">hotspot</string>
     <string name="default_hotspot_password">12345678</string>
     <string name="title_bluetooth_name">Bluetooth Name</string>
